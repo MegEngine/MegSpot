@@ -1,0 +1,19 @@
+/* 改变主题色变量 */
+@import './variables.scss';
+$--color-primary: $primaryColor;
+
+/* 改变 icon 字体路径变量，必需 */
+$--font-path: '~element-ui/lib/theme-chalk/fonts';
+
+@import '~element-ui/packages/theme-chalk/src/index';
+//暂时性解决diolag 问题 https://github.com/ElemeFE/element/issues/2461
+.el-dialog {
+  transform: none;
+  left: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+.el-button--medium {
+  font-size: 18px;
+}
