@@ -13,9 +13,9 @@ MegSpot是一款提供免费免登录、高效、专业、跨平台的图片&视
 - 支持叠加对比、分割对比、GIF 结果呈现。
 - 支持像素级图片查看、图片直方图、RGBA 查看。
 - 及时调整亮度、对比度、饱和度、灰度等指标进行预览。
-- Mac，Linux,Window 跨平台支持&支持自动更新。
+- Mac, Linux, Window 跨平台支持&支持自动更新。
 - 支持命令快捷启动。
-- 多语言支持：汉语、英语、日语
+- 多语言支持：汉语、英语、日语。
 
 ---
 
@@ -35,19 +35,19 @@ MegSpot是一款提供免费免登录、高效、专业、跨平台的图片&视
 
 #### 支持传入文件夹或文件地址，支持相对和绝对路径
 
-- -h / --help: 查看说明文档
-- -i /--image: image 比较 是默认选项
-- -v/ --video: 视频比较
-- -c/ --clear: 是否清空之前已选文件 默认不清空
+- `-h / --help`: 查看说明文档
+- `-i /--image`: image 比较 是默认选项
+- `-v/ --video`: 视频比较
+- `-c/ --clear`: 是否清空之前已选文件 默认不清空
 
 #### 实例
 
-- ./MegSpot 进入主页
-- ./MegSpot -i 进入图片对比
-- ./MegSpot -v 进入视频对比
-- ./MegSpot path 图片比较当前目录 进入选择文件页面 使用当前的 path
-- ./MegSpot path -v 视频比较当前目录 进入选择文件页面 使用当前的 path
-- ./MegSpot filePath1 filePath2 filePath3 ... 图片/视频比较已选文件 -v 比较视频 -c 清空之前已选文件 可以-v -c 也可以 -vc -cv
+- `MegSpot` 进入主页
+- `MegSpot -i` 进入图片对比
+- `MegSpot -v` 进入视频对比
+- `MegSpot path 图片比较当前目录` 进入选择文件页面 使用当前的 path
+- `MegSpot path -v 视频比较当前目录` 进入选择文件页面 使用当前的 path
+- `MegSpot filePath1 filePath2 filePath3 ...` 图片/视频比较已选文件 -v 比较视频 -c 清空之前已选文件 可以-v -c 也可以 -vc -cv
 
 #### 补充建议：
 
