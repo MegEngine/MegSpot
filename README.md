@@ -13,9 +13,9 @@ MegSpot是一款提供免费免登录、高效、专业、跨平台的图片&视
 - 支持叠加对比、分割对比、GIF 结果呈现。
 - 支持像素级图片查看、图片直方图、RGBA 查看。
 - 及时调整亮度、对比度、饱和度、灰度等指标进行预览。
-- Mac，Linux,Window 跨平台支持&支持自动更新。
+- Mac，Linux，Window 跨平台支持&支持自动更新。
 - 支持命令快捷启动。
-- 多语言支持：汉语、英语、日语
+- 多语言支持：汉语、英语、日语。
 
 ---
 
@@ -35,19 +35,19 @@ MegSpot是一款提供免费免登录、高效、专业、跨平台的图片&视
 
 #### 支持传入文件夹或文件地址，支持相对和绝对路径
 
-- -h / --help: 查看说明文档
-- -i /--image: image 比较 是默认选项
-- -v/ --video: 视频比较
-- -c/ --clear: 是否清空之前已选文件 默认不清空
+- `-h / --help`: 查看说明文档
+- `-i /--image`: image 比较 是默认选项
+- `-v/ --video`: 视频比较
+- `-c/ --clear`: 是否清空之前已选文件 默认不清空
 
 #### 实例
 
-- ./MegSpot 进入主页
-- ./MegSpot -i 进入图片对比
-- ./MegSpot -v 进入视频对比
-- ./MegSpot path 图片比较当前目录 进入选择文件页面 使用当前的 path
-- ./MegSpot path -v 视频比较当前目录 进入选择文件页面 使用当前的 path
-- ./MegSpot filePath1 filePath2 filePath3 ... 图片/视频比较已选文件 -v 比较视频 -c 清空之前已选文件 可以-v -c 也可以 -vc -cv
+- `MegSpot`进入主页
+- `MegSpot -i` 进入图片对比
+- `MegSpot -v` 进入视频对比
+- `MegSpot path `图片比较当前目录 进入选择文件页面 使用当前的 path
+- `MegSpot path -v` 视频比较当前目录 进入选择文件页面 使用当前的 path
+- `MegSpot filePath1 filePath2 filePath3 ... `图片/视频比较已选文件 -v 比较视频 -c 清空之前已选文件 可以-v -c 也可以 -vc -cv
 
 #### 补充建议：
 
@@ -87,22 +87,18 @@ npm run build:all
 - 我们欢迎你通过以下方式来帮助 MegSpot 变得更好：
   - 贡献代码；
   - 完善[文档](https://github.com/MegSpot/Docs)；
-  - 在 [MegSpot 论坛](https://discuss.megengine.org.cn) 和 Stack Overflow 回答问题；
-  - 报告使用中的 [Bugs 和 Issues](https://github.com/MegSpot/MegSpot/issues)；
-  - 审查 [Pull Requests](https://github.com/MegSpot/MegSpot/pulls)；
+  - 报告使用中的 [Bugs 和 Issues](https://github.com/MegEngine/MegSpot/issues)；
+  - 审查 [Pull Requests](https://github.com/MegEngine/MegSpot/pulls)；
   - 给 MegSpot 点亮小星星；
-  - 在你的论文和文章中引用 MegEngine；
-  - 向你的好友推荐 MegEngine；
+  - 向你的好友推荐 MegSpot；
   - ...
 
 ---
 ## 联系我们
 
-- 问题: [github.com/MegSpot/MegSpot/issues](https://github.com/MegSpot/MegSpot/issues)
+- 问题: [github.com/MegEngine/MegSpot/issues](https://github.com/MegEngine/MegSpot/issues)
 - 邮箱: [megengine-support@megvii.com](mailto:megengine-support@megvii.com)
-- 论坛: [discuss.megengine.org.cn](https://discuss.megengine.org.cn)
-- QQ: 1029741705
-- OPENI: [openi.org.cn/MegSpot](https://www.openi.org.cn/html/2020/Framework_0325/18.html)
+- QQ: 782365536
 
 ---
 ## 开源许可
