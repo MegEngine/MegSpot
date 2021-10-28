@@ -1,0 +1,18 @@
+t.DS_Store
+node_modules/
+dist/electron/*
+dist/web/*
+build/*
+!build/icons
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store

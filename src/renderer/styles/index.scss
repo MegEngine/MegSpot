@@ -1,0 +1,83 @@
+@import './variables.scss';
+@import './public.scss';
+@import './element-ui.scss';
+
+body,
+html {
+  -webkit-app-region: drag;
+  user-select: text;
+}
+
+body {
+  overflow: hidden;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
+    Microsoft YaHei, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  box-sizing: border-box;
+}
+p {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+div:focus {
+  outline: none;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+// element 全局样式修改
+.el-dialog {
+  .el-dialog__header {
+    padding: 8px;
+  }
+  .el-dialog__body {
+    padding: 10px;
+  }
+}
+
+.el-select-dropdown__item.selected {
+  font-weight: initial !important;
+}
+.el-form-item {
+  margin-bottom: 2px;
+}
+.el-card__header {
+  padding: 8px;
+}
+.el-slider__marks-text {
+  width: 30px;
+}
+.el-switch__label * {
+  color: $textColor;
+  font-size: 11px;
+}
+.el-switch__label--right {
+  margin-left: 6px;
+}
+.el-table {
+  color: $textColor;
+}

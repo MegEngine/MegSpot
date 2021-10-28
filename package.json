@@ -1,0 +1,202 @@
+{
+  "name": "MegSpot",
+  "version": "1.0.0",
+  "author": "weiyajun <weiyajun@megvii.com>",
+  "description": "A tool to improve the viewing of pictures and videos by researchers",
+  "homepage": "https://github.com/MegEngine/MegSpot",
+  "license": "Apache License Version 2.0",
+  "main": "./dist/electron/main.js",
+  "scripts": {
+    "dev": "cross-env BUILD_TARGET=clean node .electron-vue/build.js &&  node .electron-vue/dev-runner.js",
+    "build": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder",
+    "build:win32": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --win  --ia32",
+    "build:win64": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --win  --x64",
+    "build:mac": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --mac",
+    "build:linux": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --linux",
+    "build:dir": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --dir",
+    "build:all": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && sudo electron-builder -wml",
+    "publish:all": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && sudo electron-builder -wml -p onTag",
+    "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
+    "build:web": "cross-env BUILD_TARGET=web ENV_TARGET=web node .electron-vue/build.js",
+    "pack": "npm run pack:main && npm run pack:renderer",
+    "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
+    "lint": "eslint --ext .js,.vue src",
+    "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
+    "dep:upgrade": "yarn upgrade-interactive --latest",
+    "postinstall": "electron-builder install-app-deps",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
+  },
+  "build": {
+    "extraFiles": [],
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "http://127.0.0.1"
+      }
+    ],
+    "productName": "MegSpot",
+    "artifactName": "${productName}-${version}.${ext}",
+    "appId": "org.megvii.megimagecompare",
+    "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
+    "releaseInfo": {},
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "dist/electron/**/*"
+    ],
+    "extraResources": [
+      "LICENSE",
+      "COPYRIGHT",
+      "CONTRIBUTOR LICENSE AGREEMENT"
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "mac": {
+      "icon": "build/icons/icon.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "build/icons/logo.ico"
+    },
+    "linux": {
+      "icon": "build/icons",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    }
+  },
+  "dependencies": {
+    "@dhdbstjr98/gif.js": "^1.0.2",
+    "@popperjs/core": "^2.9.2",
+    "axios": "^0.21.1",
+    "dayjs": "^1.10.4",
+    "electron-log": "^4.3.4",
+    "electron-store": "4.0.0",
+    "electron-updater": "^4.3.5",
+    "element-ui": "^2.15.0",
+    "express": "^4.17.1",
+    "flex.css": "^1.1.7",
+    "fs-extra": "^9.1.0",
+    "lodash": "^4.17.21",
+    "viewerjs": "^1.9.0",
+    "vue": "^2.6.12",
+    "vue-i18n": "^8.22.4",
+    "vue-router": "^3.4.9",
+    "vue-split-panel": "^1.0.4",
+    "vuedraggable": "^2.24.3",
+    "vuescroll": "^4.17.3",
+    "vuex": "^3.6.0",
+    "vuex-electron": "^1.0.3",
+    "vxe-table": "^3.3.16",
+    "xe-utils": "^3.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-decorators": "^7.12.12",
+    "@babel/plugin-proposal-do-expressions": "^7.12.1",
+    "@babel/plugin-proposal-export-default-from": "^7.12.1",
+    "@babel/plugin-proposal-export-namespace-from": "^7.12.1",
+    "@babel/plugin-proposal-function-bind": "^7.12.1",
+    "@babel/plugin-proposal-function-sent": "^7.12.1",
+    "@babel/plugin-proposal-json-strings": "^7.12.1",
+    "@babel/plugin-proposal-logical-assignment-operators": "^7.12.1",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.12.1",
+    "@babel/plugin-proposal-numeric-separator": "^7.12.7",
+    "@babel/plugin-proposal-optional-chaining": "^7.12.7",
+    "@babel/plugin-proposal-pipeline-operator": "^7.12.1",
+    "@babel/plugin-proposal-throw-expressions": "^7.12.1",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-syntax-import-meta": "^7.10.4",
+    "@babel/plugin-transform-modules-umd": "^7.14.5",
+    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/register": "^7.12.10",
+    "@babel/runtime": "^7.12.5",
+    "@types/fs-extra": "^9.0.6",
+    "@types/node": "^14.14.22",
+    "babel-eslint": "^9.0.0",
+    "babel-loader": "^8.2.2",
+    "babel-plugin-import": "^1.13.3",
+    "cache-loader": "^4.1.0",
+    "chalk": "^4.0.0",
+    "copy-webpack-plugin": "^6.3.2",
+    "cross-env": "^7.0.3",
+    "css-loader": "^5.0.1",
+    "del": "^6.0.0",
+    "electron": "^11.2.1",
+    "electron-builder": "^22.10.5",
+    "electron-devtools-installer": "^3.1.1",
+    "electron-rebuild": "^2.3.5",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-friendly-formatter": "^4.0.1",
+    "eslint-loader": "^3.0.4",
+    "eslint-plugin-html": "^6.1.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^9.2.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.1.0",
+    "eslint-plugin-vue": "^7.5.0",
+    "file-loader": "^6.2.0",
+    "git-cz": "^4.7.6",
+    "html-webpack-plugin": "^4.5.1",
+    "husky": "^4.3.8",
+    "lint-staged": "^10.5.3",
+    "mini-css-extract-plugin": "1.3.4",
+    "multispinner": "^0.2.1",
+    "node-loader": "^1.0.2",
+    "portfinder": "^1.0.28",
+    "sass": "1.32.5",
+    "sass-loader": "^10.1.1",
+    "style-loader": "^2.0.0",
+    "svg-sprite-loader": "^5.2.1",
+    "terser-webpack-plugin": "^4.2.3",
+    "thread-loader": "^3.0.1",
+    "url-loader": "^4.1.1",
+    "vue-html-loader": "^1.2.4",
+    "vue-loader": "^15.9.6",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-hot-middleware": "^2.25.0",
+    "webpack-merge": "^5.7.3"
+  },
+  "lint-staged": {
+    "src/**/*.{js,vue}": [
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "git-cz"
+    }
+  },
+  "__npminstall_done": false
+}

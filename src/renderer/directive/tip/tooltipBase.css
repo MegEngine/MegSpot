@@ -1,0 +1,105 @@
+.tooltip {
+  background: #303133;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 4px;
+  position: absolute;
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+  display: block;
+  white-space: normal;
+  word-wrap: break-word;
+  width: 200px;
+  z-index: -1;
+  opacity: 0;
+  visibility: hidden;
+  white-space: break-spaces;
+}
+.tooltip[data-show] {
+  opacity: 1;
+  visibility: visible;
+  z-index: 999999;
+}
+
+@keyframes flash {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.circle {
+  position: absolute;
+  animation: flash 1s linear 1s infinite alternate;
+  top: calc(50% - 4px);
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: rgb(224, 36, 36);
+}
+
+.tooltip .inner_text {
+  padding: 0;
+  margin: 4px 0px;
+  line-height: 16px;
+  display: block;
+  color: #fff;
+  text-align: center;
+}
+
+.tooltip .inner_button {
+  display: block;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  margin-bottom: 5px;
+  padding: 0;
+  width: 50px;
+  height: 22px;
+  line-height: 22px;
+  color: #606266;
+  background-color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.arrow,
+.arrow::before {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+}
+
+.arrow {
+  visibility: hidden;
+}
+
+.arrow::before {
+  visibility: visible;
+  content: '';
+  transform: rotate(45deg);
+}
+
+.tooltip[data-popper-placement^='top'] > .arrow {
+  bottom: -4px;
+}
+
+.tooltip[data-popper-placement^='bottom'] > .arrow {
+  top: -4px;
+}
+
+.tooltip[data-popper-placement^='left'] > .arrow {
+  right: -4px;
+}
+
+.tooltip[data-popper-placement^='right'] > .arrow {
+
+  left: -4px;
+}

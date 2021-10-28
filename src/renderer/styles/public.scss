@@ -1,0 +1,29 @@
+@import './variables.scss';
+// 公共样式
+.scale {
+  position: absolute;
+  left: 5px;
+  bottom: 6px;
+  color: $primaryColor;
+  background: whitesmoke;
+  font-size: 12px;
+  z-index: 999;
+}
+.selected {
+  .compare-name {
+    color: $primaryColor !important;
+    font-weight: bolder;
+  }
+}
+.compare-name {
+  margin: 0 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  direction: rtl;
+  text-overflow: ellipsis;
+  z-index: 999;
+  font-size: 12px;
+  color: gray;
+  width: 0;
+}
