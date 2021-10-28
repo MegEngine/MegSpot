@@ -1,12 +1,11 @@
 # MegSpot
-
 <p align="center">
-  <img width="250"  src="./src/renderer/assets/images/logo.png">
+  <img width="150"  src="./src/renderer/assets/images/logo_256X256.png">
 </p>
 
 [English](README.md) | 中文
 
-**MegSpot**旨在提供免费免登录、高效、专业、跨平台的图片&视频的对比工具。
+**MegSpot**是一款高效、专业、跨平台的图片&视频对比应用。
 
 ## 特点
 

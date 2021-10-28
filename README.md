@@ -1,21 +1,22 @@
 # MegSpot
 
 <p align="center">
-  <img width="250"  src="./src/renderer/assets/images/logo.png">
+  <img width="150"  src="./src/renderer/assets/images/logo_256X256.png">
 </p>
 
-[English](README.md) | 中文
+[English](README_EN.md) | 中文 
 
 MegSpot是一款提供免费免登录、高效、专业、跨平台的图片&视频的对比的PC应用工具。
 
 ## 特点
 
-- 支持叠加对比、分割对比、GIF 结果呈现。
+- 支持叠加对比、拖拽对比、GIF结果呈现。
 - 支持像素级图片查看、图片直方图、RGBA 查看。
-- 及时调整亮度、对比度、饱和度、灰度等指标进行预览。
+- 支持调整亮度、对比度、饱和度、灰度等指标进行预览。
+- 支持视频对比，并继承所有图片对比的功能。
 - Mac，Linux，Window 跨平台支持&支持自动更新。
-- 支持命令快捷启动。
-- 多语言支持：汉语、英语、日语。
+- 支持终端命令。
+- 支持多语言：汉语、英语、日语。
 
 ---
 
@@ -29,13 +30,13 @@ MegSpot是一款提供免费免登录、高效、专业、跨平台的图片&视
 
 ### 拖拽对比
 
-### 文件选择
+### 便捷文件选择
 
-### linux 命令启动
+### 终端命令
 
 #### 支持传入文件夹或文件地址，支持相对和绝对路径
 
-- `-h / --help`: 查看说明文档
+- `-h / --help`: 查看帮助
 - `-i /--image`: image 比较 是默认选项
 - `-v/ --video`: 视频比较
 - `-c/ --clear`: 是否清空之前已选文件 默认不清空
@@ -45,15 +46,9 @@ MegSpot是一款提供免费免登录、高效、专业、跨平台的图片&视
 - `MegSpot`进入主页
 - `MegSpot -i` 进入图片对比
 - `MegSpot -v` 进入视频对比
-- `MegSpot path `图片比较当前目录 进入选择文件页面 使用当前的 path
-- `MegSpot path -v` 视频比较当前目录 进入选择文件页面 使用当前的 path
+- `MegSpot path ` 进入图片对比选择文件页面（使用当前的path）
+- `MegSpot path -v` 进入视频对比选择文件页面 (使用当前的 path）
 - `MegSpot filePath1 filePath2 filePath3 ... `图片/视频比较已选文件 -v 比较视频 -c 清空之前已选文件 可以-v -c 也可以 -vc -cv
-
-#### 补充建议：
-
-1. 由于 MegSpot 支持自动更新导致 MegSpot-x.x.x.AppImage 的文件名称不断变化 建议创建个硬链接指向 AppImage
-   创建命令：sudo ln ./MegSpot-x.x.x.AppImage /usr/bin/MegSpot
-2. 并将硬链接添加到\$PATH 中 方便全局启动。
 
 ---
 ## 通过源码编译安装
@@ -65,8 +60,8 @@ npm install or yarn install
 # 启动
 npm run dev
 
-# 查看package.json中的script字段，有相关构建脚本 默认打包当前机器环境安装包
-npm run build
+# 全平台构建
+npm run build:all
 
 # 打包当前机器平台之外的平台
 
@@ -76,7 +71,6 @@ npm run build:win64
 
 npm run build:win32
 
-npm run build:all
 ```
 
 ---
