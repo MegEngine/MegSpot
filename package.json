@@ -30,13 +30,16 @@
     "extraFiles": [],
     "publish": [
       {
-        "provider": "generic",
-        "url": "http://127.0.0.1"
+        "provider": "github",
+        "private": false,
+        "repo": "MegSpot",
+        "owner": "MegEngine",
+        "releaseType": "release"
       }
     ],
     "productName": "MegSpot",
     "artifactName": "${productName}-${version}.${ext}",
-    "appId": "org.megvii.megimagecompare",
+    "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
     "releaseInfo": {},
     "directories": {
@@ -67,9 +70,9 @@
     },
     "mac": {
       "icon": "build/icons/icon.icns",
+      "category": "public.app-category.utilities",
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ]
     },
     "win": {
