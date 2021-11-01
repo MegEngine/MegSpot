@@ -113,6 +113,10 @@ export default {
     removeVuexItem: {
       type: Function,
       default: () => {}
+    },
+    emptyVuexItems: {
+      type: Function,
+      default: () => {}
     }
   },
   data() {
@@ -267,7 +271,7 @@ export default {
       if (items.length) {
         this.addVuexItem(items.map(item => item.path));
       } else {
-        this.removeVuexItem(this.showFile.map(item => item.path));
+        this.emptyVuexItems();
       }
     },
     // 可外部直接调用触发逻辑
