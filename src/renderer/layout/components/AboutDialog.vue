@@ -197,24 +197,18 @@ export default {
     show() {
       this.visible = true;
     },
-    feedback() {
-      // [TODO:]
-      shell.openExternal(
-      );
-    },
     checkUpdate() {},
     imageDragDropCompare() {
-      shell.openExternal(
-      );
+      shell.openExternal();
     },
     startCommand() {
       shell.openExternal(
-        'https://wiki.megvii-inc.com/pages/viewpage.action?pageId=278201085'
+        'https://github.com/MegEngine/MegSpot/wiki/%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%93%8D%E4%BD%9C'
       );
     },
     autoUpdates() {
       shell.openExternal(
-        'https://wiki.megvii-inc.com/pages/viewpage.action?pageId=274672458'
+        'https://github.com/MegEngine/MegSpot/wiki/%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0'
       );
     }
   }

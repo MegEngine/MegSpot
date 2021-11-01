@@ -10,7 +10,7 @@ app.disableHardwareAcceleration(); // 禁用gpu加速  解决图片拖动卡顿�
 if (cmdArg.h) {
   console.log(`
 MegSpot支持linux命令启动方便用户快捷访问。可以通过参数快捷进入图片视频的文件选取和比较页面。
-Detail: [TODO:]
+Detail: https://github.com/MegEngine/MegSpot/wiki/%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%93%8D%E4%BD%9C
 
 usage: 
 ./MegSpot-x.x.x.AppImage [folderPath]  [-ivch]  进入文件选取页面，并浏览folderPath文件夹地址

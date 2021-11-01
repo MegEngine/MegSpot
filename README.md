@@ -1,7 +1,7 @@
 # MegSpot
 
 <p align="center">
-  <img width="150"  src="./src/renderer/assets/images/logo_256X256.png">
+  <img width="550"  src="./src/renderer/assets/images/big_logo_dark.png">
 </p>
 
 [English](README_EN.md) | 中文

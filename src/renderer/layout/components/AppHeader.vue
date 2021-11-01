@@ -5,10 +5,9 @@
         <el-breadcrumb class="nav" separator="|">
           <el-breadcrumb-item :to="{ path: '/' }">
             <img
-              src="@/assets/images/logo_232X232.png"
-              style="vertical-align: top; height:19px"
+              src="@/assets/images/big_logo_white.png"
+              style="vertical-align: middle; height:40px"
             />
-            <span style="color:white">MegSpot</span>
           </el-breadcrumb-item>
           <el-breadcrumb-item v-if="subNav">{{ subNav }}</el-breadcrumb-item>
           <el-breadcrumb-item v-else>{{ $t('nav.toHome') }}</el-breadcrumb-item>

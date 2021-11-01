@@ -72,7 +72,7 @@
       ]
     },
     "mac": {
-      "icon": "build/icons/icon.icns",
+      "icon": "build/icons/logo.icns",
       "category": "public.app-category.utilities",
       "target": [
         "zip",
@@ -83,7 +83,7 @@
       "icon": "build/icons/logo.ico"
     },
     "linux": {
-      "icon": "build/icons",
+      "icon": "build/logo.png",
       "target": [
         "AppImage"
       ],
