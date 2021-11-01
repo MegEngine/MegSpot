@@ -50,9 +50,12 @@ const videoStore = {
     },
     ADD_VIDEO: (state, video) => {
       if (!state.videoList.includes(video)) {
-        const tmp = [...state.videoList];
-        tmp.unshift(video);
-        state.videoList = tmp;
+        state.videoList = [...state.videoList, video];
+      }
+    },
+    ADD_VIDEOS: (state, videos) => {
+      if (videos.length) {
+        state.videoList = [...new Set(state.videoList.concat(videos))];
       }
     },
     REMOVE_VIDEO: (state, video) => {
@@ -106,11 +109,11 @@ const videoStore = {
         folders.forEach(item => commit('REMOVE_VIDEO_FOLDER', item));
       }
     },
-    addVideos({ commit }, video) {
-      if (!Array.isArray(video)) {
-        commit('ADD_VIDEO', video);
+    addVideos({ commit }, videos) {
+      if (!Array.isArray(videos)) {
+        commit('ADD_VIDEO', videos);
       } else {
-        video.reverse().forEach(item => commit('ADD_VIDEO', item));
+        commit('ADD_VIDEOS', videos);
       }
     },
     removeVideos({ commit }, video) {

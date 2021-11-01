@@ -44,6 +44,7 @@
         :checkItem="checkItem"
         :addVuexItem="addImages"
         :removeVuexItem="removeImages"
+        :emptyVuexItems="emptyImages"
         :defaultSort="defaultSort"
         @sort-change="handleSortChange"
         @addFolder="$emit('addFolder')"

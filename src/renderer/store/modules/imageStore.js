@@ -50,9 +50,12 @@ const imageStore = {
     },
     ADD_IMAGE: (state, image) => {
       if (image && !state.imageList.includes(image)) {
-        const tmp = [...state.imageList];
-        tmp.unshift(image);
-        state.imageList = tmp;
+        state.imageList = [...state.imageList, image];
+      }
+    },
+    ADD_IMAGES: (state, images) => {
+      if (images && images.length) {
+        state.imageList = [...new Set(state.imageList.concat(images))];
       }
     },
     REMOVE_IMAGE: (state, image) => {
@@ -110,7 +113,7 @@ const imageStore = {
       if (!Array.isArray(images)) {
         commit('ADD_IMAGE', images);
       } else {
-        images.reverse().forEach(item => commit('ADD_IMAGE', item));
+        commit('ADD_IMAGES', images);
       }
     },
     removeImages({ commit }, images) {

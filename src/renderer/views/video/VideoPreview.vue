@@ -47,6 +47,7 @@
         :checkItem="checkItem"
         :addVuexItem="addVideos"
         :removeVuexItem="removeVideos"
+        :emptyVuexItems="emptyVideos"
       >
       </FileTable>
       <div class="thumbnail-content" v-show="showType === 'thumbnail'">
