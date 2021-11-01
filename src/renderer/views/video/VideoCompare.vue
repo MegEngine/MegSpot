@@ -12,6 +12,9 @@
         </div>
         <Gallery
           :sortData="videoList"
+          :focusListIndex="
+            new Array(groupCount).fill(0).map((_, index) => index + startIndex)
+          "
           @update="setVideos"
           @remove="removeVideos"
         >
@@ -40,6 +43,17 @@
           :disabled="!videoList.length"
           @click="emptyVideos"
         />
+        <el-input-number
+          v-model="groupNum"
+          @change="changeGroup"
+          size="mini"
+          :step="1"
+          :min="1"
+          :max="maxGroupNum"
+          v-tip="$t('general.groupNum')"
+          label="groupNum"
+          class="group-number"
+        ></el-input-number>
         <el-radio-group v-model="showCompare" class="gap">
           <el-radio-button :label="false">{{
             $t('general.videoPlay')
@@ -49,7 +63,7 @@
           }}</el-radio-button>
         </el-radio-group>
         <el-radio-group
-          v-show="showCompare"
+          v-if="showCompare"
           v-model="smooth"
           class="gap compare-group"
         >
@@ -62,12 +76,12 @@
         </el-radio-group>
       </div>
       <div class="select">
-        <span v-show="showSelectedMsg" class="msg">
+        <span v-if="showSelectedMsg" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
         </span>
       </div>
       <div class="middle">
-        <span class="custom-container" v-show="showCompare === false">
+        <span class="custom-container" v-if="showCompare === false">
           <el-button-group>
             <el-button
               type="text"
@@ -103,7 +117,7 @@
             </el-button>
           </el-button-group>
         </span>
-        <span class="custom-container" v-show="showCompare === true">
+        <span class="custom-container" v-if="showCompare === true">
           <el-button-group style="margin-left:10px">
             <el-button
               type="text"
@@ -185,7 +199,7 @@
             <GifDialog ref="gifDialog" :selectList="videoList"></GifDialog>
           </el-button-group>
         </span>
-        <span v-show="showCompare === false" class="custom-container">
+        <span v-if="showCompare === false" class="custom-container">
           <span>
             {{ $t('video.speed') }}
           </span>
@@ -208,7 +222,7 @@
         </span>
       </div>
       <div class="right">
-        <el-button-group v-show="showCompare" class="gap">
+        <el-button-group v-if="showCompare" class="gap">
           <el-button
             type="text"
             @click="pickColor"
@@ -221,7 +235,7 @@
           </el-button>
         </el-button-group>
         <el-divider v-if="showCompare" direction="vertical"></el-divider>
-        <el-button-group v-show="showCompare" class="gap">
+        <el-button-group v-if="showCompare" class="gap">
           <el-button
             type="text"
             @click="rotate(90)"
@@ -251,7 +265,7 @@
           </el-button>
         </el-button-group>
         <el-divider v-if="showCompare" direction="vertical"></el-divider>
-        <el-button-group class="gap" v-show="showCompare">
+        <el-button-group class="gap" v-if="showCompare">
           <el-button
             type="text"
             @click="align(false)"
@@ -314,7 +328,7 @@
       </div>
     </div>
     <div class="video-grid" :style="containerStyle">
-      <div class="video-content" v-for="path in videoList" :key="path">
+      <div class="video-content" v-for="path in imageGroupList" :key="path">
         <VideoContainer
           ref="video-container"
           :path="path"
@@ -346,6 +360,9 @@ export default {
       lastY: 0,
       showCompare: false,
       showSelectedMsg: false,
+      groupNum: 0,
+      startIndex: 0,
+      offset: 0,
       playbackRate: 1,
       rateOptions: [0.3, 0.5, 1, 1.25, 1.5, 2, 3],
       loop: true
@@ -353,12 +370,40 @@ export default {
   },
   computed: {
     ...mapGetters(['videoList', 'videoConfig']),
+    maxGroupNum() {
+      return Math.ceil(
+        this.videoList.length / (this.layout[0] * this.layout[2])
+      );
+    },
+    // 每组图片数量
+    groupCount() {
+      const str = this.videoConfig.layout,
+        len = str.length;
+      return str[len - 3] * str[len - 1];
+    },
+    // 当前组的图片列表
+    imageGroupList() {
+      return this.videoList
+        ? this.videoList.slice(
+            this.startIndex,
+            this.startIndex + this.groupCount
+          )
+        : [];
+    },
     smooth: {
       get() {
         return this.videoConfig.smooth;
       },
       set(newVal) {
+        const preNum = this.groupCount * (this.groupNum - 1);
         this.setVideoConfig({ smooth: newVal });
+        const afterNum = this.groupCount * (this.groupNum - 1);
+        this.offset = preNum - afterNum;
+        this.startIndex = Math.max(
+          0,
+          (groupNum - 1) * this.groupCount + this.offset
+        );
+        this.groupNum = Math.floor(this.startIndex / this.groupCount);
       }
     },
     layout: {
@@ -417,6 +462,9 @@ export default {
     }
   },
   watch: {
+    startIndex() {
+      this.showCompare = false;
+    },
     showCompare() {
       if (this.showCompare) {
         this.changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE);
@@ -433,6 +481,12 @@ export default {
       'setVideoConfig',
       'setVideos'
     ]),
+    changeGroup(groupNum) {
+      this.startIndex = Math.max(
+        0,
+        (groupNum - 1) * this.groupCount + this.offset
+      );
+    },
     changeStatus(status) {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status);
     },
@@ -731,9 +785,13 @@ export default {
       }
     }
 
+    .group-number {
+      margin-right: 10px;
+    }
+
     .select {
       position: relative;
-      width: 310px;
+      width: 200px;
       height: 22px;
       .msg {
         position: absolute;

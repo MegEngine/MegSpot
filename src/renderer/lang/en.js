@@ -20,6 +20,7 @@ export default {
     thumbnail: 'thumbnail',
     fileName: 'file name',
     fileLoading: 'Loading files...',
+    groupNum: 'group number',
     lastModifyTime: 'lastModifyTime',
     size: 'size',
     scale: 'scale',

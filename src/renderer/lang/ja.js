@@ -20,6 +20,7 @@ export default {
     thumbnail: 'サムネイル画像',
     fileName: 'ファイル名',
     fileLoading: 'ファイルを読み込んでいます...',
+    groupNum: 'グループ番号',
     lastModifyTime: '最終変更時刻',
     size: 'ファイルサイズ',
     scale: '拡大倍率',

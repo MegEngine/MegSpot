@@ -5,8 +5,13 @@
     class="canvas-container"
     :style="containerStyle"
   >
-    <div v-for="imgs in imageList" :key="imgs">
-      <ImageCanvas ref='image_canvas' :imgSrc="imgs" :_width="canvasWidth" :_height="canvasHeight" ></ImageCanvas>
+    <div v-for="imgs in imageGroupList" :key="imgs">
+      <ImageCanvas
+        ref="image_canvas"
+        :imgSrc="imgs"
+        :_width="canvasWidth"
+        :_height="canvasHeight"
+      ></ImageCanvas>
     </div>
   </div>
 </template>
@@ -22,75 +27,95 @@ export default {
     return {
       canvasWidth: 0,
       canvasHeight: 0,
+      groupIndex: 0, // 当前组的序号
       scheduleCanvasActions: [
         {
           event: 'setOverLay',
-          action: 'setOverLay',
+          action: 'setOverLay'
         },
         {
           event: 'getImageDetails',
-          action: 'getImageDetails',
+          action: 'getImageDetails'
         },
-      ],
+        {
+          event: 'changeGroup',
+          action: 'changeGroup'
+        }
+      ]
     };
   },
   mounted() {
     this.calcCanvasSize();
     // 调度事件  使用当前组件的方法
-    this.scheduleCanvasActions.forEach((item) => {
+    this.scheduleCanvasActions.forEach(item => {
       this.$bus.$on(item.event, this[item.action]);
     });
     // resize 后重新计算宽高并渲染
     window.addEventListener('resize', this.handleResize, true);
   },
   beforeDestroy() {
-    this.scheduleCanvasActions.forEach((item) => {
+    this.scheduleCanvasActions.forEach(item => {
       this.$bus.$off(item.event, this[item.action]);
     });
   },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
+    // 每组图片数量
+    groupCount() {
+      const str = this.imageConfig.layout,
+        len = str.length;
+      return str[len - 3] * str[len - 1];
+    },
+    // 当前组的图片列表
+    imageGroupList() {
+      return this.imageList
+        ? this.imageList.slice(
+            this.groupIndex,
+            this.groupIndex + this.groupCount
+          )
+        : [];
+    },
     containerStyle() {
       switch (this.imageConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
           return {
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'column'
           };
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
           return {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: '1fr 1fr'
           };
         case GLOBAL_CONSTANTS.LAYOUT_3X1:
           return {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
+            gridTemplateColumns: '1fr 1fr 1fr'
           };
         case GLOBAL_CONSTANTS.LAYOUT_4X1:
           return {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr 1fr',
+            gridTemplateColumns: '1fr 1fr 1fr 1fr'
           };
         case GLOBAL_CONSTANTS.LAYOUT_2X2:
           return {
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gridTemplateRows: '50% 50%',
+            gridTemplateRows: '50% 50%'
           };
         case GLOBAL_CONSTANTS.LAYOUT_3X2:
           return {
             display: 'grid',
             gridTemplateColumns: '1fr 1fr 1fr',
-            gridTemplateRows: '50% 50%',
+            gridTemplateRows: '50% 50%'
           };
         default:
           return {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: '1fr 1fr'
           };
       }
-    },
+    }
   },
   watch: {
     imageList() {
@@ -98,16 +123,27 @@ export default {
         this.calcCanvasSize();
       });
     },
-    'imageConfig.layout'() {
+    imageGroupList() {
       this.$nextTick(() => {
         this.calcCanvasSize();
         this.udpateAllCanvas();
       });
     },
+    'imageConfig.layout'() {
+      this.$nextTick(() => {
+        this.calcCanvasSize();
+        this.udpateAllCanvas();
+      });
+    }
   },
   methods: {
+    // 接收改变当前组序号
+    changeGroup(groupStartIndex) {
+      console.log('change group', groupStartIndex);
+      this.groupIndex = groupStartIndex;
+    },
     ...mapActions(['setCanvasSize']),
-    handleResize: throttle(50, function () {
+    handleResize: throttle(50, function() {
       this.calcCanvasSize();
       // 重新布局图片容器;
       this.udpateAllCanvas();
@@ -167,15 +203,15 @@ export default {
       let canvasViews = this.$refs['image_canvas'];
       try {
         let details = canvasViews
-        .filter(
-          (item) => imageNameList.findIndex((name) => name === item.imgSrc) > -1
-        )
-        .map((item) => {
-          return {
-            path: item.imgSrc,
-            canvas: item.canvas,
-          };
-        });
+          .filter(
+            item => imageNameList.findIndex(name => name === item.imgSrc) > -1
+          )
+          .map(item => {
+            return {
+              path: item.imgSrc,
+              canvas: item.canvas
+            };
+          });
         callback(details);
       } catch (error) {
         console.log(error);
@@ -183,7 +219,7 @@ export default {
       }
     },
     udpateAllCanvas() {
-       this.$refs['image_canvas'].forEach((item) => {
+      this.$refs['image_canvas'].forEach(item => {
         // 重新设定宽高 然后重新绘制canvas
         item.height = Math.floor(this.canvasHeight);
         item.width = Math.floor(this.canvasWidth);
@@ -192,13 +228,13 @@ export default {
     },
     handleCompareOptions(direction) {
       const columnLen = this.getColumnLine();
-      const canvasViews =  this.$refs['image_canvas'];
+      const canvasViews = this.$refs['image_canvas'];
       let snapShotArr = [];
       let coveredArr = [];
       if (
         [
           GLOBAL_CONSTANTS.DIRECTION_LEFT,
-          GLOBAL_CONSTANTS.DIRECTION_RIGHT,
+          GLOBAL_CONSTANTS.DIRECTION_RIGHT
         ].includes(direction)
       ) {
         //左右对比,取整行进行比较
@@ -275,7 +311,7 @@ export default {
       if (
         [
           GLOBAL_CONSTANTS.DIRECTION_BOTTOM,
-          GLOBAL_CONSTANTS.DIRECTION_TOP,
+          GLOBAL_CONSTANTS.DIRECTION_TOP
         ].includes(direction)
       ) {
         //上下对比，取偶数行进行比较
@@ -304,7 +340,7 @@ export default {
       }
       return {
         snapShotArr,
-        coveredArr,
+        coveredArr
       };
     },
     //执行覆盖
@@ -336,10 +372,9 @@ export default {
       if ([GLOBAL_CONSTANTS.LAYOUT_1X1].includes(this.imageConfig.layout)) {
         return 1;
       }
-    },
-  },
+    }
+  }
 };
-</script>
 </script>
 <style lang="scss" scoped>
 #image-container {

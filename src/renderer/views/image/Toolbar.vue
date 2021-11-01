@@ -6,7 +6,14 @@
           ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
         >
       </div>
-      <Gallery :sortData="imageList" @update="setImages" @remove="removeImages">
+      <Gallery
+        :sortData="imageList"
+        :focusListIndex="
+          new Array(groupCount).fill(0).map((_, index) => index + startIndex)
+        "
+        @update="setImages"
+        @remove="removeImages"
+      >
         <template v-slot:headButton>
           <el-badge :value="imageList.length" class="item">
             <el-button
@@ -33,6 +40,17 @@
         :disabled="!imageList.length"
         @click="emptyImages"
       />
+      <el-input-number
+        v-model="groupNum"
+        @change="changeGroup"
+        size="mini"
+        :step="1"
+        :min="1"
+        :max="maxGroupNum"
+        v-tip="$t('general.groupNum')"
+        label="groupNum"
+        class="group-number"
+      ></el-input-number>
       <el-radio-group v-model="smooth" class="gap" size="mini">
         <el-radio-button :label="false">{{
           $t('imageCenter.nearestInterpolation')
@@ -244,12 +262,26 @@ export default {
       GLOBAL_CONSTANTS,
       dialogVisible: false,
       traggerRGB: false,
-      showSelectedMsg: false
+      showSelectedMsg: false,
+      groupNum: 0,
+      startIndex: 0,
+      offset: 0
     };
   },
   components: { Gallery, GifDialog },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
+    maxGroupNum() {
+      return Math.ceil(
+        this.imageList.length / (this.layout[0] * this.layout[2])
+      );
+    },
+    // 每组图片数量
+    groupCount() {
+      const str = this.imageConfig.layout,
+        len = str.length;
+      return str[len - 3] * str[len - 1];
+    },
     smooth: {
       get() {
         return this.imageConfig.smooth;
@@ -263,7 +295,16 @@ export default {
         return this.imageConfig.layout;
       },
       set(val) {
+        const preNum = this.groupCount * (this.groupNum - 1);
         this.setImageConfig({ layout: val });
+        const afterNum = this.groupCount * (this.groupNum - 1);
+        this.offset = preNum - afterNum;
+        this.startIndex = Math.max(
+          0,
+          (groupNum - 1) * this.groupCount + this.offset
+        );
+        this.$bus.$emit('changeGroup', this.startIndex);
+        this.groupNum = Math.floor(this.startIndex / this.groupCount);
       }
     }
   },
@@ -279,6 +320,13 @@ export default {
       if (event.keyCode === 27) {
         this.goBack();
       }
+    },
+    changeGroup(groupNum) {
+      this.startIndex = Math.max(
+        0,
+        (groupNum - 1) * this.groupCount + this.offset
+      );
+      this.$bus.$emit('changeGroup', this.startIndex);
     },
     changeZoom(newV, oldV) {
       if (newV >= GLOBAL_CONSTANTS.SCALE_CONSTANTS) {
@@ -395,6 +443,10 @@ export default {
         color: #e93b3b;
       }
     }
+  }
+
+  .group-number {
+    margin-right: 10px;
   }
 
   .select {
