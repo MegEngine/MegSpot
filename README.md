@@ -4,7 +4,7 @@
   <img width="150"  src="./src/renderer/assets/images/logo_256X256.png">
 </p>
 
-[English](README.md) | 中文
+[English](README_EN.md) | 中文
 
 **MegSpot**是一款提供免费免登录、高效、专业、跨平台的图片&视频的对比的 PC 应用工具。
 
