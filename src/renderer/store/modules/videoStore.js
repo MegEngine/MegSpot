@@ -1,4 +1,6 @@
 import * as GLABEL_CONSTANT from '../../constants';
+import { trimSep } from '@/utils/file';
+
 const videoStore = {
   namespaced: true,
   state: {
@@ -32,17 +34,17 @@ const videoStore = {
       state.videoConfig = newConfig;
     },
     SET_VIDEO_FOLDERS: (state, folders) => {
-      state.videoFolders = folders;
+      state.videoFolders = folders.map(trimSep);
     },
     ADD_VIDEO_FOLDER: (state, folder) => {
-      if (!state.videoFolders.includes(folder)) {
+      if (!state.videoFolders.includes(trimSep(folder))) {
         const tmp = [...state.videoFolders];
         tmp.push(folder);
         state.videoFolders = tmp;
       }
     },
     REMOVE_VIDEO_FOLDER: (state, folder) => {
-      if (state.videoFolders.includes(folder)) {
+      if (state.videoFolders.includes(trimSep(folder))) {
         const tmp = [...state.videoFolders];
         tmp.splice(state.videoFolders.indexOf(folder), 1);
         state.videoFolders = tmp;

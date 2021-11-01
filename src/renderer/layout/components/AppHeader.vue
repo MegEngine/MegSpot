@@ -5,7 +5,7 @@
         <el-breadcrumb class="nav" separator="|">
           <el-breadcrumb-item :to="{ path: '/' }">
             <img
-              src="@/assets/images/big_logo_white.png"
+              src="../../assets/images/big_logo_white.png"
               style="vertical-align: middle; height:40px"
             />
           </el-breadcrumb-item>
