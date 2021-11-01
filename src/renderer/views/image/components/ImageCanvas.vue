@@ -307,6 +307,7 @@ export default {
     },
     // 供外部直接调用 待测试
     reMount() {
+      this.initImage();
       this.initCanvas();
       this.image.onload = () => {
         this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);

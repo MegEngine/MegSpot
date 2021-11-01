@@ -19,6 +19,7 @@ export default {
     thumbnail: '缩略图',
     fileName: '文件名',
     fileLoading: '加载文件中...',
+    groupNum: '分组序号',
     lastModifyTime: '最后修改时间',
     size: '大小',
     scale: '缩放比例',

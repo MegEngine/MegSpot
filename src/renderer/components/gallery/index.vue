@@ -5,40 +5,54 @@
     </div>
     <div class="modal" @click.self="handleWrapperClick">
       <div class="container" @animationend="disappearModal">
-        <draggable v-model="sortList" id="drag">
-          <div
-            v-for="item in sortList"
-            :key="item"
-            class="dragItem"
-            @click="handleClick(item)"
-          >
-            <div
-              :title="item"
-              :class="[focusList.includes(item) ? 'focus-item' : '']"
-            >
-              <div>
-                <span
-                  @click="$emit('remove', item)"
-                  title="close this item"
-                  class="close-button"
-                  :title="$t('general.delete')"
+        <vxe-list
+          :data="sortList"
+          class="list"
+          :height="height"
+          :scroll-y="{ gt: 0 }"
+        >
+          <template #default="{ items }">
+            <draggable v-model="sortList" id="drag">
+              <div
+                v-for="(item, index) in items"
+                :key="item"
+                class="dragItem"
+                @click="handleClick(item)"
+              >
+                <div
+                  :title="item"
+                  :class="[
+                    (focusListIndex.length && focusListIndex.includes(index)) ||
+                    focusList.includes(item)
+                      ? 'focus-item'
+                      : ''
+                  ]"
                 >
-                  <svg-icon icon-class="bin" />
-                </span>
+                  <div>
+                    <span
+                      @click="$emit('remove', item)"
+                      title="close this item"
+                      class="close-button"
+                      :title="$t('general.delete')"
+                    >
+                      <svg-icon icon-class="bin" />
+                    </span>
+                  </div>
+                  <div class="content" flex="main:center cross:center">
+                    <slot
+                      name="dragItem"
+                      :src="getImageUrlSync(item)"
+                      :alt="item | getFileName"
+                    ></slot>
+                  </div>
+                  <div class="name">
+                    <span id="fileName">{{ item | getFileName }}</span>
+                  </div>
+                </div>
               </div>
-              <div class="content" flex="main:center cross:center">
-                <slot
-                  name="dragItem"
-                  :src="getImageUrlSync(item)"
-                  :alt="item | getFileName"
-                ></slot>
-              </div>
-              <div class="name">
-                <span id="fileName">{{ item | getFileName }}</span>
-              </div>
-            </div>
-          </div>
-        </draggable>
+            </draggable>
+          </template>
+        </vxe-list>
       </div>
     </div>
   </div>
@@ -63,6 +77,10 @@ export default {
     focusList: {
       type: Array,
       default: () => []
+    },
+    focusListIndex: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -72,6 +90,9 @@ export default {
     };
   },
   computed: {
+    height() {
+      return document.body.clientHeight;
+    },
     sortList: {
       get() {
         return this.sortData;
@@ -190,58 +211,61 @@ export default {
       width: 214px;
       height: 100%;
       left: -200px;
-      #drag {
-        :first-child {
-          margin-top: 0 !important;
-        }
-        float: left;
+      .list {
         height: 100%;
-        margin: 5px;
-        padding: 0;
-        overflow: auto;
-        .dragItem:hover {
-          .close-button {
-            display: initial;
+        #drag {
+          :first-child {
+            margin-top: 0 !important;
           }
-        }
-        .dragItem {
-          position: relative;
-          margin-top: 10px;
-          border-radius: 5px;
-          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-          border: 1px solid #dee1e5;
-          .close-button {
-            display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            .svg-icon {
-              color: $primaryColor;
+          float: left;
+          height: 100%;
+          margin: 5px;
+          padding: 0;
+          overflow: auto;
+          .dragItem:hover {
+            .close-button {
+              display: initial;
             }
           }
-          .close-button:hover {
-            cursor: pointer;
-            .svg-icon {
-              color: red;
+          .dragItem {
+            position: relative;
+            margin-top: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #dee1e5;
+            .close-button {
+              display: none;
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              z-index: 1000;
+              .svg-icon {
+                color: $primaryColor;
+              }
             }
-          }
-          .content {
-            width: 200px;
-            height: 130px;
-            :first-child {
-              max-width: 200px;
-              max-height: 130px;
+            .close-button:hover {
+              cursor: pointer;
+              .svg-icon {
+                color: red;
+              }
             }
-          }
-          .name {
-            width: 200px;
-            text-align: center;
-            padding: 5px 3px;
-            font-size: 12px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            word-break: break-word;
+            .content {
+              width: 200px;
+              height: 130px;
+              :first-child {
+                max-width: 200px;
+                max-height: 130px;
+              }
+            }
+            .name {
+              width: 200px;
+              text-align: center;
+              padding: 5px 3px;
+              font-size: 12px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              word-break: break-word;
+            }
           }
         }
       }
