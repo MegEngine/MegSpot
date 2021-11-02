@@ -72,7 +72,7 @@ export default {
   background: #132f51;
   box-shadow: 0px 3px 7px 0px rgba(36, 46, 66, 0.15);
   color: #ffffff;
-  padding-left: 15px;
+  padding-left: 0px;
   padding-right: 15px;
   .nav-container {
     .right-menu {

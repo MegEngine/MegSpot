@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import path from 'path';
 export default {
   name: 'file-path-input',
   props: {
@@ -27,7 +28,7 @@ export default {
   },
   methods: {
     updateFilePath(value) {
-      this.$emit('update:filePath', value);
+      this.$emit('update:filePath', path.resolve(value));
     }
   }
 };
