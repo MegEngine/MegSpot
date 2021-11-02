@@ -128,9 +128,6 @@ export default {
     this.calcSplitHeight();
     window.addEventListener('resize', this.handleResize, true);
     addDragFolderListener(document.getElementById('folderTree'), false)
-    if (!this.videoFolders || this.videoFolders.length === 0) {
-      this.addFolder();
-    }
   },
   activated() {
     window.addEventListener('keydown', this.handleHotKey, true);

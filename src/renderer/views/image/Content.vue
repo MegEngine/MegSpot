@@ -123,12 +123,13 @@ export default {
         this.calcCanvasSize();
       });
     },
-    imageGroupList() {
-      this.$nextTick(() => {
-        this.calcCanvasSize();
-        this.udpateAllCanvas();
-      });
-    },
+    // 修改插值算法会引起重绘  临时注释下方代码
+    // imageGroupList() {
+    //   this.$nextTick(() => {
+    //     this.calcCanvasSize();
+    //     this.udpateAllCanvas();
+    //   });
+    // },
     'imageConfig.layout'() {
       this.$nextTick(() => {
         this.calcCanvasSize();
@@ -139,7 +140,6 @@ export default {
   methods: {
     // 接收改变当前组序号
     changeGroup(groupStartIndex) {
-      console.log('change group', groupStartIndex);
       this.groupIndex = groupStartIndex;
     },
     ...mapActions(['setCanvasSize']),

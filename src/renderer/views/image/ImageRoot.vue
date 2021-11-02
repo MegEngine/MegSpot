@@ -144,9 +144,6 @@ export default {
   },
   mounted() {
     addDragFolderListener(document.getElementById('folderTree'));
-    if (!this.imageFolders || this.imageFolders.length === 0) {
-      this.addFolder();
-    }
   },
   activated() {
     window.addEventListener('keydown', this.handleHotKey, true);
