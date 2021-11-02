@@ -1,7 +1,6 @@
 import * as GLABEL_CONSTANT from '../../constants';
 import { trimSep } from '@/utils/file';
 
-console.log('path.sep');
 const imageStore = {
   namespaced: true,
   state: {

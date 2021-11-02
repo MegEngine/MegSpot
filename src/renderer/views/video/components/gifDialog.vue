@@ -1,6 +1,7 @@
 <template>
   <el-dialog
     ref="aboutDialog"
+    top='5vh'
     :visible.sync="visible"
     :title="$t('generateGIF.title')"
     width="80%"

@@ -74,12 +74,13 @@
             $t('imageCenter.bilinearInterpolation')
           }}</el-radio-button>
         </el-radio-group>
+        <div class="select">
+          <span v-if="showSelectedMsg" class="msg">
+            {{ $t('imageCenter.selectedMsg') }}
+          </span>
+        </div>
       </div>
-      <div class="select">
-        <span v-if="showSelectedMsg" class="msg">
-          {{ $t('imageCenter.selectedMsg') }}
-        </span>
-      </div>
+
       <div class="middle">
         <span class="custom-container" v-if="showCompare === false">
           <el-button-group>
@@ -665,6 +666,10 @@ export default {
       if (event.keyCode === 27) {
         this.goBack();
       }
+      // cmd/ctrl+p
+      if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
+        this.pickColor();
+      }
     },
     goBack() {
       if (window.history.length > 1) {
@@ -792,10 +797,8 @@ export default {
 
     .select {
       position: relative;
-      width: 200px;
       height: 22px;
       .msg {
-        position: absolute;
         font-size: 12px;
         color: red;
       }

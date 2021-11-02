@@ -59,11 +59,11 @@
           $t('imageCenter.bilinearInterpolation')
         }}</el-radio-button>
       </el-radio-group>
-    </div>
-    <div class="select">
-      <span v-show="showSelectedMsg" class="msg">
-        {{ $t('imageCenter.selectedMsg') }}
-      </span>
+      <div class="select">
+        <span v-show="showSelectedMsg" class="msg">
+          {{ $t('imageCenter.selectedMsg') }}
+        </span>
+      </div>
     </div>
     <div class="middle">
       <el-button-group class="gap">
@@ -143,7 +143,12 @@
             type="text"
             @click="pickColor"
             size="mini"
-            v-tip="$t('imageCenter.colorPicker')"
+            v-tip="
+              $t('imageCenter.colorPicker') +
+                ' ' +
+                $t('common.hotKey') +
+                ':cmd/ctrl+p'
+            "
           >
             <span class="svg-container" style="font-size: 20px">
               <svg-icon icon-class="pick-color" />
@@ -231,7 +236,7 @@
           placeholder="layout"
           class="layout-selector"
           size="mini"
-          v-tip="$t('general.layout')"
+          v-tip.left="$t('general.layout')"
         >
           <el-option
             v-for="item in [
@@ -304,7 +309,7 @@ export default {
         this.offset = preNum - afterNum;
         this.startIndex = Math.max(
           0,
-          (groupNum - 1) * this.groupCount + this.offset
+          (this.groupNum - 1) * this.groupCount + this.offset
         );
         this.$bus.$emit('changeGroup', this.startIndex);
         this.groupNum = Math.floor(this.startIndex / this.groupCount);
@@ -322,6 +327,10 @@ export default {
       // esc
       if (event.keyCode === 27) {
         this.goBack();
+      }
+      // cmd/ctrl+p
+      if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
+        this.pickColor();
       }
     },
     changeGroup(groupNum) {
@@ -455,10 +464,8 @@ export default {
 
   .select {
     position: relative;
-    width: 350px;
     height: 22px;
     .msg {
-      position: absolute;
       font-size: 12px;
       color: red;
     }

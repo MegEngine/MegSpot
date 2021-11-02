@@ -28,7 +28,7 @@ export default {
   },
   methods: {
     updateFilePath(value) {
-      this.$emit('update:filePath', path.resolve(value));
+      this.$emit('update:filePath', value);
     }
   }
 };

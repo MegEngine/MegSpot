@@ -2,9 +2,6 @@
   <div
     id="rgba-exhibit"
     flex="main:right"
-    v-tip.sure.right="
-      `left click start or stop get average RGBA value. \nChange region by hover setting button`
-    "
   >
     <div id="rgba-content" flex="cross:center">
       <div
