@@ -486,6 +486,7 @@ export default {
         0,
         (groupNum - 1) * this.groupCount + this.offset
       );
+      this.$refs.gifDialog.clear(); // 清空gifDialog上次所选
     },
     changeStatus(status) {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status);

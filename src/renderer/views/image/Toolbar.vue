@@ -130,7 +130,10 @@
             <svg-icon icon-class="gif" />
           </span>
         </el-button>
-        <GifDialog ref="gifDialog" :selectList="imageList"></GifDialog>
+        <GifDialog
+          ref="gifDialog"
+          :selectList="imageList.slice(startIndex, startIndex + groupCount)"
+        ></GifDialog>
       </el-button-group>
     </div>
     <div class="right">
@@ -326,6 +329,7 @@ export default {
         0,
         (groupNum - 1) * this.groupCount + this.offset
       );
+      this.$refs.gifDialog.clear(); // 清空gifDialog上次所选
       this.$bus.$emit('changeGroup', this.startIndex);
     },
     changeZoom(newV, oldV) {

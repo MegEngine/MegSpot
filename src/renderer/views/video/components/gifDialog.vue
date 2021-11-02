@@ -23,7 +23,7 @@
             >
               <div v-for="item in selectList" :key="item">
                 <el-option
-                  :label="item | getFileName"
+                  :label="$options.filters.getFileName(item, false)"
                   :value="item"
                 ></el-option>
               </div>
@@ -174,6 +174,11 @@ export default {
         this.gifImageList.splice(index, 1);
       }
     },
+    clear() {
+      if (this.gifImageList.length > 1) {
+        this.gifImageList = [{ path: '', imageName: '', description: '' }];
+      }
+    },
     convertCanvasToImage(canvas) {
       var image = new Image();
       image.src = canvas.toDataURL('image/png');
@@ -212,7 +217,7 @@ export default {
             item =>
               new Promise((resolve, reject) => {
                 try {
-                  let imageName = getFileName(item.imageName);
+                  let imageName = getFileName(item.imageName, false);
                   let description = imageName;
                   if (item.description) {
                     description = item.description;
@@ -340,8 +345,6 @@ export default {
     overflow: hidden;
     .image {
       text-align: center;
-      overflow-x: scroll;
-      overflow-y: scroll;
       img {
         object-fit: contain;
       }
