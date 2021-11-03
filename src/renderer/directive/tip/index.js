@@ -216,7 +216,7 @@ class TipManager {
   show() {
     // 用户未点击“确认”时，显示
     if (!this.isKnown) {
-      this.tooltip.style.transitionDelay = '0.3s';
+      this.tooltip.style.transitionDelay = '0.8s';
       this.tooltip.setAttribute('data-show', '');
 
       this.popperInstance.setOptions(options => ({

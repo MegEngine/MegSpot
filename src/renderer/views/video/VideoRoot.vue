@@ -42,20 +42,20 @@
           style="margin-right:10px"
           :disabled="!videoList.length"
           @click="emptyVideos"
-        />
-          <el-button
-            type="text"
-            size="small"
-            class="tool-item"
-            :disabled="!videoList.length"
-            @click="compare"
-            v-on:keyup.meta.enter="compare"
-            v-on:keydown.tab="compare"
-            v-tip="`${$t('common.hotKey')}：cmd/ctrl+enter`"
-          >
-            {{ $t('general.compare') }}
-          </el-button>
-        </el-tooltip>
+        >
+        </el-button>
+        <el-button
+          type="text"
+          size="small"
+          class="tool-item"
+          :disabled="!videoList.length"
+          @click="compare"
+          v-on:keyup.meta.enter="compare"
+          v-on:keydown.tab="compare"
+          v-tip="`${$t('common.hotKey')}：cmd/ctrl+enter`"
+        >
+          {{ $t('general.compare') }}
+        </el-button>
       </div>
     </div>
     <div class="content" flex-box="1">
@@ -127,7 +127,7 @@ export default {
   mounted() {
     this.calcSplitHeight();
     window.addEventListener('resize', this.handleResize, true);
-    addDragFolderListener(document.getElementById('folderTree'), false)
+    addDragFolderListener(document.getElementById('folderTree'), false);
   },
   activated() {
     window.addEventListener('keydown', this.handleHotKey, true);
@@ -211,7 +211,7 @@ export default {
       }
     },
     refresh() {
-      this.$refs.videoPreview.$refs.fileTable.refreshFileList()
+      this.$refs.videoPreview.$refs.fileTable.refreshFileList();
     }
   }
 };
