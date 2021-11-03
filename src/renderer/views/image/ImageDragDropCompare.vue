@@ -2,6 +2,11 @@
   <div id="image-drag-drop-compare">
     <div class="buttons" flex="main:justify cross:center">
       <div class="changeButton">
+        <div class="router-back" v-tip.left="`${$t('common.hotKey')}：esc`">
+          <span @click="goBack" class="btn"
+            ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
+          >
+        </div>
         <el-badge class="tool-item">
           <Gallery
             :sortData="imageList"
@@ -74,12 +79,6 @@
         <span class="tip">
           {{ $t('imageDragDropCompare.tip') }}
         </span>
-      </div>
-
-      <div class="router-back" v-tip.left="`${$t('common.hotKey')}：esc`">
-        <span @click="goBack" class="btn"
-          ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
-        >
       </div>
     </div>
     <div class="canvas">
@@ -647,30 +646,28 @@ export default {
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 #image-drag-drop-compare {
-  .buttons {
-    position: relative;
-    .changeButton {
-      .tool-item {
-        margin-left: 10px;
-      }
-      .tip {
-        text-align: center;
-        font-size: 12px;
-        color: red;
-      }
+  .changeButton {
+    .tool-item {
+      margin-left: 10px;
     }
-    .router-back {
-      .btn {
-        float: right;
-        cursor: pointer;
-        margin-right: 10px;
-        color: $labelColor;
-        &:hover {
-          color: #303133;
-        }
+    .tip {
+      text-align: center;
+      font-size: 12px;
+      color: red;
+    }
+  }
+  .router-back {
+    display:inline-block;
+    .btn {
+      cursor: pointer;
+      margin-right: 10px;
+      color: $labelColor;
+      &:hover {
+        color: #303133;
       }
     }
   }
+
   .canvas {
     #canvas {
       position: absolute;

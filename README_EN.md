@@ -193,4 +193,17 @@ Download the installation package of the corresponding system in Github Releases
 
 MegSpot use Apache License, Version 2.0
 
+## Citation
+
+If you use MegSpot in your publication,please cite it by using the following BibTeX entry.
+
+```
+@Misc{MegSpot,
+  institution = {megvii},
+  title =  {MegSpot:An efficient, professional, cross-platform image & video comparison application.},
+  howpublished = {\url{https://github.com/MegEngine/MegSpot}},
+  year = {2021}
+}
+```
+
 Copyright (c) 2014-2021 Megvii Inc. All rights reserved.

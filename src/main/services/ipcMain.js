@@ -1,6 +1,5 @@
-import { ipcMain, dialog, BrowserWindow } from 'electron';
+import { ipcMain, dialog  } from 'electron';
 import Server from '../server/index';
-import { winURL } from '../config/StaticPath';
 
 export default {
   Mainfunc(mainWindow, IsUseSysTitle) {
