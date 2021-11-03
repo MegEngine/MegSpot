@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" flex class="dashboard-container">
+  <div ref="container" id="container" flex class="dashboard-container">
     <div flex="dir:top main:center" class="entry">
       <entry-card
         v-for="item in tools"
@@ -24,41 +24,12 @@
 
 <script>
 import EntryCard from './EntryCard';
-import VideoSwiper from '../help/VideoSwiper';
+import VideoSwiper from './HelpVideo';
+import { throttle } from '@/utils';
+
 export default {
   name: 'dashboard',
   components: { EntryCard, VideoSwiper },
-  mounted() {
-    this.videoSource = [
-      {
-        url:
-          'https://cloud.video.taobao.com/play/u/2780279213/p/1/e/6/t/1/d/ld/36255062.mp4',
-        title: '视频对比使用方法'
-      },
-      {
-        url:
-          'https://cloud.video.taobao.com/play/u/2780279213/p/1/e/6/t/1/d/ld/36255062.mp4',
-        title: '图像对比使用方法'
-      },
-      {
-        url:
-          'https://cloud.video.taobao.com/play/u/2780279213/p/1/e/6/t/1/d/ld/36255062.mp4',
-        title: '工具栏说明'
-      },
-      {
-        url:
-          'https://cloud.video.taobao.com/play/u/2780279213/p/1/e/6/t/1/d/ld/36255062.mp4',
-        title: '线性对比使用方法'
-      }
-    ];
-    this.$nextTick(() => {
-      const container = this.$refs.container;
-      this.size = {
-        width: (container && (container.offsetWidth / 4) * 3) ?? 400,
-        height: (container && (container.offsetWidth * 9) / 16) ?? 300
-      };
-    });
-  },
   data() {
     return {
       videoSource: [
@@ -86,12 +57,50 @@ export default {
         }
       ]
     };
+  },
+  mounted() {
+    this.videoSource = [
+      {
+        url:
+          'http://r19airgf2.bkt.clouddn.com/MegSpot/helpVideo/image-compare.mp4',
+        title: '图像对比使用介绍'
+      },
+      {
+        url:
+          'http://r19airgf2.bkt.clouddn.com/MegSpot/helpVideo/video-compare.mp4',
+        title: '视频对比使用介绍'
+      },
+      {
+        url:
+          'http://r19airgf2.bkt.clouddn.com/MegSpot/helpVideo/drag-compare.mp4',
+        title: '拖拽对比使用介绍'
+      }
+    ];
+    window.addEventListener('resize', this.handleResize, true);
+  },
+  methods: {
+    handleResize: throttle(50, function() {
+      // this.$nextTick(() => {
+      const container = this.$refs.container;
+      console.log(
+        'handleResize',
+        (container && (container.offsetWidth / 5) * 4) ?? 500,
+        (container && (container.offsetHeight * 12) / 25) ?? 300
+      );
+      this.size = {
+        width: (container && (container.offsetWidth * 4) / 5) ?? 500,
+        height: (container && container.offsetHeight - 25) ?? 300
+      };
+      // });
+    })
   }
 };
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .dashboard-container {
+  width: 100%;
+  height: 100%;
   .entry {
     margin: 10px;
     transform: translateY(-100px);
@@ -100,7 +109,6 @@ export default {
     }
   }
   .help {
-    width: 80vw;
   }
 }
 </style>

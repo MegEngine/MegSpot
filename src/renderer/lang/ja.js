@@ -1,6 +1,7 @@
 export default {
   common: {
-    hotKey: 'ホットキー'
+    hotKey: 'ホットキー',
+    showVideoTip: 'デモビデオを表示'
   },
   nav: {
     toHome: 'ホーム',

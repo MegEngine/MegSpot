@@ -1,40 +1,48 @@
 <template>
-  <swiper
-    ref="mySwiper"
-    class="swiper"
-    :options="swiperOption"
-    @swiper="onSwiper"
-    @slideChange="onSlideChange"
-  >
-    <swiper-slide
-      v-for="(video, index) in videoSource"
-      :key="video"
-      class="video-container"
+  <div>
+    <el-button @click="videoVisible = !videoVisible">
+      {{ $t('common.showVideoTip') }}
+    </el-button>
+    <swiper
+      ref="mySwiper"
+      v-show="videoVisible"
+      class="swiper"
+      :style="'width:' + _width + 'px; height:' + _height + 'px'"
+      :options="swiperOption"
+      @swiper="onSwiper"
+      @slideChange="onSlideChange"
     >
-      <span class="title">{{ video.title }}</span>
-      <video
-        ref="video"
-        :src="video.url"
-        preload
-        :autoplay="index == realIndex"
-        controls
-        class="video"
-        @ended="handleEnd"
-      ></video>
-    </swiper-slide>
-    <div
-      class="swiper-pagination swiper-pagination-black"
-      slot="pagination"
-    ></div>
-    <div
-      class="swiper-button-prev swiper-button-white"
-      slot="button-prev"
-    ></div>
-    <div
-      class="swiper-button-next swiper-button-white"
-      slot="button-next"
-    ></div>
-  </swiper>
+      <swiper-slide
+        v-for="(video, index) in videoSource"
+        :key="video"
+        class="video-container"
+      >
+        <span class="title">{{ video.title }}</span>
+        <video
+          ref="video"
+          :src="video.url"
+          :autoplay="index == realIndex"
+          controls
+          class="video"
+          :width="_width"
+          :height="_height"
+          @ended="handleEnd"
+        ></video>
+      </swiper-slide>
+      <div
+        class="swiper-pagination swiper-pagination-black"
+        slot="pagination"
+      ></div>
+      <div
+        class="swiper-button-prev swiper-button-white"
+        slot="button-prev"
+      ></div>
+      <div
+        class="swiper-button-next swiper-button-white"
+        slot="button-next"
+      ></div>
+    </swiper>
+  </div>
 </template>
 
 <script>
@@ -43,18 +51,29 @@ import {
   Navigation,
   Pagination,
   EffectFade,
-  AutoUpdate,
   SwiperSlide
 } from 'vue-awesome-swiper';
 import 'swiper/css/swiper.css';
 
 export default {
-  name: 'VideoCarousel',
+  name: 'HelpVideo',
   components: {
     Swiper,
     SwiperSlide
   },
   props: {
+    // videoVisible: {
+    //   type: Boolean,
+    //   default: false
+    // },
+    _width: {
+      type: String | Number,
+      default: '500'
+    },
+    _height: {
+      type: String | Number,
+      default: '300'
+    },
     videoSource: {
       type: Array,
       default: () => [
@@ -69,8 +88,23 @@ export default {
     swiper() {
       return this.$refs.mySwiper.$swiper;
     },
-    swiperOption() {
-      return {
+    realIndex() {
+      return (
+        (this.$refs.mySwiper && this.$refs.mySwiper.$swiper.realIndex) ?? 0
+      );
+    }
+  },
+  watch: {},
+  data() {
+    const modules = [Navigation, Pagination, EffectFade];
+    return {
+      justEnded: false,
+      videoVisible: false,
+      activeIndex: 0,
+      prevIndex: 0,
+      duration: 3000,
+      modules,
+      swiperOption: {
         // spaceBetween: 30, // 自动翻页的间隔时间
         effect: 'fade',
         loop: true,
@@ -82,19 +116,12 @@ export default {
           nextEl: '.swiper-button-next',
           prevEl: '.swiper-button-prev'
         },
-        modules: this.modules
-      };
-    }
-  },
-  watch: {},
-  data() {
-    return {
-      justEnded: false,
-      activeIndex: 0,
-      prevIndex: 0,
-      duration: 3000,
-      modules: [Navigation, Pagination, EffectFade, AutoUpdate]
+        modules
+      }
     };
+  },
+  mounted() {
+    console.log(this.swiper);
   },
   methods: {
     onSwiper(swiper) {
