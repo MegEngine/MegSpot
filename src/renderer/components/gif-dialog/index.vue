@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     ref="aboutDialog"
-    top='5vh'
+    top="5vh"
     :visible.sync="visible"
     :title="$t('generateGIF.title')"
     width="80%"
@@ -158,7 +158,7 @@ export default {
       this.visible = true;
     },
     selectImage(imageName, index) {
-      this.gifImageList[index].imageName = imageName;
+      this.gifImageList[index].imageName = getFileName(imageName, false);
       this.gifImageList[index].path = imageName;
       if (
         this.gifImageList.length === index + 1 &&
@@ -178,13 +178,12 @@ export default {
     },
     clear() {
       if (this.gifImageList.length > 1) {
+        this.downLoadDisable = true;
+        this.fininshed = false;
+        this.tip = '';
+        this.imgVisible = false;
         this.gifImageList = [{ path: '', imageName: '', description: '' }];
       }
-    },
-    convertCanvasToImage(canvas) {
-      var image = new Image();
-      image.src = canvas.toDataURL('image/png');
-      return image;
     },
     generateGifPreview() {
       if (this.gifImageList.length - 1 < 2) {
@@ -198,13 +197,13 @@ export default {
           this.gifImageList
             .slice(0, -1)
             .filter(item => item.imageName !== '')
-            .map(item => item.imageName)
+            .map(item => item.path)
         )
       ];
       this.$bus.$emit('getImageDetails', imageNameList, details => {
         this.imageDetails = details.map(item => ({
           path: item.imgSrc,
-          imageName: getFileName(item.path),
+          imageName: getFileName(item.path, false),
           canvas: item.canvas
         }));
       });
@@ -262,16 +261,11 @@ export default {
         dither: 'FloydSteinberg'
       });
 
-      this.gifCanvasList.forEach((element, index) => {
-        let indx;
-        if (this.imageDetails[index].path === element.path) {
-          indx = index;
-        } else {
-          indx = this.imageDetails.findIndex(
-            item => item.imageName === element.imageName
-          );
-        }
-        cs.drawImage(this.imageDetails[indx].canvas, 0, 0);
+      this.gifCanvasList.forEach(element => {
+        let index = this.imageDetails.findIndex(
+          item => item.imageName === element.imageName
+        );
+        cs.drawImage(this.imageDetails[index].canvas, 0, 0);
         cs.font = `${fontSize}px Arial`;
         cs.textAlign = 'center';
         cs.fillText(

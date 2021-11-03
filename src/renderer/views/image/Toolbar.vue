@@ -261,7 +261,7 @@
 import * as GLOBAL_CONSTANTS from '@/constants';
 import Gallery from '@/components/gallery';
 import { createNamespacedHelpers } from 'vuex';
-import GifDialog from './components/gifDialog';
+import GifDialog from '@/components/gif-dialog';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
 export default {
@@ -331,6 +331,24 @@ export default {
       // cmd/ctrl+p
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
         this.pickColor();
+      }
+      // cmd/ctrl + ← 向前切换一个分组
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 37 &&
+        this.groupNum > 1
+      ) {
+        this.groupNum--;
+        this.changeGroup(this.groupNum);
+      }
+      // cmd/ctrl + → 向后切换一个分组
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 39 &&
+        this.groupNum < this.maxGroupNum
+      ) {
+        this.groupNum++;
+        this.changeGroup(this.groupNum);
       }
     },
     changeGroup(groupNum) {

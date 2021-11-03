@@ -20,7 +20,7 @@ export default {
     thumbnail: 'thumbnail',
     fileName: 'file name',
     fileLoading: 'Loading files...',
-    groupNum: 'group number',
+    groupNum: 'group number\nCtrl + ← page forward\nCtrl + → page backward',
     lastModifyTime: 'lastModifyTime',
     size: 'size',
     scale: 'scale',

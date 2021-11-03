@@ -197,7 +197,10 @@
                 <svg-icon icon-class="gif" />
               </span>
             </el-button>
-            <GifDialog ref="gifDialog" :selectList="videoList"></GifDialog>
+            <GifDialog
+              ref="gifDialog"
+              :selectList="videoList.slice(startIndex, startIndex + groupCount)"
+            ></GifDialog>
           </el-button-group>
         </span>
         <span v-if="showCompare === false" class="custom-container">
@@ -342,7 +345,7 @@
   </div>
 </template>
 <script>
-import GifDialog from './components/gifDialog';
+import GifDialog from '@/components/gif-dialog';
 import Gallery from '@/components/gallery';
 import VideoContainer from './VideoContainer';
 import * as CONSTANTS from './video-constants';
@@ -669,6 +672,24 @@ export default {
       // cmd/ctrl+p
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
         this.pickColor();
+      }
+      // cmd/ctrl + ← 向前切换一个分组
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 37 &&
+        this.groupNum > 1
+      ) {
+        this.groupNum--;
+        this.changeGroup(this.groupNum);
+      }
+      // cmd/ctrl + → 向后切换一个分组
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 39 &&
+        this.groupNum < this.maxGroupNum
+      ) {
+        this.groupNum++;
+        this.changeGroup(this.groupNum);
       }
     },
     goBack() {
