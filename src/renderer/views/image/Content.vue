@@ -27,7 +27,7 @@ export default {
     return {
       canvasWidth: 0,
       canvasHeight: 0,
-      groupIndex: 0, // 当前组的序号
+      groupStartIndex: 0,
       scheduleCanvasActions: [
         {
           event: 'setOverLay',
@@ -68,10 +68,10 @@ export default {
     },
     // 当前组的图片列表
     imageGroupList() {
-      return this.imageList
+      return this.imageList.length
         ? this.imageList.slice(
-            this.groupIndex,
-            this.groupIndex + this.groupCount
+            this.groupStartIndex,
+            this.groupStartIndex + this.groupCount
           )
         : [];
     },
@@ -123,13 +123,6 @@ export default {
         this.calcCanvasSize();
       });
     },
-    // 修改插值算法会引起重绘  临时注释下方代码
-    // imageGroupList() {
-    //   this.$nextTick(() => {
-    //     this.calcCanvasSize();
-    //     this.udpateAllCanvas();
-    //   });
-    // },
     'imageConfig.layout'() {
       this.$nextTick(() => {
         this.calcCanvasSize();
@@ -138,9 +131,9 @@ export default {
     }
   },
   methods: {
-    // 接收改变当前组序号
+    // 接收改变当前图片分组的开始序号
     changeGroup(groupStartIndex) {
-      this.groupIndex = groupStartIndex;
+      this.groupStartIndex = groupStartIndex;
     },
     ...mapActions(['setCanvasSize']),
     handleResize: throttle(50, function() {

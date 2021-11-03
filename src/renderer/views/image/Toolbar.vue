@@ -149,6 +149,9 @@
                 $t('common.hotKey') +
                 ':cmd/ctrl+p'
             "
+            :class="{
+              enabled: traggerRGB
+            }"
           >
             <span class="svg-container" style="font-size: 20px">
               <svg-icon icon-class="pick-color" />
@@ -272,8 +275,7 @@ export default {
       traggerRGB: false,
       showSelectedMsg: false,
       groupNum: 0,
-      startIndex: 0,
-      offset: 0
+      startIndex: 0
     };
   },
   components: { Gallery, GifDialog },
@@ -306,13 +308,13 @@ export default {
         const preNum = this.groupCount * (this.groupNum - 1);
         this.setImageConfig({ layout: val });
         const afterNum = this.groupCount * (this.groupNum - 1);
-        this.offset = preNum - afterNum;
+        const offset = preNum - afterNum;
         this.startIndex = Math.max(
           0,
-          (this.groupNum - 1) * this.groupCount + this.offset
+          (this.groupNum - 1) * this.groupCount + offset
         );
         this.$bus.$emit('changeGroup', this.startIndex);
-        this.groupNum = Math.floor(this.startIndex / this.groupCount);
+        this.groupNum = Math.ceil(this.startIndex / this.groupCount) + 1;
       }
     }
   },
@@ -351,10 +353,10 @@ export default {
         this.changeGroup(this.groupNum);
       }
     },
-    changeGroup(groupNum) {
+    changeGroup(groupNum, oldGroupNum) {
       this.startIndex = Math.max(
         0,
-        (groupNum - 1) * this.groupCount + this.offset
+        this.startIndex - this.groupCount * (oldGroupNum - groupNum)
       );
       this.$refs.gifDialog.clear(); // 清空gifDialog上次所选
       this.$bus.$emit('changeGroup', this.startIndex);
@@ -500,6 +502,11 @@ export default {
     .layout-selector {
       width: 80px;
       margin-left: 20px;
+    }
+    .enabled {
+      .svg-icon {
+        color: $primaryColor;
+      }
     }
   }
 }
