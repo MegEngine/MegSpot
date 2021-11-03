@@ -83,7 +83,6 @@
       "icon": "build/icons/logo.ico"
     },
     "linux": {
-      "icon": "build/logo.png",
       "target": [
         "AppImage"
       ],

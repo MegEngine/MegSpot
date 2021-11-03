@@ -65,7 +65,7 @@
                 <svg-icon v-else icon-class="folder-fill"></svg-icon>
               </span>
               <el-tooltip
-                placement="right"
+                placement="top"
                 effect="light"
                 :content="data.path"
                 :open-delay="tipDelay"

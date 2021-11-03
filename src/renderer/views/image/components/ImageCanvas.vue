@@ -7,7 +7,7 @@
           @changeVisible="handleHistVisible"
         />
       </CoverMask>
-      <el-tooltip placement="bottom">
+      <el-tooltip placement="bottom" :open-delay='800'>
         <span
           class="compare-name"
           flex-box="1"

@@ -2,9 +2,6 @@
   <div
     id="rgba-exhibit"
     flex="main:right"
-    v-tip.sure.right="
-      `left click start or stop get average RGBA value. \nChange region by hover setting button`
-    "
   >
     <div id="rgba-content" flex="cross:center">
       <div
@@ -22,7 +19,7 @@
         >{{ `${RGBAcolor.R}, ${RGBAcolor.G}, ${RGBAcolor.B} ` }}
       </span>
     </div>
-    <el-tooltip effect="light" placement="bottom">
+    <el-tooltip effect="light" placement="bottom" :open-delay='800'>
       <div slot="content" id="rgba-region">
         <span class="text-style">region:</span>
         <el-input-number

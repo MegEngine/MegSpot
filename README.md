@@ -177,4 +177,16 @@ Linux 环境下支持通过命令行进行启动、对比等操作。
 
 MegSpot 使用 Apache License, Version 2.0
 
+## 引文
+如果您在出版物中使用 MegSpot，请使用以下 BibTeX 条目引用它。
+
+```
+@Misc{MegSpot,
+  institution = {megvii},
+  title =  {MegSpot:An efficient, professional, cross-platform image & video comparison application.},
+  howpublished = {\url{https://github.com/MegEngine/MegSpot}},
+  year = {2021}
+}
+```
+
 Copyright (c) 2014-2021 Megvii Inc. All rights reserved.

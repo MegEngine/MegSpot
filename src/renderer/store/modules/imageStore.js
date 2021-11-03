@@ -1,4 +1,6 @@
 import * as GLABEL_CONSTANT from '../../constants';
+import { trimSep } from '@/utils/file';
+
 const imageStore = {
   namespaced: true,
   state: {
@@ -32,17 +34,17 @@ const imageStore = {
       state.imageConfig = newConfig;
     },
     SET_IMAGE_FOLDERS: (state, folders) => {
-      state.imageFolders = folders;
+      state.imageFolders = folders.map(trimSep);
     },
     ADD_IMAGE_FOLDER: (state, folder) => {
-      if (!state.imageFolders.includes(folder)) {
+      if (!state.imageFolders.includes(trimSep(folder))) {
         const tmp = [...state.imageFolders];
         tmp.push(folder);
         state.imageFolders = tmp;
       }
     },
     REMOVE_IMAGE_FOLDER: (state, folder) => {
-      if (state.imageFolders.includes(folder)) {
+      if (state.imageFolders.includes(trimSep(folder))) {
         const tmp = [...state.imageFolders];
         tmp.splice(state.imageFolders.indexOf(folder), 1);
         state.imageFolders = tmp;

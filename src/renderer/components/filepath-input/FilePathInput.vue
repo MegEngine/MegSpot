@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import path from 'path';
 export default {
   name: 'file-path-input',
   props: {

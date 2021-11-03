@@ -4,7 +4,7 @@
       :content="filePath"
       placement="top"
       effect="light"
-      :open-delay="500"
+      :open-delay="800"
     >
       <span class="viewer-name">{{ filePath | getFileName }}</span>
     </el-tooltip>
