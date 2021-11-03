@@ -312,7 +312,7 @@
           v-model="layout"
           placeholder="layout"
           style="width:80px"
-          v-tip="$t('general.layout')"
+          v-tip.left="$t('general.layout')"
         >
           <el-option
             v-for="item in [
