@@ -1,47 +1,55 @@
 <template>
-  <div>
-    <el-button @click="videoVisible = !videoVisible">
-      {{ $t('common.showVideoTip') }}
-    </el-button>
-    <swiper
-      ref="mySwiper"
-      v-show="videoVisible"
-      class="swiper"
-      :style="'width:' + _width + 'px; height:' + _height + 'px'"
-      :options="swiperOption"
-      @swiper="onSwiper"
-      @slideChange="onSlideChange"
-    >
-      <swiper-slide
-        v-for="(video, index) in videoSource"
-        :key="video"
-        class="video-container"
+  <div flex="dir:top">
+    <div flex="main:center">
+      <el-button
+        type="text"
+        size="medium"
+        @click="videoVisible = !videoVisible"
       >
-        <span class="title">{{ video.title }}</span>
-        <video
-          ref="video"
-          :src="video.url"
-          :autoplay="index == realIndex"
-          controls
-          class="video"
-          :width="_width"
-          :height="_height"
-          @ended="handleEnd"
-        ></video>
-      </swiper-slide>
-      <div
-        class="swiper-pagination swiper-pagination-black"
-        slot="pagination"
-      ></div>
-      <div
-        class="swiper-button-prev swiper-button-white"
-        slot="button-prev"
-      ></div>
-      <div
-        class="swiper-button-next swiper-button-white"
-        slot="button-next"
-      ></div>
-    </swiper>
+        {{ $t('common.showVideoTip') }}
+      </el-button>
+    </div>
+    <div flex="main:center">
+      <swiper
+        ref="mySwiper"
+        v-if="videoVisible"
+        class="swiper"
+        :style="'width:' + _width + 'px; height:' + _height + 'px'"
+        :options="swiperOption"
+        @swiper="onSwiper"
+        @slideChange="onSlideChange"
+      >
+        <swiper-slide
+          v-for="(video, index) in videoSource"
+          :key="video"
+          class="video-container"
+        >
+          <span class="title">{{ video.title }}</span>
+          <video
+            ref="video"
+            :src="video.url"
+            :autoplay="index == realIndex"
+            controls
+            class="video"
+            :width="_width"
+            :height="_height"
+            @ended="handleEnd"
+          ></video>
+        </swiper-slide>
+        <div
+          class="swiper-pagination swiper-pagination-black"
+          slot="pagination"
+        ></div>
+        <div
+          class="swiper-button-prev swiper-button-white"
+          slot="button-prev"
+        ></div>
+        <div
+          class="swiper-button-next swiper-button-white"
+          slot="button-next"
+        ></div>
+      </swiper>
+    </div>
   </div>
 </template>
 
@@ -62,10 +70,6 @@ export default {
     SwiperSlide
   },
   props: {
-    // videoVisible: {
-    //   type: Boolean,
-    //   default: false
-    // },
     _width: {
       type: String | Number,
       default: '500'
@@ -120,20 +124,14 @@ export default {
       }
     };
   },
-  mounted() {
-    console.log(this.swiper);
-  },
   methods: {
-    onSwiper(swiper) {
-      console.log('slide', swiper);
-    },
+    onSwiper(swiper) {},
     onSlideChange() {
       this.justEnded = false;
       this.$refs.video[this.swiper.realIndex].currentTime = 0;
       this.$refs.video[this.swiper.realIndex].play();
     },
     handleEnd(arg) {
-      console.log('ended', this.videoSource, arg.path[0].src);
       this.justEnded = true;
       this.prevIndex = this.activeIndex;
       let activeIndex = (this.activeIndex + 1) % this.videoSource.length;
@@ -158,7 +156,6 @@ export default {
     max-height: 100%;
     margin: 0;
     object-fit: contain;
-    padding-top: 10px;
     .title {
       position: absolute;
       left: 50%;

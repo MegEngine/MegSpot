@@ -1,7 +1,7 @@
 export default {
   common: {
     hotKey: '快捷键',
-    showVideoTip: '显示演示视频'
+    showVideoTip: '查看演示'
   },
   nav: {
     toHome: '主菜单',

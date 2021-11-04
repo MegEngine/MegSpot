@@ -1,6 +1,11 @@
 <template>
-  <div ref="container" id="container" flex class="dashboard-container">
-    <div flex="dir:top main:center" class="entry">
+  <div
+    ref="container"
+    id="container"
+    class="dashboard-container"
+    flex="dir:top"
+  >
+    <div flex="main:justify box:mean" class="entry">
       <entry-card
         v-for="item in tools"
         :key="item.title"
@@ -82,14 +87,9 @@ export default {
     handleResize: throttle(50, function() {
       // this.$nextTick(() => {
       const container = this.$refs.container;
-      console.log(
-        'handleResize',
-        (container && (container.offsetWidth / 5) * 4) ?? 500,
-        (container && (container.offsetHeight * 12) / 25) ?? 300
-      );
       this.size = {
-        width: (container && (container.offsetWidth * 4) / 5) ?? 500,
-        height: (container && container.offsetHeight - 25) ?? 300
+        width: (container && ((container.offsetHeight - 240) * 5) / 3) ?? 500,
+        height: (container && container.offsetHeight - 240) ?? 300
       };
       // });
     })
@@ -102,10 +102,9 @@ export default {
   width: 100%;
   height: 100%;
   .entry {
-    margin: 10px;
-    transform: translateY(-100px);
+    margin-top: 10px;
     .entry-item {
-      margin-top: 100px;
+      margin: 0 20px;
     }
   }
   .help {
