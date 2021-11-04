@@ -15,12 +15,12 @@
       <el-tab-pane label="introduction" name="introduction">
         <div style="text-align:left">
           <div class="introduction">
-            {{
-              `MegSpot is a cross-platform local application designed to provide users with convenient functions such as local picture comparison, video comparison, and picture customization processing.\r\nEnter Dingding Group for details.`
-            }}
+            {{ $t('common.desc') }}
           </div>
           <div class="handbook" flex="main:left cross:center">
-            <span class="link" @click="clickManual">manual</span>
+            <span class="link" @click="clickManual">{{
+              $t('common.manual')
+            }}</span>
           </div>
           <img
             style="width: 300px"

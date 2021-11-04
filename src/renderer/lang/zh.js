@@ -1,6 +1,9 @@
 export default {
   common: {
     supportTypes: '支持多种文件类型:',
+    desc:
+      'MegSpot是一款跨平台的本地应用，旨在为用户提供本地图片对比、视频对比、图片定制处理等便捷功能。\r\n可进入交流群了解详情、获取最新资讯。',
+    manual: '使用手册',
     hotKey: '快捷键',
     showVideoTip: '查看演示'
   },

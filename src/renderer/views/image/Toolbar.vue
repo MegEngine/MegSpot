@@ -341,7 +341,7 @@ export default {
         this.groupNum > 1
       ) {
         this.groupNum--;
-        this.changeGroup(this.groupNum);
+        this.changeGroup(this.groupNum, this.groupNum + 1);
       }
       // cmd/ctrl + → 向后切换一个分组
       if (
@@ -350,7 +350,7 @@ export default {
         this.groupNum < this.maxGroupNum
       ) {
         this.groupNum++;
-        this.changeGroup(this.groupNum);
+        this.changeGroup(this.groupNum, this.groupNum - 1);
       }
     },
     changeGroup(groupNum, oldGroupNum) {

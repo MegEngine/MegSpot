@@ -1,6 +1,9 @@
 export default {
   common: {
     supportTypes: 'Support multiple file types:',
+    desc:
+      'MegSpot is a cross-platform local application designed to provide users with convenient functions such as local picture comparison, video comparison, and picture customization processing. \r\nYou can enter the exchange group to learn more and get the latest information.',
+    manual: 'manual',
     hotKey: 'hotKey',
     showVideoTip: 'show help videos'
   },
