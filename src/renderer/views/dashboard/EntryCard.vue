@@ -1,12 +1,12 @@
 <template>
   <div class="entry-card" style="cursor:pointer" @click="toDetail">
     <el-card>
-      <div slot="header">
+      <div slot="header" class="header">
+        <i :class="icon"></i>
         <strong> {{ $t(title) }}</strong>
       </div>
-      <div class="body" flex="main:left">
-        <i :class="icon"></i>
-        <article flex-box="1">{{ $t(desc) }}</article>
+      <div class="body">
+        <article>{{ $t(desc) }}</article>
       </div>
     </el-card>
   </div>
@@ -47,25 +47,18 @@ export default {
 @import '@/styles/variables.scss';
 
 .entry-card {
+  height: 100%;
+  margin-left: 30px;
+  margin-right: 30px;
   &:hover {
-    .body > i {
+    .header {
+      transition: color 0.4s;
       color: $primaryColor;
     }
   }
   .body {
-    i {
-      cursor: pointer;
-      line-height: 80px;
-      font-size: 4em;
-      transition: color 0.3s;
-      color: #606266;
-      &:hover {
-        color: $primaryColor;
-      }
-    }
     article {
       margin-left: 20px;
-      height: 100px;
       color: $labelColor;
     }
   }

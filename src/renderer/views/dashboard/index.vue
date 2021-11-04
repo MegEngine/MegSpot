@@ -1,11 +1,6 @@
 <template>
-  <div
-    ref="container"
-    id="container"
-    class="dashboard-container"
-    flex="dir:top"
-  >
-    <div flex="main:justify box:mean" class="entry">
+  <div ref="container" id="container" flex='dir:top box:first' class="dashboard-container">
+    <div flex="dir:left main:center box:mean" class="entry">
       <entry-card
         v-for="item in tools"
         :key="item.title"
@@ -101,6 +96,9 @@ export default {
 .dashboard-container {
   width: 100%;
   height: 100%;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 30px;
   .entry {
     margin-top: 10px;
     .entry-item {
