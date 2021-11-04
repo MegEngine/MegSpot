@@ -1,11 +1,16 @@
 <template>
-  <div ref="container" id="container" flex='dir:top box:first' class="dashboard-container">
+  <div
+    ref="container"
+    id="container"
+    flex="dir:top box:first"
+    class="dashboard-container"
+  >
     <div flex="dir:left main:center box:mean" class="entry">
       <entry-card
         v-for="item in tools"
         :key="item.title"
         :title="item.title"
-        :desc="item.desc"
+        :desc="$t('common.supportTypes') + item.supportTypes"
         :icon="item.icon"
         :route="item.route"
         class="entry-item"
@@ -45,13 +50,13 @@ export default {
       tools: [
         {
           title: 'dashboard.entries.image.title',
-          desc: 'dashboard.entries.image.desc',
+          supportTypes: ' jpg, jpeg, png, svg...',
           icon: 'el-icon-picture-outline',
           route: '/image/index'
         },
         {
           title: 'dashboard.entries.video.title',
-          desc: 'dashboard.entries.video.desc',
+          supportTypes: ' mp4, mov, rmvb, avi...',
           icon: 'el-icon-video-camera',
           route: '/video/index'
         }

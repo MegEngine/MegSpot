@@ -1,5 +1,6 @@
 export default {
   common: {
+    supportTypes: '支持多种文件类型:',
     hotKey: '快捷键',
     showVideoTip: '查看演示'
   },

@@ -20,12 +20,7 @@
             }}
           </div>
           <div class="handbook" flex="main:left cross:center">
-            <span>使用手册：</span>
-            <span class="link" @click="imageDragDropCompare"
-              >图片分割对比功能</span
-            >
-            <span class="link" @click="startCommand">Linux支持命令启动</span>
-            <span class="link" @click="autoUpdates">自动更新功能说明</span>
+            <span class="link" @click="clickManual">manual</span>
           </div>
           <img
             style="width: 300px"
@@ -197,19 +192,8 @@ export default {
     show() {
       this.visible = true;
     },
-    checkUpdate() {},
-    imageDragDropCompare() {
-      shell.openExternal();
-    },
-    startCommand() {
-      shell.openExternal(
-        'https://github.com/MegEngine/MegSpot/wiki/%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%93%8D%E4%BD%9C'
-      );
-    },
-    autoUpdates() {
-      shell.openExternal(
-        'https://github.com/MegEngine/MegSpot/wiki/%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0'
-      );
+    clickManual() {
+      shell.openExternal('https://github.com/MegEngine/MegSpot/wiki');
     }
   }
 };

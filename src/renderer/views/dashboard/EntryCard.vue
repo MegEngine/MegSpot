@@ -6,7 +6,7 @@
         <strong> {{ $t(title) }}</strong>
       </div>
       <div class="body">
-        <article>{{ $t(desc) }}</article>
+        <article>{{ desc }}</article>
       </div>
     </el-card>
   </div>

@@ -1,5 +1,6 @@
 export default {
   common: {
+    supportTypes: '複数のファイルタイプをサポート:',
     hotKey: 'ホットキー',
     showVideoTip: 'デモビデオを表示'
   },

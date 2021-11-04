@@ -1,5 +1,6 @@
 export default {
   common: {
+    supportTypes: 'Support multiple file types:',
     hotKey: 'hotKey',
     showVideoTip: 'show help videos'
   },
