@@ -39,15 +39,16 @@
         v-show="showType === 'list'"
         ref="fileTable"
         :showAll="showAll"
-        @sort-change="handleSortChange"
-        @addFolder="$emit('addFolder')"
-        @updateShowFile="updateShowFile"
         :fileList="videoList"
         :currentPath="videoCurrentPath"
         :checkItem="checkItem"
         :addVuexItem="addVideos"
         :removeVuexItem="removeVideos"
         :emptyVuexItems="emptyVideos"
+        :defaultSort="videoConfig.defaultSort"
+        @sort-change="handleSortChange"
+        @addFolder="$emit('addFolder')"
+        @updateShowFile="updateShowFile"
       >
       </FileTable>
       <div class="thumbnail-content" v-show="showType === 'thumbnail'">
@@ -55,7 +56,6 @@
           v-for="item in thumbnailList"
           :key="item.path"
           :file="item"
-          :defaultSort="defaultSort"
           :fileList="videoList"
           :addVuexItem="addVideos"
           :removeVuexItem="removeVideos"
@@ -89,15 +89,11 @@ export default {
     return {
       showType: 'list',
       showAll: false,
-      showFile: [],
-      defaultSort: {
-        prop: 'lastModifyTime',
-        order: 'descending'
-      }
+      showFile: []
     };
   },
   computed: {
-    ...mapGetters(['videoList', 'videoFolders']),
+    ...mapGetters(['videoList', 'videoFolders', 'videoConfig']),
     ...mapGetters({ currentPathFromVuex: 'currentPath' }),
     videoCurrentPath: {
       get() {
@@ -112,7 +108,7 @@ export default {
       }
     },
     thumbnailList() {
-      const { prop, order } = this.defaultSort;
+      const { field, order } = this.videoConfig.defaultSort;
       const list = this.showFile.filter(this.checkItem);
       if (!order) {
         return list;
@@ -120,11 +116,11 @@ export default {
       const reverse = order === 'descending' ? -1 : 1;
       let sort = (a, b) => {
         let res;
-        if (typeof a[prop] === 'number') {
-          res = a[prop] - b[prop];
-        } else if (typeof a[prop] === 'string') {
-          const aStr = a[prop];
-          const bStr = b[prop];
+        if (typeof a[field] === 'number') {
+          res = a[field] - b[field];
+        } else if (typeof a[field] === 'string') {
+          const aStr = a[field];
+          const bStr = b[field];
           for (let i = 0; i < aStr.length; i++) {
             const chartA = aStr.charCodeAt(i);
             const chartB = bStr.charCodeAt(i);
@@ -150,16 +146,15 @@ export default {
       'removeVideos',
       'emptyVideos',
       'setVideoFolders',
-      'setFolderPath'
+      'setFolderPath',
+      'setVideoConfig'
     ]),
     checkItem(item) {
       return item.isFile && isVideo(item.path);
     },
-    handleSortChange({ column, order, prop }) {
-      this.defaultSort = {
-        order,
-        prop
-      };
+    handleSortChange(sortChange) {
+      const { order, property: field } = sortChange;
+      this.setVideoConfig({ defaultSort: { order, field } });
     },
     updateShowFile(newVal) {
       this.showFile = newVal;

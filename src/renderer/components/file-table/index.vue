@@ -8,8 +8,14 @@
     highlight-hover-row
     highlight-current-row
     :scroll-y="{ gt: 0, rHeight: 40, oSize: 5 }"
-    :sort-config="sortConfig"
-    :checkbox-config="{ trigger: 'row', checkMethod: checkSelectable }"
+    :sort-config="{
+      defaultSort
+    }"
+    :checkbox-config="{
+      trigger: 'cell',
+      highlight: true,
+      checkMethod: checkSelectable
+    }"
     :tooltip-config="{ enterable: true }"
     class="table"
     header-cell-class-name="width_adaptive"
@@ -83,10 +89,7 @@ export default {
   props: {
     defaultSort: {
       type: Object,
-      default: () => ({
-        field: 'lastModifyTime',
-        order: 'descending'
-      })
+      default: () => ({})
     },
     showAll: {
       type: Boolean,
@@ -125,13 +128,7 @@ export default {
       search: '',
       fileInfoList: [],
       origin: -1,
-      pin: false, // 按下shift
-      sortConfig: {
-        defaultSort: {
-          field: 'lastModifyTime',
-          order: 'desc'
-        }
-      }
+      pin: false // 按下shift
     };
   },
   computed: {

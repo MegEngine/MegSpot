@@ -6,7 +6,8 @@ const videoStore = {
     videoFolders: [],
     videoConfig: {
       smooth: true,
-      layout: GLABEL_CONSTANT.LAYOUT_2X1
+      layout: GLABEL_CONSTANT.LAYOUT_2X1,
+      defaultSort: {}
     },
     canvasSize: {
       width: 400,

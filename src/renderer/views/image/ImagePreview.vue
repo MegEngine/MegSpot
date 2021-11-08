@@ -45,7 +45,7 @@
         :addVuexItem="addImages"
         :removeVuexItem="removeImages"
         :emptyVuexItems="emptyImages"
-        :defaultSort="defaultSort"
+        :defaultSort="imageConfig.defaultSort"
         @sort-change="handleSortChange"
         @addFolder="$emit('addFolder')"
         @updateShowFile="updateShowFile"
@@ -57,7 +57,6 @@
         <Thumbnail
           v-for="item in thumbnailList"
           :key="item.path"
-          :defaultSort="defaultSort"
           :file="item"
           :fileList="imageList"
           :addVuexItem="addImages"
@@ -98,15 +97,11 @@ export default {
     return {
       showType: 'list',
       showAll: false,
-      showFile: [],
-      defaultSort: {
-        prop: 'lastModifyTime',
-        order: 'descending'
-      }
+      showFile: []
     };
   },
   computed: {
-    ...mapGetters(['imageList', 'imageFolders']),
+    ...mapGetters(['imageList', 'imageFolders', 'imageConfig']),
     ...mapGetters({ currentPathFromVuex: 'currentPath' }),
     currentPath: {
       get() {
@@ -121,7 +116,7 @@ export default {
       }
     },
     thumbnailList() {
-      const { prop, order } = this.defaultSort;
+      const { field, order } = this.imageConfig.defaultSort;
       const list = this.showFile.filter(this.checkItem);
       if (!order) {
         return list;
@@ -129,11 +124,11 @@ export default {
       const reverse = order === 'descending' ? -1 : 1;
       let sort = (a, b) => {
         let res;
-        if (typeof a[prop] === 'number') {
-          res = a[prop] - b[prop];
-        } else if (typeof a[prop] === 'string') {
-          const aStr = a[prop];
-          const bStr = b[prop];
+        if (typeof a[field] === 'number') {
+          res = a[field] - b[field];
+        } else if (typeof a[field] === 'string') {
+          const aStr = a[field];
+          const bStr = b[field];
           for (let i = 0; i < aStr.length; i++) {
             const chartA = aStr.charCodeAt(i);
             const chartB = bStr.charCodeAt(i);
@@ -159,16 +154,15 @@ export default {
       'removeImages',
       'emptyImages',
       'setFolderPath',
-      'setImageFolders'
+      'setImageFolders',
+      'setImageConfig'
     ]),
     checkItem(item) {
       return item.isFile && isImage(item.path);
     },
-    handleSortChange({ column, order, prop }) {
-      this.defaultSort = {
-        order,
-        prop
-      };
+    handleSortChange(sortChange) {
+      const { order, property: field } = sortChange;
+      this.setImageConfig({ defaultSort: { order, field } });
     },
     updateShowFile(newVal) {
       this.showFile = newVal;

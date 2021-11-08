@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "1.0.1",
+  "version": "1.1.2",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -38,10 +38,13 @@
       }
     ],
     "productName": "MegSpot",
-    "artifactName": "${productName}-${version}.${ext}",
+    "artifactName": "${productName}-${version}-${os}.${ext}",
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
-    "releaseInfo": {},
+    "releaseInfo": {
+      "releaseNotes": "1.优化文件列表选取。\n2.优化文件列表全选，反选效率。\n3.支持mac dmg自动更新。\n4. 修复若干bug。",
+      "releaseDate": "2021.11.4"
+    },
     "directories": {
       "output": "build"
     },
