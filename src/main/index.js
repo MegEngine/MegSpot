@@ -71,18 +71,7 @@ function onAppReady() {
 app.isReady() ? onAppReady() : app.on('ready', onAppReady);
 // 解决9.x跨域异常问题
 app.commandLine.appendSwitch('disk-cache-size', 512000);
-app.commandLine.appendSwitch(
-  'enable-logging',
-  '/Users/weiyajun/work/megvii/temp/chrome-log/a.txt'
-);
-app.commandLine.appendSwitch(
-  'log-file',
-  '/Users/weiyajun/work/megvii/temp/chrome-log/file.txt'
-);
-app.commandLine.appendSwitch(
-  'log-net-log',
-  '/Users/weiyajun/work/megvii/temp/chrome-log/net.txt'
-);
+
 app.on('window-all-closed', () => {
   // 所有平台均为所有窗口关闭就退出软件
   app.quit();

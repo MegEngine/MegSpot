@@ -4,7 +4,6 @@ import router from './router';
 import store from './store';
 // 引用element
 import ElementUI from 'element-ui';
-import './performance';
 // 日志
 import log from '@/log';
 import './error';
