@@ -27,6 +27,7 @@
 <script>
 import ImgViewer from '@/components/image-viewer/index';
 import 'viewerjs/dist/viewer.css';
+import { getImageUrlSync } from '@/utils/image';
 import Vue from 'vue';
 Vue.use(ImgViewer, {
   debug: true,
@@ -59,7 +60,7 @@ export default {
       this.orginGroupAImages = this.picPaths.map((item, index) => {
         return {
           thumbnail: require('@/assets/images/placeholder.png'),
-          source: 'file://' + item
+          source: getImageUrlSync(item)
         };
       });
       this.showViewer = true;

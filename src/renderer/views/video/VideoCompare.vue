@@ -688,6 +688,7 @@ export default {
       this.videoScale = 1;
     },
     getVidePath(path) {
+      // FIXME: 
       return path.replace('file://', '');
     },
     getImageDetails(imageNameList, callback) {

@@ -13,7 +13,6 @@
     }"
     :checkbox-config="{
       trigger: 'cell',
-      highlight: true,
       checkMethod: checkSelectable
     }"
     :tooltip-config="{ enterable: true }"

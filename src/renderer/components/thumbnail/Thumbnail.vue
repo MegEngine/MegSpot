@@ -17,7 +17,7 @@
 
 <script>
 import { formatFileSize } from '@/utils/file';
-
+import { getImageUrlSync } from '@/utils/image';
 export default {
   name: 'imageThumbnail',
   props: {
@@ -49,7 +49,7 @@ export default {
       return this.file.path;
     },
     src() {
-      return `file://${this.path.replace(/#/g, '%23')}`;
+      return getImageUrlSync(this.path).replace(/#/g, '%23');
     }
   },
   data() {

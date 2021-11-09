@@ -73,8 +73,8 @@ import RGBAExhibit from '@/components/rgba-exhibit';
 import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
-const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
-import { getImageUrlSync } from '@/utils/image';
+const { mapGetters } = createNamespacedHelpers('imageStore');
+import { getImageUrlSyncNoCache } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
 
@@ -297,7 +297,7 @@ export default {
           cv.imread(this.image)
         );
       };
-      this.image.src = getImageUrlSync(this.imgSrc);
+      this.image.src = getImageUrlSyncNoCache(this.imgSrc);
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d');
@@ -313,7 +313,7 @@ export default {
         this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
         this.drawImage();
       };
-      this.image.src = getImageUrlSync(this.imgSrc);
+      this.image.src = getImageUrlSyncNoCache(this.imgSrc);
     },
     drawImage() {
       let { x, y, width, height } = this.imagePosition;

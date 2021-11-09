@@ -2,8 +2,8 @@ import { ipcMain } from 'electron';
 // 注意这个autoUpdater不是electron中的autoUpdater
 import { autoUpdater } from 'electron-updater';
 
-autoUpdater.logger = require("electron-log")
-autoUpdater.logger.transports.file.level = "info"
+autoUpdater.logger = require('electron-log');
+autoUpdater.logger.transports.file.level = 'info';
 // 更新服务器地址，比如"http://**.**.**.**:3002/download/"
 
 // 检测更新，在你想要检查更新的时候执行，renderer事件触发后的操作自行编写
@@ -22,12 +22,10 @@ function updateHandle(mainWindow) {
 
   autoUpdater.setFeedURL({
     provider: 'github',
-    private: false,
     repo: 'MegSpot',
     owner: 'MegEngine',
-    releaseType: 'release',
+    releaseType: 'release'
   });
-
   autoUpdater.on('error', function(info) {
     console.log('info', info);
     sendUpdateMessage(message.error);
@@ -87,12 +85,12 @@ function updateHandle(mainWindow) {
       });
   });
   // 后端主动检查版本更新
-  // if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production') {
     autoUpdater.checkForUpdates();
     setInterval(() => {
       autoUpdater.checkForUpdates();
     }, 60 * 60 * 1000);
-  // }
+  }
 }
 // }
 

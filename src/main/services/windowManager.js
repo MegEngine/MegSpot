@@ -18,9 +18,6 @@ const iconPath = path.join(
 );
 
 function createMainWindow() {
-  /**
-   * Initial window options
-   */
   mainWindow = new BrowserWindow({
     height: 800,
     useContentSize: true,
@@ -111,10 +108,6 @@ function loadingWindow() {
 }
 
 function initWindow() {
-  if (config.UseStartupChart) {
-    return loadingWindow();
-  } else {
-    return createMainWindow();
-  }
+  return loadingWindow();
 }
 export default initWindow;
