@@ -74,11 +74,11 @@
             $t('imageCenter.bilinearInterpolation')
           }}</el-radio-button>
         </el-radio-group>
-      </div>
-      <div class="select">
-        <span v-if="showSelectedMsg" class="msg">
-          {{ $t('imageCenter.selectedMsg') }}
-        </span>
+        <div class="select">
+          <span v-if="showSelectedMsg" class="msg">
+            {{ $t('imageCenter.selectedMsg') }}
+          </span>
+        </div>
       </div>
       <div class="middle">
         <span class="custom-container" v-if="showCompare === false">
@@ -110,7 +110,14 @@
                 <svg-icon icon-class="restart" />
               </span>
             </el-button>
-            <el-button type="text" @click="changeLoop" v-tip="$t('video.loop')">
+            <el-button
+              type="text"
+              @click="changeLoop"
+              v-tip="$t('video.loop')"
+              :class="{
+                enabled: loop
+              }"
+            >
               <span class="svg-container" flex="cross:center">
                 <svg-icon icon-class="loop" />
               </span>
@@ -196,7 +203,10 @@
                 <svg-icon icon-class="gif" />
               </span>
             </el-button>
-            <GifDialog ref="gifDialog" :selectList="videoList"></GifDialog>
+            <GifDialog
+              ref="gifDialog"
+              :selectList="videoList.slice(startIndex, startIndex + groupCount)"
+            ></GifDialog>
           </el-button-group>
         </span>
         <span v-if="showCompare === false" class="custom-container">
@@ -216,9 +226,6 @@
             >
             </el-option>
           </el-select>
-          <el-checkbox v-model="loop">
-            {{ $t('video.loop') }}
-          </el-checkbox>
         </span>
       </div>
       <div class="right">
@@ -227,9 +234,20 @@
             type="text"
             @click="pickColor"
             size="mini"
-            v-tip="$t('imageCenter.colorPicker')"
+            v-tip="
+              $t('imageCenter.colorPicker') +
+                ' ' +
+                $t('common.hotKey') +
+                ':cmd/ctrl+p'
+            "
           >
-            <span class="svg-container" style="font-size: 20px">
+            <span
+              class="svg-container"
+              style="font-size: 20px"
+              :class="{
+                enabled: traggerRGB
+              }"
+            >
               <svg-icon icon-class="pick-color" />
             </span>
           </el-button>
@@ -308,7 +326,7 @@
           v-model="layout"
           placeholder="layout"
           style="width:80px"
-          v-tip="$t('general.layout')"
+          v-tip.left="$t('general.layout')"
         >
           <el-option
             v-for="item in [
@@ -341,7 +359,7 @@
   </div>
 </template>
 <script>
-import GifDialog from './components/gifDialog';
+import GifDialog from '@/components/gif-dialog';
 import Gallery from '@/components/gallery';
 import VideoContainer from './VideoContainer';
 import * as CONSTANTS from './video-constants';
@@ -359,10 +377,10 @@ export default {
       lastX: 0,
       lastY: 0,
       showCompare: false,
+      traggerRGB: false,
       showSelectedMsg: false,
       groupNum: 0,
       startIndex: 0,
-      offset: 0,
       playbackRate: 1,
       rateOptions: [0.3, 0.5, 1, 1.25, 1.5, 2, 3],
       loop: true
@@ -411,9 +429,17 @@ export default {
         return this.videoConfig.layout;
       },
       set(val) {
+        const preNum = this.groupCount * (this.groupNum - 1);
         //切换布局则切回视频
         this.showCompare = false;
         this.setVideoConfig({ layout: val });
+        const afterNum = this.groupCount * (this.groupNum - 1);
+        const offset = preNum - afterNum;
+        this.startIndex = Math.max(
+          0,
+          (this.groupNum - 1) * this.groupCount + offset
+        );
+        this.groupNum = Math.ceil(this.startIndex / this.groupCount) + 1;
       }
     },
     containerStyle() {
@@ -481,11 +507,12 @@ export default {
       'setVideoConfig',
       'setVideos'
     ]),
-    changeGroup(groupNum) {
+    changeGroup(groupNum, oldGroupNum) {
       this.startIndex = Math.max(
         0,
-        (groupNum - 1) * this.groupCount + this.offset
+        this.startIndex - this.groupCount * (oldGroupNum - groupNum)
       );
+      this.$refs.gifDialog && this.$refs.gifDialog.clear(); // 清空gifDialog上次所选
     },
     changeStatus(status) {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status);
@@ -664,6 +691,28 @@ export default {
       if (event.keyCode === 27) {
         this.goBack();
       }
+      // cmd/ctrl+p
+      if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
+        this.pickColor();
+      }
+      // cmd/ctrl + ← 向前切换一个分组
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 37 &&
+        this.groupNum > 1
+      ) {
+        this.groupNum--;
+        this.changeGroup(this.groupNum, this.groupNum + 1);
+      }
+      // cmd/ctrl + → 向后切换一个分组
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 39 &&
+        this.groupNum < this.maxGroupNum
+      ) {
+        this.groupNum++;
+        this.changeGroup(this.groupNum, this.groupNum - 1);
+      }
     },
     goBack() {
       if (window.history.length > 1) {
@@ -792,10 +841,8 @@ export default {
 
     .select {
       position: relative;
-      width: 200px;
       height: 22px;
       .msg {
-        position: absolute;
         font-size: 12px;
         color: red;
       }
@@ -803,12 +850,22 @@ export default {
 
     .middle {
       .el-button-group {
+        .enabled {
+          .svg-icon {
+            color: $primaryColor;
+          }
+        }
         .svg-container {
           margin-left: 0.3rem;
         }
       }
     }
     .right {
+      .enabled {
+        .svg-icon {
+          color: $primaryColor;
+        }
+      }
       .layout-selector {
         width: 80px;
         margin-left: 20px;

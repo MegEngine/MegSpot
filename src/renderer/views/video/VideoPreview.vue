@@ -1,6 +1,6 @@
 <template>
   <div class="preview" flex="dir:top">
-    <div class="toolbar">
+    <div class="toolbar" flex="cross:center">
       <file-path-input
         ref="filePathInput_ref"
         class="file-path-input"
@@ -188,7 +188,7 @@ export default {
   background-color: #f0f3f6;
   padding: 10px;
   .toolbar {
-    margin: 5px;
+    margin-bottom: 12px;
     .show-all-switch {
       margin-left: 18px;
     }

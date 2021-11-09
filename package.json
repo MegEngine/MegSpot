@@ -72,9 +72,10 @@
       ]
     },
     "mac": {
-      "icon": "build/icons/icon.icns",
+      "icon": "build/icons/logo.icns",
       "category": "public.app-category.utilities",
       "target": [
+        "zip",
         "dmg"
       ]
     },
@@ -82,7 +83,6 @@
       "icon": "build/icons/logo.ico"
     },
     "linux": {
-      "icon": "build/icons",
       "target": [
         "AppImage"
       ],
@@ -102,8 +102,10 @@
     "flex.css": "^1.1.7",
     "fs-extra": "^9.1.0",
     "lodash": "^4.17.21",
+    "swiper": "5.2.0",
     "viewerjs": "^1.9.0",
     "vue": "^2.6.12",
+    "vue-awesome-swiper": "^4.1.1",
     "vue-i18n": "^8.22.4",
     "vue-router": "^3.4.9",
     "vue-split-panel": "^1.0.4",
@@ -149,6 +151,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
     "del": "^6.0.0",
+    "dmg-builder": "^22.14.5",
     "electron": "^11.2.1",
     "electron-builder": "^22.10.5",
     "electron-devtools-installer": "^3.1.1",

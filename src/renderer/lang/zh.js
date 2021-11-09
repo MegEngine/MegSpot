@@ -1,6 +1,11 @@
 export default {
   common: {
-    hotKey: '快捷键'
+    supportTypes: '支持多种文件类型:',
+    desc:
+      'MegSpot是一款跨平台的本地应用，旨在为用户提供本地图片对比、视频对比、图片定制处理等便捷功能。\r\n可进入交流群了解详情、获取最新资讯。',
+    manual: '使用手册',
+    hotKey: '快捷键',
+    showVideoTip: '查看演示'
   },
   nav: {
     toHome: '主菜单',
@@ -19,7 +24,7 @@ export default {
     thumbnail: '缩略图',
     fileName: '文件名',
     fileLoading: '加载文件中...',
-    groupNum: '分组序号',
+    groupNum: '分组序号\nCtrl + ← 向前翻页\nCtrl + → 向后翻页',
     lastModifyTime: '最后修改时间',
     size: '大小',
     scale: '缩放比例',

@@ -1,6 +1,11 @@
 export default {
   common: {
-    hotKey: 'ホットキー'
+    supportTypes: '複数のファイルタイプをサポート:',
+    desc:
+      'MegSpotは、ローカル画像比較、ビデオ比較、画像カスタマイズ処理などの便利な機能をユーザーに提供するように設計されたクロスプラットフォームのローカルアプリケーションです。 \r\n交換グループに参加して、詳細を確認し、最新情報を入手できます。',
+    manual: 'マニュアル',
+    hotKey: 'ホットキー',
+    showVideoTip: 'デモビデオを表示'
   },
   nav: {
     toHome: 'ホーム',
@@ -20,7 +25,7 @@ export default {
     thumbnail: 'サムネイル画像',
     fileName: 'ファイル名',
     fileLoading: 'ファイルを読み込んでいます...',
-    groupNum: 'グループ番号',
+    groupNum: 'グループ番号\nCtrl + ← ページ前方 nCtrl + → ページ後方',
     lastModifyTime: '最終変更時刻',
     size: 'ファイルサイズ',
     scale: '拡大倍率',

@@ -2,7 +2,7 @@
   <div class="video-container" flex="dir:top">
     <div class="container" ref="container" flex-box="1" flex="dir:top">
       <div v-if="!videoImageVisiable" class="video-header" flex="cross:center">
-        <el-tooltip placement="bottom" :open-delay="300">
+        <el-tooltip placement="bottom" :open-delay="800">
           <template slot="content" style="float: left">
             {{ path }}
           </template>

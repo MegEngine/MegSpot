@@ -11,7 +11,7 @@
           @changeVisible="handleHistVisible"
         />
       </CoverMask>
-      <el-tooltip placement="bottom">
+      <el-tooltip placement="bottom" :open-delay="800">
         <span
           class="compare-name"
           flex-box="1"
@@ -69,7 +69,8 @@ import RGBAExhibit from '@/components/rgba-exhibit';
 import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
-const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
+const { mapGetters } = createNamespacedHelpers('videoStore');
+const { mapActions } = createNamespacedHelpers('imageStore');
 import { getImageUrlSync } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
@@ -170,7 +171,7 @@ export default {
   },
   beforeDestroy() {
     this.removeEvents();
-    this.bitMap.close();
+    this.bitMap && this.bitMap.close();
   },
   computed: {
     ...mapGetters(['videoList', 'videoConfig', 'selectedPosition']),
@@ -485,6 +486,7 @@ export default {
       };
     },
     doDrag(data) {
+      if (this.imagePosition == null) return;
       let offset = data.offset;
       let transX = this.imagePosition.x + offset.x;
       let transY = this.imagePosition.y + offset.y;
@@ -496,6 +498,7 @@ export default {
       }
     },
     doZoom(data) {
+      if (this.imagePosition == null) return;
       let mousePos = data.mousePos;
       let rate = data.rate;
       let x = mousePos.x - (mousePos.x - this.imagePosition.x) * rate;
@@ -584,10 +587,11 @@ export default {
       });
     },
     handleZoomEnd() {
-      this.broadCast({
-        name: 'doZoomEnd',
-        data: {}
-      });
+      this.imagePosition &&
+        this.broadCast({
+          name: 'doZoomEnd',
+          data: {}
+        });
     },
     broadCast({ name, data }) {
       if (!this.selected) {

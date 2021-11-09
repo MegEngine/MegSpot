@@ -31,7 +31,7 @@ export default {
     // 尽在产品模式下运行 开发模式默认也会是通过命令运行，但是不是产品模式的命令 所以禁止处理
     if (process.env.NODE_ENV !== 'production') return;
     const cmd = await electron.ipcRenderer.sendSync('get_start_cmd_arg');
-    // 命令处理规则 [TODO:]
+    // 命令处理规则 https://github.com/MegEngine/MegSpot/wiki/%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%93%8D%E4%BD%9C
     console.log(`[command start app arg]: ${JSON.stringify(cmd)}`);
     const checkedPath = [];
     const unExistPath = [];

@@ -59,11 +59,11 @@
           $t('imageCenter.bilinearInterpolation')
         }}</el-radio-button>
       </el-radio-group>
-    </div>
-    <div class="select">
-      <span v-show="showSelectedMsg" class="msg">
-        {{ $t('imageCenter.selectedMsg') }}
-      </span>
+      <div class="select">
+        <span v-show="showSelectedMsg" class="msg">
+          {{ $t('imageCenter.selectedMsg') }}
+        </span>
+      </div>
     </div>
     <div class="middle">
       <el-button-group class="gap">
@@ -130,7 +130,10 @@
             <svg-icon icon-class="gif" />
           </span>
         </el-button>
-        <GifDialog ref="gifDialog" :selectList="imageList"></GifDialog>
+        <GifDialog
+          ref="gifDialog"
+          :selectList="imageList.slice(startIndex, startIndex + groupCount)"
+        ></GifDialog>
       </el-button-group>
     </div>
     <div class="right">
@@ -140,7 +143,15 @@
             type="text"
             @click="pickColor"
             size="mini"
-            v-tip="$t('imageCenter.colorPicker')"
+            v-tip="
+              $t('imageCenter.colorPicker') +
+                ' ' +
+                $t('common.hotKey') +
+                ':cmd/ctrl+p'
+            "
+            :class="{
+              enabled: traggerRGB
+            }"
           >
             <span class="svg-container" style="font-size: 20px">
               <svg-icon icon-class="pick-color" />
@@ -228,7 +239,7 @@
           placeholder="layout"
           class="layout-selector"
           size="mini"
-          v-tip="$t('general.layout')"
+          v-tip.left="$t('general.layout')"
         >
           <el-option
             v-for="item in [
@@ -253,7 +264,7 @@
 import * as GLOBAL_CONSTANTS from '@/constants';
 import Gallery from '@/components/gallery';
 import { createNamespacedHelpers } from 'vuex';
-import GifDialog from './components/gifDialog';
+import GifDialog from '@/components/gif-dialog';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
 export default {
@@ -320,6 +331,36 @@ export default {
       if (event.keyCode === 27) {
         this.goBack();
       }
+      // cmd/ctrl+p
+      if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
+        this.pickColor();
+      }
+      // cmd/ctrl + ← 向前切换一个分组
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 37 &&
+        this.groupNum > 1
+      ) {
+        this.groupNum--;
+        this.changeGroup(this.groupNum, this.groupNum + 1);
+      }
+      // cmd/ctrl + → 向后切换一个分组
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 39 &&
+        this.groupNum < this.maxGroupNum
+      ) {
+        this.groupNum++;
+        this.changeGroup(this.groupNum, this.groupNum - 1);
+      }
+    },
+    changeGroup(groupNum, oldGroupNum) {
+      this.startIndex = Math.max(
+        0,
+        this.startIndex - this.groupCount * (oldGroupNum - groupNum)
+      );
+      this.$refs.gifDialog.clear(); // 清空gifDialog上次所选
+      this.$bus.$emit('changeGroup', this.startIndex);
     },
     changeGroup(groupNum) {
       this.startIndex = Math.max(
@@ -451,10 +492,8 @@ export default {
 
   .select {
     position: relative;
-    width: 350px;
     height: 22px;
     .msg {
-      position: absolute;
       font-size: 12px;
       color: red;
     }
@@ -471,6 +510,11 @@ export default {
     .layout-selector {
       width: 80px;
       margin-left: 20px;
+    }
+    .enabled {
+      .svg-icon {
+        color: $primaryColor;
+      }
     }
   }
 }

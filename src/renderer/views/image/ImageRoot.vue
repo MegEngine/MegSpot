@@ -64,7 +64,7 @@
         >
           {{ $t('general.dragDropCompare') }}
         </el-button>
-        <el-button
+        <!-- <el-button
           type="text"
           size="small"
           title="line-Browse"
@@ -73,7 +73,7 @@
           @click="imageBrowser"
         >
           {{ $t('general.imageBrowser') }}
-        </el-button>
+        </el-button> -->
       </div>
     </div>
 
@@ -144,9 +144,6 @@ export default {
   },
   mounted() {
     addDragFolderListener(document.getElementById('folderTree'));
-    if (!this.imageFolders || this.imageFolders.length === 0) {
-      this.addFolder();
-    }
   },
   activated() {
     window.addEventListener('keydown', this.handleHotKey, true);

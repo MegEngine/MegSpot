@@ -5,10 +5,9 @@
         <el-breadcrumb class="nav" separator="|">
           <el-breadcrumb-item :to="{ path: '/' }">
             <img
-              src="@/assets/images/logo_232X232.png"
-              style="vertical-align: top; height:19px"
+              src="../../assets/images/big_logo_white.png"
+              style="vertical-align: middle; height:40px"
             />
-            <span style="color:white">MegSpot</span>
           </el-breadcrumb-item>
           <el-breadcrumb-item v-if="subNav">{{ subNav }}</el-breadcrumb-item>
           <el-breadcrumb-item v-else>{{ $t('nav.toHome') }}</el-breadcrumb-item>
@@ -73,7 +72,7 @@ export default {
   background: #132f51;
   box-shadow: 0px 3px 7px 0px rgba(36, 46, 66, 0.15);
   color: #ffffff;
-  padding-left: 15px;
+  padding-left: 0px;
   padding-right: 15px;
   .nav-container {
     .right-menu {

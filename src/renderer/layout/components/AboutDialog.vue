@@ -15,17 +15,12 @@
       <el-tab-pane label="introduction" name="introduction">
         <div style="text-align:left">
           <div class="introduction">
-            {{
-              `MegSpot is a cross-platform local application designed to provide users with convenient functions such as local picture comparison, video comparison, and picture customization processing.\r\nEnter Dingding Group for details.`
-            }}
+            {{ $t('common.desc') }}
           </div>
           <div class="handbook" flex="main:left cross:center">
-            <span>使用手册：</span>
-            <span class="link" @click="imageDragDropCompare"
-              >图片分割对比功能</span
-            >
-            <span class="link" @click="startCommand">Linux支持命令启动</span>
-            <span class="link" @click="autoUpdates">自动更新功能说明</span>
+            <span class="link" @click="clickManual">{{
+              $t('common.manual')
+            }}</span>
           </div>
           <img
             style="width: 300px"
@@ -197,23 +192,8 @@ export default {
     show() {
       this.visible = true;
     },
-    feedback() {
-      // [TODO:]
-      shell.openExternal();
-    },
-    checkUpdate() {},
-    imageDragDropCompare() {
-      shell.openExternal();
-    },
-    startCommand() {
-      shell.openExternal(
-        'https://wiki.megvii-inc.com/pages/viewpage.action?pageId=278201085'
-      );
-    },
-    autoUpdates() {
-      shell.openExternal(
-        'https://wiki.megvii-inc.com/pages/viewpage.action?pageId=274672458'
-      );
+    clickManual() {
+      shell.openExternal('https://github.com/MegEngine/MegSpot/wiki');
     }
   }
 };

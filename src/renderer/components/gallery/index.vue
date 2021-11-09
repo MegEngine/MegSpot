@@ -7,34 +7,35 @@
       <div class="container" @animationend="disappearModal">
         <draggable v-model="sortList" id="drag">
           <div
-            v-for="item in sortList"
-            :key="item"
+            v-for="(item, index) in sortList"
             class="dragItem"
             @click="handleClick(item)"
           >
             <div
-              :title="item"
-              :class="[focusList.includes(item) ? 'focus-item' : '']"
+              :class="[
+                (focusListIndex.length && focusListIndex.includes(index)) ||
+                focusList.includes(item)
+                  ? 'focus-item'
+                  : ''
+              ]"
             >
               <div>
                 <span
                   @click="$emit('remove', item)"
-                  title="close this item"
                   class="close-button"
-                  :title="$t('general.delete')"
+                  v-tip="$t('general.delete')"
                 >
                   <svg-icon icon-class="bin" />
                 </span>
               </div>
               <div class="content" flex="main:center cross:center">
-                <slot
-                  name="dragItem"
-                  :src="getImageUrlSync(item)"
-                  :alt="item | getFileName"
-                ></slot>
+                <slot name="dragItem" :src="getImageUrlSync(item)"></slot>
               </div>
-              <div class="name">
-                <span id="fileName">{{ item | getFileName }}</span>
+              <div class="name" v-tip="item">
+                <span
+                  id="fileName"
+                  v-html="$options.filters.getFileName(item)"
+                ></span>
               </div>
             </div>
           </div>
@@ -63,6 +64,10 @@ export default {
     focusList: {
       type: Array,
       default: () => []
+    },
+    focusListIndex: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -72,6 +77,9 @@ export default {
     };
   },
   computed: {
+    height() {
+      return document.body.clientHeight;
+    },
     sortList: {
       get() {
         return this.sortData;
@@ -190,6 +198,7 @@ export default {
       width: 214px;
       height: 100%;
       left: -200px;
+      height: 100%;
       #drag {
         :first-child {
           margin-top: 0 !important;

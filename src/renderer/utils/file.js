@@ -2,6 +2,14 @@ import fs from 'fs';
 import path from 'path';
 var sizeof = require('image-size');
 
+export const trimSep = pathStr => {
+  let trimPath = pathStr;
+  if (pathStr.endsWith(path.sep)) {
+    trimPath = pathStr.substring(0, pathStr.length - path.sep.length);
+  }
+  return trimPath;
+};
+
 // 格式化文件大小  根据范围转化单位
 export const formatFileSize = fileSize => {
   if (fileSize < 1024) {
