@@ -1,13 +1,13 @@
 import Layout from '@/layout';
 const Notfound = () => import('@/views/404');
+import store from '../store';
 
 export default [
-  { path: '*', component: Notfound, hidden: true },
+  { path: '*', component: Notfound },
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
-    hidden: true,
+    redirect: store.state.preferenceStore.lastRouterPath,
     children: [
       {
         path: 'dashboard',

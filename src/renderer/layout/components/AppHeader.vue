@@ -3,7 +3,7 @@
     <div class="nav-container" flex="main:justify cross:center" flex-box="1">
       <div class="left-menu">
         <el-breadcrumb class="nav" separator="|">
-          <el-breadcrumb-item :to="{ path: '/' }">
+          <el-breadcrumb-item :to="{ path: '/dashboard' }">
             <img
               src="../../assets/images/big_logo_white.png"
               style="vertical-align: middle; height:40px"
@@ -26,7 +26,6 @@
 <script>
 import AboutDialog from './AboutDialog';
 import UpdateDialog from './UpdateDialog';
-const shell = require('electron').shell;
 export default {
   name: 'AppHeader',
   components: { AboutDialog, UpdateDialog },
@@ -57,11 +56,6 @@ export default {
             console.error('未知的路由名称请修改AppHeader.vue:' + name);
         }
       }
-    }
-  },
-  methods: {
-    gotoHome() {
-      this.$router.push('/');
     }
   }
 };

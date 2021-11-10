@@ -13,16 +13,9 @@ import path from 'path';
 var electron = require('electron');
 var userData = electron.remote.app.getPath('userData');
 console.log('userData', userData);
-var documents = electron.remote.app.getPath('documents');
-console.log('documents', documents);
-var appPath = electron.remote.app.getAppPath();
-console.log('appPath', appPath);
-console.log(
-  'electron.remote.app.getPath("temp")',
-  electron.remote.app.getPath('temp')
-);
 import { createNamespacedHelpers } from 'vuex';
-import { isDirectory, readDir, getFileStatSync, isExist } from '@/utils/file';
+const { mapGetters } = createNamespacedHelpers('preferenceStore');
+import { isDirectory, isExist } from '@/utils/file';
 const IMAGE_MODE = 'imageMode';
 const VIDEO_MODE = 'videoMode';
 export default {
@@ -125,10 +118,23 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['lastRouterPath'])
+  },
   mounted() {
     electron.ipcRenderer.on('debugMessage', (event, text) => {
       console.log(`[debug message]: ${text}`);
     });
+    console.log('this.lastRouterPath', this.lastRouterPath);
+    console.log('this.$route.path', this.$route.path);
+    // if (this.lastRouterPath !== this.$route.path) {
+    //   this.$router.replace({
+    //     path: this.lastRouterPath
+    //   });
+    // }
+    // router.afterEach((to, from) => {
+    //   store.dispatch('preferenceStore/setLastRouterPath', to.path);
+    // });
   }
 };
 </script>

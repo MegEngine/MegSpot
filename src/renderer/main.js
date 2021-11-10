@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './App';
-import router from './router';
 import store from './store';
+import router from './router';
 // 引用element
 import ElementUI from 'element-ui';
 // 日志
