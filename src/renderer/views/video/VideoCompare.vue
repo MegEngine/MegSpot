@@ -500,6 +500,54 @@ export default {
       this.showCompare = false;
     }
   },
+  created() {
+    // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
+    if (this.videoList.length <= 4) {
+      let smartLayout;
+      switch (this.videoList.length) {
+        case 1:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X1;
+          break;
+        case 2:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X1;
+          break;
+        case 3:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_3X1;
+          break;
+        case 4:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_4X1;
+          break;
+        default:
+          smartLayout = this.imageConfig.layout;
+      }
+      this.setVideoConfig({ layout: smartLayout });
+    }
+  },
+  mounted() {
+    window.addEventListener('keyup', this.handleHotKey, true);
+    this.$bus.$on(
+      CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM,
+      (data, callback) => {
+        const { factor, lastX, lastY } = data;
+        this.lastX = lastX;
+        this.lastY = lastY;
+        this.videoScale *= factor;
+        callback(this.videoScale);
+      }
+    );
+    this.$bus.$on('getImageDetails', this.getImageDetails);
+    this.$bus.$on('image_handleSelect', this.handleSelect);
+    // resize 后重新计算宽高并渲染
+    window.addEventListener('resize', () => {
+      this.showCompare = false;
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener('keyup', this.handleHotKey, true);
+    this.$bus.$off(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM);
+    this.$bus.$off('image_handleSelect', this.handleSelect);
+    this.$bus.$off('getImageDetails');
+  },
   methods: {
     ...mapActions([
       'removeVideos',
@@ -737,7 +785,7 @@ export default {
       this.videoScale = 1;
     },
     getVidePath(path) {
-      // FIXME: 
+      // FIXME:
       return path.replace('file://', '');
     },
     getImageDetails(imageNameList, callback) {
@@ -764,31 +812,6 @@ export default {
         this.$message.error(error.toString() || error.message);
       }
     }
-  },
-  mounted() {
-    window.addEventListener('keyup', this.handleHotKey, true);
-    this.$bus.$on(
-      CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM,
-      (data, callback) => {
-        const { factor, lastX, lastY } = data;
-        this.lastX = lastX;
-        this.lastY = lastY;
-        this.videoScale *= factor;
-        callback(this.videoScale);
-      }
-    );
-    this.$bus.$on('getImageDetails', this.getImageDetails);
-    this.$bus.$on('image_handleSelect', this.handleSelect);
-    // resize 后重新计算宽高并渲染
-    window.addEventListener('resize', () => {
-      this.showCompare = false;
-    });
-  },
-  beforeDestroy() {
-    window.removeEventListener('keyup', this.handleHotKey, true);
-    this.$bus.$off(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM);
-    this.$bus.$off('image_handleSelect', this.handleSelect);
-    this.$bus.$off('getImageDetails');
   }
 };
 </script>

@@ -312,7 +312,7 @@ export default {
         this.offset = preNum - afterNum;
         this.startIndex = Math.max(
           0,
-          (groupNum - 1) * this.groupCount + this.offset
+          (this.groupNum - 1) * this.groupCount + this.offset
         );
         this.$bus.$emit('changeGroup', this.startIndex);
         this.groupNum = Math.floor(this.startIndex / this.groupCount);

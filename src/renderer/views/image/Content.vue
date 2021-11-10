@@ -44,6 +44,29 @@ export default {
       ]
     };
   },
+  created() {
+    // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
+    if (this.imageList.length <= 4) {
+      let smartLayout;
+      switch (this.imageList.length) {
+        case 1:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X1;
+          break;
+        case 2:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X1;
+          break;
+        case 3:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_3X1;
+          break;
+        case 4:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_4X1;
+          break;
+        default:
+          smartLayout = this.imageConfig.layout;
+      }
+      this.setImageConfig({ layout: smartLayout });
+    }
+  },
   mounted() {
     this.calcCanvasSize();
     // 调度事件  使用当前组件的方法
@@ -141,7 +164,7 @@ export default {
     changeGroup(groupStartIndex) {
       this.groupStartIndex = groupStartIndex;
     },
-    ...mapActions(['setCanvasSize']),
+    ...mapActions(['setCanvasSize', 'setImageConfig']),
     handleResize: throttle(50, function() {
       this.calcCanvasSize();
       // 重新布局图片容器;
