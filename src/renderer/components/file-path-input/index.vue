@@ -1,5 +1,5 @@
 <template>
-  <div class="file-path-input">
+  <div class="filepath-input">
     <el-input
       placeholder="Please enter the file path"
       prefix-icon="el-icon-search"
@@ -33,7 +33,7 @@ export default {
 </script>
 
 <style scoped>
-.file-path-input {
+.filepath-input {
   color: rgba(0, 0, 0, 0.55) !important;
   border-radius: 2px !important;
   height: 26px !important;

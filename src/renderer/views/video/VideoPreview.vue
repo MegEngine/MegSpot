@@ -78,7 +78,7 @@ import { isVideo } from '@/components/file-tree/lib/util';
 import SearchInput from '@/components/search-input/SearchInput';
 import FileTable from '@/components/file-table';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
-import FilePathInput from '@/components/file-path-input/index.vue';
+import FilePathInput from '@/components/file-path-input';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 

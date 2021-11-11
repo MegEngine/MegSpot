@@ -63,7 +63,6 @@
         >
           <template v-slot:default="slotProps">
             <img
-              loading='lazy'
               :src="slotProps.src"
               style="object-fit:contain;width:200px;height:170px"
             />
@@ -79,7 +78,7 @@ import { isDirectory, isExist } from '@/utils/file';
 import { isImage } from '@/components/file-tree/lib/util';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
 import FileTable from '@/components/file-table';
-import FilePathInput from '@/components/file-path-input/index.vue';
+import FilePathInput from '@/components/file-path-input';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
@@ -113,6 +112,7 @@ export default {
     },
     thumbnailList() {
       const { field, order } = this.imageConfig.defaultSort;
+      console.log('this.imageConfig.defaultSort', this.imageConfig.defaultSort);
       const list = this.showFile.filter(this.checkItem);
       if (!order) {
         return list;
@@ -141,7 +141,6 @@ export default {
       };
 
       list.sort(sort);
-      console.log('list', list);
       return list;
     }
   },
