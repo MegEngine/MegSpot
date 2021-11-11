@@ -12,7 +12,7 @@ import { NO_CACHE_FILE_PROTOCOL } from '@/constants';
 protocol.registerSchemesAsPrivileged([
   {
     scheme: NO_CACHE_FILE_PROTOCOL,
-    privileges: { bypassCSP: true, standard: true }
+    privileges: { bypassCSP: true }
   }
 ]);
 // app.disableHardwareAcceleration(); // 禁用gpu加速  解决图片拖动卡顿问题
@@ -50,11 +50,13 @@ function onAppReady() {
   protocol.registerFileProtocol(
     NO_CACHE_FILE_PROTOCOL,
     (request, callback) => {
-      const url = request.url.substr(`${NO_CACHE_FILE_PROTOCOL}://`.length);
+      const url = decodeURI(request.url).substr(
+        `${NO_CACHE_FILE_PROTOCOL}://`.length
+      );
       callback({
         path: url,
         headers: {
-          'cache-control': 'no-cache'
+          'cache-control': 'no-store'
         }
       });
     },
