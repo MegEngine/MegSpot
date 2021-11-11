@@ -383,7 +383,17 @@ export default {
       startIndex: 0,
       playbackRate: 1,
       rateOptions: [0.3, 0.5, 1, 1.25, 1.5, 2, 3],
-      loop: true
+      loop: true,
+      scheduleCanvasActions: [
+        {
+          event: 'image_handleSelect',
+          action: 'handleSelect'
+        },
+        {
+          event: 'getImageDetails',
+          action: 'getImageDetails'
+        }
+      ]
     };
   },
   computed: {
@@ -535,8 +545,10 @@ export default {
         callback(this.videoScale);
       }
     );
-    this.$bus.$on('getImageDetails', this.getImageDetails);
-    this.$bus.$on('image_handleSelect', this.handleSelect);
+    // 调度事件  使用当前组件的方法
+    this.scheduleCanvasActions.forEach(item => {
+      this.$bus.$on(item.event, this[item.action]);
+    });
     // resize 后重新计算宽高并渲染
     window.addEventListener('resize', () => {
       this.showCompare = false;
@@ -545,8 +557,9 @@ export default {
   beforeDestroy() {
     window.removeEventListener('keyup', this.handleHotKey, true);
     this.$bus.$off(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM);
-    this.$bus.$off('image_handleSelect', this.handleSelect);
-    this.$bus.$off('getImageDetails');
+    this.scheduleCanvasActions.forEach(item => {
+      this.$bus.$off(item.event, this[item.action]);
+    });
   },
   methods: {
     ...mapActions([

@@ -80,6 +80,10 @@ export default {
         {
           event: CONSTANTS.BUS_VIDEO_COMPARE_ACTION,
           action: 'executeAction'
+        },
+        {
+          event: 'getCanvasSize',
+          action: 'getCanvasSize'
         }
       ]
     };
@@ -100,6 +104,12 @@ export default {
     play() {
       this.video.currentTime = this.currentTime;
       this.video.play();
+    },
+    getCanvasSize(data, callback) {
+      callback({
+        width: this.container.clientWidth,
+        height: this.container.clientHeight - 22
+      });
     },
     // 提供外部直接调用
     getVideo({ name, data }, callback) {

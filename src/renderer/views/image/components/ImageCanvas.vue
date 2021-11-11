@@ -223,7 +223,6 @@ export default {
       }
       return this.afterFullSize || !isTooSmall;
     },
-
     setCanvasStyle({ style }) {
       this.canvas.style.filter = style;
     },

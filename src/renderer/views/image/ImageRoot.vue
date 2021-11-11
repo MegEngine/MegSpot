@@ -113,13 +113,11 @@ import Vue from 'vue';
 import FileTree from '@/components/file-tree/FileTree.vue';
 import Gallery from '@/components/gallery';
 import ShowPath from '@/components/show-path';
-import VueSplit from 'vue-split-panel';
 import ImagePreview from './ImagePreview';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 import addDragFolderListener from '@/utils/dragFolder.js';
 
-Vue.use(VueSplit);
 export default {
   name: 'ImageRoot',
   components: { FileTree, ImagePreview, Gallery, ShowPath },

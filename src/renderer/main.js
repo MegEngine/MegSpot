@@ -19,8 +19,10 @@ import { loadLib } from './lib';
 import { Header, Column, Tooltip, Table } from 'vxe-table';
 import 'xe-utils';
 import 'vxe-table/lib/style.css';
+import VueSplit from 'vue-split-panel';
 import VueScroll from 'vuescroll';
 
+Vue.use(VueSplit);
 Vue.use(VueScroll);
 Vue.use(Header)
   .use(Column)

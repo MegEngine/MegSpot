@@ -40,6 +40,10 @@ export default {
         {
           event: 'changeGroup',
           action: 'changeGroup'
+        },
+        {
+          event: 'getCanvasSize',
+          action: 'getCanvasSize'
         }
       ]
     };
@@ -164,19 +168,21 @@ export default {
     changeGroup(groupStartIndex) {
       this.groupStartIndex = groupStartIndex;
     },
-    ...mapActions(['setCanvasSize', 'setImageConfig']),
+    ...mapActions(['setImageConfig']),
     handleResize: throttle(50, function() {
       this.calcCanvasSize();
       // 重新布局图片容器;
       this.udpateAllCanvas();
     }),
-    calcCanvasSize() {
-      this.canvasWidth = this.calcWidth();
-      this.canvasHeight = this.calcHeight() - 18;
-      this.setCanvasSize({
+    getCanvasSize(data, callback) {
+      callback({
         width: this.canvasWidth,
         height: this.canvasHeight
       });
+    },
+    calcCanvasSize() {
+      this.canvasWidth = this.calcWidth();
+      this.canvasHeight = this.calcHeight() - 18;
     },
     calcWidth() {
       const containerWidth = document.body.clientWidth;

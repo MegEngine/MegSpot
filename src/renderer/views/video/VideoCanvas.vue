@@ -70,7 +70,6 @@ import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters } = createNamespacedHelpers('videoStore');
-const { mapActions } = createNamespacedHelpers('imageStore');
 import { getImageUrlSync } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
@@ -197,7 +196,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setCanvasSize']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, width, height) {
       const cw = this.width,
@@ -329,11 +327,6 @@ export default {
       this.cs = this.canvas.getContext('2d');
       this.$nextTick(() => {
         this.cs.imageSmoothingEnabled = this.videoConfig.smooth;
-        // 设置生成gif图的宽高
-        this.setCanvasSize({
-          width: this.canvas.width,
-          height: this.canvas.height
-        });
       });
     },
     // 供外部直接调用 待测试

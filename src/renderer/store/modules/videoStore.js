@@ -11,10 +11,6 @@ const videoStore = {
       layout: GLABEL_CONSTANT.LAYOUT_2X1,
       defaultSort: {}
     },
-    canvasSize: {
-      width: 400,
-      height: 300
-    },
     //当前文件夹路径
     currentPath: '',
     // 记忆文件树展开
@@ -26,7 +22,6 @@ const videoStore = {
     getVideoFolders: state => () => state.videoFolders,
     videoConfig: state => state.videoConfig,
     currentPath: state => state.currentPath,
-    canvasSize: state => state.canvasSize,
     expandData: state => state.expandData
   },
   mutations: {
@@ -73,9 +68,6 @@ const videoStore = {
     },
     EMPTY_VIDEOS: state => {
       state.videoList = [];
-    },
-    SET_CANVAS_SIZE: (state, newCanvasSize) => {
-      state.canvasSize = newCanvasSize;
     },
     // 修改当前文件夹
     SET_CURRENT_FOLDER_PATH: (state, newFolderPath) => {
@@ -131,9 +123,6 @@ const videoStore = {
     },
     emptyVideos({ commit }) {
       commit('EMPTY_VIDEOS');
-    },
-    setCanvasSize({ commit }, newCanvasSize) {
-      commit('SET_CANVAS_SIZE', newCanvasSize);
     },
     //修改当前文件夹路径
     setFolderPath({ commit }, newFolderPath) {
