@@ -1,7 +1,7 @@
 <template>
-  <div class="filepath-input">
+  <div class="file-path-input">
     <el-input
-      :placeholder="placeholder"
+      placeholder="Please enter the file path"
       prefix-icon="el-icon-search"
       :value="filePath"
       :disabled="disabled"
@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import path from 'path';
 export default {
   name: 'file-path-input',
   props: {
@@ -23,7 +22,6 @@ export default {
       type: String,
       default: ''
     },
-    placeholder: { type: String, default: '' },
     disabled: { type: Boolean, default: false }
   },
   methods: {
@@ -35,7 +33,7 @@ export default {
 </script>
 
 <style scoped>
-.filepath-input {
+.file-path-input {
   color: rgba(0, 0, 0, 0.55) !important;
   border-radius: 2px !important;
   height: 26px !important;

@@ -6,7 +6,6 @@
         class="file-path-input"
         flex-box="1"
         :filePath.sync="videoCurrentPath"
-        placeholder="Please enter the file path"
       >
       </file-path-input>
       <el-button class="addFolder" type="primary" @click="addFolder">{{
@@ -79,7 +78,7 @@ import { isVideo } from '@/components/file-tree/lib/util';
 import SearchInput from '@/components/search-input/SearchInput';
 import FileTable from '@/components/file-table';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
-import FilePathInput from '@/components/filepath-input/FilePathInput.vue';
+import FilePathInput from '@/components/file-path-input/index.vue';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 

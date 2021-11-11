@@ -33,7 +33,7 @@ Options:
   -c, --clear    清空已选
 
 advise:
-  由于freeStone支持自动更新导致  MegSpot-x.x.x.AppImage的文件名称会不断变化，建议创建个硬链接指向AppImage
+  由于MegSpot支持自动更新导致  MegSpot-x.x.x.AppImage的文件名称会不断变化，建议创建个硬链接指向AppImage
   命令：sudo ln ./MegSpot-x.x.x.AppImage /usr/bin/MegSpot      
   `);
   app.exit();
@@ -70,7 +70,7 @@ function onAppReady() {
 // 禁止缓存
 app.isReady() ? onAppReady() : app.on('ready', onAppReady);
 // 解决9.x跨域异常问题
-app.commandLine.appendSwitch('disk-cache-size', 512000);
+app.commandLine.appendArgument('no-sandbox');
 
 app.on('window-all-closed', () => {
   // 所有平台均为所有窗口关闭就退出软件

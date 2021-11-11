@@ -6,7 +6,6 @@
         ref="filePathInput_ref"
         class="file-path-input"
         :filePath.sync="currentPath"
-        placeholder="Please enter the file path"
       >
       </file-path-input>
       <el-button class="addFolder" type="primary" @click="addFolder">{{
@@ -64,10 +63,9 @@
         >
           <template v-slot:default="slotProps">
             <img
+              loading='lazy'
               :src="slotProps.src"
-              :placeholder="slotProps.placeholder"
               style="object-fit:contain;width:200px;height:170px"
-              slot="placeholder"
             />
           </template>
         </Thumbnail>
@@ -80,16 +78,14 @@
 import { isDirectory, isExist } from '@/utils/file';
 import { isImage } from '@/components/file-tree/lib/util';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
-import Previewer from './components/Previewer';
 import FileTable from '@/components/file-table';
-import FilePathInput from '@/components/filepath-input/FilePathInput.vue';
+import FilePathInput from '@/components/file-path-input/index.vue';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
 export default {
   components: {
     Thumbnail,
-    Previewer,
     FileTable,
     FilePathInput
   },
@@ -145,6 +141,7 @@ export default {
       };
 
       list.sort(sort);
+      console.log('list', list);
       return list;
     }
   },

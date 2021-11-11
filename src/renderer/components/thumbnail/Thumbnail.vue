@@ -7,7 +7,7 @@
   >
     <el-checkbox v-model="checked"></el-checkbox>
     <div class="container" flex="main:center cross:center">
-      <slot :src="src" :placeholder="placeholder"></slot>
+      <slot :src="src"></slot>
     </div>
     <div class="name">
       {{ file.name }}
@@ -54,7 +54,6 @@ export default {
   },
   data() {
     return {
-      placeholder: require('@/assets/images/placeholder.png'),
       checked: false
     };
   },
