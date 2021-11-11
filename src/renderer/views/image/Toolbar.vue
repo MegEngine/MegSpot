@@ -7,7 +7,7 @@
         >
       </div>
       <Gallery
-        :sortData="imageList"
+        :selectedList="imageList"
         :focusListIndex="
           new Array(groupCount).fill(0).map((_, index) => index + startIndex)
         "

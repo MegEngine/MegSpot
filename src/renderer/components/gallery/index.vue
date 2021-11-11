@@ -3,44 +3,71 @@
     <div @click="showModal">
       <slot name="headButton"></slot>
     </div>
-    <div class="modal" @click.self="handleWrapperClick">
-      <div class="container" @animationend="disappearModal">
-        <draggable v-model="sortList" id="drag">
-          <div
-            v-for="(item, index) in sortList"
-            class="dragItem"
-            @click="handleClick(item)"
-          >
-            <div
-              :class="[
-                (focusListIndex.length && focusListIndex.includes(index)) ||
-                focusList.includes(item)
-                  ? 'focus-item'
-                  : ''
-              ]"
-            >
-              <div>
-                <span
-                  @click="$emit('remove', item)"
-                  class="close-button"
-                  v-tip="$t('general.delete')"
-                >
-                  <svg-icon icon-class="bin" />
-                </span>
-              </div>
-              <div class="content" flex="main:center cross:center">
-                <slot name="dragItem" :src="getImageUrlSync(item)"></slot>
-              </div>
-              <div class="name" v-tip="item">
-                <span
-                  id="fileName"
-                  v-html="$options.filters.getFileName(item)"
-                ></span>
-              </div>
-            </div>
+    <div class="modal" @click="handleWrapperClick">
+      <Split :gutterSize="4">
+        <SplitArea
+          :size="size"
+          :minSize="minSize"
+          :style="{ minWidth: minSize + 'px', maxWidth: maxSize + 'px' }"
+        >
+          <div class="container" @animationend="disappearModal" @click.stop>
+            <vue-scroll>
+              <draggable
+                v-model="sortList"
+                v-bind="dragOptions"
+                @start="drag = true"
+                @end="drag = false"
+                class="sortList"
+              >
+                <transition-group id="drag" type="transition" name="flip-list">
+                  <div
+                    v-for="(item, index) in sortList"
+                    :key="item"
+                    class="dragItem"
+                    @click="handleClick(item)"
+                  >
+                    <div
+                      :class="[
+                        (focusListIndex.length &&
+                          focusListIndex.includes(index)) ||
+                        focusList.includes(item)
+                          ? 'focus-item'
+                          : ''
+                      ]"
+                    >
+                      <div>
+                        <span
+                          @click="$emit('remove', item)"
+                          title="close this item"
+                          class="close-button"
+                          :title="$t('general.delete')"
+                        >
+                          <svg-icon icon-class="bin" />
+                        </span>
+                      </div>
+                      <div class="content" flex="main:center cross:center">
+                        <slot
+                          name="dragItem"
+                          :src="getImageUrlSync(item)"
+                          :alt="item | getFileName"
+                        ></slot>
+                      </div>
+                      <div class="name" v-tip="item">
+                        <span
+                          v-html="$options.filters.getFileName(item)"
+                        ></span>
+                      </div>
+                    </div>
+                  </div>
+                </transition-group>
+              </draggable>
+            </vue-scroll>
           </div>
-        </draggable>
-      </div>
+        </SplitArea>
+        <SplitArea :size="100 - size">
+          <div class="blank"></div>
+        </SplitArea>
+      </Split>
     </div>
   </div>
 </template>
@@ -52,7 +79,7 @@ export default {
   name: 'gallery',
   components: { draggable },
   props: {
-    sortData: {
+    selectedList: {
       type: Array,
       required: true,
       default: () => []
@@ -73,22 +100,55 @@ export default {
   data() {
     return {
       modalItem: null,
-      visible: false
+      visible: false,
+      size: 70,
+      itemSize: {
+        width: 200,
+        height: 156,
+        padding: 14
+      },
+      dragOptions: {
+        animation: 200,
+        group: 'description',
+        disabled: false,
+        ghostClass: 'ghost',
+        scrollPanel: {
+          scrollingX: false
+        },
+        bar: {
+          minSize: 0
+        }
+      },
+      drag: false
     };
   },
   computed: {
-    height() {
-      return document.body.clientHeight;
+    maxColumnLength() {
+      return Math.floor(document.body.clientWidth / (this.itemSize.width + 10));
+    },
+    columnItemNum() {
+      return Math.floor(document.body.clientHeight / this.itemSize.height) || 1;
+    },
+    minSize() {
+      return this.itemSize.width + 24;
+    },
+    maxSize() {
+      return Math.min(
+        Math.ceil(this.selectedList.length / this.columnItemNum) *
+          this.itemSize.width,
+        (document.body.clientWidth * 4) / 5
+      );
     },
     sortList: {
       get() {
-        return this.sortData;
+        return this.selectedList;
       },
       set(newVal) {
         this.$emit('update', newVal);
       }
     }
   },
+  watch: {},
   mounted() {
     window.addEventListener('keydown', this.handleHotKey, true);
     this.modalItem = document.getElementsByClassName('modal')[0];
@@ -180,6 +240,7 @@ export default {
 }
 .gallery {
   display: inline-block;
+  overflow: hidden;
   .modal {
     width: 100%;
     height: 100%;
@@ -194,66 +255,80 @@ export default {
     z-index: 1000;
     .container {
       background-color: #f1f0ed;
-      position: absolute;
-      width: 214px;
+      width: 100%;
       height: 100%;
       left: -200px;
-      height: 100%;
-      #drag {
-        :first-child {
-          margin-top: 0 !important;
-        }
-        float: left;
-        height: 100%;
-        margin: 5px;
-        padding: 0;
-        overflow: auto;
-        .dragItem:hover {
-          .close-button {
-            display: initial;
+      .sortList {
+        padding-right: 10px;
+        ::v-deep {
+          .el-button--mini {
+            padding: 1px 5px;
           }
         }
-        .dragItem {
-          position: relative;
-          margin-top: 10px;
-          border-radius: 5px;
-          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-          border: 1px solid #dee1e5;
-          .close-button {
-            display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            .svg-icon {
-              color: $primaryColor;
+        .setting-btn {
+          float: right;
+          .svg-icon {
+            font-size: 18px;
+          }
+        }
+        #drag {
+          :first-child {
+            // margin-top: 0 !important;
+          }
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          .dragItem:hover {
+            .close-button {
+              display: initial;
             }
           }
-          .close-button:hover {
-            cursor: pointer;
-            .svg-icon {
-              color: red;
+          .dragItem {
+            position: relative;
+            margin: 10px 0 0 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #dee1e5;
+            .close-button {
+              display: none;
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              z-index: 1000;
+              .svg-icon {
+                color: $primaryColor;
+              }
             }
-          }
-          .content {
-            width: 200px;
-            height: 130px;
-            :first-child {
-              max-width: 200px;
-              max-height: 130px;
+            .close-button:hover {
+              cursor: pointer;
+              .svg-icon {
+                color: red;
+              }
             }
-          }
-          .name {
-            width: 200px;
-            text-align: center;
-            padding: 5px 3px;
-            font-size: 12px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            word-break: break-word;
+            .content {
+              width: 200px;
+              height: 130px;
+              :first-child {
+                max-width: 200px;
+                max-height: 130px;
+              }
+            }
+            .name {
+              width: 200px;
+              text-align: center;
+              padding: 5px 3px;
+              font-size: 12px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              word-break: break-word;
+            }
           }
         }
       }
+    }
+    .blank {
+      width: 100%;
+      height: 100%;
     }
   }
 }
@@ -262,25 +337,25 @@ export default {
 }
 .appearModal {
   animation-name: appearOpacity;
-  animation-duration: 0.5s;
+  animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
 }
 .disappearModal {
   animation-name: disappearOpacity;
-  animation-duration: 0.5s;
+  animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
 }
 .appearDragList {
   animation-name: appear;
-  animation-duration: 0.5s;
+  animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
 }
 .disappearDragList {
   animation-name: disappear;
-  animation-duration: 0.5s;
+  animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
 }

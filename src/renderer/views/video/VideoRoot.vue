@@ -13,7 +13,7 @@
         </el-button>
         <el-badge :value="videoList.length" class="tool-item">
           <Gallery
-            :sortData="videoList"
+            :selectedList="videoList"
             @update="setVideos"
             @remove="removeVideos"
           >

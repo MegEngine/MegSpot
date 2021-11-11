@@ -13,7 +13,7 @@
         </el-button>
         <el-badge :value="imageList.length" class="tool-item">
           <Gallery
-            :sortData="imageList"
+            :selectedList="imageList"
             @update="setImages"
             @remove="removeImages"
           >

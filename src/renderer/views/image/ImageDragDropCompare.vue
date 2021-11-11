@@ -9,7 +9,7 @@
         </div>
         <el-badge class="tool-item">
           <Gallery
-            :sortData="imageList"
+            :selectedList="imageList"
             :focusList="this.selectedList"
             @update="setImages"
             @remove="removeImages"
@@ -657,7 +657,7 @@ export default {
     }
   }
   .router-back {
-    display:inline-block;
+    display: inline-block;
     .btn {
       cursor: pointer;
       margin-right: 10px;

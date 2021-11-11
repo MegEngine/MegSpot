@@ -4,7 +4,7 @@
       <div class="changeButton">
         <el-badge class="tool-item">
           <Gallery
-            :sortData="imageList"
+            :selectedList="imageList"
             :focusList="this.selectedList"
             @update="setImages"
             @remove="removeImages"

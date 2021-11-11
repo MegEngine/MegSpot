@@ -11,7 +11,7 @@
           >
         </div>
         <Gallery
-          :sortData="videoList"
+          :selectedList="videoList"
           :focusListIndex="
             new Array(groupCount).fill(0).map((_, index) => index + startIndex)
           "
