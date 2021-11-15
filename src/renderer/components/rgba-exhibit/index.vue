@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="rgba-exhibit"
-    flex="main:right"
-  >
+  <div id="rgba-exhibit" flex="main:right">
     <div id="rgba-content" flex="cross:center">
       <div
         id="rgba-block"
@@ -19,48 +16,16 @@
         >{{ `${RGBAcolor.R}, ${RGBAcolor.G}, ${RGBAcolor.B} ` }}
       </span>
     </div>
-    <el-tooltip effect="light" placement="bottom" :open-delay='800'>
-      <div slot="content" id="rgba-region">
-        <span class="text-style">region:</span>
-        <el-input-number
-          id="slider"
-          v-model="radiusData"
-          :min="1"
-          :max="200"
-        ></el-input-number>
-      </div>
-      <el-button type="text" size="medium">
-        <svg-icon icon-class="settings"></svg-icon>
-      </el-button>
-    </el-tooltip>
   </div>
 </template>
 
 <script>
 export default {
   name: 'RGBAExhibit',
-  model: {
-    prop: 'radius',
-    event: 'update'
-  },
   props: {
     RGBAcolor: {
       type: Object,
       required: true
-    },
-    radius: {
-      type: Number,
-      required: true
-    }
-  },
-  computed: {
-    radiusData: {
-      get() {
-        return this.radius;
-      },
-      set(newVal) {
-        this.$emit('update', newVal);
-      }
     }
   }
 };

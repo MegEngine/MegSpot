@@ -256,6 +256,9 @@
           >
           </el-option>
         </el-select>
+        <el-button-group class="gap">
+          <ImageSetting></ImageSetting>
+        </el-button-group>
       </div>
     </div>
   </div>
@@ -265,6 +268,7 @@ import * as GLOBAL_CONSTANTS from '@/constants';
 import Gallery from '@/components/gallery';
 import { createNamespacedHelpers } from 'vuex';
 import GifDialog from '@/components/gif-dialog';
+import ImageSetting from '@/components/image-setting';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
 export default {
@@ -279,7 +283,7 @@ export default {
       offset: 0
     };
   },
-  components: { Gallery, GifDialog },
+  components: { Gallery, GifDialog, ImageSetting },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
     maxGroupNum() {

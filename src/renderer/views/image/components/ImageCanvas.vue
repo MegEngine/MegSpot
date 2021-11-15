@@ -8,14 +8,7 @@
         />
       </CoverMask>
       <el-tooltip placement="bottom" :open-delay="800">
-        <span
-          class="compare-name"
-          flex-box="1"
-          v-html="
-            (selected ? `<span style='color: red'>(✔)</span>` : ``) +
-              $options.filters.getFileName(imgSrc)
-          "
-        ></span>
+        <span class="compare-name" flex-box="1" v-html="getTitle"></span>
         <div slot="content">
           {{ imgSrc }}
           <br /><br />
@@ -24,11 +17,7 @@
           >
         </div>
       </el-tooltip>
-      <RGBAExhibit
-        :RGBAcolor="RGBAcolor"
-        v-model="radius"
-        @update="changeRadius"
-      ></RGBAExhibit>
+      <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
       <EffectPreview @change="changeCanvasStyle" />
     </div>
     <div ref="container" class="canvas-container" id="canvas-container">
@@ -52,7 +41,7 @@
           />
           <canvas
             ref="canvas"
-            class="canvas-style"
+            :style="preference.background.style"
             :width="_width"
             :height="_height"
           >
@@ -74,6 +63,9 @@ import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters } = createNamespacedHelpers('imageStore');
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
 import { getImageUrlSyncNoCache } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
@@ -152,6 +144,14 @@ export default {
         {
           event: 'imageCenter_align',
           action: 'align'
+        },
+        {
+          event: 'radius',
+          action: 'setRadius'
+        },
+        {
+          event: 'bg',
+          action: 'bg'
         }
       ],
       histVisible: true,
@@ -167,8 +167,18 @@ export default {
   },
   computed: {
     ...mapGetters(['imageConfig', 'imageList']),
+    ...preferenceMapGetters(['preference']),
     selected() {
       return this.imgSrc === this.selectedId;
+    },
+    getTitle() {
+      return this.preference.showTitle
+        ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
+            this.$options.filters.getFileName(this.imgSrc)
+        : ' ';
+    },
+    canvasStyle() {
+      return this.preference.background;
     }
   },
   mounted() {
@@ -177,6 +187,9 @@ export default {
     this.initCanvas();
     this.initImage();
     this.listenEvents();
+  },
+  activated() {
+    this.defaultStyle = this.$refs.canvas.style;
   },
   beforeDestroy() {
     this.removeEvents();
@@ -191,6 +204,10 @@ export default {
     }
   },
   methods: {
+    bg({ mode, color, style }, callback) {
+      this.$refs.canvas.style = style;
+      callback(this.$refs.canvas.style);
+    },
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, _width, _height) {
       const cw = this._width,
@@ -351,12 +368,6 @@ export default {
     pickColor({ status }) {
       this.traggerRGB = status;
     },
-    changeRadius(radius) {
-      this.broadCast({
-        name: 'doChangeRadius',
-        data: { radius }
-      });
-    },
     changeCanvasStyle(newStyle) {
       // FIXME: 具体的值没有被广播
       this.broadCast({
@@ -364,7 +375,7 @@ export default {
         data: { style: newStyle }
       });
     },
-    doChangeRadius({ radius }) {
+    setRadius(radius) {
       this.radius = radius;
     },
     handleMove: throttle(40, function(mousePos) {

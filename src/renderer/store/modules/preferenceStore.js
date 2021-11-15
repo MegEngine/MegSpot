@@ -2,7 +2,14 @@ const preferenceStore = {
   namespaced: true,
   state: {
     preference: {
-      appLanguage: 'en'
+      appLanguage: 'en',
+      showTitle: true,
+      background: {
+        mode: 'white',
+        style: 'background: #fafafa;'
+      },
+      // 是否默认显示直方图
+      defaultShowHist: true
     },
     lastRouterPath: '/dashboard'
   },

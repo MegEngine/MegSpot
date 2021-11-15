@@ -142,15 +142,8 @@ export default {
   },
   computed: {
     imgStyle() {
-      return (
-        'width:' +
-        // this.canvasSize.width
-        400 +
-        'px; height:' +
-        // this.canvasSize.height
-        400 +
-        'px;'
-      );
+      return `width:  ${(50 / this.canvasSize.height) *
+        this.canvasSize.width}vh; height:50vh;padding-top: 5px`;
     }
   },
   methods: {
@@ -343,7 +336,7 @@ export default {
     margin-bottom: 5px;
   }
   .gifPreview {
-    height: 400px;
+    height: 50vh;
     border: 1px solid gray;
     text-align: center;
     overflow: hidden;

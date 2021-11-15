@@ -76,10 +76,7 @@ import { throttle } from '@/utils';
 import { formatFileSize } from '@/utils/file';
 import SearchInput from '../search-input/SearchInput.vue';
 import { isDirectory, readDir, getFileStatSync } from '@/utils/file';
-import { createNamespacedHelpers } from 'vuex';
-const { mapGetters: preMapGetters } = createNamespacedHelpers(
-  'preferenceStore'
-);
+
 import { DELIMITER } from '@/constants';
 
 export default {
@@ -131,7 +128,6 @@ export default {
     };
   },
   computed: {
-    // ...preMapGetters(['preference']),
     showFile: function() {
       return this.fileInfoList
         .filter(item => {

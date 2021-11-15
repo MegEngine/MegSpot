@@ -3,6 +3,7 @@
     <span
       v-show="!scaleEditorVisible"
       class="scale-number"
+      :style="{ color: textColor }"
       @dblclick="handleScaleDbClick"
     >
       {{ scaleData }}
@@ -24,6 +25,8 @@
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex';
+const { mapGetters } = createNamespacedHelpers('preferenceStore');
 export default {
   name: 'ScaleEditor',
   props: {
@@ -48,6 +51,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['preference']),
     scaleData: {
       get() {
         return this.scale;
@@ -55,6 +59,11 @@ export default {
       set(newVal) {
         if (newVal !== this.scale) this.$emit('update', newVal);
       }
+    },
+    textColor() {
+      return this.preference.background.mode.toLowerCase().includes('dark')
+        ? '#fff'
+        : 'black';
     }
   }
 };
