@@ -1,4 +1,6 @@
-export const DELIMITER = process.platform !== 'win32' ? '/' : '\\';
+import path from 'path';
+
+export const DELIMITER = path.sep;
 export const DIRECTION_LEFT = 'direction_left';
 export const DIRECTION_RIGHT = 'direction_right';
 export const DIRECTION_BOTTOM = 'direction_bottom';

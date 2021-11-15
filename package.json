@@ -93,6 +93,7 @@
     "@dhdbstjr98/gif.js": "^1.0.2",
     "@popperjs/core": "^2.9.2",
     "axios": "^0.21.1",
+    "chokidar": "^3.5.2",
     "dayjs": "^1.10.4",
     "electron-log": "^4.3.4",
     "electron-store": "4.0.0",

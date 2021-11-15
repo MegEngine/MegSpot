@@ -74,6 +74,7 @@ import { formatFileSize } from '@/utils/file';
 import SearchInput from '../search-input/SearchInput.vue';
 import { isDirectory, readDir, getFileStatSync } from '@/utils/file';
 import { DELIMITER } from '@/constants';
+import chokidar from 'chokidar';
 
 export default {
   name: 'FileTable',
@@ -120,7 +121,9 @@ export default {
       search: '',
       fileInfoList: [],
       origin: -1,
-      pin: false // 按下shift
+      pin: false, // 按下shift
+      // 监听当前文件夹的变化,变化后手动刷新目录
+      watcher: undefined
     };
   },
   computed: {
@@ -156,15 +159,7 @@ export default {
         this.pin = false;
       }
     });
-    await this.refreshFileList();
-    // 手动
-    this.$nextTick(async () => {
-      await this.$refs.xTable.sort(
-        this.defaultSort.field,
-        this.defaultSort.order
-      );
-      this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0]);
-    });
+
     this.$nextTick(() => {
       this.updateTableHeight();
     });
@@ -181,9 +176,25 @@ export default {
   },
   watch: {
     currentPath: {
-      handler: async function() {
-        await this.refreshFileList();
-      }
+      handler: function(newVal, oldVal) {
+        if (oldVal) {
+          this.watcher.close();
+        }
+        if (newVal) {
+          this.watcher = chokidar
+            .watch(newVal, {
+              // 持续监听
+              persistent: true,
+              // 忽略初始化的目录检测（即：认为监听时目录是从空变为当前目录的过程 会触发很多的addDir,add file回调）
+              ignoreInitial: true
+            })
+            .on('all', () => {
+              this.refreshFileList();
+            });
+        }
+        this.refreshFileList();
+      },
+      immediate: true
     },
     fileList(newVal, oldVal) {
       oldVal.forEach(path => {
@@ -290,6 +301,15 @@ export default {
       } else {
         this.fileInfoList = [];
       }
+      // 重新触发排序
+      this.$nextTick(() => {
+        this.$refs.xTable
+          .sort(this.defaultSort.field, this.defaultSort.order)
+          .then(() => {
+            // 向父级反馈 最新的顺序
+            this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0]);
+          });
+      });
     },
     // 供外部直接调研获取 通过排序处理后的tableData
     getSortData() {
