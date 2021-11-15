@@ -1,6 +1,6 @@
 <template>
   <vxe-table
-    ref="table"
+    ref="xTable"
     :data="showFile"
     auto-resize
     border
@@ -8,11 +8,9 @@
     highlight-hover-row
     highlight-current-row
     :scroll-y="{ gt: 0, rHeight: 40, oSize: 5 }"
-    :sort-config="{
-      defaultSort
-    }"
     :checkbox-config="{
       trigger: 'cell',
+      range: true,
       checkMethod: checkSelectable
     }"
     :tooltip-config="{ enterable: true }"
@@ -22,6 +20,8 @@
     v-on="$listeners"
     @checkbox-all="selectAll"
     @checkbox-change="select"
+    @checkbox-range-end="handleRangeSelect"
+    @checkbox-range-change="handleRangingRender"
   >
     <template #empty>
       <span v-if="!currentPath"
@@ -76,16 +76,16 @@ import { throttle } from '@/utils';
 import { formatFileSize } from '@/utils/file';
 import SearchInput from '../search-input/SearchInput.vue';
 import { isDirectory, readDir, getFileStatSync } from '@/utils/file';
-
 import { DELIMITER } from '@/constants';
+import chokidar from 'chokidar';
 
 export default {
   name: 'FileTable',
   components: { SearchInput },
   props: {
     defaultSort: {
-      type: Object,
-      default: () => ({})
+      required: true,
+      type: Object
     },
     showAll: {
       type: Boolean,
@@ -124,7 +124,9 @@ export default {
       search: '',
       fileInfoList: [],
       origin: -1,
-      pin: false // 按下shift
+      pin: false, // 按下shift
+      // 监听当前文件夹的变化,变化后手动刷新目录
+      watcher: undefined
     };
   },
   computed: {
@@ -145,11 +147,7 @@ export default {
         );
     }
   },
-  mounted() {
-    this.$emit('updateShowFile', this.showFile);
-    this.$nextTick(() => {
-      this.updateTableHeight();
-    });
+  async mounted() {
     window.addEventListener('resize', throttle(300, this.updateTableHeight));
     window.addEventListener('keydown', code => {
       // 开启多选
@@ -163,23 +161,41 @@ export default {
         this.pin = false;
       }
     });
+
+    this.$nextTick(() => {
+      this.updateTableHeight();
+    });
   },
   updated() {
     // 打开同步选中
     this.fileList.forEach(path => {
-      // 同步删除
       const item = this.showFile.find(item => item.path === path);
       if (item) {
-        this.$refs.table.setCheckboxRow(item, true);
+        this.$refs.xTable.setCheckboxRow(item, true);
       }
     });
   },
   watch: {
-    showFile(newVal, oldVal) {
-      this.$emit('updateShowFile', newVal);
-    },
-    async currentPath() {
-      await this.refreshFileList();
+    currentPath: {
+      handler: function(newVal, oldVal) {
+        if (oldVal) {
+          this.watcher.close();
+        }
+        if (newVal) {
+          this.watcher = chokidar
+            .watch(newVal, {
+              // 持续监听
+              persistent: true,
+              // 忽略初始化的目录检测（即：认为监听时目录是从空变为当前目录的过程 会触发很多的addDir,add file回调）
+              ignoreInitial: true
+            })
+            .on('all', () => {
+              this.refreshFileList();
+            });
+        }
+        this.refreshFileList();
+      },
+      immediate: true
     },
     fileList(newVal, oldVal) {
       oldVal.forEach(path => {
@@ -187,7 +203,7 @@ export default {
         if (!newVal.includes(path)) {
           const item = this.showFile.find(item => item.path === path);
           if (item) {
-            this.$refs.table.setCheckboxRow(item, false);
+            this.$refs.xTable.setCheckboxRow(item, false);
           }
         }
       });
@@ -196,7 +212,7 @@ export default {
         if (!oldVal.includes(path)) {
           const item = this.showFile.find(item => item.path === path);
           if (item) {
-            this.$refs.table.setCheckboxRow(item, true);
+            this.$refs.xTable.setCheckboxRow(item, true);
           }
         }
       });
@@ -224,7 +240,19 @@ export default {
     },
     updateTableHeight() {
       this.tableHeight =
-        this.$refs.table.$el.parentElement.clientHeight || this.tableHeight;
+        this.$refs.xTable.$el.parentElement.clientHeight || this.tableHeight;
+    },
+    // 由于vxe-table 在range选择过程中 会清空已选，所以需要在选择过程中不断更新已选中。
+    handleRangingRender() {
+      this.fileList.forEach(path => {
+        const item = this.showFile.find(item => item.path === path);
+        if (item) {
+          this.$refs.xTable.setCheckboxRow(item, true);
+        }
+      });
+    },
+    handleRangeSelect({ records }) {
+      this.addVuexItem(records.map(item => item.path));
     },
     commonSelect(row) {
       const sortData = this.getSortData(); // 获取最终渲染的table数据
@@ -237,11 +265,9 @@ export default {
         // 选中 起点行 -- 到当前点击行
         let minIndex = Math.min(origin, currentRowIndex);
         let maxIndex = Math.max(origin, currentRowIndex);
-        for (let i = 0; i < sortData.length; i++) {
-          if (i >= minIndex && i <= maxIndex) {
-            this.addVuexItem(sortData[i].path);
-          }
-        }
+        this.addVuexItem(
+          sortData.slice(minIndex, maxIndex + 1).map(item => item.path)
+        );
       } else {
         // 未按住shift 或无起点 只增删该行并初始化起点
         this.origin = sortData.indexOf(row);
@@ -286,10 +312,19 @@ export default {
       } else {
         this.fileInfoList = [];
       }
+      // 重新触发排序
+      this.$nextTick(() => {
+        this.$refs.xTable
+          .sort(this.defaultSort.field, this.defaultSort.order)
+          .then(() => {
+            // 向父级反馈 最新的顺序
+            this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0]);
+          });
+      });
     },
     // 供外部直接调研获取 通过排序处理后的tableData
     getSortData() {
-      return this.$refs.table.tableData;
+      return this.$refs.xTable.getTableData().visibleData;
     }
   }
 };

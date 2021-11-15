@@ -125,16 +125,7 @@ export default {
     electron.ipcRenderer.on('debugMessage', (event, text) => {
       console.log(`[debug message]: ${text}`);
     });
-    console.log('this.lastRouterPath', this.lastRouterPath);
-    console.log('this.$route.path', this.$route.path);
-    // if (this.lastRouterPath !== this.$route.path) {
-    //   this.$router.replace({
-    //     path: this.lastRouterPath
-    //   });
-    // }
-    // router.afterEach((to, from) => {
-    //   store.dispatch('preferenceStore/setLastRouterPath', to.path);
-    // });
+    
   }
 };
 </script>

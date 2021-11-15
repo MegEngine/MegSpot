@@ -148,10 +148,6 @@ export default {
         {
           event: 'radius',
           action: 'setRadius'
-        },
-        {
-          event: 'bg',
-          action: 'bg'
         }
       ],
       histVisible: true,
@@ -188,9 +184,6 @@ export default {
     this.initImage();
     this.listenEvents();
   },
-  activated() {
-    this.defaultStyle = this.$refs.canvas.style;
-  },
   beforeDestroy() {
     this.removeEvents();
     this.bitMap && this.bitMap.close();
@@ -204,10 +197,6 @@ export default {
     }
   },
   methods: {
-    bg({ mode, color, style }, callback) {
-      this.$refs.canvas.style = style;
-      callback(this.$refs.canvas.style);
-    },
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, _width, _height) {
       const cw = this._width,

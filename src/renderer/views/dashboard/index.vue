@@ -67,17 +67,17 @@ export default {
     this.videoSource = [
       {
         url:
-          'http://r19airgf2.bkt.clouddn.com/MegSpot/helpVideo/image-compare.mp4',
+          'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/image-compare.mp4',
         title: '图像对比使用介绍'
       },
       {
         url:
-          'http://r19airgf2.bkt.clouddn.com/MegSpot/helpVideo/video-compare.mp4',
+          'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/video-compare.mp4',
         title: '视频对比使用介绍'
       },
       {
         url:
-          'http://r19airgf2.bkt.clouddn.com/MegSpot/helpVideo/drag-compare.mp4',
+          'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/drag-compare.mp4',
         title: '拖拽对比使用介绍'
       }
     ];

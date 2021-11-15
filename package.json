@@ -93,11 +93,13 @@
     "@dhdbstjr98/gif.js": "^1.0.2",
     "@popperjs/core": "^2.9.2",
     "axios": "^0.21.1",
+    "chokidar": "^3.5.2",
     "dayjs": "^1.10.4",
     "electron-log": "^4.3.4",
     "electron-store": "4.0.0",
     "electron-updater": "^4.3.5",
     "element-ui": "^2.15.0",
+    "ex-utils": "^0.0.4",
     "express": "^4.17.1",
     "flex.css": "^1.1.7",
     "fs-extra": "^9.1.0",
@@ -113,7 +115,7 @@
     "vuescroll": "^4.17.3",
     "vuex": "^3.6.0",
     "vuex-electron": "^1.0.3",
-    "vxe-table": "^3.3.16",
+    "vxe-table": "^3.4.5",
     "xe-utils": "^3.4.0"
   },
   "devDependencies": {

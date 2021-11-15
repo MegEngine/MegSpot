@@ -78,7 +78,7 @@ export default {
       radius: 10,
       value: null,
       mode: 'white',
-      bgColor: '#fff',
+      bgColor: '#fafafa',
       baseStyle:
         'display: inline-block; margin-right: 5px; width: 24px; height: 24px; border:dashed gray 2px;',
       predefineColors: ['#e3e7e900', '#2f2f2f', '#fafafa'],

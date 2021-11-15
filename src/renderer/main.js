@@ -16,18 +16,16 @@ import './directive';
 import './filter';
 import { loadLib } from './lib';
 // 表格
-import { Header, Column, Tooltip, Table } from 'vxe-table';
 import 'xe-utils';
+import VXETable from 'vxe-table';
 import 'vxe-table/lib/style.css';
 import VueSplit from 'vue-split-panel';
 import VueScroll from 'vuescroll';
 
+console.log('VXETable', VXETable);
+Vue.use(VXETable);
 Vue.use(VueSplit);
 Vue.use(VueScroll);
-Vue.use(Header)
-  .use(Column)
-  .use(Tooltip)
-  .use(Table);
 Vue.config.productionTip = false;
 
 Vue.use(ElementUI, {

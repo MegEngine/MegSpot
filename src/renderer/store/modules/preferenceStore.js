@@ -9,7 +9,7 @@ const preferenceStore = {
         style: 'background: #fafafa;'
       },
       // 是否默认显示直方图
-      defaultShowHist: true
+      defaultShowHist: false
     },
     lastRouterPath: '/dashboard'
   },
