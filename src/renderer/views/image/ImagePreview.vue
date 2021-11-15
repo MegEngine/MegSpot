@@ -8,9 +8,13 @@
         :filePath.sync="currentPath"
       >
       </file-path-input>
-      <el-button class="addFolder" type="primary" @click="addFolder">{{
-        $t('image.toolbar.addFolder')
-      }}</el-button>
+      <el-button
+        class="addFolder"
+        type="primary"
+        :disabled="imageFolders.includes(currentPath)"
+        @click="addFolder"
+        >{{ $t('image.toolbar.addFolder') }}</el-button
+      >
       <el-switch
         class="show-all-switch"
         v-model="showAll"
@@ -47,7 +51,6 @@
         :defaultSort="imageConfig.defaultSort"
         @sort-change="handleSortChange"
         @addFolder="$emit('addFolder')"
-        @updateShowFile="updateShowFile"
       >
       </FileTable>
     </div>
@@ -92,7 +95,7 @@ export default {
     return {
       showType: 'list',
       showAll: false,
-      showFile: []
+      thumbnailList: []
     };
   },
   computed: {
@@ -109,39 +112,6 @@ export default {
           this.setFolderPath(newFolderPath);
         }
       }
-    },
-    thumbnailList() {
-      const { field, order } = this.imageConfig.defaultSort;
-      console.log('this.imageConfig.defaultSort', this.imageConfig.defaultSort);
-      const list = this.showFile.filter(this.checkItem);
-      if (!order) {
-        return list;
-      }
-      const reverse = order === 'descending' ? -1 : 1;
-      let sort = (a, b) => {
-        let res;
-        if (typeof a[field] === 'number') {
-          res = a[field] - b[field];
-        } else if (typeof a[field] === 'string') {
-          const aStr = a[field];
-          const bStr = b[field];
-          for (let i = 0; i < aStr.length; i++) {
-            const chartA = aStr.charCodeAt(i);
-            const chartB = bStr.charCodeAt(i);
-            if (chartA > chartB) {
-              res = 1;
-              break;
-            } else if (chartA < chartB) {
-              res = -1;
-              break;
-            }
-          }
-        }
-        return res * reverse;
-      };
-
-      list.sort(sort);
-      return list;
     }
   },
   methods: {
@@ -157,12 +127,11 @@ export default {
       return item.isFile && isImage(item.path);
     },
     handleSortChange(sortChange) {
+      this.thumbnailList = this.$refs.fileTable.getSortData();
       const { order, property: field } = sortChange;
       this.setImageConfig({ defaultSort: { order, field } });
     },
-    updateShowFile(newVal) {
-      this.showFile = newVal;
-    },
+    // FIX ME: 不可添加则直接禁用按钮
     addFolder() {
       let folderPath = this.currentPath;
       if (folderPath.length && isExist(folderPath)) {

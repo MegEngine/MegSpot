@@ -8,9 +8,13 @@
         :filePath.sync="videoCurrentPath"
       >
       </file-path-input>
-      <el-button class="addFolder" type="primary" @click="addFolder">{{
-        $t('image.toolbar.addFolder')
-      }}</el-button>
+      <el-button
+        class="addFolder"
+        type="primary"
+        :disabled="videoFolders.includes(videoCurrentPath)"
+        @click="addFolder"
+        >{{ $t('image.toolbar.addFolder') }}</el-button
+      >
       <el-switch
         class="show-all-switch"
         v-model="showAll"
@@ -47,7 +51,6 @@
         :defaultSort="videoConfig.defaultSort"
         @sort-change="handleSortChange"
         @addFolder="$emit('addFolder')"
-        @updateShowFile="updateShowFile"
       >
       </FileTable>
       <div class="thumbnail-content" v-show="showType === 'thumbnail'">
@@ -87,8 +90,7 @@ export default {
   data() {
     return {
       showType: 'list',
-      showAll: false,
-      showFile: []
+      showAll: false
     };
   },
   computed: {
@@ -105,38 +107,6 @@ export default {
           this.setFolderPath(newFolderPath);
         }
       }
-    },
-    thumbnailList() {
-      const { field, order } = this.videoConfig.defaultSort;
-      const list = this.showFile.filter(this.checkItem);
-      if (!order) {
-        return list;
-      }
-      const reverse = order === 'descending' ? -1 : 1;
-      let sort = (a, b) => {
-        let res;
-        if (typeof a[field] === 'number') {
-          res = a[field] - b[field];
-        } else if (typeof a[field] === 'string') {
-          const aStr = a[field];
-          const bStr = b[field];
-          for (let i = 0; i < aStr.length; i++) {
-            const chartA = aStr.charCodeAt(i);
-            const chartB = bStr.charCodeAt(i);
-            if (chartA > chartB) {
-              res = 1;
-              break;
-            } else if (chartA < chartB) {
-              res = -1;
-              break;
-            }
-          }
-        }
-        return res * reverse;
-      };
-
-      list.sort(sort);
-      return list;
     }
   },
   methods: {
@@ -152,11 +122,9 @@ export default {
       return item.isFile && isVideo(item.path);
     },
     handleSortChange(sortChange) {
+      this.thumbnailList = this.$refs.fileTable.getSortData();
       const { order, property: field } = sortChange;
-      this.setVideoConfig({ defaultSort: { order, field } });
-    },
-    updateShowFile(newVal) {
-      this.showFile = newVal;
+      this.setImageConfig({ defaultSort: { order, field } });
     },
     addFolder() {
       let folderPath = this.videoCurrentPath;

@@ -166,10 +166,6 @@ export default {
       type: Array,
       default: () => []
     },
-    defaultCurrentPath: {
-      type: String,
-      default: ''
-    },
     includes: {
       type: Array,
       default: () => []
@@ -276,7 +272,6 @@ export default {
     async handleRefresh(node, data) {
       node.loaded = false;
       node.expand();
-      this.$emit('refresh');
     },
     async loadMultiDir(dirs) {
       const result = [];
@@ -315,7 +310,6 @@ export default {
       this.closeFolder(data);
     },
     async onRefreshAllFolder() {
-      this.$emit('refresh');
       this.treeData = await this.loadMultiDir(this.openedFolders);
     },
     truncateName(src) {

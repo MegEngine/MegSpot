@@ -1,6 +1,6 @@
 <template>
   <vxe-table
-    ref="table"
+    ref="xTable"
     :data="showFile"
     auto-resize
     border
@@ -8,9 +8,6 @@
     highlight-hover-row
     highlight-current-row
     :scroll-y="{ gt: 0, rHeight: 40, oSize: 5 }"
-    :sort-config="{
-      defaultSort
-    }"
     :checkbox-config="{
       trigger: 'cell',
       checkMethod: checkSelectable
@@ -76,10 +73,6 @@ import { throttle } from '@/utils';
 import { formatFileSize } from '@/utils/file';
 import SearchInput from '../search-input/SearchInput.vue';
 import { isDirectory, readDir, getFileStatSync } from '@/utils/file';
-import { createNamespacedHelpers } from 'vuex';
-const { mapGetters: preMapGetters } = createNamespacedHelpers(
-  'preferenceStore'
-);
 import { DELIMITER } from '@/constants';
 
 export default {
@@ -87,8 +80,8 @@ export default {
   components: { SearchInput },
   props: {
     defaultSort: {
-      type: Object,
-      default: () => ({})
+      required: true,
+      type: Object
     },
     showAll: {
       type: Boolean,
@@ -149,11 +142,7 @@ export default {
         );
     }
   },
-  mounted() {
-    this.$emit('updateShowFile', this.showFile);
-    this.$nextTick(() => {
-      this.updateTableHeight();
-    });
+  async mounted() {
     window.addEventListener('resize', throttle(300, this.updateTableHeight));
     window.addEventListener('keydown', code => {
       // 开启多选
@@ -167,6 +156,18 @@ export default {
         this.pin = false;
       }
     });
+    await this.refreshFileList();
+    // 手动
+    this.$nextTick(async () => {
+      await this.$refs.xTable.sort(
+        this.defaultSort.field,
+        this.defaultSort.order
+      );
+      this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0]);
+    });
+    this.$nextTick(() => {
+      this.updateTableHeight();
+    });
   },
   updated() {
     // 打开同步选中
@@ -174,16 +175,15 @@ export default {
       // 同步删除
       const item = this.showFile.find(item => item.path === path);
       if (item) {
-        this.$refs.table.setCheckboxRow(item, true);
+        this.$refs.xTable.setCheckboxRow(item, true);
       }
     });
   },
   watch: {
-    showFile(newVal, oldVal) {
-      this.$emit('updateShowFile', newVal);
-    },
-    async currentPath() {
-      await this.refreshFileList();
+    currentPath: {
+      handler: async function() {
+        await this.refreshFileList();
+      }
     },
     fileList(newVal, oldVal) {
       oldVal.forEach(path => {
@@ -191,7 +191,7 @@ export default {
         if (!newVal.includes(path)) {
           const item = this.showFile.find(item => item.path === path);
           if (item) {
-            this.$refs.table.setCheckboxRow(item, false);
+            this.$refs.xTable.setCheckboxRow(item, false);
           }
         }
       });
@@ -200,7 +200,7 @@ export default {
         if (!oldVal.includes(path)) {
           const item = this.showFile.find(item => item.path === path);
           if (item) {
-            this.$refs.table.setCheckboxRow(item, true);
+            this.$refs.xTable.setCheckboxRow(item, true);
           }
         }
       });
@@ -228,7 +228,7 @@ export default {
     },
     updateTableHeight() {
       this.tableHeight =
-        this.$refs.table.$el.parentElement.clientHeight || this.tableHeight;
+        this.$refs.xTable.$el.parentElement.clientHeight || this.tableHeight;
     },
     commonSelect(row) {
       const sortData = this.getSortData(); // 获取最终渲染的table数据
@@ -293,7 +293,7 @@ export default {
     },
     // 供外部直接调研获取 通过排序处理后的tableData
     getSortData() {
-      return this.$refs.table.tableData;
+      return this.$refs.xTable.getTableData().visibleData;
     }
   }
 };
