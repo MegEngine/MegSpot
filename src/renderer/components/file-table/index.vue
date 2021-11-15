@@ -10,6 +10,7 @@
     :scroll-y="{ gt: 0, rHeight: 40, oSize: 5 }"
     :checkbox-config="{
       trigger: 'cell',
+      range: true,
       checkMethod: checkSelectable
     }"
     :tooltip-config="{ enterable: true }"
@@ -19,6 +20,8 @@
     v-on="$listeners"
     @checkbox-all="selectAll"
     @checkbox-change="select"
+    @checkbox-range-end="handleRangeSelect"
+    @checkbox-range-change="handleRangingRender"
   >
     <template #empty>
       <span v-if="!currentPath"
@@ -167,7 +170,6 @@ export default {
   updated() {
     // 打开同步选中
     this.fileList.forEach(path => {
-      // 同步删除
       const item = this.showFile.find(item => item.path === path);
       if (item) {
         this.$refs.xTable.setCheckboxRow(item, true);
@@ -241,6 +243,18 @@ export default {
       this.tableHeight =
         this.$refs.xTable.$el.parentElement.clientHeight || this.tableHeight;
     },
+    // 由于vxe-table 在range选择过程中 会清空已选，所以需要在选择过程中不断更新已选中。
+    handleRangingRender() {
+      this.fileList.forEach(path => {
+        const item = this.showFile.find(item => item.path === path);
+        if (item) {
+          this.$refs.xTable.setCheckboxRow(item, true);
+        }
+      });
+    },
+    handleRangeSelect({ records }) {
+      this.addVuexItem(records.map(item => item.path));
+    },
     commonSelect(row) {
       const sortData = this.getSortData(); // 获取最终渲染的table数据
       const origin = this.origin; // 起点行
@@ -252,11 +266,9 @@ export default {
         // 选中 起点行 -- 到当前点击行
         let minIndex = Math.min(origin, currentRowIndex);
         let maxIndex = Math.max(origin, currentRowIndex);
-        for (let i = 0; i < sortData.length; i++) {
-          if (i >= minIndex && i <= maxIndex) {
-            this.addVuexItem(sortData[i].path);
-          }
-        }
+        this.addVuexItem(
+          sortData.slice(minIndex, maxIndex + 1).map(item => item.path)
+        );
       } else {
         // 未按住shift 或无起点 只增删该行并初始化起点
         this.origin = sortData.indexOf(row);
