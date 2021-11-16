@@ -37,7 +37,12 @@
       @dbclick="handleDbclick"
       @mouseMove="handleMove"
     >
-      <div ref="canvas-item" class="canvas-item" @contextmenu.prevent>
+      <div
+        ref="canvas-item"
+        class="canvas-item"
+        @contextmenu.prevent
+        :style="canvasStyle"
+      >
         <ScaleEditor
           class="scale-editor"
           :scale="imgScale"
@@ -46,13 +51,7 @@
           @reset="resetZoom"
           @update="setZoom"
         />
-        <canvas
-          ref="canvasDom"
-          :style="canvasStyle"
-          :width="width"
-          :height="height"
-        >
-        </canvas>
+        <canvas ref="canvasDom" :width="width" :height="height"> </canvas>
         <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
       </div>
     </OperationContainer>
@@ -467,9 +466,11 @@ export default {
       if (canvasRadio > imageRadio) {
         //比较高，所以高占100%,宽居中
         width = ch * imageRadio;
+        x = (canvas.width - width) / 2;
       } else {
         //比较宽，所以宽占100%,高居中
         height = cw / imageRadio;
+        y = (canvas.height - height) / 2;
       }
       return {
         x,
