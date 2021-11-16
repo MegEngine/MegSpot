@@ -12,14 +12,7 @@
         />
       </CoverMask>
       <el-tooltip placement="bottom" :open-delay="800">
-        <span
-          class="compare-name"
-          flex-box="1"
-          v-html="
-            (selected ? `<span style='color: red'>(✔)</span>` : ``) +
-              $options.filters.getFileName(videoSrc)
-          "
-        ></span>
+        <span class="compare-name" flex-box="1" v-html="getTitle"></span>
         <div slot="content">
           {{ videoSrc }}
           <br /><br />
@@ -53,7 +46,13 @@
           @reset="resetZoom"
           @update="setZoom"
         />
-        <canvas ref="canvasDom" :width="width" :height="height"> </canvas>
+        <canvas
+          ref="canvasDom"
+          :style="canvasStyle"
+          :width="width"
+          :height="height"
+        >
+        </canvas>
         <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
       </div>
     </OperationContainer>
@@ -70,6 +69,9 @@ import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters } = createNamespacedHelpers('videoStore');
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
 import { getImageUrlSync } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
@@ -174,18 +176,28 @@ export default {
   },
   computed: {
     ...mapGetters(['videoList', 'videoConfig', 'selectedPosition']),
+    ...preferenceMapGetters(['preference']),
+    getTitle() {
+      return this.preference.showTitle
+        ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
+            this.$options.filters.getFileName(this.videoSrc)
+        : ' ';
+    },
     canvasStyle() {
-      let filter = '';
-      ['brightness', 'contrast', 'saturate', 'grayscale', 'opacity'].forEach(
-        item => {
-          filter += `${item}(${this[item]}%) `;
-        }
-      );
-      ['blur'].forEach(item => {
-        filter += `${item}(${this[item]}px) `;
-      });
-      return filter;
+      return this.preference.background.style;
     }
+    // canvasStyle() {
+    //   let filter = '';
+    //   ['brightness', 'contrast', 'saturate', 'grayscale', 'opacity'].forEach(
+    //     item => {
+    //       filter += `${item}(${this[item]}%) `;
+    //     }
+    //   );
+    //   ['blur'].forEach(item => {
+    //     filter += `${item}(${this[item]}px) `;
+    //   });
+    //   return filter;
+    // }
   },
   watch: {
     'videoConfig.smooth': {
@@ -708,17 +720,19 @@ export default {
           padding: 0 2px;
         }
       }
-      canvas {
-        background: #e3e7e9;
-        background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
-          linear-gradient(45deg, transparent 75%, #f6fafc 0),
-          linear-gradient(45deg, #f6fafc 25%, transparent 0),
-          linear-gradient(45deg, transparent 75%, #f6fafc 0);
-        background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
-        background-size: 20px 20px;
-        vertical-align: middle;
-        font-size: 0;
-      }
+
+      /** default canvas background */
+      // canvas {
+      //   background: #e3e7e9;
+      //   background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
+      //     linear-gradient(45deg, transparent 75%, #f6fafc 0),
+      //     linear-gradient(45deg, #f6fafc 25%, transparent 0),
+      //     linear-gradient(45deg, transparent 75%, #f6fafc 0);
+      //   background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
+      //   background-size: 20px 20px;
+      //   vertical-align: middle;
+      //   font-size: 0;
+      // }
       img {
         object-fit: contain;
         vertical-align: middle;

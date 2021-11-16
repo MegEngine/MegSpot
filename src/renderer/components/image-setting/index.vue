@@ -1,23 +1,34 @@
 <template>
   <div flex="main:right">
     <el-popover
+      v-model="visible"
       effect="light"
       placement="bottom"
-      trigger="click"
+      trigger="manual"
       popper-class="image-setting"
       @click.stop
     >
+      <div class="header">
+        <div class="title">Image Setting Panel</div>
+        <el-button
+          type="text"
+          class="close-btn"
+          @click="visible = false"
+          v-tip="'close'"
+        >
+          <svg-icon icon-class="close" class="icon"></svg-icon>
+        </el-button>
+      </div>
       <div flex="dir:top" class="setting-group">
-        <div flex class="setting-item">
+        <div flex="main:justify" class="setting-item">
+          <span>show histogram：</span>
+          <el-switch v-model="defaultShowHist"></el-switch>
+        </div>
+        <div flex="main:justify" class="setting-item">
           <span>show image name：</span>
-          <el-switch v-model="showTitle" style="margin-right: 20px;">
-          </el-switch>
+          <el-switch v-model="showTitle"></el-switch>
         </div>
-        <div flex class="setting-item">
-          <span>show histogram by default：</span>
-          <el-switch v-model="defaultShowHist"> </el-switch>
-        </div>
-        <div flex class="setting-item">
+        <div flex="main:justify" class="setting-item">
           <span>background mode：</span>
           <el-select
             v-model="mode"
@@ -31,14 +42,11 @@
                 :key="index"
                 :label="item.mode"
                 :value="item.mode"
-                flex="main:justify cross:center"
+                style="padding: 0 10px 0 5px;"
               >
-                <div style="">{{ item.mode }}</div>
-                <div flex="main:justify">
-                  <span style="color: #8492a6; font-size: 13px"
-                    >{{ item.color.slice(0, 7) }}&nbsp;&nbsp;</span
-                  >
+                <div flex="main:justify cross:center">
                   <div :style="baseStyle + item.style"></div>
+                  <span>{{ item.mode }}</span>
                 </div>
               </el-option>
             </div>
@@ -51,7 +59,7 @@
           >
           </el-color-picker>
         </div>
-        <div class="setting-item">
+        <div flex="main:justify" class="setting-item">
           <span>region：</span>
           <el-input-number
             v-model="radius"
@@ -61,7 +69,12 @@
           ></el-input-number>
         </div>
       </div>
-      <el-button slot="reference" type="text">
+      <el-button
+        slot="reference"
+        type="text"
+        @click="visible = !visible"
+        :class="{ enabled: visible }"
+      >
         <svg-icon icon-class="settings" style="font-size: 22px;"></svg-icon>
       </el-button>
     </el-popover>
@@ -73,6 +86,12 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore');
 export default {
   name: 'ImageSetting',
+  props: {
+    visible: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       radius: 10,
@@ -80,7 +99,7 @@ export default {
       mode: 'white',
       bgColor: '#fafafa',
       baseStyle:
-        'display: inline-block; margin-right: 5px; width: 24px; height: 24px; border:dashed gray 2px;',
+        'display: inline-block; margin-right: 5px; width: 24px; height: 24px; border:solid gray 2px;',
       predefineColors: ['#e3e7e900', '#2f2f2f', '#fafafa'],
       colorOptions: [
         {
@@ -153,15 +172,37 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
+@import '@/styles/variables.scss';
 .image-setting {
+  position: relative;
   font-size: 16px;
-  .setting-group {
-    :first-child {
-      margin-top: 0 !important;
+  .header {
+    .title {
+      font-weight: bold;
+      text-align: center;
     }
+
+    .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      .icon {
+        &:hover {
+          color: red;
+        }
+        font-size: 18px;
+      }
+    }
+  }
+  .setting-group {
     .setting-item {
       margin-top: 10px;
     }
+  }
+}
+.enabled {
+  .svg-icon {
+    color: $primaryColor;
   }
 }
 </style>

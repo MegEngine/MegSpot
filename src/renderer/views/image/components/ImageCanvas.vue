@@ -41,7 +41,7 @@
           />
           <canvas
             ref="canvas"
-            :style="preference.background.style"
+            :style="canvasStyle"
             :width="_width"
             :height="_height"
           >
@@ -174,7 +174,7 @@ export default {
         : ' ';
     },
     canvasStyle() {
-      return this.preference.background;
+      return this.preference.background.style;
     }
   },
   mounted() {
@@ -710,15 +710,16 @@ export default {
         font-size: 0;
       }
 
-      .canvas-style {
-        background: #e3e7e9;
-        background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
-          linear-gradient(45deg, transparent 75%, #f6fafc 0),
-          linear-gradient(45deg, #f6fafc 25%, transparent 0),
-          linear-gradient(45deg, transparent 75%, #f6fafc 0);
-        background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
-        background-size: 20px 20px;
-      }
+      /** default canvas background */
+      // .canvas-style {
+      //   background: #e3e7e9;
+      //   background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
+      //     linear-gradient(45deg, transparent 75%, #f6fafc 0),
+      //     linear-gradient(45deg, #f6fafc 25%, transparent 0),
+      //     linear-gradient(45deg, transparent 75%, #f6fafc 0);
+      //   background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
+      //   background-size: 20px 20px;
+      // }
 
       #feedback {
         position: absolute;

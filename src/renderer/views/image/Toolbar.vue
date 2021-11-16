@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar" flex="main:justify cross:center">
+  <div flex="main:justify cross:center" class="toolbar">
     <div class="left" flex="cross:center">
       <div class="router-back" v-tip.sure="`${$t('common.hotKey')}：esc`">
         <span @click="goBack" class="btn"
@@ -88,6 +88,7 @@
           <span class="svg-container">
             <svg-icon
               icon-class="direction-left"
+              class="svg-container"
               style="transform:rotate(180deg);"
             />
           </span>
@@ -456,9 +457,9 @@ export default {
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 .toolbar {
-  height: 28px;
-  padding: 0 10px;
+  height: 28px !important;
   position: relative;
+  padding: 0 5px;
   .gap + .gap {
     margin-left: 10px;
   }

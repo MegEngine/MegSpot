@@ -240,7 +240,6 @@ export default {
 }
 .gallery {
   display: inline-block;
-  overflow: hidden;
   .modal {
     width: 100%;
     height: 100%;

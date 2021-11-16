@@ -343,6 +343,9 @@
           >
           </el-option>
         </el-select>
+        <el-button-group class="gap">
+          <ImageSetting></ImageSetting>
+        </el-button-group>
       </div>
     </div>
     <div class="video-grid" :style="containerStyle">
@@ -361,6 +364,7 @@
 <script>
 import GifDialog from '@/components/gif-dialog';
 import Gallery from '@/components/gallery';
+import ImageSetting from '@/components/image-setting';
 import VideoContainer from './VideoContainer';
 import * as CONSTANTS from './video-constants';
 import * as GLOBAL_CONSTANTS from '@/constants';
@@ -368,7 +372,7 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 
 export default {
-  components: { VideoContainer, Gallery, GifDialog },
+  components: { VideoContainer, Gallery, GifDialog, ImageSetting },
   data() {
     return {
       CONSTANTS,
