@@ -22,7 +22,6 @@ import 'vxe-table/lib/style.css';
 import VueSplit from 'vue-split-panel';
 import VueScroll from 'vuescroll';
 
-console.log('VXETable', VXETable);
 Vue.use(VXETable);
 Vue.use(VueSplit);
 Vue.use(VueScroll);

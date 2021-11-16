@@ -51,13 +51,6 @@
               </el-option>
             </div>
           </el-select>
-          <el-color-picker
-            v-show="false"
-            v-model="bgColor"
-            :predefine="predefineColors"
-            show-alpha
-          >
-          </el-color-picker>
         </div>
         <div flex="main:justify" class="setting-item">
           <span>region：</span>
@@ -96,8 +89,6 @@ export default {
     return {
       radius: 10,
       value: null,
-      mode: 'white',
-      bgColor: '#fafafa',
       baseStyle:
         'display: inline-block; margin-right: 5px; width: 24px; height: 24px; border:solid gray 2px;',
       predefineColors: ['#e3e7e900', '#2f2f2f', '#fafafa'],
@@ -128,12 +119,12 @@ export default {
     },
     handleModeChange(curMode) {
       const bg = this.colorOptions.find(item => item.mode === curMode);
-      this.bgColor = bg.color;
       this.setPreference({ background: bg });
     }
   },
   computed: {
     ...mapGetters(['preference']),
+
     defaultShowHist: {
       get() {
         return this.preference.defaultShowHist; // true
@@ -156,6 +147,14 @@ export default {
       },
       set(newVal) {
         this.setPreference({ backgroundStyle: newVal });
+      }
+    },
+    mode: {
+      get() {
+        return this.preference.background.mode; // mix
+      },
+      set(newVal) {
+        this.setPreference({ mode: newVal });
       }
     },
     radiusData: {

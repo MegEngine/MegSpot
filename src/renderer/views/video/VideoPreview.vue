@@ -90,6 +90,7 @@ export default {
   data() {
     return {
       showType: 'list',
+      thumbnailList: [],
       showAll: false
     };
   },
@@ -124,7 +125,7 @@ export default {
     handleSortChange(sortChange) {
       this.thumbnailList = this.$refs.fileTable.getSortData();
       const { order, property: field } = sortChange;
-      this.setImageConfig({ defaultSort: { order, field } });
+      this.setVideoConfig({ defaultSort: { order, field } });
     },
     addFolder() {
       let folderPath = this.videoCurrentPath;

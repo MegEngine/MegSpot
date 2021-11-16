@@ -20,7 +20,12 @@
       <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
       <EffectPreview @change="changeCanvasStyle" />
     </div>
-    <div ref="container" class="canvas-container" id="canvas-container">
+    <div
+      ref="container"
+      class="canvas-container"
+      id="canvas-container"
+      :style="canvasStyle"
+    >
       <OperationContainer
         id="canvas-container"
         ref="canvas-container"
@@ -39,13 +44,7 @@
             @reset="resetZoom"
             @update="setZoom"
           />
-          <canvas
-            ref="canvas"
-            :style="canvasStyle"
-            :width="_width"
-            :height="_height"
-          >
-          </canvas>
+          <canvas ref="canvas" :width="_width" :height="_height"> </canvas>
           <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
         </div>
       </OperationContainer>

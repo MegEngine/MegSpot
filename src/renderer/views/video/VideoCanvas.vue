@@ -186,18 +186,6 @@ export default {
     canvasStyle() {
       return this.preference.background.style;
     }
-    // canvasStyle() {
-    //   let filter = '';
-    //   ['brightness', 'contrast', 'saturate', 'grayscale', 'opacity'].forEach(
-    //     item => {
-    //       filter += `${item}(${this[item]}%) `;
-    //     }
-    //   );
-    //   ['blur'].forEach(item => {
-    //     filter += `${item}(${this[item]}px) `;
-    //   });
-    //   return filter;
-    // }
   },
   watch: {
     'videoConfig.smooth': {
