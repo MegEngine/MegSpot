@@ -529,7 +529,7 @@ export default {
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_3X1;
           break;
         case 4:
-          smartLayout = GLOBAL_CONSTANTS.LAYOUT_4X1;
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X2;
           break;
         default:
           smartLayout = this.imageConfig.layout;
