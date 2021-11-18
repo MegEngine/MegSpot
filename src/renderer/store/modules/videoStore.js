@@ -64,7 +64,7 @@ const videoStore = {
       }
     },
     SET_VIDEOS: (state, newVideoList) => {
-      state.videoList = newVideoList;
+      state.videoList = [...newVideoList];
     },
     EMPTY_VIDEOS: state => {
       state.videoList = [];

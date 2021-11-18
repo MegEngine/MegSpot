@@ -1,5 +1,5 @@
 <template>
-  <div class="image-center" flex='dir:top box:first'>
+  <div class="image-center" flex="dir:top box:first">
     <Toolbar></Toolbar>
     <Content ref="content" class="content-container"></Content>
   </div>
@@ -8,12 +8,13 @@
 <script>
 import Toolbar from './Toolbar';
 import Content from './Content';
+
 export default {
   name: 'image-compare',
   components: {
     Toolbar,
-    Content,
-  },
+    Content
+  }
 };
 </script>
 <style lang="scss" scoped>

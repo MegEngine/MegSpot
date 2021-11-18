@@ -126,7 +126,7 @@ export default {
       origin: -1,
       pin: false, // 按下shift
       // 监听当前文件夹的变化,变化后手动刷新目录
-      watcher: undefined
+      wacther: undefined
     };
   },
   computed: {
@@ -175,19 +175,28 @@ export default {
       }
     });
   },
+  beforeDestroy() {
+    this.wacther && this.wacther.close();
+    this.wacther = null;
+  },
   watch: {
     currentPath: {
       handler: function(newVal, oldVal) {
         if (oldVal) {
-          this.watcher.close();
+          this.wacther.close();
         }
         if (newVal) {
-          this.watcher = chokidar
+          this.wacther = chokidar
             .watch(newVal, {
               // 持续监听
               persistent: true,
               // 忽略初始化的目录检测（即：认为监听时目录是从空变为当前目录的过程 会触发很多的addDir,add file回调）
-              ignoreInitial: true
+              ignoreInitial: true,
+              // 等待写入完成
+              awaitWriteFinish: {
+                stabilityThreshold: 2000,
+                pollInterval: 100
+              }
             })
             .on('all', () => {
               this.refreshFileList();

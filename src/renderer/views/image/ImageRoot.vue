@@ -209,8 +209,7 @@ export default {
           this.setFolderPath(data.path);
         });
       }
-    },
-   
+    }
   }
 };
 </script>

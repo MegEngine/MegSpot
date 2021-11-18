@@ -125,7 +125,6 @@ export default {
     electron.ipcRenderer.on('debugMessage', (event, text) => {
       console.log(`[debug message]: ${text}`);
     });
-    
   }
 };
 </script>

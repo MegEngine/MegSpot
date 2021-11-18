@@ -61,13 +61,14 @@ import RGBAExhibit from '@/components/rgba-exhibit';
 import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
-const { mapGetters } = createNamespacedHelpers('imageStore');
+const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
   'preferenceStore'
 );
 import { getImageUrlSyncNoCache } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
+import chokidar from 'chokidar';
 
 export default {
   components: {
@@ -94,6 +95,8 @@ export default {
   },
   data() {
     return {
+      // 监听图像文件的变化,变化后自动刷新图像
+      wacther: undefined,
       header: null,
       canvas: null,
       maskDom: undefined,
@@ -188,6 +191,36 @@ export default {
     this.bitMap && this.bitMap.close();
   },
   watch: {
+    imgSrc: {
+      handler: function(newVal, oldVal) {
+        if (oldVal) {
+          this.wacther && this.wacther.close();
+        }
+        if (newVal) {
+          this.wacther = chokidar
+            .watch(newVal, {
+              // 持续监听
+              persistent: true,
+              // 忽略初始化的目录检测
+              ignoreInitial: true,
+              // 等待写入完成
+              awaitWriteFinish: {
+                stabilityThreshold: 2000,
+                pollInterval: 100
+              }
+            })
+            .on('change', (path, details) => {
+              console.log('image--change', path, details);
+              this.initImage(false);
+            })
+            .on('unlink', (path, details) => {
+              console.log('image--remove', path, details);
+              this.removeImages(path);
+            });
+        }
+      },
+      immediate: true
+    },
     'imageConfig.smooth': {
       handler(newVal, oldVal) {
         this.setSmooth();
@@ -196,6 +229,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['removeImages']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, _width, _height) {
       const cw = this._width,
@@ -287,21 +321,23 @@ export default {
         this[name](data);
       }
     },
-    initImage() {
+    initImage(initPosition = true) {
+      console.log('initImage', initPosition);
       this.image = new Image();
       this.image.onload = async () => {
         let offsreen = new OffscreenCanvas(this.image.width, this.image.height);
         let offCtx = offsreen.getContext('2d');
         offCtx.drawImage(this.image, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
-        this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
+        initPosition &&
+          (this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap));
         this.doZoomEnd();
         this.drawImage();
         this.currentHist = this.$refs['hist-container'].generateHist(
           cv.imread(this.image)
         );
       };
-      this.image.src = getImageUrlSyncNoCache(this.imgSrc);
+      this.image.src = getImageUrlSyncNoCache(this.imgSrc); //        'C:/Demo/1-1%20-%20副本.jpg'
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d');
