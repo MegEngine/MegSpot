@@ -127,9 +127,10 @@ export default {
       return item.isFile && isImage(item.path);
     },
     handleSortChange(sortChange) {
-      this.thumbnailList = this.$refs.fileTable.getSortData();
       const { order, property: field } = sortChange;
       this.setImageConfig({ defaultSort: { order, field } });
+      // 获取新排序下的thunbnail顺序
+      this.thumbnailList = this.$refs.fileTable.getSortData();
     },
     // FIX ME: 不可添加则直接禁用按钮
     addFolder() {

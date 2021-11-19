@@ -123,9 +123,10 @@ export default {
       return item.isFile && isVideo(item.path);
     },
     handleSortChange(sortChange) {
-      this.thumbnailList = this.$refs.fileTable.getSortData();
       const { order, property: field } = sortChange;
       this.setVideoConfig({ defaultSort: { order, field } });
+      // 获取新排序下的thunbnail顺序
+      this.thumbnailList = this.$refs.fileTable.getSortData();
     },
     addFolder() {
       let folderPath = this.videoCurrentPath;

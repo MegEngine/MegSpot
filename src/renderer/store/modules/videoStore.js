@@ -9,7 +9,10 @@ const videoStore = {
     videoConfig: {
       smooth: true,
       layout: GLABEL_CONSTANT.LAYOUT_2X1,
-      defaultSort: {}
+      defaultSort: {
+        order: 'asc',
+        field: 'name'
+      }
     },
     //当前文件夹路径
     currentPath: '',
