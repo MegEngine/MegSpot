@@ -166,7 +166,7 @@ Linux 环境下支持通过命令行进行启动、对比等操作。
 - 问题: [github.com/MegSpot/MegSpot/issues](https://github.com/MegSpot/MegSpot/issues)
 - 邮箱: [megengine-support@megvii.com](mailto:megengine-support@megvii.com)
 - 论坛: [discuss.megengine.org.cn](https://discuss.megengine.org.cn)
-- QQ: 1029741705
+- QQ: 782365536
 - OPENI: [openi.org.cn/MegSpot](https://www.openi.org.cn/html/2020/Framework_0325/18.html)
 
 ---
