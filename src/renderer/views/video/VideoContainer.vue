@@ -14,7 +14,7 @@
           <span
             class="file-name"
             flex-box="1"
-            v-html="$options.filters.getFileName(videoSrc)"
+            v-html="$options.filters.getFileName(path)"
           ></span>
         </el-tooltip>
         <el-button
@@ -42,6 +42,7 @@
       <VideoCanvas
         ref="videoImage"
         v-if="videoImageVisiable"
+        :path="path"
         :video="video"
         :videoSrc="videoSrc"
         :width="container.clientWidth"

@@ -9,6 +9,6 @@ export default function(path, flag = true) {
    * 将第一特殊字符 _ 后面增加&lrm;转义符号
    * 参考文献： https://www.w3.org/TR/WCAG20-TECHS/H34.html
    *   */
-  if (flag) fileName = fileName.replace(/([-_])/, '&lrm;$1');
+  if (flag) fileName = fileName.replace(/([.-_])/, '&lrm;$1');
   return fileName;
 }

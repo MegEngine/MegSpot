@@ -14,7 +14,7 @@
       <el-tooltip placement="bottom" :open-delay="800">
         <span class="compare-name" flex-box="1" v-html="getTitle"></span>
         <div slot="content">
-          {{ videoSrc }}
+          {{ path }}
           <br /><br />
           <span class="size">
             {{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span
@@ -85,6 +85,10 @@ export default {
     EffectPreview
   },
   props: {
+    path: {
+      type: String,
+      default: ''
+    },
     videoSrc: {
       type: String,
       default: ''
@@ -179,7 +183,7 @@ export default {
     getTitle() {
       return this.preference.showTitle
         ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
-            this.$options.filters.getFileName(this.videoSrc)
+            this.$options.filters.getFileName(this.path)
         : ' ';
     },
     canvasStyle() {
