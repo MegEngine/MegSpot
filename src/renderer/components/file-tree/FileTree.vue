@@ -122,7 +122,7 @@
 
 <script>
 import vuescroll from 'vuescroll';
-import SearchInput from '@/components/search-input/SearchInput';
+import SearchInput from '@/components/search-input';
 import ContextMenu from '@/components/context-menu';
 import { listDir } from './lib/file.js';
 import { defaultIcon } from './lib/consts.js';

@@ -53,6 +53,25 @@
           </el-select>
         </div>
         <div flex="main:justify" class="setting-item">
+          <span>scale options：</span>
+          <el-select
+            v-model="scaleOptions"
+            multiple
+            filterable
+            allow-create
+            default-first-option
+            placeholder="setting default scale options"
+          >
+            <el-option
+              v-for="(item, index) in preference.scaleOptions"
+              :key="index"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
+        </div>
+        <div flex="main:justify" class="setting-item">
           <span>region：</span>
           <el-input-number
             v-model="radius"
@@ -79,16 +98,10 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore');
 export default {
   name: 'ImageSetting',
-  props: {
-    visible: {
-      type: Boolean,
-      default: false
-    }
-  },
   data() {
     return {
+      visible: false,
       radius: 10,
-      value: null,
       baseStyle:
         'display: inline-block; margin-right: 5px; width: 24px; height: 24px; border:solid gray 2px;',
       predefineColors: ['#e3e7e900', '#2f2f2f', '#fafafa'],
@@ -124,7 +137,20 @@ export default {
   },
   computed: {
     ...mapGetters(['preference']),
-
+    scaleOptions: {
+      get() {
+        return [...this.preference.scaleOptions].sort((a, b) => a - b);
+      },
+      set(newVal) {
+        this.setPreference({
+          scaleOptions: [
+            ...new Set(
+              newVal.filter(item => !isNaN(item)).map(item => Number(item))
+            )
+          ]
+        });
+      }
+    },
     defaultShowHist: {
       get() {
         return this.preference.defaultShowHist; // true

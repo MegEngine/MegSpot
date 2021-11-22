@@ -8,6 +8,7 @@ const preferenceStore = {
         mode: 'white',
         style: 'background: #fafafa;'
       },
+      scaleOptions: [4, 2, 1, 0.5, 0.25],
       // 是否默认显示直方图
       defaultShowHist: false
     },

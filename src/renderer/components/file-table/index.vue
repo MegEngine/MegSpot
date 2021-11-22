@@ -42,13 +42,30 @@
       sortable
     >
       <template #header>
-        <search-input
-          v-model="search"
-          size="mini"
-          placeholder="filter file name according to input"
-          autofocus
-          clearable
-        ></search-input>
+        <div flex="cross:center">
+          <el-tooltip
+            :content="(regexpEnabled ? 'Disable' : 'Enable') + ' Regexp'"
+          >
+            <vxe-checkbox v-model="regexpEnabled"></vxe-checkbox>
+          </el-tooltip>
+          <search-input
+            v-model="search"
+            size="mini"
+            placeholder="filter file name according to input"
+            autofocus
+            clearable
+          >
+            <span
+              v-if="regexpEnabled"
+              slot="prepend"
+              style="font-size:16px; color: black"
+              >/</span
+            >
+            <span v-if="regexpEnabled" slot="append" style="color: black"
+              >/ig</span
+            >
+          </search-input>
+        </div>
       </template>
     </vxe-column>
     <vxe-column
@@ -74,7 +91,7 @@
 import dayjs from 'dayjs';
 import { throttle } from '@/utils';
 import { formatFileSize } from '@/utils/file';
-import SearchInput from '../search-input/SearchInput.vue';
+import SearchInput from '../search-input';
 import { isDirectory, readDir, getFileStatSync } from '@/utils/file';
 import { DELIMITER } from '@/constants';
 import chokidar from 'chokidar';
@@ -122,6 +139,7 @@ export default {
     return {
       tableHeight: 1000,
       search: '',
+      regexpEnabled: false, // 采用正则表达式方法搜索
       fileInfoList: [],
       origin: -1,
       pin: false, // 按下shift
@@ -140,11 +158,26 @@ export default {
           }
           return false;
         })
-        .filter(
-          item =>
-            !this.search ||
-            item.name.toLowerCase().includes(this.search.toLowerCase())
-        );
+        .filter(item => {
+          let result;
+          try {
+            result =
+              !this.search ||
+              (this.regexpEnabled
+                ? new RegExp(this.search, 'ig').test(item.name)
+                : item.name
+                    .toString()
+                    .toLowerCase()
+                    .indexOf(this.search.toLowerCase()) > -1);
+          } catch {
+            result =
+              item.name
+                .toString()
+                .toLowerCase()
+                .indexOf(this.search.toLowerCase()) > -1;
+          }
+          return result;
+        });
     }
   },
   async mounted() {
@@ -346,6 +379,10 @@ export default {
   background-color: #f0f3f6;
 
   ::v-deep {
+    .el-input-group__prepend,
+    .el-input-group__append {
+      padding: 0;
+    }
     .width_adaptive {
       /*表头与单元格统一高度*/
       padding: 0 !important;

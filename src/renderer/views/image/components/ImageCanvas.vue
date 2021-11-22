@@ -322,7 +322,6 @@ export default {
       }
     },
     initImage(initPosition = true) {
-      console.log('initImage', initPosition);
       this.image = new Image();
       this.image.onload = async () => {
         let offsreen = new OffscreenCanvas(this.image.width, this.image.height);

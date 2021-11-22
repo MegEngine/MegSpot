@@ -29,6 +29,7 @@ export default {
     size: '大小',
     scale: '缩放比例',
     sortDialogTips: 'tips:上下拖动可调整顺序',
+    selectAll: '全部选择',
     clearAll: '全部清空',
     delete: '删除此项',
     showAll: '显示全部',

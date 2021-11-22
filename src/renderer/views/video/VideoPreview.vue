@@ -1,41 +1,44 @@
 <template>
   <div class="preview" flex="dir:top">
-    <div class="toolbar" flex="cross:center">
-      <file-path-input
-        ref="filePathInput_ref"
-        class="file-path-input"
-        flex-box="1"
-        :filePath.sync="videoCurrentPath"
-      >
-      </file-path-input>
-      <el-button
-        class="addFolder"
-        type="primary"
-        :disabled="videoFolders.includes(videoCurrentPath)"
-        @click="addFolder"
-        >{{ $t('image.toolbar.addFolder') }}</el-button
-      >
-      <el-switch
-        class="show-all-switch"
-        v-model="showAll"
-        active-color="#1067d1"
-        :active-value="true"
-        :inactive-value="false"
-        :active-text="$t('general.showAll')"
-      >
-      </el-switch>
-      <el-radio-group
-        v-model="showType"
-        size="mini"
-        class="show-type-container"
-      >
-        <el-radio-button label="list">
-          <svg-icon icon-class="file-table-list"></svg-icon>
-        </el-radio-button>
-        <el-radio-button label="thumbnail">
-          <svg-icon icon-class="file-thumbnail"></svg-icon>
-        </el-radio-button>
-      </el-radio-group>
+    <div class="toolbar" flex="dir:top">
+      <div flex="cross:center">
+        <file-path-input
+          ref="filePathInput_ref"
+          class="file-path-input"
+          flex-box="1"
+          :filePath.sync="videoCurrentPath"
+        >
+        </file-path-input>
+        <el-button
+          class="addFolder"
+          type="primary"
+          :disabled="videoFolders.includes(videoCurrentPath)"
+          @click="addFolder"
+          >{{ $t('image.toolbar.addFolder') }}</el-button
+        >
+        <el-switch
+          class="show-all-switch"
+          v-model="showAll"
+          active-color="#1067d1"
+          :active-value="true"
+          :inactive-value="false"
+          :active-text="$t('general.showAll')"
+        >
+        </el-switch>
+        <el-radio-group
+          v-model="showType"
+          size="mini"
+          class="show-type-container"
+        >
+          <el-radio-button label="list">
+            <svg-icon icon-class="file-table-list"></svg-icon>
+          </el-radio-button>
+          <el-radio-button label="thumbnail">
+            <svg-icon icon-class="file-thumbnail"></svg-icon>
+          </el-radio-button>
+        </el-radio-group>
+      </div>
+      <SortToolBar></SortToolBar>
     </div>
     <div class="preview-content" flex-box="1">
       <FileTable
@@ -78,7 +81,8 @@
 <script>
 import { isDirectory, isExist } from '@/utils/file';
 import { isVideo } from '@/components/file-tree/lib/util';
-import SearchInput from '@/components/search-input/SearchInput';
+import SearchInput from '@/components/search-input';
+import SortToolBar from '@/components/sort-toolbar';
 import FileTable from '@/components/file-table';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
 import FilePathInput from '@/components/file-path-input';
@@ -86,7 +90,7 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 
 export default {
-  components: { Thumbnail, SearchInput, FileTable, FilePathInput },
+  components: { Thumbnail, SearchInput, FileTable, FilePathInput, SortToolBar },
   data() {
     return {
       showType: 'list',
@@ -157,7 +161,6 @@ export default {
   background-color: #f0f3f6;
   padding: 10px;
   .toolbar {
-    margin-bottom: 12px;
     .show-all-switch {
       margin-left: 18px;
     }

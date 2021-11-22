@@ -30,6 +30,7 @@ export default {
     size: 'size',
     scale: 'scale',
     sortDialogTips: 'tips:drag to change order',
+    selectAll: 'select All',
     clearAll: 'unselect all',
     delete: 'delete this item',
     showAll: 'show all',

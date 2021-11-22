@@ -59,12 +59,15 @@ const imageStore = {
         state.imageList = [...new Set(state.imageList.concat(images))];
       }
     },
-    REMOVE_IMAGE: (state, image) => {
-      if (state.imageList.includes(image)) {
-        const tmp = [...state.imageList];
-        tmp.splice(state.imageList.indexOf(image), 1);
-        state.imageList = tmp;
-      }
+    REMOVE_IMAGES: (state, images) => {
+      const tmp = [...state.imageList];
+      images.forEach(image => {
+        let index = tmp.indexOf(image);
+        if (index > -1) {
+          tmp.splice(index, 1);
+        }
+      });
+      state.imageList = tmp;
     },
     SET_IMAGES: (state, newImageList) => {
       state.imageList = newImageList;
@@ -115,11 +118,7 @@ const imageStore = {
       }
     },
     removeImages({ commit }, images) {
-      if (!Array.isArray(images)) {
-        commit('REMOVE_IMAGE', images);
-      } else {
-        images.forEach(item => commit('REMOVE_IMAGE', item));
-      }
+      commit('REMOVE_IMAGES', Array.isArray(images) ? images : [images]);
     },
     setImages({ commit }, newImageList) {
       commit('SET_IMAGES', newImageList);

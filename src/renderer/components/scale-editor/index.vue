@@ -9,14 +9,29 @@
       {{ scaleData }}
     </span>
     <div v-show="scaleEditorVisible" class="scale-input">
-      <el-input-number
-        v-model="scaleData"
-        size="small"
-        :precision="2"
-        :step="0.1"
-        :min="0"
-        @change="handleChange"
-      ></el-input-number>
+      <el-tooltip
+        :disabled="preference.scaleOptions.length === 0"
+        effect="light"
+        popper-class="select-content"
+      >
+        <el-input-number
+          v-model="scaleData"
+          size="small"
+          :precision="2"
+          :step="0.1"
+          :min="0"
+          @change="handleChange"
+        ></el-input-number>
+        <div slot="content" flex="dir:top">
+          <span
+            v-for="item in preference.scaleOptions"
+            :key="item"
+            class="select-item"
+            @click="setNewScale(item)"
+            >{{ item }}
+          </span>
+        </div>
+      </el-tooltip>
       <el-button type="primary" size="mini" @click="handleScaleReset"
         >reset
       </el-button>
@@ -26,9 +41,11 @@
 
 <script>
 import { createNamespacedHelpers } from 'vuex';
+import SearchInput from '@/components/search-input';
 const { mapGetters } = createNamespacedHelpers('preferenceStore');
 export default {
   name: 'ScaleEditor',
+  components: { SearchInput },
   props: {
     scaleEditorVisible: {
       type: Boolean,
@@ -40,6 +57,9 @@ export default {
     }
   },
   methods: {
+    setNewScale(newScalse) {
+      this.$emit('update', Number(newScalse));
+    },
     handleScaleDbClick() {
       this.$emit('show');
     },
@@ -57,7 +77,7 @@ export default {
         return this.scale;
       },
       set(newVal) {
-        if (newVal !== this.scale) this.$emit('update', newVal);
+        if (newVal !== this.scale) this.setNewScale(newVal);
       }
     },
     textColor() {
@@ -95,6 +115,22 @@ export default {
     }
     .el-button {
       padding: 2.5px 6px;
+    }
+  }
+}
+</style>
+<style rel="stylesheet/scss" lang="scss">
+.select-content {
+  padding: 1px 0;
+  .select-item {
+    padding: 0 2px;
+    min-width: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #606266;
+    &:hover {
+      cursor: pointer;
+      background-color: #81b0f7;
     }
   }
 }

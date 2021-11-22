@@ -30,6 +30,7 @@ export default {
     size: 'ファイルサイズ',
     scale: '拡大倍率',
     sortDialogTips: 'ヒント：ファイル名をドラッグして表示順を変更できます',
+    selectAll: 'すべての選択肢',
     clearAll: 'すべて選択解除',
     delete: 'このアイテムを削除する',
     showAll: 'すべて表示する',
