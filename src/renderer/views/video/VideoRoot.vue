@@ -64,6 +64,7 @@
           <FileTree
             ref="folderTree"
             id="folderTree"
+            :currentPath="currentPath"
             :openedFolders="videoFolders"
             :checkedFiles="checkedFiles"
             @close="onClose"

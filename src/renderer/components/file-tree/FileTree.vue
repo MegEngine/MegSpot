@@ -126,6 +126,7 @@ import SearchInput from '@/components/search-input';
 import ContextMenu from '@/components/context-menu';
 import { listDir } from './lib/file.js';
 import { defaultIcon } from './lib/consts.js';
+import { DELIMITER, SORTING_FILE_NAME } from '@/constants';
 import { throttle } from '@/utils';
 import chokidar from 'chokidar';
 
@@ -197,6 +198,7 @@ export default {
       type: Boolean,
       default: true
     },
+    currentPath: String,
     tipClose: {
       type: String,
       default: 'Close Folder'
@@ -225,6 +227,9 @@ export default {
       } else {
         return defaultIcon;
       }
+    },
+    sortFilePath() {
+      return this.currentPath + DELIMITER + SORTING_FILE_NAME;
     }
   },
   watch: {
@@ -248,8 +253,10 @@ export default {
               }
             }
           )
-          .on('all', async () => {
-            this.treeData = await this.loadMultiDir(this.openedFolders);
+          .on('all', async (event, path) => {
+            if (path !== this.sortFilePath) {
+              this.treeData = await this.loadMultiDir(this.openedFolders);
+            }
           });
       }
     },

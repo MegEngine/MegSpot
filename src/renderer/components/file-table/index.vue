@@ -89,7 +89,7 @@
 
 <script>
 import dayjs from 'dayjs';
-import { throttle } from '@/utils';
+import { throttle, debounce } from '@/utils';
 import { formatFileSize } from '@/utils/file';
 import SearchInput from '../search-input';
 import { isDirectory, readDir, getFileStatSync } from '@/utils/file';
@@ -138,7 +138,7 @@ export default {
   data() {
     return {
       tableHeight: 1000,
-      search: '',
+      searchString: '',
       regexpEnabled: false, // 采用正则表达式方法搜索
       fileInfoList: [],
       origin: -1,
@@ -148,6 +148,14 @@ export default {
     };
   },
   computed: {
+    search: {
+      get() {
+        return this.searchString;
+      },
+      set: debounce(100, function(newVal) {
+        this.searchString = newVal;
+      })
+    },
     showFile: function() {
       return this.fileInfoList
         .filter(item => {

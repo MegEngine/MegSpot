@@ -39,9 +39,11 @@
         </el-radio-group>
       </div>
       <SortToolBar
+        :currentPath="currentPath"
         :allSelectd.sync="allSelectd"
         :oneOrMoreSelected.sync="oneOrMoreSelected"
         @change="handleSelectAll"
+        @getSortData="getSortData"
       ></SortToolBar>
     </div>
     <div flex-box="1" class="preview-content" v-show="showType === 'list'">
@@ -140,6 +142,9 @@ export default {
       'setImageFolders',
       'setImageConfig'
     ]),
+    getSortData(data, callback) {
+      callback(this.currentPath);
+    },
     checkItem(item) {
       return item.isFile && isImage(item.path);
     },

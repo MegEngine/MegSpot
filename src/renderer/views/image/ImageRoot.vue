@@ -83,6 +83,7 @@
           <FileTree
             ref="folderTree"
             id="folderTree"
+            :currentPath="currentPath"
             :openedFolders="imageFolders"
             :checkedFiles="checkedFiles"
             @close="onClose"
@@ -107,7 +108,6 @@
 
 <script>
 const { dialog } = require('electron').remote;
-import Vue from 'vue';
 import FileTree from '@/components/file-tree/FileTree.vue';
 import Gallery from '@/components/gallery';
 import ShowPath from '@/components/show-path';
