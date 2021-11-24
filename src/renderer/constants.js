@@ -1,6 +1,8 @@
 import path from 'path';
+import os from 'os';
 
-export const DELIMITER = path.sep;
+export const DELIMITER = path.sep; // 分割符
+export const EOF = os.EOL; // 换行符
 export const SORTING_FILE_NAME = '.MegSpotSort.ini';
 export const DIRECTION_LEFT = 'direction_left';
 export const DIRECTION_RIGHT = 'direction_right';

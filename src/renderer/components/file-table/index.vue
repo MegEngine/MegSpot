@@ -13,6 +13,8 @@
       range: true,
       checkMethod: checkSelectable
     }"
+    :sort-config="{ sortMethod: customSortMethod }"
+    show-overflow="tooltip"
     :tooltip-config="{ enterable: true }"
     class="table"
     header-cell-class-name="width_adaptive"
@@ -88,12 +90,13 @@
 </template>
 
 <script>
+import fse from 'fs-extra';
 import dayjs from 'dayjs';
 import { throttle, debounce } from '@/utils';
 import { formatFileSize } from '@/utils/file';
 import SearchInput from '../search-input';
 import { isDirectory, readDir, getFileStatSync } from '@/utils/file';
-import { DELIMITER } from '@/constants';
+import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants';
 import chokidar from 'chokidar';
 
 export default {
@@ -141,6 +144,7 @@ export default {
       searchString: '',
       regexpEnabled: false, // 采用正则表达式方法搜索
       fileInfoList: [],
+      sortList: [],
       origin: -1,
       pin: false, // 按下shift
       // 监听当前文件夹的变化,变化后手动刷新目录
@@ -186,6 +190,9 @@ export default {
           }
           return result;
         });
+    },
+    sortFilePath() {
+      return this.currentPath + DELIMITER + SORTING_FILE_NAME;
     }
   },
   async mounted() {
@@ -202,7 +209,7 @@ export default {
         this.pin = false;
       }
     });
-
+    this.$bus.$on('applySortFile', this.applySortFile);
     this.$nextTick(() => {
       this.updateTableHeight();
     });
@@ -217,6 +224,7 @@ export default {
     });
   },
   beforeDestroy() {
+    this.$bus.$off('applySortFile', this.applySortFile);
     this.wacther && this.wacther.close();
     this.wacther = null;
   },
@@ -239,7 +247,14 @@ export default {
                 pollInterval: 100
               }
             })
-            .on('all', () => {
+            .on('all', async (event, path) => {
+              if (path === this.sortFilePath) {
+                const exist = await fse.pathExists(path);
+                if (exist) {
+                  const data = await fse.readFile(path, 'utf8');
+                  this.sortList = data.split(EOF);
+                } else this.sortList = [];
+              }
               this.refreshFileList();
             });
         }
@@ -269,6 +284,52 @@ export default {
     }
   },
   methods: {
+    async customSortMethod({ data, sortList }) {
+      const extist = await fse.pathExists(this.sortFilePath);
+      if (!this.sortList.length && extist) {
+        const data = await fse.readFile(this.sortFilePath, 'utf8');
+        this.sortList = data.split(EOF);
+      }
+      const sortItem = sortList[0];
+      // 取出第一个排序的列
+      const { property, order } = sortItem;
+      let list = [];
+      // name
+      if (property === this.defaultSort.field) {
+        // 是否根据排序文件排序
+        if (!this.sortList.length) {
+          if (order === 'asc' || order === 'desc') {
+            list = data.sort((a, b) => a[property] < b[property]);
+          }
+        } else {
+          // 根据排序文件排序
+          list = data.sort((a, b) => {
+            let indexA = this.sortList.indexOf(a[property]);
+            let indexB = this.sortList.indexOf(b[property]);
+            if (indexA === -1 && indexB === -1) return 0;
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+            return indexA - indexB;
+          });
+        }
+      }
+      if (order === 'desc') {
+        list.reverse();
+      }
+      return list;
+    },
+    applySortFile(data, callback) {
+      this.$refs.xTable.clearSort();
+      // 重新触发排序
+      this.$nextTick(() => {
+        this.$refs.xTable
+          .sort(this.defaultSort.field, this.defaultSort.order ?? 'null')
+          .then(() => {
+            // 向父级反馈 最新的顺序
+            this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0]);
+          });
+      });
+    },
     checkSelectable({ row }) {
       return this.checkItem(row);
     },
@@ -365,14 +426,14 @@ export default {
       // 重新触发排序
       this.$nextTick(() => {
         this.$refs.xTable
-          .sort(this.defaultSort.field, this.defaultSort.order)
+          .sort(this.defaultSort.field, this.defaultSort.order ?? 'null')
           .then(() => {
             // 向父级反馈 最新的顺序
             this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0]);
           });
       });
     },
-    // 供外部直接调研获取 通过排序处理后的tableData
+    // 供外部直接调用获取 通过排序处理后的tableData
     getSortData() {
       return this.$refs.xTable.getTableData().visibleData;
     }

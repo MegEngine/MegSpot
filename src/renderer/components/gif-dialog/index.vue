@@ -105,8 +105,6 @@ const { dialog } = require('electron').remote;
 const fs = require('fs');
 import getFileName from '@/filter/get-file-name';
 import GIF from '@dhdbstjr98/gif.js/dist/gif';
-import { getImageUrlSync } from '@/utils/image';
-import { createNamespacedHelpers } from 'vuex';
 
 export default {
   components: {},
@@ -156,9 +154,7 @@ export default {
     selectImage(imageName, index) {
       this.imageNameList.add(imageName);
       const data = { imageNameList: this.imageNameList };
-      console.log('getCanvasSize', data);
       this.$bus.$emit('getCanvasSize', data, res => {
-        console.log('res', res);
         this.canvasSize = res;
       });
       this.gifImageList[index].imageName = getFileName(imageName, false);

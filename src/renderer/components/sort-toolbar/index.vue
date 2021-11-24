@@ -39,11 +39,13 @@
 
 <script>
 import fse from 'fs-extra';
-const { dialog } = require('electron').remote;
-import { DELIMITER, SORTING_FILE_NAME } from '@/constants';
 import chokidar from 'chokidar';
+import getFileName from '@/filter/get-file-name';
+const { dialog } = require('electron').remote;
+import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants';
 
 export default {
+  components: {},
   props: {
     currentPath: String,
     allSelectd: {
@@ -59,16 +61,11 @@ export default {
   },
   data() {
     return {
-      fse: null,
       generateVisible: false
     };
   },
-  created() {
-    this.fse = fse;
-  },
-  mounted() {
-    console.log('fse', this.fse, this.fse.version);
-  },
+  created() {},
+  mounted() {},
   beforeDestroy() {
     this.wacther && this.wacther.close();
     this.wacther = null;
@@ -89,45 +86,61 @@ export default {
           this.$message.success('success');
         });
     },
-    getSortData() {
-      console.log('emit');
-      this.$emit('getSortData', {}, this.generateSortFile);
+    async applySortFile() {
+      this.$bus.$emit('applySortFile');
     },
-    applySortFile() {},
-    editSortFile() {},
-    async generateSortFile(file = '', event) {
+    editSortFile() {
+      this.$emit('showDialog');
+    },
+    async generateSortFile() {
       const path = this.sortFilePath;
       let exstis = await fse.pathExists(path);
+      let cancel = false;
       if (exstis) {
         this.$confirm('排序文件已存在，是否覆盖', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).catch(() => {
+          cancel = true;
           this.$message({
             type: 'info',
             message: '已取消覆盖'
           });
         });
       }
+      if (cancel) return;
+      // 获取当前表格排序列表数据
+      const data = await new Promise(resolve =>
+        this.$emit('getSortData', null, data =>
+          resolve(data.map(item => getFileName(item.path, false)).join(EOF))
+        )
+      );
+      // 写入文件
       try {
-        await fse.outputFile(path, file);
+        await fse.outputFile(path, data);
         this.$message({
           type: 'success',
           message: `The sorting file is successfully generated !<br /> and its path is <a style="color: blue;">${path}</a>`,
           dangerouslyUseHTMLString: true
         });
         this.generateVisible = false;
-        const data = await fse.readFile(path, 'utf8');
-
-        console.log(data);
+        const _data = await fse.readFile(path, 'utf8');
       } catch (err) {
         console.error(err);
+        this.$message.error(err);
       }
     },
     async confirmBtnVisible() {
       const exists = await fse.pathExists(this.sortFilePath);
       this.generateVisible = !exists;
+      // 更改dialog中的排序列表
+      if (exists) {
+        const data = await fse.readFile(this.sortFilePath, 'utf8');
+        this.$parent.$refs['file_list_dialog'].handleFileChange(
+          data.split(EOF)
+        );
+      }
     }
   },
   computed: {

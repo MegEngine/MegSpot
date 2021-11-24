@@ -43,7 +43,8 @@
         :allSelectd.sync="allSelectd"
         :oneOrMoreSelected.sync="oneOrMoreSelected"
         @change="handleSelectAll"
-        @getSortData="getSortData"
+        @getSortData="handleGetSortData"
+        @showDialog="handleShowDialog"
       ></SortToolBar>
     </div>
     <div flex-box="1" class="preview-content" v-show="showType === 'list'">
@@ -81,6 +82,11 @@
         </Thumbnail>
       </div>
     </div>
+    <FileListDialog
+      ref="file_list_dialog"
+      :currentPath="currentPath"
+      @getSortData="handleGetSortData"
+    />
   </div>
 </template>
 
@@ -91,6 +97,7 @@ import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
 import FileTable from '@/components/file-table';
 import FilePathInput from '@/components/file-path-input';
 import SortToolBar from '@/components/sort-toolbar';
+import FileListDialog from '@/components/file-list-dialog';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
@@ -99,7 +106,8 @@ export default {
     Thumbnail,
     FileTable,
     FilePathInput,
-    SortToolBar
+    SortToolBar,
+    FileListDialog
   },
   data() {
     return {
@@ -142,8 +150,11 @@ export default {
       'setImageFolders',
       'setImageConfig'
     ]),
-    getSortData(data, callback) {
-      callback(this.currentPath);
+    handleGetSortData(data, callback) {
+      callback(this.$refs.fileTable.getSortData());
+    },
+    handleShowDialog() {
+      this.$refs['file_list_dialog'].show();
     },
     checkItem(item) {
       return item.isFile && isImage(item.path);
