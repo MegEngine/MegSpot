@@ -38,7 +38,14 @@
           </el-radio-button>
         </el-radio-group>
       </div>
-      <SortToolBar></SortToolBar>
+      <SortToolBar
+        :currentPath="videoCurrentPath"
+        :allSelectd.sync="allSelectd"
+        :oneOrMoreSelected.sync="oneOrMoreSelected"
+        @change="handleSelectAll"
+        @getSortData="handleGetSortData"
+        @showDialog="handleShowDialog"
+      ></SortToolBar>
     </div>
     <div class="preview-content" flex-box="1">
       <FileTable
@@ -75,6 +82,11 @@
         </Thumbnail>
       </div>
     </div>
+    <SortFileDialog
+      ref="sort_file_dialog"
+      :currentPath="videoCurrentPath"
+      @getSortData="handleGetSortData"
+    />
   </div>
 </template>
 
@@ -83,6 +95,7 @@ import { isDirectory, isExist } from '@/utils/file';
 import { isVideo } from '@/components/file-tree/lib/util';
 import SearchInput from '@/components/search-input';
 import SortToolBar from '@/components/sort-toolbar';
+import SortFileDialog from '@/components/sort-file-dialog';
 import FileTable from '@/components/file-table';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
 import FilePathInput from '@/components/file-path-input';
@@ -90,7 +103,14 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 
 export default {
-  components: { Thumbnail, SearchInput, FileTable, FilePathInput, SortToolBar },
+  components: {
+    Thumbnail,
+    SearchInput,
+    FileTable,
+    FilePathInput,
+    SortToolBar,
+    SortFileDialog
+  },
   data() {
     return {
       showType: 'list',
@@ -101,6 +121,17 @@ export default {
   computed: {
     ...mapGetters(['videoList', 'videoFolders', 'videoConfig']),
     ...mapGetters({ currentPathFromVuex: 'currentPath' }),
+    arr() {
+      return this.videoList.filter(item =>
+        item.startsWith(this.videoCurrentPath)
+      );
+    },
+    allSelectd() {
+      return this.thumbnailList.every(item => this.arr.indexOf(item.path) >= 0);
+    },
+    oneOrMoreSelected() {
+      return this.thumbnailList.some(item => this.arr.indexOf(item.path) >= 0);
+    },
     videoCurrentPath: {
       get() {
         return this.currentPathFromVuex;
@@ -125,6 +156,23 @@ export default {
     ]),
     checkItem(item) {
       return item.isFile && isVideo(item.path);
+    },
+    handleSelectAll({ checked }) {
+      if (this.allSelectd) {
+        this.removeVideos(
+          this.thumbnailList.filter(item => item.isFile).map(item => item.path)
+        );
+      } else {
+        this.addVideos(
+          this.thumbnailList.filter(item => item.isFile).map(item => item.path)
+        );
+      }
+    },
+    handleGetSortData(data, callback) {
+      callback(this.$refs.fileTable.getSortData());
+    },
+    handleShowDialog() {
+      this.$refs['sort_file_dialog'].show();
     },
     handleSortChange(sortChange) {
       const { order, property: field } = sortChange;

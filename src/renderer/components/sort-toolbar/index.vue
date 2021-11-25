@@ -15,24 +15,24 @@
       v-tip="'Generate Sorting File'"
       @click="generateSortFile"
     >
-      <!-- 生成排序文件 -->
-      Generate
+      {{ $t('sortFile.generate') }}
     </el-button>
+    <span v-show="generateVisible" class="tip">{{
+      $t('sortFile.generateTip')
+    }}</span>
     <el-button
       v-show="!generateVisible"
       v-tip="'Apply Sorting File'"
       @click="applySortFile"
     >
-      <!-- 应用排序文件 -->
-      Apply
+      {{ $t('sortFile.apply') }}
     </el-button>
     <el-button
       v-show="!generateVisible"
       v-tip="'Edit Sorting File'"
       @click="editSortFile"
     >
-      <!-- 编辑排序文件 -->
-      Edit
+      {{ $t('sortFile.edit') }}
     </el-button>
   </div>
 </template>
@@ -137,7 +137,7 @@ export default {
       // 更改dialog中的排序列表
       if (exists) {
         const data = await fse.readFile(this.sortFilePath, 'utf8');
-        this.$parent.$refs['file_list_dialog'].handleFileChange(
+        this.$parent.$refs['sort_file_dialog'].handleFileChange(
           data.split(EOF)
         );
       }
@@ -183,6 +183,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/public.scss';
 .sort-toolbar-container {
   margin: 5px 0;
 }

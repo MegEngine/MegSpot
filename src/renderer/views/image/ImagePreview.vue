@@ -82,8 +82,8 @@
         </Thumbnail>
       </div>
     </div>
-    <FileListDialog
-      ref="file_list_dialog"
+    <SortFileDialog
+      ref="sort_file_dialog"
       :currentPath="currentPath"
       @getSortData="handleGetSortData"
     />
@@ -97,7 +97,7 @@ import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
 import FileTable from '@/components/file-table';
 import FilePathInput from '@/components/file-path-input';
 import SortToolBar from '@/components/sort-toolbar';
-import FileListDialog from '@/components/file-list-dialog';
+import SortFileDialog from '@/components/sort-file-dialog';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
@@ -107,7 +107,7 @@ export default {
     FileTable,
     FilePathInput,
     SortToolBar,
-    FileListDialog
+    SortFileDialog
   },
   data() {
     return {
@@ -154,7 +154,7 @@ export default {
       callback(this.$refs.fileTable.getSortData());
     },
     handleShowDialog() {
-      this.$refs['file_list_dialog'].show();
+      this.$refs['sort_file_dialog'].show();
     },
     checkItem(item) {
       return item.isFile && isImage(item.path);

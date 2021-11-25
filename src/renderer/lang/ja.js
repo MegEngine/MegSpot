@@ -114,5 +114,14 @@ export default {
     play: '再生',
     pause: '一時停止',
     reset: 'リセット'
+  },
+  sortFile: {
+    apply: '応用',
+    edit: '編集',
+    generate: '生成',
+    generateTip:
+      'クリックして、現在のディレクトリに.MegSpotSort.iniソート構成ファイルを生成します',
+    sortFile: 'ファイルを並べ替える',
+    useTableFileList: '現在のテーブル並べ替えリストを適用する'
   }
 };

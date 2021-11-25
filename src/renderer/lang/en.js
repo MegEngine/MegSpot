@@ -114,5 +114,14 @@ export default {
     play: 'play',
     pause: 'pause',
     reset: 'reset'
+  },
+  sortFile: {
+    apply: 'Apply',
+    edit: 'Edit',
+    generate: 'Generate',
+    generateTip:
+      'Click to generate the .MegSpotSort.ini sorting configuration file in the current directory',
+    sortFile: ' Sorting File',
+    useTableFileList: 'Apply current table sorting list'
   }
 };

@@ -3,16 +3,15 @@
     id="dialog"
     width="80%"
     :visible.sync="visible"
-    title="Edit Sorting File"
     :before-close="clear"
   >
+    <span slot="title">{{
+      $t('sortFile.edit') + $t('sortFile.sortFile')
+    }}</span>
     <div class="toolbar" flex="dir:right">
-      <el-button type="primary" class="right-btn" @click="saveSortFile"
-        >设为默认排序文件</el-button
-      >
-      <el-button type="warning" @click="showTableFileList"
-        >显示当前表格排序列表</el-button
-      >
+      <el-button type="warning" @click="showTableFileList">{{
+        $t('sortFile.useTableFileList')
+      }}</el-button>
     </div>
     <div class="file-list">
       <vue-scroll>
@@ -53,7 +52,7 @@ import draggable from 'vuedraggable';
 import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants';
 
 export default {
-  name: 'FileListDialog',
+  name: 'SortFileDialog',
   components: { draggable },
   props: {
     currentPath: {
@@ -68,11 +67,12 @@ export default {
       fileList: [],
       changed: false,
       drag: false,
+      checked: false, // 关闭dialog是否询问保存
       textAlign: 'left'
     };
   },
   async mounted() {
-    this.$bus.$on('showFileListDialog', () => {
+    this.$bus.$on('showSortFileDialog', () => {
       this.visible = true;
     });
     this.sortList = await this.getSortList();
@@ -147,14 +147,18 @@ export default {
     clear(done) {
       this.visible = false;
       if (this.changed) {
-        this.$confirm('是否保存排序文件', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-          'append-to-body': true
-        }).then(() => {
+        if (this.checked) {
+          this.$confirm('是否保存排序文件', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+            'append-to-body': true
+          }).then(() => {
+            this.saveSortFile();
+          });
+        } else {
           this.saveSortFile();
-        });
+        }
       }
       this.changed = false;
     }
@@ -178,12 +182,19 @@ export default {
 
 <style lang="scss" scoped>
 #dialog {
+  // margin-top: 9vh !important;
+  // margin-bottom: 8vh !important;
+  height: 100%;
+  overflow: hidden;
   .toolbar {
     .right-btn {
       margin-left: 10px;
     }
   }
   .file-list {
+    margin: 20px 0;
+    height: 70vh;
+    overflow: auto;
     li {
       list-style-type: none;
     }

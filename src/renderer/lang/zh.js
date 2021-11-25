@@ -113,5 +113,13 @@ export default {
     play: '播放',
     pause: '暂停',
     reset: '复位'
+  },
+  sortFile: {
+    apply: '应用',
+    edit: '编辑',
+    generate: '生成',
+    generateTip: '点击即可在当前目录下生成.MegSpotSort.ini排序配置文件',
+    sortFile: '排序文件',
+    useTableFileList: '应用当前表格排序'
   }
 };
