@@ -1,8 +1,8 @@
 export default {
   common: {
-    supportTypes: '複数のファイルタイプをサポート:',
+    supportTypes: '対応ファイルタイプ:',
     desc:
-      'MegSpotは、ローカル画像比較、ビデオ比較、画像カスタマイズ処理などの便利な機能をユーザーに提供するように設計されたクロスプラットフォームのローカルアプリケーションです。 \r\n交換グループに参加して、詳細を確認し、最新情報を入手できます。',
+      'MegSpotは、画像比較、ビデオ比較、画像カスタマイズ処理などの便利な機能をユーザーに提供するように設計されたクロスプラットフォームのネイティブアプリケーションです。 \r\nqqグループ（782365536）に参加して、詳細を確認し、最新情報を入手してください。',
     manual: 'マニュアル',
     hotKey: 'ホットキー',
     showVideoTip: 'デモビデオを表示'
@@ -16,24 +16,24 @@ export default {
     layout: 'レイアウト',
     aboutText: 'オン',
     introduction:
-      'MegSpotは、ローカル画像比較、ビデオ比較、画像カスタマイズ処理などの便利な機能をユーザーに提供するように設計されたクロスプラットフォームのローカルアプリケーションです。\r\n詳細については、DingdingGroupを入力してください',
+      'MegSpotは、画像比較、ビデオ比較、画像カスタマイズ処理などの便利な機能をユーザーに提供するように設計されたクロスプラットフォームのローカルアプリケーションです。\r\n詳細については、DingdingGroupを入力してください',
     videoPlay: '動画の再生',
-    videoCompare: '静止画の対照',
-    compare: '対照',
-    selected: '選択されている',
+    videoCompare: '画像比較',
+    compare: '比較',
+    selected: '選択ファイル',
     list: 'リスト',
     thumbnail: 'サムネイル画像',
     fileName: 'ファイル名',
     fileLoading: 'ファイルを読み込んでいます...',
-    groupNum: 'グループ番号\nCtrl + ← ページ前方 nCtrl + → ページ後方',
-    lastModifyTime: '最終変更時刻',
+    groupNum: 'グループ番号\nCtrl + ← 戻る \nCtrl + → 進む',
+    lastModifyTime: '更新日付',
     size: 'ファイルサイズ',
     scale: '拡大倍率',
     sortDialogTips: 'ヒント：ファイル名をドラッグして表示順を変更できます',
     clearAll: 'すべて選択解除',
-    delete: 'このアイテムを削除する',
-    showAll: 'すべて表示する',
-    history: '歴史記録',
+    delete: 'このアイテムを削除',
+    showAll: 'すべて表示',
+    history: '履歴',
     dragDropCompare: 'ドラッグアンドドロップの比較',
     imageBrowser: '画像ブラウザ',
     imageList: '画像リスト',
@@ -45,15 +45,15 @@ export default {
     entries: {
       image: {
         title: '画像',
-        desc: 'ローカルの画像を対照する'
+        desc: '画像ビューア。画像の表示、比較'
       },
       video: {
         title: '動画',
-        desc: 'ローカルの動画を対照する'
+        desc: '動画プレイヤー。動画の再生、比較'
       },
       viewer: {
         title: 'カスタムビューア',
-        desc: 'カスタム画像処理ロジックを使用してビューアを作成する'
+        desc: 'カスタム画像処理ロジックを使用したビューアを作成する'
       }
     }
   },
@@ -61,8 +61,8 @@ export default {
     toolbar: {
       openFolder: 'フォルダを開く',
       addFolder: 'フォルダーを追加',
-      imageQueue: '画像のリスト',
-      compareImages: '画像を比較する',
+      imageQueue: '画像リスト',
+      compareImages: '画像を比較',
       cleanImageQueue: 'リストをクリア'
     },
     folder: {
@@ -72,7 +72,7 @@ export default {
   imagePreview: {},
   imageCenter: {
     bilinearInterpolation: 'バイリニア補間',
-    selectedMsg: '画像が選択されており、独立して操作できます',
+    selectedMsg: 'この画像は選択されており、独立して操作できます',
     colorPicker: 'カラーピッカー',
     nearestInterpolation: '最近傍補間',
     overlayLeft: '左側にオーバーレイ表示',
@@ -84,28 +84,28 @@ export default {
     fullsize: 'フルサイズ',
     adaptive: '全体を見る',
     align: '整列（サイズは同じままです）',
-    align2: 'align（同じサイズ）',
+    align2: '整列（同じサイズ）',
     helpText:
-      '画像をダブルクリックとして、その画像が個別に操作できます。ファイルネイムにクリックして、コメントが編集できます。',
-    rotate: 'スピン',
+      '画像をダブルクリックして、その画像を個別に操作できます。ファイル名をクリックして、コメントが編集できます。',
+    rotate: '回転',
     generateGIF: 'gifを生成する'
   },
   imageDragDropCompare: {
-    hideLine: 'コントラストラインを隠す',
-    displayLine: 'コントラストラインを表示',
+    hideLine: '比較ラインを隠す',
+    displayLine: '比較ライン表示',
     tip:
-      'デフォルトでは、選択された最初の2つの画像が比較されます。 変更する必要がある場合は、選択したものを開いて切り替えてください。'
+      'デフォルトでは、選択された画像の最初の2つが比較されます。 変更する場合は、選択を開いて切り替えてください。'
   },
   generateGIF: {
     title: '比較働画GIFを生成',
     image: '比較図',
-    description: '説明する',
-    operation: '操作する',
+    description: '説明',
+    operation: '操作',
     tips: {
-      wait: '生成に時間がかかるかもしれませんが、お待ちください',
-      saved: 'GIFファイル保存成功！',
-      finished: 'GIF生成に成功しました！',
-      tooSmallNumber: '選択済み画像の数が少なすぎる！'
+      wait: '生成しています、お待ちください',
+      saved: 'GIFファイルを保存しました！',
+      finished: 'GIFファイルを生成しました！',
+      tooSmallNumber: '選択済み画像の数が少なすぎます！'
     }
   },
   video: {
@@ -114,5 +114,14 @@ export default {
     play: '再生',
     pause: '一時停止',
     reset: 'リセット'
+  },
+  sortFile: {
+    apply: '応用',
+    edit: '編集',
+    generate: '生成',
+    generateTip:
+      'クリックして、現在のディレクトリに.MegSpotSort.iniソート構成ファイルを生成します',
+    sortFile: 'ファイルを並べ替える',
+    useTableFileList: '現在のテーブル並べ替えリストを適用する'
   }
 };

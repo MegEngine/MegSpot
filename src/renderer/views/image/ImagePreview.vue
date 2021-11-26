@@ -1,40 +1,53 @@
 <template>
   <div class="preview" ref="preview" flex="dir:top">
-    <div class="toolbar" flex="cross:center">
-      <file-path-input
-        flex-box="1"
-        ref="filePathInput_ref"
-        class="file-path-input"
-        :filePath.sync="currentPath"
-        placeholder="Please enter the file path"
-      >
-      </file-path-input>
-      <el-button class="addFolder" type="primary" @click="addFolder">{{
-        $t('image.toolbar.addFolder')
-      }}</el-button>
-      <el-switch
-        class="show-all-switch"
-        v-model="showAll"
-        active-color="#1067d1"
-        :active-value="true"
-        :inactive-value="false"
-        :active-text="$t('general.showAll')"
-      >
-      </el-switch>
-      <el-radio-group
-        v-model="showType"
-        size="mini"
-        class="show-type-container"
-      >
-        <el-radio-button label="list">
-          <svg-icon icon-class="file-table-list"></svg-icon>
-        </el-radio-button>
-        <el-radio-button label="thumbnail">
-          <svg-icon icon-class="file-thumbnail"></svg-icon>
-        </el-radio-button>
-      </el-radio-group>
+    <div class="toolbar" flex="dir:top">
+      <div flex="cross:center">
+        <file-path-input
+          flex-box="1"
+          ref="filePathInput_ref"
+          class="file-path-input"
+          :filePath.sync="currentPath"
+        >
+        </file-path-input>
+        <el-button
+          class="addFolder"
+          type="primary"
+          :disabled="imageFolders.includes(currentPath)"
+          @click="addFolder"
+          >{{ $t('image.toolbar.addFolder') }}</el-button
+        >
+        <el-switch
+          class="show-all-switch"
+          v-model="showAll"
+          active-color="#1067d1"
+          :active-value="true"
+          :inactive-value="false"
+          :active-text="$t('general.showAll')"
+        >
+        </el-switch>
+        <el-radio-group
+          v-model="showType"
+          size="mini"
+          class="show-type-container"
+        >
+          <el-radio-button label="list">
+            <svg-icon icon-class="file-table-list"></svg-icon>
+          </el-radio-button>
+          <el-radio-button label="thumbnail">
+            <svg-icon icon-class="file-thumbnail"></svg-icon>
+          </el-radio-button>
+        </el-radio-group>
+      </div>
+      <SortToolBar
+        :currentPath="currentPath"
+        :btnDisabled="btnDisabled"
+        :allSelectd.sync="allSelectd"
+        :oneOrMoreSelected.sync="oneOrMoreSelected"
+        @change="handleSelectAll"
+        @getSortData="handleGetSortData"
+        @showDialog="handleShowDialog"
+      ></SortToolBar>
     </div>
-
     <div flex-box="1" class="preview-content" v-show="showType === 'list'">
       <FileTable
         ref="fileTable"
@@ -45,10 +58,10 @@
         :addVuexItem="addImages"
         :removeVuexItem="removeImages"
         :emptyVuexItems="emptyImages"
-        :defaultSort="defaultSort"
+        :defaultSort="imageConfig.defaultSort"
+        @canApply="handleCanApplyChange"
         @sort-change="handleSortChange"
         @addFolder="$emit('addFolder')"
-        @updateShowFile="updateShowFile"
       >
       </FileTable>
     </div>
@@ -57,7 +70,6 @@
         <Thumbnail
           v-for="item in thumbnailList"
           :key="item.path"
-          :defaultSort="defaultSort"
           :file="item"
           :fileList="imageList"
           :addVuexItem="addImages"
@@ -66,14 +78,17 @@
           <template v-slot:default="slotProps">
             <img
               :src="slotProps.src"
-              :placeholder="slotProps.placeholder"
               style="object-fit:contain;width:200px;height:170px"
-              slot="placeholder"
             />
           </template>
         </Thumbnail>
       </div>
     </div>
+    <SortFileDialog
+      ref="sort_file_dialog"
+      :currentPath="currentPath"
+      @getSortData="handleGetSortData"
+    />
   </div>
 </template>
 
@@ -81,33 +96,41 @@
 import { isDirectory, isExist } from '@/utils/file';
 import { isImage } from '@/components/file-tree/lib/util';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
-import Previewer from './components/Previewer';
 import FileTable from '@/components/file-table';
-import FilePathInput from '@/components/filepath-input/FilePathInput.vue';
+import FilePathInput from '@/components/file-path-input';
+import SortToolBar from '@/components/sort-toolbar';
+import SortFileDialog from '@/components/sort-file-dialog';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
 export default {
   components: {
     Thumbnail,
-    Previewer,
     FileTable,
-    FilePathInput
+    FilePathInput,
+    SortToolBar,
+    SortFileDialog
   },
   data() {
     return {
       showType: 'list',
       showAll: false,
-      showFile: [],
-      defaultSort: {
-        prop: 'lastModifyTime',
-        order: 'descending'
-      }
+      btnDisabled: true,
+      thumbnailList: []
     };
   },
   computed: {
-    ...mapGetters(['imageList', 'imageFolders']),
+    ...mapGetters(['imageList', 'imageFolders', 'imageConfig']),
     ...mapGetters({ currentPathFromVuex: 'currentPath' }),
+    arr() {
+      return this.imageList.filter(item => item.startsWith(this.currentPath));
+    },
+    allSelectd() {
+      return this.thumbnailList.every(item => this.arr.indexOf(item.path) >= 0);
+    },
+    oneOrMoreSelected() {
+      return this.thumbnailList.some(item => this.arr.indexOf(item.path) >= 0);
+    },
     currentPath: {
       get() {
         return this.currentPathFromVuex;
@@ -119,38 +142,6 @@ export default {
           this.setFolderPath(newFolderPath);
         }
       }
-    },
-    thumbnailList() {
-      const { prop, order } = this.defaultSort;
-      const list = this.showFile.filter(this.checkItem);
-      if (!order) {
-        return list;
-      }
-      const reverse = order === 'descending' ? -1 : 1;
-      let sort = (a, b) => {
-        let res;
-        if (typeof a[prop] === 'number') {
-          res = a[prop] - b[prop];
-        } else if (typeof a[prop] === 'string') {
-          const aStr = a[prop];
-          const bStr = b[prop];
-          for (let i = 0; i < aStr.length; i++) {
-            const chartA = aStr.charCodeAt(i);
-            const chartB = bStr.charCodeAt(i);
-            if (chartA > chartB) {
-              res = 1;
-              break;
-            } else if (chartA < chartB) {
-              res = -1;
-              break;
-            }
-          }
-        }
-        return res * reverse;
-      };
-
-      list.sort(sort);
-      return list;
     }
   },
   methods: {
@@ -159,20 +150,39 @@ export default {
       'removeImages',
       'emptyImages',
       'setFolderPath',
-      'setImageFolders'
+      'setImageFolders',
+      'setImageConfig'
     ]),
+    handleGetSortData(data, callback) {
+      callback(this.$refs.fileTable.getSortData());
+    },
+    handleShowDialog() {
+      this.$refs['sort_file_dialog'].show();
+    },
     checkItem(item) {
       return item.isFile && isImage(item.path);
     },
-    handleSortChange({ column, order, prop }) {
-      this.defaultSort = {
-        order,
-        prop
-      };
+    handleSelectAll({ checked }) {
+      if (this.allSelectd) {
+        this.removeImages(
+          this.thumbnailList.filter(item => item.isFile).map(item => item.path)
+        );
+      } else {
+        this.addImages(
+          this.thumbnailList.filter(item => item.isFile).map(item => item.path)
+        );
+      }
     },
-    updateShowFile(newVal) {
-      this.showFile = newVal;
+    handleSortChange(sortChange) {
+      const { order, property: field } = sortChange;
+      this.setImageConfig({ defaultSort: { order, field } });
+      // 获取新排序下的thunbnail顺序
+      this.thumbnailList = this.$refs.fileTable.getSortData();
     },
+    handleCanApplyChange(canApply) {
+      this.btnDisabled = !canApply;
+    },
+    // FIX ME: 不可添加则直接禁用按钮
     addFolder() {
       let folderPath = this.currentPath;
       if (folderPath.length && isExist(folderPath)) {
@@ -211,7 +221,6 @@ export default {
     overflow: auto;
   }
   .toolbar {
-    margin-bottom: 12px;
     .show-all-switch {
       margin-left: 18px;
     }

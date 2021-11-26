@@ -1,10 +1,9 @@
 import Vue from 'vue';
 import App from './App';
-import router from './router';
 import store from './store';
+import router from './router';
 // 引用element
 import ElementUI from 'element-ui';
-import './performance';
 // 日志
 import log from '@/log';
 import './error';
@@ -17,13 +16,15 @@ import './directive';
 import './filter';
 import { loadLib } from './lib';
 // 表格
-import { Header, Column, Tooltip, Table } from 'vxe-table';
 import 'xe-utils';
+import VXETable from 'vxe-table';
 import 'vxe-table/lib/style.css';
-Vue.use(Header)
-  .use(Column)
-  .use(Tooltip)
-  .use(Table);
+import VueSplit from 'vue-split-panel';
+import VueScroll from 'vuescroll';
+
+Vue.use(VXETable);
+Vue.use(VueSplit);
+Vue.use(VueScroll);
 Vue.config.productionTip = false;
 
 Vue.use(ElementUI, {

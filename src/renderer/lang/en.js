@@ -1,8 +1,8 @@
 export default {
   common: {
-    supportTypes: 'Support multiple file types:',
+    supportTypes: 'Support file types:',
     desc:
-      'MegSpot is a cross-platform local application designed to provide users with convenient functions such as local picture comparison, video comparison, and picture customization processing. \r\nYou can enter the exchange group to learn more and get the latest information.',
+      'MegSpot is a cross-platform native application designed to provide users with convenient functions such as picture comparison, video comparison. \r\nYou can enter the QQ group(782365536) to learn more and get the latest information.',
     manual: 'manual',
     hotKey: 'hotKey',
     showVideoTip: 'show help videos'
@@ -25,7 +25,7 @@ export default {
     thumbnail: 'thumbnail',
     fileName: 'file name',
     fileLoading: 'Loading files...',
-    groupNum: 'group number\nCtrl + ← page forward\nCtrl + → page backward',
+    groupNum: 'group number\nCtrl + ← page backword\nCtrl + → page forward',
     lastModifyTime: 'lastModifyTime',
     size: 'size',
     scale: 'scale',
@@ -114,5 +114,14 @@ export default {
     play: 'play',
     pause: 'pause',
     reset: 'reset'
+  },
+  sortFile: {
+    apply: 'Apply',
+    edit: 'Edit',
+    generate: 'Generate',
+    generateTip:
+      'Click to generate the .MegSpotSort.ini sorting configuration file in the current directory',
+    sortFile: ' Sorting File',
+    useTableFileList: 'Apply current table sorting list'
   }
 };

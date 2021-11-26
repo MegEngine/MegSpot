@@ -4,7 +4,7 @@
       <div class="changeButton">
         <el-badge class="tool-item">
           <Gallery
-            :sortData="imageList"
+            :selectedList="imageList"
             :focusList="this.selectedList"
             @update="setImages"
             @remove="removeImages"
@@ -650,16 +650,12 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
+@import '@/styles/public.scss';
 .buttons {
   position: relative;
   .changeButton {
     .tool-item {
       margin-left: 10px;
-    }
-    .tip {
-      text-align: center;
-      font-size: 12px;
-      color: red;
     }
   }
   .router-back {

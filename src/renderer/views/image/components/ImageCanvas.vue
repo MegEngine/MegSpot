@@ -8,14 +8,7 @@
         />
       </CoverMask>
       <el-tooltip placement="bottom" :open-delay="800">
-        <span
-          class="compare-name"
-          flex-box="1"
-          v-html="
-            (selected ? `<span style='color: red'>(✔)</span>` : ``) +
-              $options.filters.getFileName(imgSrc)
-          "
-        ></span>
+        <span class="compare-name" flex-box="1" v-html="getTitle"></span>
         <div slot="content">
           {{ imgSrc }}
           <br /><br />
@@ -24,14 +17,15 @@
           >
         </div>
       </el-tooltip>
-      <RGBAExhibit
-        :RGBAcolor="RGBAcolor"
-        v-model="radius"
-        @update="changeRadius"
-      ></RGBAExhibit>
+      <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
       <EffectPreview @change="changeCanvasStyle" />
     </div>
-    <div ref="container" class="canvas-container" id="canvas-container">
+    <div
+      ref="container"
+      class="canvas-container"
+      id="canvas-container"
+      :style="canvasStyle"
+    >
       <OperationContainer
         id="canvas-container"
         ref="canvas-container"
@@ -50,13 +44,7 @@
             @reset="resetZoom"
             @update="setZoom"
           />
-          <canvas
-            ref="canvas"
-            class="canvas-style"
-            :width="_width"
-            :height="_height"
-          >
-          </canvas>
+          <canvas ref="canvas" :width="_width" :height="_height"> </canvas>
           <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
         </div>
       </OperationContainer>
@@ -74,9 +62,13 @@ import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
-import { getImageUrlSync } from '@/utils/image';
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
+import { getImageUrlSyncNoCache } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
+import chokidar from 'chokidar';
 
 export default {
   components: {
@@ -103,6 +95,8 @@ export default {
   },
   data() {
     return {
+      // 监听图像文件的变化,变化后自动刷新图像
+      wacther: undefined,
       header: null,
       canvas: null,
       maskDom: undefined,
@@ -152,6 +146,10 @@ export default {
         {
           event: 'imageCenter_align',
           action: 'align'
+        },
+        {
+          event: 'radius',
+          action: 'setRadius'
         }
       ],
       histVisible: true,
@@ -167,8 +165,18 @@ export default {
   },
   computed: {
     ...mapGetters(['imageConfig', 'imageList']),
+    ...preferenceMapGetters(['preference']),
     selected() {
       return this.imgSrc === this.selectedId;
+    },
+    getTitle() {
+      return this.preference.showTitle
+        ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
+            this.$options.filters.getFileName(this.imgSrc)
+        : ' ';
+    },
+    canvasStyle() {
+      return this.preference.background.style;
     }
   },
   mounted() {
@@ -183,6 +191,36 @@ export default {
     this.bitMap && this.bitMap.close();
   },
   watch: {
+    imgSrc: {
+      handler: function(newVal, oldVal) {
+        if (oldVal) {
+          this.wacther && this.wacther.close();
+        }
+        if (newVal) {
+          this.wacther = chokidar
+            .watch(newVal, {
+              // 持续监听
+              persistent: true,
+              // 忽略初始化的目录检测
+              ignoreInitial: true,
+              // 等待写入完成
+              awaitWriteFinish: {
+                stabilityThreshold: 2000,
+                pollInterval: 100
+              }
+            })
+            .on('change', (path, details) => {
+              console.log('image--change', path, details);
+              this.initImage(false);
+            })
+            .on('unlink', (path, details) => {
+              console.log('image--remove', path, details);
+              this.removeImages(path);
+            });
+        }
+      },
+      immediate: true
+    },
     'imageConfig.smooth': {
       handler(newVal, oldVal) {
         this.setSmooth();
@@ -191,6 +229,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['removeImages']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, _width, _height) {
       const cw = this._width,
@@ -223,7 +262,6 @@ export default {
       }
       return this.afterFullSize || !isTooSmall;
     },
-
     setCanvasStyle({ style }) {
       this.canvas.style.filter = style;
     },
@@ -283,21 +321,22 @@ export default {
         this[name](data);
       }
     },
-    initImage() {
+    initImage(initPosition = true) {
       this.image = new Image();
       this.image.onload = async () => {
         let offsreen = new OffscreenCanvas(this.image.width, this.image.height);
         let offCtx = offsreen.getContext('2d');
         offCtx.drawImage(this.image, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
-        this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
+        initPosition &&
+          (this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap));
         this.doZoomEnd();
         this.drawImage();
         this.currentHist = this.$refs['hist-container'].generateHist(
           cv.imread(this.image)
         );
       };
-      this.image.src = getImageUrlSync(this.imgSrc);
+      this.image.src = getImageUrlSyncNoCache(this.imgSrc); //        'C:/Demo/1-1%20-%20副本.jpg'
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d');
@@ -313,7 +352,7 @@ export default {
         this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
         this.drawImage();
       };
-      this.image.src = getImageUrlSync(this.imgSrc);
+      this.image.src = getImageUrlSyncNoCache(this.imgSrc);
     },
     drawImage() {
       let { x, y, width, height } = this.imagePosition;
@@ -352,12 +391,6 @@ export default {
     pickColor({ status }) {
       this.traggerRGB = status;
     },
-    changeRadius(radius) {
-      this.broadCast({
-        name: 'doChangeRadius',
-        data: { radius }
-      });
-    },
     changeCanvasStyle(newStyle) {
       // FIXME: 具体的值没有被广播
       this.broadCast({
@@ -365,7 +398,7 @@ export default {
         data: { style: newStyle }
       });
     },
-    doChangeRadius({ radius }) {
+    setRadius(radius) {
       this.radius = radius;
     },
     handleMove: throttle(40, function(mousePos) {
@@ -711,15 +744,16 @@ export default {
         font-size: 0;
       }
 
-      .canvas-style {
-        background: #e3e7e9;
-        background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
-          linear-gradient(45deg, transparent 75%, #f6fafc 0),
-          linear-gradient(45deg, #f6fafc 25%, transparent 0),
-          linear-gradient(45deg, transparent 75%, #f6fafc 0);
-        background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
-        background-size: 20px 20px;
-      }
+      /** default canvas background */
+      // .canvas-style {
+      //   background: #e3e7e9;
+      //   background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
+      //     linear-gradient(45deg, transparent 75%, #f6fafc 0),
+      //     linear-gradient(45deg, #f6fafc 25%, transparent 0),
+      //     linear-gradient(45deg, transparent 75%, #f6fafc 0);
+      //   background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
+      //   background-size: 20px 20px;
+      // }
 
       #feedback {
         position: absolute;

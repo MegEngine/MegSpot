@@ -13,7 +13,7 @@
         </el-button>
         <el-badge :value="videoList.length" class="tool-item">
           <Gallery
-            :sortData="videoList"
+            :selectedList="videoList"
             @update="setVideos"
             @remove="removeVideos"
           >
@@ -64,14 +64,13 @@
           <FileTree
             ref="folderTree"
             id="folderTree"
+            :currentPath="currentPath"
             :openedFolders="videoFolders"
             :checkedFiles="checkedFiles"
             @close="onClose"
             @select="onSelect"
             @addFolder="addFolder"
             :defaultExpand="expandData"
-            :defaultCurrentPath="videoCurrentPath"
-            @refresh="refresh"
             @addExpand="addExpandData"
             @removeExpand="removeExpandData"
           >
@@ -113,16 +112,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['videoList', 'videoFolders', 'expandData']),
-    ...mapGetters({ currentPathFromVuex: 'currentPath' }),
-    videoCurrentPath: {
-      get() {
-        return this.currentPathFromVuex;
-      },
-      set(newFolderPath) {
-        this.setFolderPath(newFolderPath);
-      }
-    }
+    ...mapGetters(['videoList', 'videoFolders', 'expandData', 'currentPath'])
   },
   mounted() {
     this.calcSplitHeight();
@@ -198,7 +188,7 @@ export default {
         }
       });
       this.removeVideos(removeList);
-      this.videoCurrentPath = '';
+      this.setFolderPath('');
     },
     onSelect(data) {
       console.log('onSelect', data);
@@ -206,12 +196,9 @@ export default {
       if (data.type === 0) {
         this.$nextTick(() => {
           // 等左侧导航树先渲染
-          this.videoCurrentPath = data.path;
+          this.setFolderPath(data.path);
         });
       }
-    },
-    refresh() {
-      this.$refs.videoPreview.$refs.fileTable.refreshFileList();
     }
   }
 };

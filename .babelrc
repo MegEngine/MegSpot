@@ -119,13 +119,6 @@
     }
   },
   "plugins": [
-    [
-      "import",
-      {
-        "libraryName": "vxe-table",
-        "style": true // 样式是否也按需加载
-      }
-    ],
     "@babel/transform-runtime",
     "@babel/plugin-syntax-dynamic-import"
   ]

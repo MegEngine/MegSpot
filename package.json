@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -38,12 +38,12 @@
       }
     ],
     "productName": "MegSpot",
-    "artifactName": "${productName}-${version}.${ext}",
+    "artifactName": "${productName}-${version}-${os}.${ext}",
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1.图片对比支持分组查看。\n2.优化文件列表全选，反选效率。\n3.支持mac dmg自动更新。\n4. 修复若干bug。",
-      "releaseDate": "2021.11.4"
+      "releaseNotes": "1.提供自定义排序文件。\n2.文件读取支持缓存&优化列表页面效率。\n3.文件列表支持区域选取&文件发生变化后自动更新。\n4. 修复若干bug。",
+      "releaseDate": "2021.11.26"
     },
     "directories": {
       "output": "build"
@@ -93,11 +93,13 @@
     "@dhdbstjr98/gif.js": "^1.0.2",
     "@popperjs/core": "^2.9.2",
     "axios": "^0.21.1",
+    "chokidar": "^3.5.2",
     "dayjs": "^1.10.4",
     "electron-log": "^4.3.4",
     "electron-store": "4.0.0",
     "electron-updater": "^4.3.5",
     "element-ui": "^2.15.0",
+    "ex-utils": "^0.0.4",
     "express": "^4.17.1",
     "flex.css": "^1.1.7",
     "fs-extra": "^9.1.0",
@@ -113,7 +115,7 @@
     "vuescroll": "^4.17.3",
     "vuex": "^3.6.0",
     "vuex-electron": "^1.0.3",
-    "vxe-table": "^3.3.16",
+    "vxe-table": "^3.4.5",
     "xe-utils": "^3.4.0"
   },
   "devDependencies": {

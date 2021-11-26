@@ -1,53 +1,66 @@
 <template>
   <div class="preview" flex="dir:top">
-    <div class="toolbar" flex="cross:center">
-      <file-path-input
-        ref="filePathInput_ref"
-        class="file-path-input"
-        flex-box="1"
-        :filePath.sync="videoCurrentPath"
-        placeholder="Please enter the file path"
-      >
-      </file-path-input>
-      <el-button class="addFolder" type="primary" @click="addFolder">{{
-        $t('image.toolbar.addFolder')
-      }}</el-button>
-      <el-switch
-        class="show-all-switch"
-        v-model="showAll"
-        active-color="#1067d1"
-        :active-value="true"
-        :inactive-value="false"
-        :active-text="$t('general.showAll')"
-      >
-      </el-switch>
-      <el-radio-group
-        v-model="showType"
-        size="mini"
-        class="show-type-container"
-      >
-        <el-radio-button label="list">
-          <svg-icon icon-class="file-table-list"></svg-icon>
-        </el-radio-button>
-        <el-radio-button label="thumbnail">
-          <svg-icon icon-class="file-thumbnail"></svg-icon>
-        </el-radio-button>
-      </el-radio-group>
+    <div class="toolbar" flex="dir:top">
+      <div flex="cross:center">
+        <file-path-input
+          ref="filePathInput_ref"
+          class="file-path-input"
+          flex-box="1"
+          :filePath.sync="videoCurrentPath"
+        >
+        </file-path-input>
+        <el-button
+          class="addFolder"
+          type="primary"
+          :disabled="videoFolders.includes(videoCurrentPath)"
+          @click="addFolder"
+          >{{ $t('image.toolbar.addFolder') }}</el-button
+        >
+        <el-switch
+          class="show-all-switch"
+          v-model="showAll"
+          active-color="#1067d1"
+          :active-value="true"
+          :inactive-value="false"
+          :active-text="$t('general.showAll')"
+        >
+        </el-switch>
+        <el-radio-group
+          v-model="showType"
+          size="mini"
+          class="show-type-container"
+        >
+          <el-radio-button label="list">
+            <svg-icon icon-class="file-table-list"></svg-icon>
+          </el-radio-button>
+          <el-radio-button label="thumbnail">
+            <svg-icon icon-class="file-thumbnail"></svg-icon>
+          </el-radio-button>
+        </el-radio-group>
+      </div>
+      <SortToolBar
+        :currentPath="videoCurrentPath"
+        :allSelectd.sync="allSelectd"
+        :oneOrMoreSelected.sync="oneOrMoreSelected"
+        @change="handleSelectAll"
+        @getSortData="handleGetSortData"
+        @showDialog="handleShowDialog"
+      ></SortToolBar>
     </div>
     <div class="preview-content" flex-box="1">
       <FileTable
         v-show="showType === 'list'"
         ref="fileTable"
         :showAll="showAll"
-        @sort-change="handleSortChange"
-        @addFolder="$emit('addFolder')"
-        @updateShowFile="updateShowFile"
         :fileList="videoList"
         :currentPath="videoCurrentPath"
         :checkItem="checkItem"
         :addVuexItem="addVideos"
         :removeVuexItem="removeVideos"
         :emptyVuexItems="emptyVideos"
+        :defaultSort="videoConfig.defaultSort"
+        @sort-change="handleSortChange"
+        @addFolder="$emit('addFolder')"
       >
       </FileTable>
       <div class="thumbnail-content" v-show="showType === 'thumbnail'">
@@ -55,7 +68,6 @@
           v-for="item in thumbnailList"
           :key="item.path"
           :file="item"
-          :defaultSort="defaultSort"
           :fileList="videoList"
           :addVuexItem="addVideos"
           :removeVuexItem="removeVideos"
@@ -70,35 +82,56 @@
         </Thumbnail>
       </div>
     </div>
+    <SortFileDialog
+      ref="sort_file_dialog"
+      :currentPath="videoCurrentPath"
+      @getSortData="handleGetSortData"
+    />
   </div>
 </template>
 
 <script>
 import { isDirectory, isExist } from '@/utils/file';
 import { isVideo } from '@/components/file-tree/lib/util';
-import SearchInput from '@/components/search-input/SearchInput';
+import SearchInput from '@/components/search-input';
+import SortToolBar from '@/components/sort-toolbar';
+import SortFileDialog from '@/components/sort-file-dialog';
 import FileTable from '@/components/file-table';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
-import FilePathInput from '@/components/filepath-input/FilePathInput.vue';
+import FilePathInput from '@/components/file-path-input';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 
 export default {
-  components: { Thumbnail, SearchInput, FileTable, FilePathInput },
+  components: {
+    Thumbnail,
+    SearchInput,
+    FileTable,
+    FilePathInput,
+    SortToolBar,
+    SortFileDialog
+  },
   data() {
     return {
       showType: 'list',
-      showAll: false,
-      showFile: [],
-      defaultSort: {
-        prop: 'lastModifyTime',
-        order: 'descending'
-      }
+      thumbnailList: [],
+      showAll: false
     };
   },
   computed: {
-    ...mapGetters(['videoList', 'videoFolders']),
+    ...mapGetters(['videoList', 'videoFolders', 'videoConfig']),
     ...mapGetters({ currentPathFromVuex: 'currentPath' }),
+    arr() {
+      return this.videoList.filter(item =>
+        item.startsWith(this.videoCurrentPath)
+      );
+    },
+    allSelectd() {
+      return this.thumbnailList.every(item => this.arr.indexOf(item.path) >= 0);
+    },
+    oneOrMoreSelected() {
+      return this.thumbnailList.some(item => this.arr.indexOf(item.path) >= 0);
+    },
     videoCurrentPath: {
       get() {
         return this.currentPathFromVuex;
@@ -110,38 +143,6 @@ export default {
           this.setFolderPath(newFolderPath);
         }
       }
-    },
-    thumbnailList() {
-      const { prop, order } = this.defaultSort;
-      const list = this.showFile.filter(this.checkItem);
-      if (!order) {
-        return list;
-      }
-      const reverse = order === 'descending' ? -1 : 1;
-      let sort = (a, b) => {
-        let res;
-        if (typeof a[prop] === 'number') {
-          res = a[prop] - b[prop];
-        } else if (typeof a[prop] === 'string') {
-          const aStr = a[prop];
-          const bStr = b[prop];
-          for (let i = 0; i < aStr.length; i++) {
-            const chartA = aStr.charCodeAt(i);
-            const chartB = bStr.charCodeAt(i);
-            if (chartA > chartB) {
-              res = 1;
-              break;
-            } else if (chartA < chartB) {
-              res = -1;
-              break;
-            }
-          }
-        }
-        return res * reverse;
-      };
-
-      list.sort(sort);
-      return list;
     }
   },
   methods: {
@@ -150,19 +151,34 @@ export default {
       'removeVideos',
       'emptyVideos',
       'setVideoFolders',
-      'setFolderPath'
+      'setFolderPath',
+      'setVideoConfig'
     ]),
     checkItem(item) {
       return item.isFile && isVideo(item.path);
     },
-    handleSortChange({ column, order, prop }) {
-      this.defaultSort = {
-        order,
-        prop
-      };
+    handleSelectAll({ checked }) {
+      if (this.allSelectd) {
+        this.removeVideos(
+          this.thumbnailList.filter(item => item.isFile).map(item => item.path)
+        );
+      } else {
+        this.addVideos(
+          this.thumbnailList.filter(item => item.isFile).map(item => item.path)
+        );
+      }
     },
-    updateShowFile(newVal) {
-      this.showFile = newVal;
+    handleGetSortData(data, callback) {
+      callback(this.$refs.fileTable.getSortData());
+    },
+    handleShowDialog() {
+      this.$refs['sort_file_dialog'].show();
+    },
+    handleSortChange(sortChange) {
+      const { order, property: field } = sortChange;
+      this.setVideoConfig({ defaultSort: { order, field } });
+      // 获取新排序下的thunbnail顺序
+      this.thumbnailList = this.$refs.fileTable.getSortData();
     },
     addFolder() {
       let folderPath = this.videoCurrentPath;
@@ -193,7 +209,6 @@ export default {
   background-color: #f0f3f6;
   padding: 10px;
   .toolbar {
-    margin-bottom: 12px;
     .show-all-switch {
       margin-left: 18px;
     }

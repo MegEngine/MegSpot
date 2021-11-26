@@ -4,7 +4,7 @@
       <div id="left-bar" flex="main:center cross:center">
         <el-badge class="tool-item">
           <Gallery
-            :sortData="imageList"
+            :selectedList="imageList"
             @update="setImages"
             @remove="removeImages"
           >

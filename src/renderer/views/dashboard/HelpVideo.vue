@@ -61,7 +61,6 @@ import {
   EffectFade,
   SwiperSlide
 } from 'vue-awesome-swiper';
-import 'swiper/css/swiper.css';
 
 export default {
   name: 'HelpVideo',
@@ -143,6 +142,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import 'swiper/swiper.scss';
 .swiper {
   margin-left: 20px;
   margin-right: 20px;

@@ -1,6 +1,8 @@
 # MegSpot
 
-![](big_logo_dark.png)
+<p align="center">
+  <img width="550"  src="./src/renderer/assets/images/big_logo_dark.png">
+</p>
 
 [English](README_EN.md) | 中文
 
@@ -176,6 +178,7 @@ Linux 环境下支持通过命令行进行启动、对比等操作。
 MegSpot 使用 Apache License, Version 2.0
 
 ## 引文
+
 如果您在出版物中使用 MegSpot，请使用以下 BibTeX 条目引用它。
 
 ```

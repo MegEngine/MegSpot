@@ -11,7 +11,7 @@
           >
         </div>
         <Gallery
-          :sortData="videoList"
+          :selectedList="videoList"
           :focusListIndex="
             new Array(groupCount).fill(0).map((_, index) => index + startIndex)
           "
@@ -80,7 +80,6 @@
           </span>
         </div>
       </div>
-
       <div class="middle">
         <span class="custom-container" v-if="showCompare === false">
           <el-button-group>
@@ -344,6 +343,9 @@
           >
           </el-option>
         </el-select>
+        <el-button-group class="gap">
+          <ImageSetting></ImageSetting>
+        </el-button-group>
       </div>
     </div>
     <div class="video-grid" :style="containerStyle">
@@ -362,6 +364,7 @@
 <script>
 import GifDialog from '@/components/gif-dialog';
 import Gallery from '@/components/gallery';
+import ImageSetting from '@/components/image-setting';
 import VideoContainer from './VideoContainer';
 import * as CONSTANTS from './video-constants';
 import * as GLOBAL_CONSTANTS from '@/constants';
@@ -369,7 +372,7 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 
 export default {
-  components: { VideoContainer, Gallery, GifDialog },
+  components: { VideoContainer, Gallery, GifDialog, ImageSetting },
   data() {
     return {
       CONSTANTS,
@@ -384,7 +387,17 @@ export default {
       startIndex: 0,
       playbackRate: 1,
       rateOptions: [0.3, 0.5, 1, 1.25, 1.5, 2, 3],
-      loop: true
+      loop: true,
+      scheduleCanvasActions: [
+        {
+          event: 'image_handleSelect',
+          action: 'handleSelect'
+        },
+        {
+          event: 'getImageDetails',
+          action: 'getImageDetails'
+        }
+      ]
     };
   },
   computed: {
@@ -414,7 +427,15 @@ export default {
         return this.videoConfig.smooth;
       },
       set(newVal) {
+        const preNum = this.groupCount * (this.groupNum - 1);
         this.setVideoConfig({ smooth: newVal });
+        const afterNum = this.groupCount * (this.groupNum - 1);
+        this.offset = preNum - afterNum;
+        this.startIndex = Math.max(
+          0,
+          (groupNum - 1) * this.groupCount + this.offset
+        );
+        this.groupNum = Math.floor(this.startIndex / this.groupCount);
       }
     },
     layout: {
@@ -492,6 +513,57 @@ export default {
     videoList() {
       this.showCompare = false;
     }
+  },
+  created() {
+    // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
+    if (this.videoList.length <= 4) {
+      let smartLayout;
+      switch (this.videoList.length) {
+        case 1:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X1;
+          break;
+        case 2:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X1;
+          break;
+        case 3:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_3X1;
+          break;
+        case 4:
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X2;
+          break;
+        default:
+          smartLayout = this.imageConfig.layout;
+      }
+      this.setVideoConfig({ layout: smartLayout });
+    }
+  },
+  mounted() {
+    window.addEventListener('keyup', this.handleHotKey, true);
+    this.$bus.$on(
+      CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM,
+      (data, callback) => {
+        const { factor, lastX, lastY } = data;
+        this.lastX = lastX;
+        this.lastY = lastY;
+        this.videoScale *= factor;
+        callback(this.videoScale);
+      }
+    );
+    // 调度事件  使用当前组件的方法
+    this.scheduleCanvasActions.forEach(item => {
+      this.$bus.$on(item.event, this[item.action]);
+    });
+    // resize 后重新计算宽高并渲染
+    window.addEventListener('resize', () => {
+      this.showCompare = false;
+    });
+  },
+  beforeDestroy() {
+    window.removeEventListener('keyup', this.handleHotKey, true);
+    this.$bus.$off(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM);
+    this.scheduleCanvasActions.forEach(item => {
+      this.$bus.$off(item.event, this[item.action]);
+    });
   },
   methods: {
     ...mapActions([
@@ -730,6 +802,7 @@ export default {
       this.videoScale = 1;
     },
     getVidePath(path) {
+      // FIXME:
       return path.replace('file://', '');
     },
     getImageDetails(imageNameList, callback) {
@@ -756,31 +829,6 @@ export default {
         this.$message.error(error.toString() || error.message);
       }
     }
-  },
-  mounted() {
-    window.addEventListener('keyup', this.handleHotKey, true);
-    this.$bus.$on(
-      CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM,
-      (data, callback) => {
-        const { factor, lastX, lastY } = data;
-        this.lastX = lastX;
-        this.lastY = lastY;
-        this.videoScale *= factor;
-        callback(this.videoScale);
-      }
-    );
-    this.$bus.$on('getImageDetails', this.getImageDetails);
-    this.$bus.$on('image_handleSelect', this.handleSelect);
-    // resize 后重新计算宽高并渲染
-    window.addEventListener('resize', () => {
-      this.showCompare = false;
-    });
-  },
-  beforeDestroy() {
-    window.removeEventListener('keyup', this.handleHotKey, true);
-    this.$bus.$off(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_HANDLE_ZOOM);
-    this.$bus.$off('image_handleSelect', this.handleSelect);
-    this.$bus.$off('getImageDetails');
   }
 };
 </script>

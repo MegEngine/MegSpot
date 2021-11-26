@@ -22,12 +22,10 @@ function updateHandle(mainWindow) {
 
   autoUpdater.setFeedURL({
     provider: 'github',
-    private: false,
     repo: 'MegSpot',
     owner: 'MegEngine',
     releaseType: 'release'
   });
-
   autoUpdater.on('error', function(info) {
     console.log('info', info);
     sendUpdateMessage(message.error);

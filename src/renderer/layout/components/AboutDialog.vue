@@ -176,7 +176,7 @@ export default {
       this.visible = !this.visible;
       ipcRenderer.send(this.visible ? 'put-in-tray' : 'tray-removed');
     });
-    this.logPath = this.$log.transports.file.findLogPath();
+    this.logPath = this.$log.transports.file.getFile().path;
     try {
       const logs = this.$log.transports.file.readAllLogs();
       const lastLog = logs[0]?.lines.slice(-100);

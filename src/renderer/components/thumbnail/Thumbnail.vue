@@ -7,7 +7,7 @@
   >
     <el-checkbox v-model="checked"></el-checkbox>
     <div class="container" flex="main:center cross:center">
-      <slot :src="src" :placeholder="placeholder"></slot>
+      <slot :src="src"></slot>
     </div>
     <div class="name">
       {{ file.name }}
@@ -17,7 +17,7 @@
 
 <script>
 import { formatFileSize } from '@/utils/file';
-
+import { getImageUrlSync } from '@/utils/image';
 export default {
   name: 'imageThumbnail',
   props: {
@@ -49,12 +49,11 @@ export default {
       return this.file.path;
     },
     src() {
-      return `file://${this.path.replace(/#/g, '%23')}`;
+      return getImageUrlSync(this.path).replace(/#/g, '%23');
     }
   },
   data() {
     return {
-      placeholder: require('@/assets/images/placeholder.png'),
       checked: false
     };
   },

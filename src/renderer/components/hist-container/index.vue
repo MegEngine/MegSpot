@@ -16,21 +16,20 @@
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex';
+const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore');
 export default {
   name: 'HistContainer',
-
   data() {
     return {
-      visible: true,
       hist: undefined
     };
   },
-  watch: {},
   mounted() {
     this.hist = this.$refs.hist;
   },
-
   methods: {
+    ...mapActions(['setPreference']),
     // 供外部调用直接生成直方图
     // 由于mat数据较大通过属性传递 需要额外占用存储空间
     //不如通过方法调用 生成后直接释放
@@ -85,6 +84,17 @@ export default {
     // 供外部直接调用
     setVisible(visible) {
       this.visible = visible;
+    }
+  },
+  computed: {
+    ...mapGetters(['preference']),
+    visible: {
+      get() {
+        return this.preference.defaultShowHist;
+      },
+      set() {
+        this.setPreference({ defaultShowHist: !this.visible });
+      }
     }
   }
 };

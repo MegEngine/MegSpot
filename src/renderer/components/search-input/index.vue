@@ -14,6 +14,9 @@
       @blur="onBlur"
       ref="searchInput"
     >
+      <template v-for="item in slots" :slot="item"
+        ><slot :name="item"></slot
+      ></template>
     </el-input>
   </div>
 </template>
@@ -25,6 +28,11 @@ export default {
     value: [String, Number],
     placeholder: { type: String, default: '' },
     disabled: { type: Boolean, default: false }
+  },
+  data() {
+    return {
+      slots: ['prefix', 'suffix', 'prepend', 'append']
+    };
   },
   methods: {
     onInput(value) {

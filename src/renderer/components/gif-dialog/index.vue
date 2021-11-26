@@ -1,7 +1,6 @@
 <template>
   <el-dialog
     ref="aboutDialog"
-    top="5vh"
     :visible.sync="visible"
     :title="$t('generateGIF.title')"
     width="80%"
@@ -87,24 +86,14 @@
       <div class="tip" :style="`color: ${fininshed ? 'green' : 'red'};`">
         {{ tip }}
       </div>
-      <div
-        class="gifPreview"
-        v-loading="generateLoading"
-        :style="gifPreviewHeight"
-      >
+      <div class="gifPreview" v-loading="generateLoading">
         <div class="image">
           <img
             src=""
             alt="gif Preview"
             id="result"
             v-if="imgVisible"
-            :style="
-              'width:' +
-                canvasSize.width +
-                'px; height:' +
-                canvasSize.height +
-                'px;'
-            "
+            :style="imgStyle"
           />
         </div>
       </div>
@@ -116,9 +105,6 @@ const { dialog } = require('electron').remote;
 const fs = require('fs');
 import getFileName from '@/filter/get-file-name';
 import GIF from '@dhdbstjr98/gif.js/dist/gif';
-import { getImageUrlSync } from '@/utils/image';
-import { createNamespacedHelpers } from 'vuex';
-const { mapGetters } = createNamespacedHelpers('imageStore');
 
 export default {
   components: {},
@@ -133,12 +119,17 @@ export default {
     return {
       visible: false,
       gifImageList: [{ path: '', imageName: '', description: '' }],
+      imageNameList: new Set(),
       updateKey: 1,
       optionList: {
         delay: 1000
       },
       imgVisible: false,
       fileContent: null,
+      canvasSize: {
+        width: 400,
+        height: 300
+      },
       gifCanvasList: [],
       downLoadDisable: true,
       generateLoading: false,
@@ -148,16 +139,24 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['canvasSize']),
-    gifPreviewHeight() {
-      return `height: ${this.canvasSize.height + 20}px; padding-top: 10px`;
+    imgStyle() {
+      return `width:  ${(50 / this.canvasSize.height) *
+        this.canvasSize.width}vh; height:50vh;padding-top: 5px`;
     }
   },
   methods: {
-    show() {
+    show(canvasSize) {
+      if (canvasSize && canvasSize.width > 0) {
+        this.canvasSize = canvasSize;
+      }
       this.visible = true;
     },
     selectImage(imageName, index) {
+      this.imageNameList.add(imageName);
+      const data = { imageNameList: this.imageNameList };
+      this.$bus.$emit('getCanvasSize', data, res => {
+        this.canvasSize = res;
+      });
       this.gifImageList[index].imageName = getFileName(imageName, false);
       this.gifImageList[index].path = imageName;
       if (
@@ -192,15 +191,8 @@ export default {
         this.tip = this.$t('generateGIF.tips.tooSmallNumber');
         return;
       }
-      let imageNameList = [
-        ...new Set(
-          this.gifImageList
-            .slice(0, -1)
-            .filter(item => item.imageName !== '')
-            .map(item => item.path)
-        )
-      ];
-      this.$bus.$emit('getImageDetails', imageNameList, details => {
+
+      this.$bus.$emit('getImageDetails', [...this.imageNameList], details => {
         this.imageDetails = details.map(item => ({
           path: item.imgSrc,
           imageName: getFileName(item.path, false),
@@ -265,7 +257,13 @@ export default {
         let index = this.imageDetails.findIndex(
           item => item.imageName === element.imageName
         );
-        cs.drawImage(this.imageDetails[index].canvas, 0, 0);
+        cs.drawImage(
+          this.imageDetails[index].canvas,
+          0,
+          0,
+          this.canvasSize.width,
+          this.canvasSize.height
+        );
         cs.font = `${fontSize}px Arial`;
         cs.textAlign = 'center';
         cs.fillText(
@@ -334,7 +332,7 @@ export default {
     margin-bottom: 5px;
   }
   .gifPreview {
-    height: 400px;
+    height: 50vh;
     border: 1px solid gray;
     text-align: center;
     overflow: hidden;

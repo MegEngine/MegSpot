@@ -1,6 +1,6 @@
 <template>
   <div ref="folder" class="folder">
-    <vuescroll :ops="scrollBarOpts" ref="vuescroll">
+    <vue-scroll :ops="scrollBarOpts" ref="vuescroll">
       <div class="folder-head" flex="cross:center">
         <el-tooltip
           placement="right"
@@ -116,21 +116,22 @@
           </span>
         </span>
       </el-tree>
-    </vuescroll>
+    </vue-scroll>
   </div>
 </template>
 
 <script>
-import vuescroll from 'vuescroll';
-import SearchInput from '@/components/search-input/SearchInput';
+import SearchInput from '@/components/search-input';
 import ContextMenu from '@/components/context-menu';
 import { listDir } from './lib/file.js';
 import { defaultIcon } from './lib/consts.js';
+import { DELIMITER, SORTING_FILE_NAME } from '@/constants';
 import { throttle } from '@/utils';
+import chokidar from 'chokidar';
 
 export default {
   name: 'FileTree',
-  components: { SearchInput, vuescroll, ContextMenu },
+  components: { SearchInput, ContextMenu },
   data() {
     return {
       scrollBarOpts: {
@@ -142,6 +143,8 @@ export default {
           opacity: 0.8
         }
       },
+      // 监听文件夹列表中每个文件夹的变化,变化后自动刷新目录
+      watcher: undefined,
       onlyDir: true,
       currentKey: '',
       treeData: [],
@@ -165,10 +168,6 @@ export default {
     defaultExpand: {
       type: Array,
       default: () => []
-    },
-    defaultCurrentPath: {
-      type: String,
-      default: ''
     },
     includes: {
       type: Array,
@@ -198,6 +197,7 @@ export default {
       type: Boolean,
       default: true
     },
+    currentPath: String,
     tipClose: {
       type: String,
       default: 'Close Folder'
@@ -226,9 +226,39 @@ export default {
       } else {
         return defaultIcon;
       }
+    },
+    sortFilePath() {
+      return this.currentPath + DELIMITER + SORTING_FILE_NAME;
     }
   },
   watch: {
+    treeData(newVal, oldVal) {
+      if (oldVal) {
+        this.watcher && this.watcher.close();
+      }
+      if (newVal) {
+        this.watcher = chokidar
+          .watch(
+            newVal.map(item => item.path),
+            {
+              // 持续监听
+              persistent: true,
+              // 忽略初始化的目录检测
+              ignoreInitial: true,
+              // 等待写入完成
+              awaitWriteFinish: {
+                stabilityThreshold: 2000,
+                pollInterval: 100
+              }
+            }
+          )
+          .on('all', async (event, path) => {
+            if (path !== this.sortFilePath) {
+              this.treeData = await this.loadMultiDir(this.openedFolders);
+            }
+          });
+      }
+    },
     openedFolders: {
       handler: async function(newVal, oldVal) {
         this.treeData = await this.loadMultiDir(this.openedFolders);
@@ -261,6 +291,8 @@ export default {
   beforeDestroy() {
     this.dblclick = null;
     this.closeFolder = null;
+    this.watcher && this.watcher.close();
+    this.watcher = null;
   },
   methods: {
     async loadNode(node, resolve) {
@@ -276,7 +308,6 @@ export default {
     async handleRefresh(node, data) {
       node.loaded = false;
       node.expand();
-      this.$emit('refresh');
     },
     async loadMultiDir(dirs) {
       const result = [];
@@ -315,7 +346,6 @@ export default {
       this.closeFolder(data);
     },
     async onRefreshAllFolder() {
-      this.$emit('refresh');
       this.treeData = await this.loadMultiDir(this.openedFolders);
     },
     truncateName(src) {

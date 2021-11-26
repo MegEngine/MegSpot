@@ -13,7 +13,7 @@
         </el-button>
         <el-badge :value="imageList.length" class="tool-item">
           <Gallery
-            :sortData="imageList"
+            :selectedList="imageList"
             @update="setImages"
             @remove="removeImages"
           >
@@ -83,14 +83,13 @@
           <FileTree
             ref="folderTree"
             id="folderTree"
+            :currentPath="currentPath"
             :openedFolders="imageFolders"
             :checkedFiles="checkedFiles"
             @close="onClose"
             :addFolder="addFolder"
             :defaultExpand="expandData"
-            :defaultCurrentPath="currentPath"
             @select="onSelect"
-            @refresh="refresh"
             @addExpand="addExpandData"
             @removeExpand="removeExpandData"
           >
@@ -109,17 +108,14 @@
 
 <script>
 const { dialog } = require('electron').remote;
-import Vue from 'vue';
 import FileTree from '@/components/file-tree/FileTree.vue';
 import Gallery from '@/components/gallery';
 import ShowPath from '@/components/show-path';
-import VueSplit from 'vue-split-panel';
 import ImagePreview from './ImagePreview';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 import addDragFolderListener from '@/utils/dragFolder.js';
 
-Vue.use(VueSplit);
 export default {
   name: 'ImageRoot',
   components: { FileTree, ImagePreview, Gallery, ShowPath },
@@ -131,16 +127,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['imageList', 'imageFolders', 'expandData']),
-    ...mapGetters({ currentPathFromVuex: 'currentPath' }),
-    currentPath: {
-      get() {
-        return this.currentPathFromVuex;
-      },
-      set(newFolderPath) {
-        this.setFolderPath(newFolderPath);
-      }
-    }
+    ...mapGetters(['imageList', 'imageFolders', 'expandData', 'currentPath'])
   },
   mounted() {
     addDragFolderListener(document.getElementById('folderTree'));
@@ -212,19 +199,16 @@ export default {
         }
       });
       this.removeImages(removeList);
-      this.currentPath = '';
+      this.setFolderPath('');
     },
     onSelect(data) {
       // 如果选中了文件夹 更新当前激活的文件夹
       if (data.type === 0) {
         this.$nextTick(() => {
           // 等左侧导航树先渲染
-          this.currentPath = data.path;
+          this.setFolderPath(data.path);
         });
       }
-    },
-    refresh() {
-      this.$refs.ImagePreview.$refs.fileTable.refreshFileList();
     }
   }
 };

@@ -8,11 +8,11 @@ const imageStore = {
     imageList: [],
     imageConfig: {
       smooth: true,
-      layout: GLABEL_CONSTANT.LAYOUT_2X1
-    },
-    canvasSize: {
-      width: 400,
-      height: 300
+      layout: GLABEL_CONSTANT.LAYOUT_2X1,
+      defaultSort: {
+        order: 'asc',
+        field: 'name'
+      }
     },
     //当前文件夹路径
     currentPath: '',
@@ -25,7 +25,6 @@ const imageStore = {
     getImageFolders: state => () => state.imageFolders,
     imageConfig: state => state.imageConfig,
     currentPath: state => state.currentPath,
-    canvasSize: state => state.canvasSize,
     expandData: state => state.expandData
   },
   mutations: {
@@ -60,21 +59,21 @@ const imageStore = {
         state.imageList = [...new Set(state.imageList.concat(images))];
       }
     },
-    REMOVE_IMAGE: (state, image) => {
-      if (state.imageList.includes(image)) {
-        const tmp = [...state.imageList];
-        tmp.splice(state.imageList.indexOf(image), 1);
-        state.imageList = tmp;
-      }
+    REMOVE_IMAGES: (state, images) => {
+      const tmp = [...state.imageList];
+      images.forEach(image => {
+        let index = tmp.indexOf(image);
+        if (index > -1) {
+          tmp.splice(index, 1);
+        }
+      });
+      state.imageList = tmp;
     },
     SET_IMAGES: (state, newImageList) => {
       state.imageList = newImageList;
     },
     EMPTY_IMAGE: state => {
       state.imageList = [];
-    },
-    SET_CANVAS_SIZE: (state, newCanvasSize) => {
-      state.canvasSize = newCanvasSize;
     },
     // 修改当前文件夹
     SET_CURRENT_FOLDER_PATH: (state, newFolderPath) => {
@@ -119,20 +118,13 @@ const imageStore = {
       }
     },
     removeImages({ commit }, images) {
-      if (!Array.isArray(images)) {
-        commit('REMOVE_IMAGE', images);
-      } else {
-        images.forEach(item => commit('REMOVE_IMAGE', item));
-      }
+      commit('REMOVE_IMAGES', Array.isArray(images) ? images : [images]);
     },
     setImages({ commit }, newImageList) {
       commit('SET_IMAGES', newImageList);
     },
     emptyImages({ commit }) {
       commit('EMPTY_IMAGE');
-    },
-    setCanvasSize({ commit }, newCanvasSize) {
-      commit('SET_CANVAS_SIZE', newCanvasSize);
     },
     //修改当前文件夹路径
     setFolderPath({ commit }, newFolderPath) {

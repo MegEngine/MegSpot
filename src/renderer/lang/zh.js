@@ -2,7 +2,7 @@ export default {
   common: {
     supportTypes: '支持多种文件类型:',
     desc:
-      'MegSpot是一款跨平台的本地应用，旨在为用户提供本地图片对比、视频对比、图片定制处理等便捷功能。\r\n可进入交流群了解详情、获取最新资讯。',
+      'MegSpot是一款跨平台的本地应用，旨在为用户提供本地图片对比、视频对比、图片定制处理等便捷功能。\r\n可进入QQ交流群(782365536)了解详情、获取最新资讯。',
     manual: '使用手册',
     hotKey: '快捷键',
     showVideoTip: '查看演示'
@@ -29,6 +29,7 @@ export default {
     size: '大小',
     scale: '缩放比例',
     sortDialogTips: 'tips:上下拖动可调整顺序',
+    selectAll: '全部选择',
     clearAll: '全部清空',
     delete: '删除此项',
     showAll: '显示全部',
@@ -112,5 +113,13 @@ export default {
     play: '播放',
     pause: '暂停',
     reset: '复位'
+  },
+  sortFile: {
+    apply: '应用',
+    edit: '编辑',
+    generate: '生成',
+    generateTip: '点击即可在当前目录下生成.MegSpotSort.ini排序配置文件',
+    sortFile: '排序文件',
+    useTableFileList: '应用当前表格排序'
   }
 };

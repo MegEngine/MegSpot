@@ -12,16 +12,9 @@
         />
       </CoverMask>
       <el-tooltip placement="bottom" :open-delay="800">
-        <span
-          class="compare-name"
-          flex-box="1"
-          v-html="
-            (selected ? `<span style='color: red'>(✔)</span>` : ``) +
-              $options.filters.getFileName(videoSrc)
-          "
-        ></span>
+        <span class="compare-name" flex-box="1" v-html="getTitle"></span>
         <div slot="content">
-          {{ videoSrc }}
+          {{ path }}
           <br /><br />
           <span class="size">
             {{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span
@@ -44,7 +37,12 @@
       @dbclick="handleDbclick"
       @mouseMove="handleMove"
     >
-      <div ref="canvas-item" class="canvas-item" @contextmenu.prevent>
+      <div
+        ref="canvas-item"
+        class="canvas-item"
+        @contextmenu.prevent
+        :style="canvasStyle"
+      >
         <ScaleEditor
           class="scale-editor"
           :scale="imgScale"
@@ -70,7 +68,9 @@ import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters } = createNamespacedHelpers('videoStore');
-const { mapActions } = createNamespacedHelpers('imageStore');
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
 import { getImageUrlSync } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
@@ -85,6 +85,10 @@ export default {
     EffectPreview
   },
   props: {
+    path: {
+      type: String,
+      default: ''
+    },
     videoSrc: {
       type: String,
       default: ''
@@ -175,17 +179,15 @@ export default {
   },
   computed: {
     ...mapGetters(['videoList', 'videoConfig', 'selectedPosition']),
+    ...preferenceMapGetters(['preference']),
+    getTitle() {
+      return this.preference.showTitle
+        ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
+            this.$options.filters.getFileName(this.path)
+        : ' ';
+    },
     canvasStyle() {
-      let filter = '';
-      ['brightness', 'contrast', 'saturate', 'grayscale', 'opacity'].forEach(
-        item => {
-          filter += `${item}(${this[item]}%) `;
-        }
-      );
-      ['blur'].forEach(item => {
-        filter += `${item}(${this[item]}px) `;
-      });
-      return filter;
+      return this.preference.background.style;
     }
   },
   watch: {
@@ -197,7 +199,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setCanvasSize']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, width, height) {
       const cw = this.width,
@@ -329,11 +330,6 @@ export default {
       this.cs = this.canvas.getContext('2d');
       this.$nextTick(() => {
         this.cs.imageSmoothingEnabled = this.videoConfig.smooth;
-        // 设置生成gif图的宽高
-        this.setCanvasSize({
-          width: this.canvas.width,
-          height: this.canvas.height
-        });
       });
     },
     // 供外部直接调用 待测试
@@ -474,9 +470,11 @@ export default {
       if (canvasRadio > imageRadio) {
         //比较高，所以高占100%,宽居中
         width = ch * imageRadio;
+        x = (canvas.width - width) / 2;
       } else {
         //比较宽，所以宽占100%,高居中
         height = cw / imageRadio;
+        y = (canvas.height - height) / 2;
       }
       return {
         x,
@@ -715,17 +713,19 @@ export default {
           padding: 0 2px;
         }
       }
-      canvas {
-        background: #e3e7e9;
-        background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
-          linear-gradient(45deg, transparent 75%, #f6fafc 0),
-          linear-gradient(45deg, #f6fafc 25%, transparent 0),
-          linear-gradient(45deg, transparent 75%, #f6fafc 0);
-        background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
-        background-size: 20px 20px;
-        vertical-align: middle;
-        font-size: 0;
-      }
+
+      /** default canvas background */
+      // canvas {
+      //   background: #e3e7e9;
+      //   background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
+      //     linear-gradient(45deg, transparent 75%, #f6fafc 0),
+      //     linear-gradient(45deg, #f6fafc 25%, transparent 0),
+      //     linear-gradient(45deg, transparent 75%, #f6fafc 0);
+      //   background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
+      //   background-size: 20px 20px;
+      //   vertical-align: middle;
+      //   font-size: 0;
+      // }
       img {
         object-fit: contain;
         vertical-align: middle;

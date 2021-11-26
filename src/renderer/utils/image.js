@@ -1,15 +1,10 @@
 import { readFileSync, formatFileSize, getFileStat, getFileSize } from './file';
-
-// 读取图片内容并生成url
-export const getImageUrl = async (
-  path,
-  cb,
-  options = { type: 'image/jpg' }
-) => {
-  cb('file://' + path);
-};
+import { NO_CACHE_FILE_PROTOCOL } from '@/constants';
 export const getImageUrlSync = path => {
   return 'file://' + path;
+};
+export const getImageUrlSyncNoCache = path => {
+  return `${NO_CACHE_FILE_PROTOCOL}://${path}`;
 };
 export const getImageType = str => {
   var reg = /\.(png|jpg|gif|jpeg|webp)$/;

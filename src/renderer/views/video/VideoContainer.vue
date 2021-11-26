@@ -1,6 +1,11 @@
 <template>
   <div class="video-container" flex="dir:top">
-    <div class="container" ref="container" flex-box="1" flex="dir:top">
+    <div
+      class="container"
+      ref="container"
+      flex-box="1"
+      flex="dir:top box:first"
+    >
       <div v-if="!videoImageVisiable" class="video-header" flex="cross:center">
         <el-tooltip placement="bottom" :open-delay="800">
           <template slot="content" style="float: left">
@@ -9,7 +14,7 @@
           <span
             class="file-name"
             flex-box="1"
-            v-html="$options.filters.getFileName(videoSrc)"
+            v-html="$options.filters.getFileName(path)"
           ></span>
         </el-tooltip>
         <el-button
@@ -23,7 +28,6 @@
       <video
         class="video-style"
         preload
-        :src="videoSrc"
         type="video/mp4"
         :loop="loop"
         ref="video"
@@ -38,6 +42,7 @@
       <VideoCanvas
         ref="videoImage"
         v-if="videoImageVisiable"
+        :path="path"
         :video="video"
         :videoSrc="videoSrc"
         :width="container.clientWidth"
@@ -52,6 +57,8 @@ import VideoCanvas from './VideoCanvas.vue';
 const UPDATE_VIDEO_PROGRESS = 'UPDATE_VIDEO_PROGRESS';
 import { createNamespacedHelpers } from 'vuex';
 const { mapActions } = createNamespacedHelpers('videoStore');
+import { getImageUrlSyncNoCache } from '@/utils/image';
+import chokidar from 'chokidar';
 
 export default {
   name: 'VideoContainer',
@@ -80,18 +87,54 @@ export default {
         {
           event: CONSTANTS.BUS_VIDEO_COMPARE_ACTION,
           action: 'executeAction'
+        },
+        {
+          event: 'getCanvasSize',
+          action: 'getCanvasSize'
         }
       ]
     };
   },
   computed: {
     videoSrc() {
-      return `file://${this.path.replace(/#/g, '%23')}`;
+      return getImageUrlSyncNoCache(this.path).replaceAll(/\\/g, '/');
     }
   },
   watch: {
     playbackRate(val) {
       this.video.playbackRate = val;
+    },
+    path: {
+      handler: function(newVal, oldVal) {
+        console.log('videoPath', newVal, oldVal);
+        this.showCompare = false;
+        if (oldVal) {
+          this.wacther && this.wacther.close();
+        }
+        if (newVal) {
+          this.wacther = chokidar
+            .watch(newVal, {
+              // 持续监听
+              persistent: true,
+              // 忽略初始化的目录检测
+              ignoreInitial: true,
+              // 等待写入完成
+              awaitWriteFinish: {
+                stabilityThreshold: 2000,
+                pollInterval: 100
+              }
+            })
+            .on('change', (path, details) => {
+              console.log('video--change', path, details);
+              this.setVideoSrc(path);
+            })
+            .on('unlink', (path, details) => {
+              console.log('video--remove', path, details);
+              this.removeVideos(path);
+            });
+        }
+      },
+      immediate: true
     }
   },
   methods: {
@@ -100,6 +143,17 @@ export default {
     play() {
       this.video.currentTime = this.currentTime;
       this.video.play();
+    },
+    getCanvasSize(data, callback) {
+      callback({
+        width: this.container.clientWidth,
+        height: this.container.clientHeight - 22
+      });
+    },
+    setVideoSrc(videoSrc) {
+      this.video.src = getImageUrlSyncNoCache(videoSrc).replaceAll(/\\/g, '/');
+      // this.video.currentTime = 0;
+      this.video.load();
     },
     // 提供外部直接调用
     getVideo({ name, data }, callback) {
@@ -152,6 +206,7 @@ export default {
   },
   mounted() {
     this.video = this.$refs.video;
+    this.video.src = this.videoSrc;
     this.container = this.$refs.container;
     this.scheduleCanvasActions.forEach(item => {
       this.$bus.$on(item.event, this[item.action]);

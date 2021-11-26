@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar" flex="main:justify cross:center">
+  <div flex="main:justify cross:center" class="toolbar">
     <div class="left" flex="cross:center">
       <div class="router-back" v-tip.sure="`${$t('common.hotKey')}：esc`">
         <span @click="goBack" class="btn"
@@ -7,7 +7,7 @@
         >
       </div>
       <Gallery
-        :sortData="imageList"
+        :selectedList="imageList"
         :focusListIndex="
           new Array(groupCount).fill(0).map((_, index) => index + startIndex)
         "
@@ -88,6 +88,7 @@
           <span class="svg-container">
             <svg-icon
               icon-class="direction-left"
+              class="svg-container"
               style="transform:rotate(180deg);"
             />
           </span>
@@ -256,6 +257,9 @@
           >
           </el-option>
         </el-select>
+        <el-button-group class="gap">
+          <ImageSetting></ImageSetting>
+        </el-button-group>
       </div>
     </div>
   </div>
@@ -265,6 +269,7 @@ import * as GLOBAL_CONSTANTS from '@/constants';
 import Gallery from '@/components/gallery';
 import { createNamespacedHelpers } from 'vuex';
 import GifDialog from '@/components/gif-dialog';
+import ImageSetting from '@/components/image-setting';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
 export default {
@@ -275,10 +280,11 @@ export default {
       traggerRGB: false,
       showSelectedMsg: false,
       groupNum: 0,
-      startIndex: 0
+      startIndex: 0,
+      offset: 0
     };
   },
-  components: { Gallery, GifDialog },
+  components: { Gallery, GifDialog, ImageSetting },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
     maxGroupNum() {
@@ -308,13 +314,13 @@ export default {
         const preNum = this.groupCount * (this.groupNum - 1);
         this.setImageConfig({ layout: val });
         const afterNum = this.groupCount * (this.groupNum - 1);
-        const offset = preNum - afterNum;
+        this.offset = preNum - afterNum;
         this.startIndex = Math.max(
           0,
-          (this.groupNum - 1) * this.groupCount + offset
+          (this.groupNum - 1) * this.groupCount + this.offset
         );
         this.$bus.$emit('changeGroup', this.startIndex);
-        this.groupNum = Math.ceil(this.startIndex / this.groupCount) + 1;
+        this.groupNum = Math.floor(this.startIndex / this.groupCount);
       }
     }
   },
@@ -359,6 +365,13 @@ export default {
         this.startIndex - this.groupCount * (oldGroupNum - groupNum)
       );
       this.$refs.gifDialog.clear(); // 清空gifDialog上次所选
+      this.$bus.$emit('changeGroup', this.startIndex);
+    },
+    changeGroup(groupNum) {
+      this.startIndex = Math.max(
+        0,
+        (groupNum - 1) * this.groupCount + this.offset
+      );
       this.$bus.$emit('changeGroup', this.startIndex);
     },
     changeZoom(newV, oldV) {
@@ -444,9 +457,9 @@ export default {
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 .toolbar {
-  height: 28px;
-  padding: 0 10px;
+  height: 28px !important;
   position: relative;
+  padding: 0 5px;
   .gap + .gap {
     margin-left: 10px;
   }

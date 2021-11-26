@@ -3,7 +3,7 @@
     <div class="nav-container" flex="main:justify cross:center" flex-box="1">
       <div class="left-menu">
         <el-breadcrumb class="nav" separator="|">
-          <el-breadcrumb-item :to="{ path: '/' }">
+          <el-breadcrumb-item :to="{ path: '/dashboard' }">
             <img
               src="../../assets/images/big_logo_white.png"
               style="vertical-align: middle; height:40px"
@@ -14,7 +14,9 @@
         </el-breadcrumb>
       </div>
       <div class="right-menu">
-        <i class="el-icon-s-tools" @click="$refs.aboutDialog.show()"></i>
+        <i @click="$refs.aboutDialog.show()">
+          <svg-icon icon-class="about"></svg-icon
+        ></i>
         <!-- 先隐藏自动更新主动触发按钮  <i
           <svg-icon icon-class="update"></svg-icon> -->
       </div>
@@ -26,7 +28,6 @@
 <script>
 import AboutDialog from './AboutDialog';
 import UpdateDialog from './UpdateDialog';
-const shell = require('electron').shell;
 export default {
   name: 'AppHeader',
   components: { AboutDialog, UpdateDialog },
@@ -58,11 +59,6 @@ export default {
         }
       }
     }
-  },
-  methods: {
-    gotoHome() {
-      this.$router.push('/');
-    }
   }
 };
 </script>
@@ -80,6 +76,9 @@ export default {
       margin-left: auto;
       .about {
         vertical-align: bottom;
+      }
+      .svg-icon {
+        font-size: 20px;
       }
     }
     .left-menu {

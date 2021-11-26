@@ -1,4 +1,3 @@
-t.DS_Store
 node_modules/
 dist/electron/*
 dist/web/*
