@@ -14,7 +14,7 @@
       }}</el-button>
     </div>
     <div class="file-list">
-      <vue-scroll>
+      <vue-scroll :ops="scrollBarOpts" ref="vuescroll">
         <draggable
           class="list-group"
           tag="ul"
@@ -68,7 +68,15 @@ export default {
       changed: false,
       drag: false,
       checked: false, // 关闭dialog是否询问保存
-      textAlign: 'left'
+      textAlign: 'left',
+      scrollBarOpts: {
+        scrollPanel: {
+          scrollingX: false
+        },
+        bar: {
+          keepShow: true
+        }
+      }
     };
   },
   async mounted() {

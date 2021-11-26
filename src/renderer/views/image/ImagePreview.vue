@@ -40,6 +40,7 @@
       </div>
       <SortToolBar
         :currentPath="currentPath"
+        :btnDisabled="btnDisabled"
         :allSelectd.sync="allSelectd"
         :oneOrMoreSelected.sync="oneOrMoreSelected"
         @change="handleSelectAll"
@@ -58,6 +59,7 @@
         :removeVuexItem="removeImages"
         :emptyVuexItems="emptyImages"
         :defaultSort="imageConfig.defaultSort"
+        @canApply="handleCanApplyChange"
         @sort-change="handleSortChange"
         @addFolder="$emit('addFolder')"
       >
@@ -113,6 +115,7 @@ export default {
     return {
       showType: 'list',
       showAll: false,
+      btnDisabled: true,
       thumbnailList: []
     };
   },
@@ -175,6 +178,9 @@ export default {
       this.setImageConfig({ defaultSort: { order, field } });
       // 获取新排序下的thunbnail顺序
       this.thumbnailList = this.$refs.fileTable.getSortData();
+    },
+    handleCanApplyChange(canApply) {
+      this.btnDisabled = !canApply;
     },
     // FIX ME: 不可添加则直接禁用按钮
     addFolder() {

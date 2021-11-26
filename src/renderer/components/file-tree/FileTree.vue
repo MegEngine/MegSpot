@@ -1,6 +1,6 @@
 <template>
   <div ref="folder" class="folder">
-    <vuescroll :ops="scrollBarOpts" ref="vuescroll">
+    <vue-scroll :ops="scrollBarOpts" ref="vuescroll">
       <div class="folder-head" flex="cross:center">
         <el-tooltip
           placement="right"
@@ -116,12 +116,11 @@
           </span>
         </span>
       </el-tree>
-    </vuescroll>
+    </vue-scroll>
   </div>
 </template>
 
 <script>
-import vuescroll from 'vuescroll';
 import SearchInput from '@/components/search-input';
 import ContextMenu from '@/components/context-menu';
 import { listDir } from './lib/file.js';
@@ -132,7 +131,7 @@ import chokidar from 'chokidar';
 
 export default {
   name: 'FileTree',
-  components: { SearchInput, vuescroll, ContextMenu },
+  components: { SearchInput, ContextMenu },
   data() {
     return {
       scrollBarOpts: {

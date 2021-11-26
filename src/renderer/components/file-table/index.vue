@@ -148,7 +148,8 @@ export default {
       origin: -1,
       pin: false, // 按下shift
       // 监听当前文件夹的变化,变化后手动刷新目录
-      wacther: undefined
+      wacther: undefined,
+      canApply: false
     };
   },
   computed: {
@@ -230,7 +231,7 @@ export default {
   },
   watch: {
     currentPath: {
-      handler: function(newVal, oldVal) {
+      handler: async function(newVal, oldVal) {
         if (oldVal) {
           this.wacther.close();
         }
@@ -258,6 +259,11 @@ export default {
               this.refreshFileList();
             });
         }
+        const exist = await fse.pathExists(this.sortFilePath);
+        if (exist) {
+          const data = await fse.readFile(this.sortFilePath, 'utf8');
+          this.sortList = data.split(EOF);
+        } else this.sortList = [];
         this.refreshFileList();
       },
       immediate: true
@@ -281,6 +287,11 @@ export default {
           }
         }
       });
+    },
+    canApply(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.$emit('canApply', newVal);
+      }
     }
   },
   methods: {
@@ -294,40 +305,51 @@ export default {
       // 取出第一个排序的列
       const { property, order } = sortItem;
       let list = [];
-      // name
-      if (property === this.defaultSort.field) {
-        // 是否根据排序文件排序
-        if (!this.sortList.length) {
-          if (order === 'asc' || order === 'desc') {
-            list = data.sort((a, b) => a[property] < b[property]);
-          }
-        } else {
-          // 根据排序文件排序
-          list = data.sort((a, b) => {
-            let indexA = this.sortList.indexOf(a[property]);
-            let indexB = this.sortList.indexOf(b[property]);
-            if (indexA === -1 && indexB === -1) return 0;
-            if (indexA === -1) return 1;
-            if (indexB === -1) return -1;
-            return indexA - indexB;
-          });
+      // 是否根据排序文件排序
+      if (property === 'name' && this.sortList.length) {
+        list = data.sort((a, b) => {
+          let indexA = this.sortList.indexOf(a[property]);
+          let indexB = this.sortList.indexOf(b[property]);
+          if (indexA === -1 && indexB === -1) return a[property] < b[property];
+          if (indexA === -1) return 1;
+          if (indexB === -1) return -1;
+          return indexA - indexB;
+        });
+      } else {
+        if (order === 'asc' || order === 'desc') {
+          list = data.sort((a, b) => a[property] < b[property]);
         }
       }
       if (order === 'desc') {
         list.reverse();
       }
+
+      if (this.searchString !== '') {
+        this.canApply = false;
+      } else {
+        new Promise(async resolve => {
+          for (let i = 0, len = this.sortList.length; i < len; i++) {
+            if (list[i].name !== this.sortList[i]) {
+              resolve(true);
+              break;
+            }
+          }
+          resolve(false);
+        }).then(res => {
+          this.canApply = res;
+        });
+      }
+
       return list;
     },
     applySortFile(data, callback) {
       this.$refs.xTable.clearSort();
       // 重新触发排序
       this.$nextTick(() => {
-        this.$refs.xTable
-          .sort(this.defaultSort.field, this.defaultSort.order ?? 'null')
-          .then(() => {
-            // 向父级反馈 最新的顺序
-            this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0]);
-          });
+        this.$refs.xTable.sort('name', 'asc').then(() => {
+          // 向父级反馈 最新的顺序
+          this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0]);
+        });
       });
     },
     checkSelectable({ row }) {

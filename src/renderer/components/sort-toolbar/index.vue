@@ -22,6 +22,7 @@
     }}</span>
     <el-button
       v-show="!generateVisible"
+      :disabled="btnDisabled"
       v-tip="'Apply Sorting File'"
       @click="applySortFile"
     >
@@ -48,6 +49,10 @@ export default {
   components: {},
   props: {
     currentPath: String,
+    btnDisabled: {
+      type: Boolean,
+      default: true
+    },
     allSelectd: {
       type: Boolean,
       default: false
