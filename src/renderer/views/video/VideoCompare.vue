@@ -370,6 +370,7 @@ import * as CONSTANTS from './video-constants';
 import * as GLOBAL_CONSTANTS from '@/constants';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
+import { DELIMITER, NO_CACHE_FILE_PROTOCOL } from '@/constants';
 
 export default {
   components: { VideoContainer, Gallery, GifDialog, ImageSetting },
@@ -802,8 +803,14 @@ export default {
       this.videoScale = 1;
     },
     getVidePath(path) {
-      // FIXME:
-      return path.replace('file://', '');
+      return path
+        .replace(
+          path.includes(NO_CACHE_FILE_PROTOCOL)
+            ? `${NO_CACHE_FILE_PROTOCOL}://`
+            : 'file://',
+          ''
+        )
+        .replace(/[\\\/]/g, DELIMITER);
     },
     getImageDetails(imageNameList, callback) {
       const canvasViews = this.$refs['video-container'].map(item =>
@@ -817,12 +824,10 @@ export default {
                 name => name === this.getVidePath(item.videoSrc)
               ) > -1
           )
-          .map(item => {
-            return {
-              path: this.getVidePath(item.videoSrc),
-              canvas: item.canvas
-            };
-          });
+          .map(item => ({
+            path: this.getVidePath(item.videoSrc),
+            canvas: item.canvas
+          }));
         callback(details);
       } catch (error) {
         console.log(error);
