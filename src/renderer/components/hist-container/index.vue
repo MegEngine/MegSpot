@@ -22,8 +22,12 @@ export default {
   name: 'HistContainer',
   data() {
     return {
+      visible: false,
       hist: undefined
     };
+  },
+  created() {
+    this.visible = this.preference.defaultShowHist;
   },
   mounted() {
     this.hist = this.$refs.hist;
@@ -87,15 +91,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['preference']),
-    visible: {
-      get() {
-        return this.preference.defaultShowHist;
-      },
-      set() {
-        this.setPreference({ defaultShowHist: !this.visible });
-      }
-    }
+    ...mapGetters(['preference'])
   }
 };
 </script>

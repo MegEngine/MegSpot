@@ -21,7 +21,7 @@
       </div>
       <div flex="dir:top" class="setting-group">
         <div flex="main:justify" class="setting-item">
-          <span>show histogram：</span>
+          <span>default show histogram：</span>
           <el-switch v-model="defaultShowHist"></el-switch>
         </div>
         <div flex="main:justify" class="setting-item">
@@ -153,7 +153,7 @@ export default {
     },
     defaultShowHist: {
       get() {
-        return this.preference.defaultShowHist; // true
+        return this.preference.defaultShowHist; // false
       },
       set(newVal) {
         this.setPreference({ defaultShowHist: newVal });
