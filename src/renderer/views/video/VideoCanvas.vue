@@ -57,6 +57,7 @@
     </OperationContainer>
   </div>
 </template>
+
 <script>
 import Vue from 'vue';
 const cv = Vue.prototype.$cv;
@@ -101,6 +102,15 @@ export default {
     height: {
       type: Number,
       default: 500
+    },
+    playEnabled: {
+      type: Boolean,
+      default: false
+    },
+    frames: {
+      // 每秒图像数
+      type: Number,
+      default: 20
     }
   },
   data() {
@@ -170,10 +180,17 @@ export default {
   mounted() {
     this.canvas = this.$refs.canvasDom;
     this.initCanvas();
+    // this.initImage();
+    // this.taskInterval = setInterval(() => {
+    //   this.initImage();
+    // }, 100);
     this.initImage();
+    this.histContainer = this.$refs['hist-container'];
     this.listenEvents();
   },
   beforeDestroy() {
+    // window.clearInterval(this.taskInterval);
+    window.clearTimeout(this.timer);
     this.removeEvents();
     this.bitMap && this.bitMap.close();
   },
@@ -196,6 +213,16 @@ export default {
         this.setSmooth();
       },
       immediate: true
+    },
+    playEnabled(newVal) {
+      if (newVal) {
+        this.timer = setTimeout(
+          this.initImage,
+          Number(1000 / frames).toFixed(2)
+        );
+      } else {
+        window.clearTimeout(this.timer);
+      }
     }
   },
   methods: {
@@ -312,7 +339,10 @@ export default {
       let offCtx = offsreen.getContext('2d');
       offCtx.drawImage(this.video, 0, 0);
       this.bitMap = await offsreen.transferToImageBitmap();
-      this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
+      // console.log('this.imagePosition', this.imagePosition);
+      this.imagePosition =
+        this.imagePosition || this.getImageInitPos(this.canvas, this.bitMap);
+      // console.log('this.imagePosition', this.imagePosition);
       this.doZoomEnd();
       this.drawImage();
 
@@ -322,9 +352,31 @@ export default {
       histCanvas.height = this.video.videoHeight;
       let histCanvasCtx = histCanvas.getContext('2d');
       histCanvasCtx.drawImage(this.video, 0, 0);
-      this.currentHist = this.$refs['hist-container'].generateHist(
-        cv.imread(histCanvas)
-      );
+      // new Promise(resolve =>
+      //   resolve(
+      //     this.histContainer.generateHist(cv.imread(histCanvas))
+      //   )
+      // )
+      //   .then(res => {
+      //     this.currentHist = res;
+      //     console.log('res', res);
+      //   })
+      //   .catch(err => {
+      //     console.log('err', err);
+      // });
+      try {
+        this.currentHist = this.histContainer.generateHist(
+          cv.imread(histCanvas)
+        );
+      } catch (err) {
+        console.log('err', err);
+      }
+      if (this.playEnabled) {
+        this.timer = setTimeout(
+          this.initImage,
+          Number(1000 / frames).toFixed(2)
+        );
+      }
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d');
@@ -373,7 +425,7 @@ export default {
       });
     },
     doHistVisible({ visible }) {
-      this.$refs['hist-container'].setVisible(visible);
+      this.histContainer.setVisible(visible);
     },
     pickColor({ status }) {
       this.traggerRGB = status;
@@ -427,7 +479,7 @@ export default {
       if (status) {
         this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.cs.drawImage(snapShot, 0, 0);
-        if (this.$refs['hist-container'].visible) {
+        if (this.histContainer.visible) {
           this.maskDom = hist;
         }
       } else {
@@ -680,6 +732,7 @@ export default {
   }
 };
 </script>
+
 <style scoped lang="scss">
 @import '@/styles/variables.scss';
 .video-canvas {

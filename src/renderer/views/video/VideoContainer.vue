@@ -47,10 +47,13 @@
         :videoSrc="videoSrc"
         :width="container.clientWidth"
         :height="container.clientHeight - 22"
+        :playEnabled="playEnabled"
+        v-bind="$attrs"
       ></VideoCanvas>
     </div>
   </div>
 </template>
+
 <script>
 import * as CONSTANTS from './video-constants';
 import VideoCanvas from './VideoCanvas.vue';
@@ -59,6 +62,7 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapActions } = createNamespacedHelpers('videoStore');
 import { getImageUrlSyncNoCache } from '@/utils/image';
 import chokidar from 'chokidar';
+import { t } from 'vxe-table';
 
 export default {
   name: 'VideoContainer',
@@ -70,6 +74,7 @@ export default {
       video: undefined,
       container: undefined,
       currentTime: 0,
+      playEnabled: false,
       // 调度事件
       scheduleCanvasActions: [
         {
@@ -175,9 +180,11 @@ export default {
       switch (action) {
         case CONSTANTS.VIDEO_STATUS_START:
           this.video.play();
+          this.playEnabled = true;
           break;
         case CONSTANTS.VIDEO_STATUS_PAUSE:
           this.video.pause();
+          this.playEnabled = false;
           break;
         case CONSTANTS.VIDEO_STATUS_RESET:
           this.video.currentTime = 0;
@@ -226,6 +233,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 .video-container {

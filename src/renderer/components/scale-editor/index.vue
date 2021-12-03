@@ -77,7 +77,9 @@ export default {
         return this.scale;
       },
       set(newVal) {
-        if (newVal !== this.scale) this.setNewScale(newVal);
+        if (newVal.toString() !== this.scale.toString()) {
+          this.setNewScale(newVal);
+        }
       }
     },
     textColor() {

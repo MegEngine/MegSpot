@@ -39,7 +39,7 @@
           type="text"
           icon="el-icon-circle-close"
           title="unselected all"
-          style="margin-right:10px"
+          style="margin-right: 10px"
           :disabled="!videoList.length"
           @click="emptyVideos"
         />
@@ -81,7 +81,8 @@
         </div>
       </div>
       <div class="middle">
-        <span class="custom-container" v-if="showCompare === false">
+        <!-- v-if="showCompare === false" -->
+        <span class="custom-container">
           <el-button-group>
             <el-button
               type="text"
@@ -125,7 +126,7 @@
           </el-button-group>
         </span>
         <span class="custom-container" v-if="showCompare === true">
-          <el-button-group style="margin-left:10px">
+          <el-button-group style="margin-left: 10px">
             <el-button
               type="text"
               :disabled="videoList.length <= 1"
@@ -155,7 +156,7 @@
               <span class="svg-container">
                 <svg-icon
                   icon-class="direction-left"
-                  style="transform:rotate(180deg);"
+                  style="transform: rotate(180deg)"
                 />
               </span>
             </el-button>
@@ -172,7 +173,7 @@
               <span class="svg-container">
                 <svg-icon
                   icon-class="direction-left"
-                  style="transform:rotate(-90deg);"
+                  style="transform: rotate(-90deg)"
                 />
               </span>
             </el-button>
@@ -189,7 +190,7 @@
               <span class="svg-container">
                 <svg-icon
                   icon-class="direction-left"
-                  style="transform:rotate(90deg);"
+                  style="transform: rotate(90deg)"
                 />
               </span>
             </el-button>
@@ -216,7 +217,7 @@
           <el-select
             v-model="playbackRate"
             placeholder="rate"
-            style="width:80px;margin-right:20px"
+            style="width: 80px; margin-right: 20px"
           >
             <el-option
               v-for="item in rateOptions"
@@ -325,7 +326,7 @@
         <el-select
           v-model="layout"
           placeholder="layout"
-          style="width:80px"
+          style="width: 80px"
           v-tip.left="$t('general.layout')"
         >
           <el-option
@@ -356,6 +357,7 @@
           :loop="loop"
           :playbackRate="playbackRate"
           :videoImageVisiable="showCompare"
+          v-bind="config"
         ></VideoContainer>
       </div>
     </div>
@@ -379,6 +381,9 @@ export default {
       CONSTANTS,
       GLOBAL_CONSTANTS,
       videoScale: 1,
+      config: {
+        frames: 20
+      },
       lastX: 0,
       lastY: 0,
       showCompare: false,
@@ -508,7 +513,7 @@ export default {
     },
     showCompare() {
       if (this.showCompare) {
-        this.changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE);
+        // this.changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE);
       }
     },
     videoList() {
