@@ -50,13 +50,13 @@ export default {
       tools: [
         {
           title: 'dashboard.entries.image.title',
-          supportTypes: ' jpg, jpeg, png, svg...',
+          supportTypes: ' jpg, jpeg, png, svg',
           icon: 'el-icon-picture-outline',
           route: '/image/index'
         },
         {
           title: 'dashboard.entries.video.title',
-          supportTypes: ' mp4, mov, rmvb, avi...',
+          supportTypes: ' mp4, mov, rmvb, avi',
           icon: 'el-icon-video-camera',
           route: '/video/index'
         }

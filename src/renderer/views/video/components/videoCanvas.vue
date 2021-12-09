@@ -1,11 +1,7 @@
 <template>
-  <div
-    class="video-canvas"
-    flex="dir:top box:first"
-    :class="{ selected: selected }"
-  >
-    <div class="header" flex="cross:center">
-      <CoverMask :mask="maskDom">
+  <div :class="['image-canvas', { selected: selected }]" @click.stop>
+    <div ref="header" class="header" flex="cross:center">
+      <CoverMask :mask="maskDom" class="cover-mask">
         <HistContainer
           ref="hist-container"
           @changeVisible="handleHistVisible"
@@ -21,43 +17,40 @@
           >
         </div>
       </el-tooltip>
-      <RGBAExhibit
-        :RGBAcolor="RGBAcolor"
-        v-model="radius"
-        @update="changeRadius"
-      ></RGBAExhibit>
+      <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
       <EffectPreview @change="changeCanvasStyle" />
     </div>
-    <OperationContainer
+    <div
+      ref="container"
+      class="canvas-container"
       id="canvas-container"
-      ref="canvas-container"
-      @drag="handleDrag"
-      @zoom="handleZoom"
-      @scrollEnd="handleZoomEnd"
-      @dbclick="handleDbclick"
-      @mouseMove="handleMove"
+      :style="canvasStyle"
     >
-      <div
-        ref="canvas-item"
-        class="canvas-item"
-        @contextmenu.prevent
-        :style="canvasStyle"
+      <OperationContainer
+        id="canvas-container"
+        ref="canvas-container"
+        @drag="handleDrag"
+        @zoom="handleZoom"
+        @scrollEnd="handleZoomEnd"
+        @dbclick="handleDbclick"
+        @mouseMove="handleMove"
       >
-        <ScaleEditor
-          class="scale-editor"
-          :scale="imgScale"
-          :scaleEditorVisible.sync="scaleEditorVisible"
-          @show="showScaleEditor"
-          @reset="resetZoom"
-          @update="setZoom"
-        />
-        <canvas ref="canvasDom" :width="width" :height="height"> </canvas>
-        <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
-      </div>
-    </OperationContainer>
+        <div class="canvas-item" @contextmenu.prevent>
+          <ScaleEditor
+            class="scale-editor"
+            :scale="imgScale"
+            :scaleEditorVisible.sync="scaleEditorVisible"
+            @show="showScaleEditor"
+            @reset="resetZoom"
+            @update="setZoom"
+          />
+          <canvas ref="canvas" :width="_width" :height="_height"> </canvas>
+          <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
+        </div>
+      </OperationContainer>
+    </div>
   </div>
 </template>
-
 <script>
 import Vue from 'vue';
 const cv = Vue.prototype.$cv;
@@ -68,13 +61,15 @@ import RGBAExhibit from '@/components/rgba-exhibit';
 import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
 import { createNamespacedHelpers } from 'vuex';
-const { mapGetters } = createNamespacedHelpers('videoStore');
+const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
   'preferenceStore'
 );
-import { getImageUrlSync } from '@/utils/image';
+import { getImageUrlSyncNoCache } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
+import chokidar from 'chokidar';
+import * as CONSTANTS from '../video-constants';
 
 export default {
   components: {
@@ -90,32 +85,23 @@ export default {
       type: String,
       default: ''
     },
-    videoSrc: {
-      type: String,
-      default: ''
-    },
-    video: HTMLVideoElement,
-    width: {
+    _width: {
       type: Number,
       default: 500
     },
-    height: {
+    _height: {
       type: Number,
       default: 500
-    },
-    playEnabled: {
-      type: Boolean,
-      default: false
-    },
-    frames: {
-      // 每秒图像数
-      type: Number,
-      default: 20
     }
   },
   data() {
     return {
+      // 监听图像文件的变化,变化后自动刷新图像
+      wacther: undefined,
+      header: null,
       canvas: null,
+      video: null,
+      paused: true,
       maskDom: undefined,
       currentHist: undefined,
       histImage: null,
@@ -130,7 +116,6 @@ export default {
       imgScale: 'N/A',
       scaleEditorVisible: false,
       afterFullSize: false,
-      selected: false,
       selectedId: null,
       // 原图的mat 缓存用于便捷获取
       syncCanvasActions: [
@@ -147,7 +132,7 @@ export default {
           action: 'reverse'
         }
       ],
-      // 调度事件
+      // 广播调度事件
       scheduleCanvasActions: [
         {
           event: 'image_broadcast',
@@ -158,12 +143,24 @@ export default {
           action: 'handleSelect'
         },
         {
-          event: 'videoCenter_getSelectedPosition',
+          event: 'imageCenter_getSelectedPosition',
           action: 'getSelectedPosition'
         },
         {
-          event: 'videoCenter_align',
+          event: 'imageCenter_align',
           action: 'align'
+        },
+        {
+          event: 'radius',
+          action: 'setRadius'
+        },
+        {
+          event: CONSTANTS.BUS_VIDEO_COMPARE_ACTION,
+          action: 'executeAction'
+        },
+        {
+          event: 'changeLoop',
+          action: 'changeLoop'
         }
       ],
       histVisible: true,
@@ -177,26 +174,12 @@ export default {
       }
     };
   },
-  mounted() {
-    this.canvas = this.$refs.canvasDom;
-    this.initCanvas();
-    // this.initImage();
-    // this.taskInterval = setInterval(() => {
-    //   this.initImage();
-    // }, 100);
-    this.initImage();
-    this.histContainer = this.$refs['hist-container'];
-    this.listenEvents();
-  },
-  beforeDestroy() {
-    // window.clearInterval(this.taskInterval);
-    window.clearTimeout(this.timer);
-    this.removeEvents();
-    this.bitMap && this.bitMap.close();
-  },
   computed: {
-    ...mapGetters(['videoList', 'videoConfig', 'selectedPosition']),
+    ...mapGetters(['videoConfig', 'videoList']),
     ...preferenceMapGetters(['preference']),
+    selected() {
+      return this.path === this.selectedId;
+    },
     getTitle() {
       return this.preference.showTitle
         ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
@@ -207,39 +190,76 @@ export default {
       return this.preference.background.style;
     }
   },
+  mounted() {
+    this.header = this.$refs.header;
+    this.canvas = this.$refs.canvas;
+
+    this.initCanvas();
+    this.initVideo();
+
+    this.listenEvents();
+  },
+  beforeDestroy() {
+    this.removeEvents();
+    this.video && (this.video = null);
+    this.bitMap && this.bitMap.close();
+  },
   watch: {
+    path: {
+      handler: function(newVal, oldVal) {
+        if (oldVal) {
+          this.wacther && this.wacther.close();
+        }
+        if (newVal) {
+          this.wacther = chokidar
+            .watch(newVal, {
+              // 持续监听
+              persistent: true,
+              // 忽略初始化的目录检测
+              ignoreInitial: true,
+              // 等待写入完成
+              awaitWriteFinish: {
+                stabilityThreshold: 2000,
+                pollInterval: 100
+              }
+            })
+            .on('change', (path, details) => {
+              console.log('image--change', path, details);
+              this.initImage(false);
+            })
+            .on('unlink', (path, details) => {
+              console.log('image--remove', path, details);
+              this.removeImages(path);
+            });
+        }
+      },
+      immediate: true
+    },
     'videoConfig.smooth': {
       handler(newVal, oldVal) {
         this.setSmooth();
       },
       immediate: true
-    },
-    playEnabled(newVal) {
-      if (newVal) {
-        this.timer = setTimeout(
-          this.initImage,
-          Number(1000 / frames).toFixed(2)
-        );
-      } else {
-        window.clearTimeout(this.timer);
-      }
     }
   },
   methods: {
+    ...mapActions(['removeImages']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
-    checkBorder(transX, transY, width, height) {
-      const cw = this.width,
-        ch = this.height,
-        iw = width ?? this.imagePosition.width,
-        ih = height ?? this.imagePosition.height;
+    checkBorder(transX, transY, _width, _height) {
+      const cw = this._width,
+        ch = this._height,
+        iw = _width ?? this.imagePosition.width,
+        ih = _height ?? this.imagePosition.height;
       const constantsW = DRAG_CONSTANTS * iw,
         constantsH = DRAG_CONSTANTS * ih;
+
       let isFullFilled =
         transX <= constantsW &&
         transY <= constantsH &&
         transX + iw >= cw &&
         transY + ih >= ch; // 判断图像是否占据整个canvas
       if (isFullFilled) return true;
+
       let isTooLeft = transX + iw < constantsW; // 图像是否过于偏左
       let isTooRight = transX > cw - constantsW; // 图像是否过于偏右
       let isTooTop = transY + ih < constantsH; // 图像是否过于偏上
@@ -256,21 +276,45 @@ export default {
       }
       return this.afterFullSize || !isTooSmall;
     },
-    resetImageStyle() {
-      // 预览处理效果
-      this.brightness = 100;
-      this.contrast = 100;
-      this.saturate = 100;
-      this.grayscale = 0;
-      this.opacity = 100;
-      this.blur = 0;
+    // 判断图像是否占据整个canvas
+    isFullFilled() {
+      const cw = this.canvas.width,
+        ch = this.canvas.height,
+        iw = this.imagePosition.width,
+        ih = this.imagePosition.height;
+      const constantsW = DRAG_CONSTANTS * iw,
+        constantsH = DRAG_CONSTANTS * ih;
+      const { x: transX, y: transY } = this.imagePosition;
+      return (
+        transX <= constantsW &&
+        transY <= constantsH &&
+        transX + iw >= cw &&
+        transY + ih >= ch
+      );
     },
-    changeCanvasStyle(newStyle) {
-      // FIXME: 具体的值没有被广播
-      this.broadCast({
-        name: 'setCanvasStyle',
-        data: { style: newStyle }
-      });
+    executeAction(action) {
+      switch (action) {
+        case CONSTANTS.VIDEO_STATUS_START:
+          this.video.play();
+          this.paused = false;
+          this.$bus.$emit('changeVideoPaused', false);
+          break;
+        case CONSTANTS.VIDEO_STATUS_PAUSE:
+          this.video.pause();
+          this.paused = true;
+          this.$bus.$emit('changeVideoPaused', true);
+          this.generateHist();
+          break;
+        case CONSTANTS.VIDEO_STATUS_RESET:
+          this.video.currentTime = 0;
+          break;
+        default:
+          console.error('unknown actions:' + action);
+          break;
+      }
+    },
+    changeLoop(loop) {
+      this.video.loop = loop;
     },
     setCanvasStyle({ style }) {
       this.canvas.style.filter = style;
@@ -281,7 +325,6 @@ export default {
         this.reDraw();
       }
     },
-    // 提供外部直接调用
     getSnapshot() {
       // 叠加显示时候 生成快照
       return {
@@ -290,6 +333,7 @@ export default {
       };
     },
     listenEvents() {
+      // 广播调度事件
       this.scheduleCanvasActions.forEach(item => {
         this.$bus.$on(item.event, this[item.action]);
       });
@@ -300,7 +344,7 @@ export default {
         });
       });
       // 鼠标点击时隐藏编辑scale的输入框
-      this.$refs['canvas-item'].addEventListener(
+      this.$refs.container.addEventListener(
         'click',
         () => {
           this.scaleEditorVisible = false;
@@ -318,64 +362,51 @@ export default {
       });
     },
     dispatchCanvasAction({ name, data }) {
-      if (!this.selectedId || this.selectedId === this.videoSrc) {
+      if (!this.selectedId || this.selectedId === this.path) {
         this[name](data);
       }
     },
     handleBroadcast({ name, data }) {
       if (this.selectedId) {
-        if (data.id === this.videoSrc || this.selectedId === this.videoSrc) {
+        if (data.id === this.path || this.selectedId === this.path) {
           this[name](data);
         }
       } else {
         this[name](data);
       }
     },
-    async initImage() {
-      let offsreen = new OffscreenCanvas(
-        this.video.videoWidth,
-        this.video.videoHeight
-      );
-      let offCtx = offsreen.getContext('2d');
-      offCtx.drawImage(this.video, 0, 0);
-      this.bitMap = await offsreen.transferToImageBitmap();
-      // console.log('this.imagePosition', this.imagePosition);
-      this.imagePosition =
-        this.imagePosition || this.getImageInitPos(this.canvas, this.bitMap);
-      // console.log('this.imagePosition', this.imagePosition);
+    async initImage(initPosition = true) {
+      if (!this.paused) {
+        let offsreen = new OffscreenCanvas(
+          this.video.videoWidth,
+          this.video.videoHeight
+        );
+        let offCtx = offsreen.getContext('2d');
+        offCtx.drawImage(this.video, 0, 0);
+        this.bitMap = await offsreen.transferToImageBitmap();
+      }
+      if (initPosition || !this.imagePosition) {
+        this.imagePosition = this.getImageInitPos(this.canvas, this.video);
+      }
       this.doZoomEnd();
       this.drawImage();
 
-      // 生成hist直方图 需要一个和video一样大的canvas作为入参
-      const histCanvas = document.createElement('canvas');
-      histCanvas.width = this.video.videoWidth;
-      histCanvas.height = this.video.videoHeight;
-      let histCanvasCtx = histCanvas.getContext('2d');
-      histCanvasCtx.drawImage(this.video, 0, 0);
-      // new Promise(resolve =>
-      //   resolve(
-      //     this.histContainer.generateHist(cv.imread(histCanvas))
-      //   )
-      // )
-      //   .then(res => {
-      //     this.currentHist = res;
-      //     console.log('res', res);
-      //   })
-      //   .catch(err => {
-      //     console.log('err', err);
-      // });
+      if (!this.currentHist) {
+        this.generateHist();
+      }
+    },
+    generateHist() {
       try {
-        this.currentHist = this.histContainer.generateHist(
+        const histCanvas = document.createElement('canvas');
+        histCanvas.width = this.video.videoWidth;
+        histCanvas.height = this.video.videoHeight;
+        let histCanvasCtx = histCanvas.getContext('2d');
+        histCanvasCtx.drawImage(this.video, 0, 0);
+        this.currentHist = this.$refs['hist-container'].generateHist(
           cv.imread(histCanvas)
         );
       } catch (err) {
         console.log('err', err);
-      }
-      if (this.playEnabled) {
-        this.timer = setTimeout(
-          this.initImage,
-          Number(1000 / frames).toFixed(2)
-        );
       }
     },
     initCanvas() {
@@ -384,38 +415,48 @@ export default {
         this.cs.imageSmoothingEnabled = this.videoConfig.smooth;
       });
     },
+    initVideo() {
+      const render = () => {
+        if (this.video !== null) {
+          this.drawImage();
+        }
+        window.requestAnimationFrame(render);
+      };
+      this.video = document.createElement('video');
+      this.video.addEventListener('canplay', () => {
+        this.paused = false;
+        this.imagePosition = this.getImageInitPos(this.canvas, this.video);
+        this.doZoomEnd();
+        this.initImage(false);
+        render();
+      });
+      this.video.src = this.path;
+      this.video.autoplay = true;
+      this.video.loop = true;
+    },
     // 供外部直接调用 待测试
     reMount() {
+      this.initImage();
       this.initCanvas();
       this.image.onload = () => {
         this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
         this.drawImage();
       };
-      this.image.src = getImageUrlSync(this.videoSrc);
+      this.image.src = getImageUrlSyncNoCache(this.path);
     },
     drawImage() {
       let { x, y, width, height } = this.imagePosition;
       this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.cs.drawImage(
-        this.bitMap,
-        x, //x
-        y, //y
-        width,
-        height
-      );
+      this.cs.drawImage(this.video, x, y, width, height);
     },
     handleDbclick() {
-      this.$bus.$emit(
-        'image_handleSelect',
-        this.selected ? null : this.videoSrc
-      );
+      if (!this.selected) {
+        this.$bus.$emit('image_handleSelect', this.path);
+      } else {
+        this.$bus.$emit('image_handleSelect', null);
+      }
     },
     handleSelect(selectedId) {
-      if (this.videoSrc === selectedId) {
-        this.selected = true;
-      } else {
-        this.selected = false;
-      }
       this.selectedId = selectedId;
     },
     handleHistVisible(visible) {
@@ -425,18 +466,29 @@ export default {
       });
     },
     doHistVisible({ visible }) {
-      this.histContainer.setVisible(visible);
+      this.$refs['hist-container'].setVisible(visible);
+    },
+    handleScaleDbClick(data) {
+      console.log('handleScaleDbClick', Object.values(arguments));
+      this.scaleEditorVisible = !this.scaleEditorVisible;
+    },
+    handleScaleReset() {
+      console.log('handleScaleReset');
+    },
+    changeZoom(data) {
+      console.log('changeZoom', data);
     },
     pickColor({ status }) {
       this.traggerRGB = status;
     },
-    changeRadius(radius) {
+    changeCanvasStyle(newStyle) {
+      // FIXME: 具体的值没有被广播
       this.broadCast({
-        name: 'doChangeRadius',
-        data: { radius }
+        name: 'setCanvasStyle',
+        data: { style: newStyle }
       });
     },
-    doChangeRadius({ radius }) {
+    setRadius(radius) {
       this.radius = radius;
     },
     handleMove: throttle(40, function(mousePos) {
@@ -479,7 +531,7 @@ export default {
       if (status) {
         this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.cs.drawImage(snapShot, 0, 0);
-        if (this.histContainer.visible) {
+        if (this.$refs['hist-container'].visible) {
           this.maskDom = hist;
         }
       } else {
@@ -491,8 +543,8 @@ export default {
       if (val) {
         let x = 0,
           y = 0;
-        let width = this.image.naturalWidth;
-        let height = this.image.naturalHeight;
+        let width = this.video.videoWidth;
+        let height = this.video.videoHeight;
         this.afterFullSize = true;
         this.imagePosition = { x, y, width, height };
         this.doZoomEnd();
@@ -502,14 +554,14 @@ export default {
       }
     },
     reDraw() {
-      window.requestAnimationFrame(this.drawImage);
+      window.requestAnimationFrame(() => this.initImage(false));
     },
     getImageInitPos(canvas, image) {
-      const cw = this.width;
-      const ch = this.height;
+      const cw = canvas.width;
+      const ch = canvas.height;
 
-      const iw = image.width;
-      const ih = image.height;
+      const iw = image.width || image.videoWidth;
+      const ih = image.height || image.videoHeight;
 
       const canvasRadio = cw / ch;
       const imageRadio = iw / ih;
@@ -521,11 +573,11 @@ export default {
 
       if (canvasRadio > imageRadio) {
         //比较高，所以高占100%,宽居中
-        width = ch * imageRadio;
+        width = canvas.height * imageRadio;
         x = (canvas.width - width) / 2;
       } else {
         //比较宽，所以宽占100%,高居中
-        height = cw / imageRadio;
+        height = canvas.width / imageRadio;
         y = (canvas.height - height) / 2;
       }
       return {
@@ -546,55 +598,6 @@ export default {
         this.imagePosition.y = transY;
         this.drawImage();
       }
-    },
-    doZoom(data) {
-      if (this.imagePosition == null) return;
-      let mousePos = data.mousePos;
-      let rate = data.rate;
-      let x = mousePos.x - (mousePos.x - this.imagePosition.x) * rate;
-      let y = mousePos.y - (mousePos.y - this.imagePosition.y) * rate;
-      let height = this.imagePosition.height * rate;
-      let width = this.imagePosition.width * rate;
-      if (
-        (rate > 1 || this.checkSize(width, height)) &&
-        this.checkBorder(x, y, width, height)
-      ) {
-        this.imagePosition = {
-          x,
-          y,
-          height,
-          width
-        };
-        this.imgScale = 'N/A';
-        this.drawImage();
-      }
-    },
-    doZoomEnd() {
-      this.imgScale = Number(
-        this.imagePosition.width / this.bitMap.width
-      ).toFixed(2);
-    },
-    handleDrag(offset) {
-      this.broadCast({
-        name: 'doDrag',
-        data: { offset: offset, id: this.videoSrc }
-      });
-    },
-    // 判断图像是否占据整个canvas
-    isFullFilled() {
-      const cw = this.canvas.width,
-        ch = this.canvas.height,
-        iw = this.imagePosition.width,
-        ih = this.imagePosition.height;
-      const constantsW = DRAG_CONSTANTS * iw,
-        constantsH = DRAG_CONSTANTS * ih;
-      const { x: transX, y: transY } = this.imagePosition;
-      return (
-        transX <= constantsW &&
-        transY <= constantsH &&
-        transX + iw >= cw &&
-        transY + ih >= ch
-      );
     },
     /******************ScaleEditor START******************/
     showScaleEditor() {
@@ -621,8 +624,16 @@ export default {
       }
       const oldScale = this.imgScale ?? scale;
       const scaleRatio = scale / oldScale;
-      // 从画布中心放大
+      // 默认从画布中心放大
       const position = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
+      // 画像不占据整个画布时，从画像中心放大
+      // const isFullFilled = this.isFullFilled();
+      // const position = isFullFilled
+      //   ? { x: this.canvas.width / 2, y: this.canvas.height / 2 }
+      //   : {
+      //       x: (this.imagePosition.x + this.imagePosition.width) / 2,
+      //       y: (this.imagePosition.y + this.imagePosition.height) / 2
+      //     };
       this.doZoom({
         rate: scaleRatio,
         mousePos: position
@@ -630,10 +641,47 @@ export default {
       this.imgScale = scale;
     },
     /******************ScaleEditor END******************/
+    doZoom(data) {
+      if (this.imagePosition == null) return;
+      let mousePos = data.mousePos;
+      let rate = data.rate;
+      let x = mousePos.x - (mousePos.x - this.imagePosition.x) * rate;
+      let y = mousePos.y - (mousePos.y - this.imagePosition.y) * rate;
+      let height = this.imagePosition.height * rate;
+      let width = this.imagePosition.width * rate;
+      // 缩小时才检查显示图片是否过小
+      if (
+        (rate > 1 || this.checkSize(width, height)) &&
+        this.checkBorder(x, y, width, height)
+      ) {
+        this.imagePosition = {
+          x,
+          y,
+          height,
+          width
+        };
+        this.imgScale = 'N/A';
+        // this.drawImage();
+        if (!this.paused) {
+          this.drawImage();
+        }
+      }
+    },
+    doZoomEnd() {
+      this.imgScale = this.video
+        ? Number(this.imagePosition.width / this.video.videoWidth).toFixed(2)
+        : 'N/A';
+    },
+    handleDrag(offset) {
+      this.broadCast({
+        name: 'doDrag',
+        data: { offset: offset, id: this.path }
+      });
+    },
     handleZoom(rate, mousePos) {
       this.broadCast({
         name: 'doZoom',
-        data: { rate: rate, mousePos: mousePos, id: this.videoSrc }
+        data: { rate: rate, mousePos: mousePos, id: this.path }
       });
     },
     handleZoomEnd() {
@@ -677,10 +725,12 @@ export default {
       }
       offCtx.drawImage(this.bitMap, 0, 0);
       this.bitMap.close();
+      this.bitMap = null;
       this.bitMap = offsreen.transferToImageBitmap();
       this.drawImage();
     },
     reverse(direction) {
+      console.log('reverse', direction);
       let offscreenWidth = this.bitMap.width;
       let offscreenHight = this.bitMap.height;
       let offsreen = new OffscreenCanvas(offscreenWidth, offscreenHight);
@@ -696,6 +746,7 @@ export default {
       }
       offCtx.drawImage(this.bitMap, 0, 0);
       this.bitMap.close();
+      this.bitMap = null;
       this.bitMap = offsreen.transferToImageBitmap();
       this.drawImage(this.bitMap);
     },
@@ -703,7 +754,7 @@ export default {
       const { beSameSize, position } = data;
       if (
         this.selectedId ||
-        (!this.selectedId && this.videoSrc !== this.videoList[0])
+        (!this.selectedId && this.path !== this.videoList[0])
       ) {
         if (beSameSize) {
           let { x, y, width, height } = position;
@@ -720,11 +771,11 @@ export default {
     getSelectedPosition(data, callback) {
       if (
         this.selected ||
-        this.videoSrc === this.selectedId ||
-        (!this.selectedId && this.videoSrc === this.videoList[0])
+        this.path === this.selectedId ||
+        (!this.selectedId && this.path === this.videoList[0])
       ) {
         callback({
-          id: this.videoSrc,
+          id: this.path,
           position: this.imagePosition
         });
       }
@@ -732,24 +783,24 @@ export default {
   }
 };
 </script>
-
 <style scoped lang="scss">
 @import '@/styles/variables.scss';
-.video-canvas {
-  height: 100%;
-  z-index: 1;
+.image-canvas {
   .header {
     height: 18px;
     line-height: 16px;
     background-color: #f6f6f6;
+    padding-right: 10px;
   }
-  #canvas-container {
-    height: auto;
-    width: 100%;
+  .canvas-container {
     .canvas-item {
       position: relative;
       width: 100%;
       height: 100%;
+      img {
+        object-fit: contain;
+        vertical-align: middle;
+      }
       ::v-deep {
         input,
         .el-input-group__append {
@@ -767,8 +818,13 @@ export default {
         }
       }
 
+      .canvas {
+        vertical-align: middle;
+        font-size: 0;
+      }
+
       /** default canvas background */
-      // canvas {
+      // .canvas-style {
       //   background: #e3e7e9;
       //   background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0),
       //     linear-gradient(45deg, transparent 75%, #f6fafc 0),
@@ -776,24 +832,11 @@ export default {
       //     linear-gradient(45deg, transparent 75%, #f6fafc 0);
       //   background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
       //   background-size: 20px 20px;
-      //   vertical-align: middle;
-      //   font-size: 0;
       // }
-      img {
-        object-fit: contain;
-        vertical-align: middle;
-      }
+
       #feedback {
         position: absolute;
         border: 1px solid red;
-      }
-      #preview {
-        position: absolute;
-        top: 0;
-        right: 14px;
-        z-index: 1;
-        padding: 0;
-        font-size: 17px;
       }
     }
   }

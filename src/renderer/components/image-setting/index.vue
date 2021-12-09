@@ -81,13 +81,12 @@
           ></el-input-number>
         </div>
       </div>
-      <el-button
-        slot="reference"
-        type="text"
-        @click="visible = !visible"
-        :class="{ enabled: visible }"
-      >
-        <svg-icon icon-class="settings" style="font-size: 22px;"></svg-icon>
+      <el-button slot="reference" type="text" @click="visible = !visible">
+        <svg-icon
+          :clicked="visible"
+          icon-class="settings"
+          style="font-size: 22px;"
+        ></svg-icon>
       </el-button>
     </el-popover>
   </div>
@@ -223,11 +222,6 @@ export default {
     .setting-item {
       margin-top: 10px;
     }
-  }
-}
-.enabled {
-  .svg-icon {
-    color: $primaryColor;
   }
 }
 </style>

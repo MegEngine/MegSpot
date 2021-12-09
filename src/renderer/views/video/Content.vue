@@ -16,11 +16,11 @@
   </div>
 </template>
 <script>
-import ImageCanvas from './components/ImageCanvas';
+import ImageCanvas from './components/videoCanvas';
 import { throttle } from '@/utils';
 import * as GLOBAL_CONSTANTS from '@/constants';
 import { createNamespacedHelpers } from 'vuex';
-const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
+const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 export default {
   components: { ImageCanvas },
   data() {
@@ -50,9 +50,9 @@ export default {
   },
   created() {
     // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
-    if (this.imageList.length <= 4) {
+    if (this.videoList.length <= 4) {
       let smartLayout;
-      switch (this.imageList.length) {
+      switch (this.videoList.length) {
         case 1:
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X1;
           break;
@@ -66,9 +66,9 @@ export default {
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X2;
           break;
         default:
-          smartLayout = this.imageConfig.layout;
+          smartLayout = this.videoConfig.layout;
       }
-      this.setImageConfig({ layout: smartLayout });
+      this.setVideoConfig({ layout: smartLayout });
     }
   },
   mounted() {
@@ -86,24 +86,24 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(['imageList', 'imageConfig']),
+    ...mapGetters(['videoList', 'videoConfig']),
     // 每组图片数量
     groupCount() {
-      const str = this.imageConfig.layout,
+      const str = this.videoConfig.layout,
         len = str.length;
       return str[len - 3] * str[len - 1];
     },
     // 当前组的图片列表
     imageGroupList() {
-      return this.imageList.length
-        ? this.imageList.slice(
+      return this.videoList.length
+        ? this.videoList.slice(
             this.groupStartIndex,
             this.groupStartIndex + this.groupCount
           )
         : [];
     },
     containerStyle() {
-      switch (this.imageConfig.layout) {
+      switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
           return {
             display: 'flex',
@@ -145,7 +145,7 @@ export default {
     }
   },
   watch: {
-    imageList() {
+    videoList() {
       this.$nextTick(() => {
         this.calcCanvasSize();
       });
@@ -156,7 +156,7 @@ export default {
         this.udpateAllCanvas();
       });
     },
-    'imageConfig.layout'() {
+    'videoConfig.layout'() {
       this.$nextTick(() => {
         this.calcCanvasSize();
         this.udpateAllCanvas();
@@ -164,11 +164,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['setVideoConfig']),
     // 接收改变当前图片分组的开始序号
     changeGroup(groupStartIndex) {
       this.groupStartIndex = groupStartIndex;
     },
-    ...mapActions(['setImageConfig']),
     handleResize: throttle(50, function() {
       this.calcCanvasSize();
       // 重新布局图片容器;
@@ -186,7 +186,7 @@ export default {
     },
     calcWidth() {
       const containerWidth = document.body.clientWidth;
-      switch (this.imageConfig.layout) {
+      switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
           return containerWidth;
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
@@ -208,7 +208,7 @@ export default {
         .getBoundingClientRect();
       const containerHeight =
         document.body.clientHeight - toolbarInfo.height - headerInfo.height;
-      switch (this.imageConfig.layout) {
+      switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
         case GLOBAL_CONSTANTS.LAYOUT_3X1:
@@ -382,22 +382,22 @@ export default {
       //获取列数
       if (
         [GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(
-          this.imageConfig.layout
+          this.videoConfig.layout
         )
       ) {
         return 3;
       }
       if (
         [GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(
-          this.imageConfig.layout
+          this.videoConfig.layout
         )
       ) {
         return 2;
       }
-      if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.videoConfig.layout)) {
         return 4;
       }
-      if ([GLOBAL_CONSTANTS.LAYOUT_1X1].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_1X1].includes(this.videoConfig.layout)) {
         return 1;
       }
     }

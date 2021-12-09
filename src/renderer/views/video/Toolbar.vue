@@ -7,18 +7,18 @@
         >
       </div>
       <Gallery
-        :selectedList="imageList"
+        :selectedList="videoList"
         :focusListIndex="
           new Array(groupCount).fill(0).map((_, index) => index + startIndex)
         "
-        @update="setImages"
-        @remove="removeImages"
+        @update="setVideos"
+        @remove="removeVideos"
       >
         <template v-slot:headButton>
-          <el-badge :value="imageList.length" class="item">
+          <el-badge :value="videoList.length" class="item">
             <el-button
               type="text"
-              :disabled="!imageList.length"
+              :disabled="!videoList.length"
               v-tip.sure.right="
                 'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
               "
@@ -37,8 +37,8 @@
         icon="el-icon-circle-close"
         v-tip="$t('general.clearAll')"
         class="clear-images"
-        :disabled="!imageList.length"
-        @click="emptyImages"
+        :disabled="!videoList.length"
+        @click="emptyVideos"
       />
       <el-input-number
         v-model="groupNum"
@@ -66,6 +66,40 @@
       </div>
     </div>
     <div class="middle">
+      <el-button-group class="gap">
+        <el-button
+          type="text"
+          v-tip="$t('video.play')"
+          @click="changeStatus(CONSTANTS.VIDEO_STATUS_START)"
+        >
+          <span class="svg-container">
+            <svg-icon icon-class="play" :clicked="!videoPaused" />
+          </span>
+        </el-button>
+        <el-button
+          type="text"
+          @click="changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE)"
+          v-tip="$t('video.pause')"
+        >
+          <span class="svg-container">
+            <svg-icon icon-class="pause" :clicked="videoPaused" />
+          </span>
+        </el-button>
+        <el-button
+          type="text"
+          @click="changeStatus(CONSTANTS.VIDEO_STATUS_RESET)"
+          v-tip="$t('video.reset')"
+        >
+          <span class="svg-container">
+            <svg-icon icon-class="restart" />
+          </span>
+        </el-button>
+        <el-button type="text" @click="changeLoop" v-tip="$t('video.loop')">
+          <span class="svg-container" flex="cross:center">
+            <svg-icon icon-class="loop" :clicked="loop" />
+          </span>
+        </el-button>
+      </el-button-group>
       <el-button-group class="gap">
         <el-button
           type="text"
@@ -133,7 +167,7 @@
         </el-button>
         <GifDialog
           ref="gifDialog"
-          :selectList="imageList.slice(startIndex, startIndex + groupCount)"
+          :selectList="videoList.slice(startIndex, startIndex + groupCount)"
         ></GifDialog>
       </el-button-group>
     </div>
@@ -160,6 +194,7 @@
         <el-button-group class="gap">
           <el-button
             type="text"
+            :disabled="!videoPaused"
             @click="rotate(90)"
             size="mini"
             v-tip="$t('imageCenter.rotate')"
@@ -170,6 +205,7 @@
           </el-button>
           <el-button
             type="text"
+            :disabled="!videoPaused"
             @click="reverse(1)"
             v-tip="$t('imageCenter.horizontalFlip')"
             size="mini"
@@ -181,6 +217,7 @@
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @click="reverse(-1)"
             v-tip="$t('imageCenter.verticalFlip')"
           >
@@ -263,53 +300,57 @@
 </template>
 <script>
 import * as GLOBAL_CONSTANTS from '@/constants';
+import * as CONSTANTS from './video-constants';
 import Gallery from '@/components/gallery';
 import { createNamespacedHelpers } from 'vuex';
 import GifDialog from '@/components/gif-dialog';
 import ImageSetting from '@/components/image-setting';
-const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
+const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 
 export default {
   data() {
     return {
+      CONSTANTS,
       GLOBAL_CONSTANTS,
       dialogVisible: false,
       traggerRGB: false,
       showSelectedMsg: false,
       groupNum: 0,
       startIndex: 0,
-      offset: 0
+      offset: 0,
+      loop: true,
+      videoPaused: false
     };
   },
   components: { Gallery, GifDialog, ImageSetting },
   computed: {
-    ...mapGetters(['imageList', 'imageConfig']),
+    ...mapGetters(['videoList', 'videoConfig']),
     maxGroupNum() {
       return Math.ceil(
-        this.imageList.length / (this.layout[0] * this.layout[2])
+        this.videoList.length / (this.layout[0] * this.layout[2])
       );
     },
     // 每组图片数量
     groupCount() {
-      const str = this.imageConfig.layout,
+      const str = this.videoConfig.layout,
         len = str.length;
       return str[len - 3] * str[len - 1];
     },
     smooth: {
       get() {
-        return this.imageConfig.smooth;
+        return this.videoConfig.smooth;
       },
       set(newVal) {
-        this.setImageConfig({ smooth: newVal });
+        this.setVideoConfig({ smooth: newVal });
       }
     },
     layout: {
       get() {
-        return this.imageConfig.layout;
+        return this.videoConfig.layout;
       },
       set(val) {
         const preNum = this.groupCount * (this.groupNum - 1);
-        this.setImageConfig({ layout: val });
+        this.setVideoConfig({ layout: val });
         const afterNum = this.groupCount * (this.groupNum - 1);
         this.offset = preNum - afterNum;
         this.startIndex = Math.max(
@@ -323,10 +364,10 @@ export default {
   },
   methods: {
     ...mapActions([
-      'emptyImages',
-      'removeImages',
-      'setImageConfig',
-      'setImages'
+      'emptyVideos',
+      'removeVideos',
+      'setVideoConfig',
+      'setVideos'
     ]),
     handleHotKey(event) {
       // esc
@@ -355,6 +396,13 @@ export default {
         this.groupNum++;
         this.changeGroup(this.groupNum, this.groupNum - 1);
       }
+    },
+    changeStatus(status) {
+      this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status);
+    },
+    changeLoop() {
+      this.loop = !this.loop;
+      this.$bus.$emit('changeLoop', this.loop);
     },
     changeGroup(groupNum, oldGroupNum) {
       this.startIndex = Math.max(
@@ -388,12 +436,15 @@ export default {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_RESET);
       this.imgScale = 1;
     },
+    handleChangeVideoPaused(videoPaused) {
+      this.videoPaused = videoPaused;
+    },
     goBack() {
       if (window.history.length > 1) {
         this.$router.back();
       } else {
         // 如果强制reload导致没有历史路由 唯一的历史就是当前页面 则回到默认的历史页面
-        this.$router.push('/image/index');
+        this.$router.push('/video/index');
       }
     },
     resetCanvas(data) {
@@ -444,10 +495,12 @@ export default {
   mounted() {
     window.addEventListener('keydown', this.handleHotKey, true);
     this.$bus.$on('image_handleSelect', this.handleSelect);
+    this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused);
   },
   beforeDestroy() {
     window.removeEventListener('keydown', this.handleHotKey, true);
     this.$bus.$off('image_handleSelect', this.handleSelect);
+    this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused);
   }
 };
 </script>

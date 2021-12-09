@@ -33,12 +33,12 @@ export const truncateText = (str, len, ellipsis = '...') => {
     const contentLen = len - ellipsis.length;
     const content = str.slice(0, contentLen);
     return content + ellipsis;
-  }
+  }s
 };
 
 export const isImage = (src) =>
-  /\.(jpe?g|gif|ico|pcx|svg|bmp|tif|png|raw|tga)(\?.*)?$/.test(src) ||
-  /\.(JPE?G|GIF|ICO|PCX|SVG|BMP|TIF|PNG|RAW|TGA)(\?.*)?$/.test(src);
+  /\.(jpe?g|ico|pcx|svg|bmp|tif|png|raw|tga)(\?.*)?$/.test(src) ||
+  /\.(JPE?G|ICO|PCX|SVG|BMP|TIF|PNG|RAW|TGA)(\?.*)?$/.test(src);
 export const isVideo = (src) =>
   /(.*)\.(mp4|mov|rmvb|avi|ts)$/.test(src) ||
   /(.*)\.(MP4|MOV|RMVB|AVI|TS)$/.test(src);
