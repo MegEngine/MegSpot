@@ -210,12 +210,12 @@ export default {
               }
             })
             .on('change', (path, details) => {
-              console.log('video--change', path, details);
+              console.log('image--change', path, details);
               this.initImage(false);
             })
             .on('unlink', (path, details) => {
-              console.log('video--remove', path, details);
-              this.removeVideos(path);
+              console.log('image--remove', path, details);
+              this.removeImages(path);
             });
         }
       },
@@ -229,15 +229,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['removeVideos']),
+    ...mapActions(['removeImages']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, _width, _height) {
       const cw = this._width,
         ch = this._height,
         iw = _width ?? this.imagePosition.width,
         ih = _height ?? this.imagePosition.height;
-      const constantsW = DRAG_CONSTANTS * iw,
-        constantsH = DRAG_CONSTANTS * ih;
+      const constantsW = DRAG_CONSTANTS * (cw > iw ? cw : iw),
+        constantsH = DRAG_CONSTANTS * (ch > ih ? ch : ih);
 
       let isFullFilled =
         transX <= constantsW &&

@@ -1,5 +1,5 @@
 <template>
-  <div class="image-center" flex="dir:top box:first">
+  <div class="video-center" flex="dir:top box:first">
     <Toolbar></Toolbar>
     <Content ref="content" class="content-container"></Content>
   </div>
@@ -10,7 +10,7 @@ import Toolbar from './Toolbar';
 import Content from './Content';
 
 export default {
-  name: 'image-compare',
+  name: 'video-compare',
   components: {
     Toolbar,
     Content
@@ -18,7 +18,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.image-center {
+.video-center {
   height: 100%;
   .content-container {
     background: #f4f4f5;

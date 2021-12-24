@@ -21,6 +21,7 @@ import { throttle } from '@/utils';
 import * as GLOBAL_CONSTANTS from '@/constants';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
+
 export default {
   components: { ImageCanvas },
   data() {

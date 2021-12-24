@@ -5,24 +5,37 @@
     class="canvas-container"
     :style="containerStyle"
   >
-    <div v-for="imgs in imageGroupList" :key="imgs">
-      <ImageCanvas
+    <div v-for="(video, index) in videoGroupList" :key="index">
+      <VideoCanvas
         ref="image_canvas"
-        :path="imgs"
+        :index="index"
+        :path="video"
         :_width="canvasWidth"
         :_height="canvasHeight"
-      ></ImageCanvas>
+      ></VideoCanvas>
     </div>
+    <Sticky>
+      <template v-slot:icon>
+        <el-button type="text">
+          <span class="svg-container">
+            <svg-icon icon-class="play" :clicked="true" />
+          </span>
+        </el-button>
+      </template>
+      <VideoProgressBar />
+    </Sticky>
   </div>
 </template>
 <script>
-import ImageCanvas from './components/videoCanvas';
+import VideoCanvas from './components/videoCanvas';
+import Sticky from '@/components/sticky';
+import VideoProgressBar from './components/videoProgressBar';
 import { throttle } from '@/utils';
 import * as GLOBAL_CONSTANTS from '@/constants';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 export default {
-  components: { ImageCanvas },
+  components: { VideoCanvas, Sticky, VideoProgressBar },
   data() {
     return {
       canvasWidth: 0,
@@ -94,7 +107,7 @@ export default {
       return str[len - 3] * str[len - 1];
     },
     // 当前组的图片列表
-    imageGroupList() {
+    videoGroupList() {
       return this.videoList.length
         ? this.videoList.slice(
             this.groupStartIndex,
@@ -150,7 +163,7 @@ export default {
         this.calcCanvasSize();
       });
     },
-    imageGroupList() {
+    videoGroupList() {
       this.$nextTick(() => {
         this.calcCanvasSize();
         this.udpateAllCanvas();
@@ -186,6 +199,7 @@ export default {
     },
     calcWidth() {
       const containerWidth = document.body.clientWidth;
+      this.containerWidth = containerWidth;
       switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
           return containerWidth;
@@ -208,6 +222,7 @@ export default {
         .getBoundingClientRect();
       const containerHeight =
         document.body.clientHeight - toolbarInfo.height - headerInfo.height;
+      this.containerHeight = containerHeight;
       switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
@@ -408,6 +423,8 @@ export default {
 #image-container {
   overflow-x: hidden;
   gap: 2px;
+  width: 100%;
+  height: 100%;
   .canvas-item + .canvas-item {
     border-left: 1px solid red;
   }
@@ -424,5 +441,8 @@ export default {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
+.svg-container {
+  font-size: 24px;
 }
 </style>

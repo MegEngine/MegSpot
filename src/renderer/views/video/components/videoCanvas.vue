@@ -81,6 +81,10 @@ export default {
     EffectPreview
   },
   props: {
+    index: {
+      type: Number,
+      default: 0
+    },
     path: {
       type: String,
       default: ''
@@ -100,6 +104,7 @@ export default {
       wacther: undefined,
       header: null,
       canvas: null,
+      currentTime: 0,
       video: null,
       paused: true,
       maskDom: undefined,
@@ -161,6 +166,10 @@ export default {
         {
           event: 'changeLoop',
           action: 'changeLoop'
+        },
+        {
+          event: 'videoChangeTime',
+          action: 'handleVideoChangeTime'
         }
       ],
       histVisible: true,
@@ -196,7 +205,6 @@ export default {
 
     this.initCanvas();
     this.initVideo();
-
     this.listenEvents();
   },
   beforeDestroy() {
@@ -224,12 +232,12 @@ export default {
               }
             })
             .on('change', (path, details) => {
-              console.log('image--change', path, details);
+              console.log('video--change', path, details);
               this.initImage(false);
             })
             .on('unlink', (path, details) => {
-              console.log('image--remove', path, details);
-              this.removeImages(path);
+              console.log('video--remove', path, details);
+              this.removeVideos(path);
             });
         }
       },
@@ -243,15 +251,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['removeImages']),
+    ...mapActions(['removeVideos']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, _width, _height) {
       const cw = this._width,
         ch = this._height,
         iw = _width ?? this.imagePosition.width,
         ih = _height ?? this.imagePosition.height;
-      const constantsW = DRAG_CONSTANTS * iw,
-        constantsH = DRAG_CONSTANTS * ih;
+      const constantsW = DRAG_CONSTANTS * (cw > iw ? cw : iw),
+        constantsH = DRAG_CONSTANTS * (ch > ih ? ch : ih);
 
       let isFullFilled =
         transX <= constantsW &&
@@ -366,6 +374,9 @@ export default {
         this[name](data);
       }
     },
+    handleVideoChangeTime(currentTime) {
+      this.video.currentTime = currentTime;
+    },
     handleBroadcast({ name, data }) {
       if (this.selectedId) {
         if (data.id === this.path || this.selectedId === this.path) {
@@ -428,8 +439,27 @@ export default {
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         this.doZoomEnd();
         this.initImage(false);
+        this.currentTime = 0;
+        console.log(`video-${this.index + 1}: duration`, this.video.duration);
+        this.$bus.$emit('createMark', {
+          index: (this.index + 1).toString(),
+          num: Math.round(this.video.duration).toString()
+        });
         render();
       });
+      // this.video.addEventListener('timeupdate', evt => {
+      //   // 监听视频播放过程中的时间
+      //   if (Math.abs(this.video.currentTime - this.currentTime) > 1) {
+      //     // 广播更新
+      //     this.$bus.$emit('updateVideoTime', {
+      //       index: this.index + 1,
+      //       time: this.video.currentTime,
+      //       duration: this.video.duration
+      //     });
+      //   } else {
+      //     this.currentTime = this.video.currentTime;
+      //   }
+      // });
       this.video.src = this.path;
       this.video.autoplay = true;
       this.video.loop = true;
