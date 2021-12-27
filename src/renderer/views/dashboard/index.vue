@@ -18,23 +18,23 @@
       </entry-card>
     </div>
     <div class="help">
-      <VideoSwiper
+      <HelpVideo
         :videoSource="videoSource"
         :_width="size.width"
         :_height="size.height"
-      ></VideoSwiper>
+      ></HelpVideo>
     </div>
   </div>
 </template>
 
 <script>
 import EntryCard from './EntryCard';
-import VideoSwiper from './HelpVideo';
+import HelpVideo from './HelpVideo';
 import { throttle } from '@/utils';
 
 export default {
   name: 'dashboard',
-  components: { EntryCard, VideoSwiper },
+  components: { EntryCard, HelpVideo },
   data() {
     return {
       videoSource: [

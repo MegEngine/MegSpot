@@ -11,6 +11,15 @@
         @click="changeVisible(false)"
       >
       </canvas>
+      <el-button
+        class="close-icon"
+        icon="el-icon-circle-close"
+        size="medium"
+        type="text"
+        @click="changeVisible(false)"
+        v-show="visible"
+      >
+      </el-button>
     </div>
   </div>
 </template>
@@ -107,6 +116,11 @@ export default {
     #hist {
       width: 160px;
       height: 90px;
+    }
+    .close-icon {
+      position: absolute;
+      left: 161px;
+      top: 63px;
     }
   }
   #hist-icon {
