@@ -170,6 +170,10 @@ export default {
         {
           event: 'videoChangeTime',
           action: 'handleVideoChangeTime'
+        },
+        {
+          event: 'videoResetTime',
+          action: 'handleVideoResetTime'
         }
       ],
       histVisible: true,
@@ -233,7 +237,7 @@ export default {
             })
             .on('change', (path, details) => {
               console.log('video--change', path, details);
-              this.initImage(false);
+              this.initImage();
             })
             .on('unlink', (path, details) => {
               console.log('video--remove', path, details);
@@ -375,7 +379,15 @@ export default {
       }
     },
     handleVideoChangeTime(currentTime) {
-      this.video.currentTime = currentTime;
+      if (this.video.duration >= currentTime) {
+        if (Math.abs(this.video.currentTime - currentTime) > 1) {
+          this.video.currentTime = currentTime;
+          this.video.play();
+        }
+      } else {
+        this.video.currentTime = this.video.duration;
+        this.video.pause();
+      }
     },
     handleBroadcast({ name, data }) {
       if (this.selectedId) {
@@ -386,7 +398,11 @@ export default {
         this[name](data);
       }
     },
-    async initImage(initPosition = true) {
+    handleVideoResetTime() {
+      this.video.currentTime = 0;
+      this.video.play();
+    },
+    async initImage(initPosition = false) {
       if (!this.paused) {
         let offsreen = new OffscreenCanvas(
           this.video.videoWidth,
@@ -396,7 +412,9 @@ export default {
         offCtx.drawImage(this.video, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
       }
-      if (initPosition || !this.imagePosition) {
+      // 删除initPosition判断， 默认不进行图像位置重置
+      if (!this.imagePosition && isNaN(this.imagePosition?.height)) {
+        console.log('initPosition', initPosition, this.imagePosition);
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
       }
       this.doZoomEnd();
@@ -433,11 +451,13 @@ export default {
       this.video = document.createElement('video');
       this.video.addEventListener('canplay', () => {
         this.paused = false;
-        this.imagePosition = this.getImageInitPos(this.canvas, this.video);
+        if (!this.imagePosition || isNaN(this.imagePosition?.height)) {
+          this.imagePosition = this.getImageInitPos(this.canvas, this.video);
+        }
         this.doZoomEnd();
-        this.initImage(false);
+        this.initImage();
         this.currentTime = 0;
-        console.log(`video-${this.index + 1}: duration`, this.video.duration);
+        // console.log(`video-${this.index + 1}: duration`, this.video.duration);
         this.$bus.$emit('createMark', {
           index: (this.index + 1).toString(),
           num: Math.round(this.video.duration).toString()
@@ -446,7 +466,7 @@ export default {
       });
       this.video.src = this.path;
       this.video.autoplay = true;
-      this.video.loop = true;
+      this.video.loop = false;
     },
     startAnimation() {
       this.stopAnimation();
@@ -465,7 +485,7 @@ export default {
     },
     // 供外部直接调用 待测试
     reMount() {
-      this.initImage();
+      this.initImage(true);
       this.initCanvas();
       this.image.onload = () => {
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
@@ -580,12 +600,12 @@ export default {
         this.doZoomEnd();
         this.drawImage();
       } else {
-        this.initImage();
+        this.initImage(true);
       }
     },
     reDraw() {
       // 待测试
-      window.requestAnimationFrame(() => this.initImage(false));
+      window.requestAnimationFrame(this.initImage);
     },
     getImageInitPos(canvas, video) {
       const cw = canvas.width;

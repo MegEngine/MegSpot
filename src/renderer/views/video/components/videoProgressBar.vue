@@ -1,7 +1,7 @@
 <template>
   <div class="process-container" ref="container">
     <el-slider
-      v-model="value"
+      :value="currentTime"
       :max="max"
       :marks="marks"
       :format-tooltip="formatter"
@@ -14,6 +14,10 @@
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex';
+const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
+import * as CONSTANTS from '../video-constants';
+
 export default {
   name: 'VideoProgressBar',
   data() {
@@ -35,12 +39,50 @@ export default {
   mounted() {
     this.$bus.$on('createMark', this.createMark);
     this.$bus.$on('updateVideoTime', this.updateVideoTime);
+    this.$bus.$on(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, this.executeAction);
+    this.countDown();
   },
   beforeDestroy() {
     this.$bus.$off('createMark', this.createMark);
     this.$bus.$off('updateVideoTime', this.updateVideoTime);
+    this.$bus.$off(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, this.executeAction);
   },
   methods: {
+    ...mapActions(['setVideoConfig']),
+    countDown(startTime = 0) {
+      this.getTime(startTime);
+    },
+    getTime(currentTime) {
+      this.timer && clearTimeout(this.timer);
+      if (this.max > 0 && currentTime >= this.max) {
+        this.$bus.$emit('videoResetTime');
+        this.countDown();
+        return;
+      }
+      this.timer = setTimeout(() => {
+        this.setVideoConfig({ currentTime: currentTime + 1 });
+        this.getTime(currentTime + 1);
+      }, 1000);
+    },
+    executeAction(action) {
+      switch (action) {
+        case CONSTANTS.VIDEO_STATUS_START:
+          this.countDown(this.currentTime);
+          break;
+        case CONSTANTS.VIDEO_STATUS_PAUSE:
+          this.stopVideoTime();
+          break;
+        case CONSTANTS.VIDEO_STATUS_RESET:
+          this.countDown();
+          break;
+        default:
+          console.error('unknown actions:' + action);
+          break;
+      }
+    },
+    stopVideoTime() {
+      this.timer && clearTimeout(this.timer);
+    },
     updateVideoTime(obj) {
       console.log('updateVideoTime', obj);
     },
@@ -48,6 +90,10 @@ export default {
       this.changed = value === this.lastValue;
       if (value !== this.lastValue) {
         this.lastValue = value;
+        if (this.currentTime != value) {
+          this.setVideoConfig({ currentTime: value });
+          this.countDown(value);
+        }
         this.$bus.$emit('videoChangeTime', value);
       }
     },
@@ -107,11 +153,20 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['videoList', 'videoConfig']),
+    currentTime() {
+      return this.videoConfig.currentTime;
+    }
+  },
   watch: {
     changed(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.$parent.$emit('changed', newVal);
       }
+    },
+    max() {
+      this.countDown();
     }
   }
 };
@@ -125,9 +180,10 @@ export default {
   width: 100%;
 
   ::v-deep {
-    .el-slider {
-      width: 500px;
-    }
+    /** 进度条宽度 */
+    // .el-slider {
+    //   width: 500px;
+    // }
     .el-slider__marks-text {
       text-align: center;
     }
