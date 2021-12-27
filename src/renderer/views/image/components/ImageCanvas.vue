@@ -236,8 +236,8 @@ export default {
         ch = this._height,
         iw = _width ?? this.imagePosition.width,
         ih = _height ?? this.imagePosition.height;
-      const constantsW = DRAG_CONSTANTS * (cw > iw ? cw : iw),
-        constantsH = DRAG_CONSTANTS * (ch > ih ? ch : ih);
+      const constantsW = DRAG_CONSTANTS * (cw < iw ? cw : iw),
+        constantsH = DRAG_CONSTANTS * (ch < ih ? ch : ih);
 
       let isFullFilled =
         transX <= constantsW &&

@@ -3,7 +3,7 @@
     <div class="nav-container" flex="main:justify cross:center" flex-box="1">
       <img
         src="../../assets/images/big_logo_white.png"
-        style="vertical-align: middle; height:40px"
+        style="padding-top: 5px; height:40px"
         @click="jumpToDashboard"
       />
       <div class="left-menu">

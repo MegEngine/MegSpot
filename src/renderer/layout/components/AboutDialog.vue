@@ -126,6 +126,10 @@ export default {
           key: 'cmd/ctrl+enter'
         },
         {
+          cmd: 'empty all selected files',
+          key: 'cmd/ctrl+delete'
+        },
+        {
           cmd: 'back to file select',
           key: 'esc'
         },
