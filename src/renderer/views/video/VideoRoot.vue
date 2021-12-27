@@ -41,18 +41,19 @@
           title="unselected all"
           style="margin-right:10px"
           :disabled="!videoList.length"
+          v-tip.sure="`${$t('common.hotKey')}：cmd/ctrl+delete`"
           @click="emptyVideos"
         >
         </el-button>
         <el-button
-          type="text"
-          size="small"
+          type="primary"
+          round
           class="tool-item"
           :disabled="!videoList.length"
           @click="compare"
           v-on:keyup.meta.enter="compare"
           v-on:keydown.tab="compare"
-          v-tip="`${$t('common.hotKey')}：cmd/ctrl+enter`"
+          v-tip.sure="`${$t('common.hotKey')}：cmd/ctrl+enter`"
         >
           {{ $t('general.compare') }}
         </el-button>
@@ -145,6 +146,10 @@ export default {
       // cmd+enter
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 13) {
         this.compare();
+      }
+      // cmd+delete
+      if ((event.metaKey || event.ctrlKey) && event.keyCode === 8) {
+        this.emptyVideos();
       }
     },
     calcSplitHeight() {

@@ -4,9 +4,18 @@
       <el-button
         type="text"
         size="medium"
-        @click="videoVisible = !videoVisible"
+        @click="videoVisible = true"
+        v-show="videoVisible == false"
       >
         {{ $t('common.showVideoTip') }}
+      </el-button>
+      <el-button
+        icon="el-icon-circle-close"
+        size="medium"
+        type="text"
+        @click="videoVisible = false"
+        v-show="videoVisible == true"
+      >
       </el-button>
     </div>
     <div flex="main:center">

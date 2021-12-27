@@ -41,13 +41,14 @@
           style="margin-right:10px"
           title="unselected all"
           :disabled="!imageList.length"
+          v-tip.sure="`${$t('common.hotKey')}：cmd/ctrl+delete`"
           @click="emptyImages"
         />
 
         <el-button
-          type="text"
-          size="small"
-          v-tip="`${$t('common.hotKey')}：cmd/ctrl+enter`"
+          type="primary"
+          round
+          v-tip.sure="`${$t('common.hotKey')}：cmd/ctrl+enter`"
           class="tool-item"
           :disabled="!imageList.length"
           @click="compare"
@@ -55,8 +56,8 @@
           {{ $t('general.compare') }}
         </el-button>
         <el-button
-          type="text"
-          size="small"
+          type="primary"
+          round
           title="drag-drop-compare"
           class="tool-item"
           :disabled="!imageList.length"
@@ -153,6 +154,10 @@ export default {
       // cmd+enter
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 13) {
         this.compare();
+      }
+      // cmd+delete
+      if ((event.metaKey || event.ctrlKey) && event.keyCode === 8) {
+        this.emptyImages();
       }
     },
     compare() {
