@@ -371,21 +371,10 @@ export default {
       );
       this.$bus.$emit('changeGroup', this.startIndex);
     },
-    changeZoom(newV, oldV) {
-      if (newV >= GLOBAL_CONSTANTS.SCALE_CONSTANTS) {
-        this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_SET_ZOOM, {
-          imgScale: newV,
-          currentZoom: oldV,
-          lastX: this.lastX,
-          lastY: this.lastY
-        });
-      }
-    },
     handleSelect(data) {
       this.showSelectedMsg = !!data;
     },
     handleReset() {
-      this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_RESET);
       this.imgScale = 1;
     },
     goBack() {

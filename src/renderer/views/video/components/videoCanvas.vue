@@ -311,7 +311,7 @@ export default {
           this.video.pause();
           this.paused = true;
           this.$bus.$emit('changeVideoPaused', true);
-          this.generateHist();
+          this.requestGenerateHist();
           break;
         case CONSTANTS.VIDEO_STATUS_RESET:
           this.video.currentTime = 0;
@@ -403,8 +403,11 @@ export default {
       this.drawImage();
 
       if (!this.currentHist) {
-        this.generateHist();
+        this.requestGenerateHist();
       }
+    },
+    requestGenerateHist() {
+      window.requestAnimationFrame(this.generateHist);
     },
     generateHist() {
       try {
@@ -427,12 +430,6 @@ export default {
       });
     },
     initVideo() {
-      const render = () => {
-        if (this.video !== null) {
-          this.drawImage();
-        }
-        window.requestAnimationFrame(render);
-      };
       this.video = document.createElement('video');
       this.video.addEventListener('canplay', () => {
         this.paused = false;
@@ -445,31 +442,33 @@ export default {
           index: (this.index + 1).toString(),
           num: Math.round(this.video.duration).toString()
         });
-        render();
+        this.startAnimation();
       });
-      // this.video.addEventListener('timeupdate', evt => {
-      //   // 监听视频播放过程中的时间
-      //   if (Math.abs(this.video.currentTime - this.currentTime) > 1) {
-      //     // 广播更新
-      //     this.$bus.$emit('updateVideoTime', {
-      //       index: this.index + 1,
-      //       time: this.video.currentTime,
-      //       duration: this.video.duration
-      //     });
-      //   } else {
-      //     this.currentTime = this.video.currentTime;
-      //   }
-      // });
       this.video.src = this.path;
       this.video.autoplay = true;
       this.video.loop = true;
+    },
+    startAnimation() {
+      this.stopAnimation();
+      const render = () => {
+        if (this.video !== null) {
+          this.drawImage();
+        }
+        this.requestId = window.requestAnimationFrame(render);
+      };
+      render();
+    },
+    stopAnimation() {
+      if (this.requestId) {
+        window.cancelAnimationFrame(this.requestId);
+      }
     },
     // 供外部直接调用 待测试
     reMount() {
       this.initImage();
       this.initCanvas();
       this.image.onload = () => {
-        this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
+        this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         this.drawImage();
       };
       this.image.src = getImageUrlSyncNoCache(this.path);
@@ -559,6 +558,7 @@ export default {
     // 外部直接调用
     setCoverStatus({ snapShot, hist }, status) {
       if (status) {
+        this.stopAnimation();
         this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.cs.drawImage(snapShot, 0, 0);
         if (this.$refs['hist-container'].visible) {
@@ -566,7 +566,7 @@ export default {
         }
       } else {
         this.maskDom = null;
-        this.drawImage();
+        this.startAnimation();
       }
     },
     reset(val) {
@@ -584,14 +584,15 @@ export default {
       }
     },
     reDraw() {
+      // 待测试
       window.requestAnimationFrame(() => this.initImage(false));
     },
-    getImageInitPos(canvas, image) {
+    getImageInitPos(canvas, video) {
       const cw = canvas.width;
       const ch = canvas.height;
 
-      const iw = image.width || image.videoWidth;
-      const ih = image.height || image.videoHeight;
+      const iw = video.videoWidth;
+      const ih = video.videoHeight;
 
       const canvasRadio = cw / ch;
       const imageRadio = iw / ih;

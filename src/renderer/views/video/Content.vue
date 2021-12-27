@@ -7,7 +7,7 @@
   >
     <div v-for="(video, index) in videoGroupList" :key="index">
       <VideoCanvas
-        ref="image_canvas"
+        ref="video_canvas"
         :index="index"
         :path="video"
         :_width="canvasWidth"
@@ -243,7 +243,7 @@ export default {
       );
     },
     getImageDetails(imageNameList, callback) {
-      let canvasViews = this.$refs['image_canvas'];
+      let canvasViews = this.$refs['video_canvas'];
       try {
         let details = canvasViews
           .filter(
@@ -262,7 +262,7 @@ export default {
       }
     },
     udpateAllCanvas() {
-      this.$refs['image_canvas'].forEach(item => {
+      this.$refs['video_canvas'].forEach(item => {
         // 重新设定宽高 然后重新绘制canvas
         item.height = Math.floor(this.canvasHeight);
         item.width = Math.floor(this.canvasWidth);
@@ -271,7 +271,7 @@ export default {
     },
     handleCompareOptions(direction) {
       const columnLen = this.getColumnLine();
-      const canvasViews = this.$refs['image_canvas'];
+      const canvasViews = this.$refs['video_canvas'];
       let snapShotArr = [];
       let coveredArr = [];
       if (

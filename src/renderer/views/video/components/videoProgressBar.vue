@@ -20,7 +20,6 @@ export default {
     return {
       value: 0,
       lastValue: 0,
-      count: 1,
       changed: false,
       max: 0,
       marks: {
@@ -60,7 +59,6 @@ export default {
         this.marks[num] = {
           label: this.$createElement('strong', index)
         };
-        this.count++;
       } else {
         const indexs = this.marks[num].label.children[0].text
           .toString()
