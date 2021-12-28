@@ -11,44 +11,16 @@
         >
           {{ $t('image.toolbar.addFolder') }}
         </el-button>
-        <el-badge :value="imageList.length" class="tool-item">
-          <Gallery
-            :selectedList="imageList"
-            @update="setImages"
-            @remove="removeImages"
-          >
-            <template v-slot:headButton>
-              <el-button
-                type="text"
-                size="mini"
-                :disabled="!imageList.length"
-                v-tip.sure="
-                  'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
-                "
-              >
-                {{ $t('general.selected') }}
-              </el-button>
-            </template>
-            <template v-slot:dragItem="item">
-              <img :src="item.src" :alt="item.alt" />
-            </template>
-          </Gallery>
-        </el-badge>
-        <el-button
-          type="text"
-          size="mini"
-          icon="el-icon-circle-close"
-          style="margin-right:10px"
-          title="unselected all"
-          :disabled="!imageList.length"
-          v-tip.sure="`${$t('common.hotKey')}：cmd/ctrl+delete`"
+        <SelectedBtn
+          :selectedList="imageList"
+          @update="setImages"
+          @remove="removeImages"
           @click="emptyImages"
         />
-
         <el-button
           type="primary"
           round
-          v-tip.sure="`${$t('common.hotKey')}：cmd/ctrl+enter`"
+          :title="`${$t('common.hotKey')}：cmd/ctrl+enter`"
           class="tool-item"
           :disabled="!imageList.length"
           @click="compare"
@@ -110,7 +82,7 @@
 <script>
 const { dialog } = require('electron').remote;
 import FileTree from '@/components/file-tree/FileTree.vue';
-import Gallery from '@/components/gallery';
+import SelectedBtn from '@/components/selected-btn';
 import ShowPath from '@/components/show-path';
 import ImagePreview from './ImagePreview';
 import { createNamespacedHelpers } from 'vuex';
@@ -119,7 +91,7 @@ import addDragFolderListener from '@/utils/dragFolder.js';
 
 export default {
   name: 'ImageRoot',
-  components: { FileTree, ImagePreview, Gallery, ShowPath },
+  components: { FileTree, ImagePreview, SelectedBtn, ShowPath },
   data() {
     return {
       isDraging: false,
@@ -232,6 +204,9 @@ export default {
   .tool {
     padding: 0 10px;
     border-bottom: 1px solid #eee;
+    .tool-items{
+      position: relative;
+    }
     .tool-item + .tool-item {
       margin-left: 10px;
     }

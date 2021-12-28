@@ -6,40 +6,16 @@
           ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
         >
       </div>
-      <Gallery
+      <SelectedBtn
         :selectedList="imageList"
         :focusListIndex="
           new Array(groupCount).fill(0).map((_, index) => index + startIndex)
         "
         @update="setImages"
         @remove="removeImages"
-      >
-        <template v-slot:headButton>
-          <el-badge :value="imageList.length" class="item">
-            <el-button
-              type="text"
-              :disabled="!imageList.length"
-              v-tip.sure.right="
-                'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
-              "
-            >
-              {{ $t('general.selected') }}
-            </el-button>
-          </el-badge>
-        </template>
-        <template v-slot:dragItem="item">
-          <img :src="item.src" :alt="item.alt" />
-        </template>
-      </Gallery>
-      <el-button
-        type="text"
-        size="large"
-        icon="el-icon-circle-close"
-        v-tip="$t('general.clearAll')"
-        class="clear-images"
-        :disabled="!imageList.length"
         @click="emptyImages"
-      />
+      >
+      </SelectedBtn>
       <el-input-number
         v-model="groupNum"
         @change="changeGroup"
@@ -263,13 +239,14 @@
 </template>
 <script>
 import * as GLOBAL_CONSTANTS from '@/constants';
-import Gallery from '@/components/gallery';
+import SelectedBtn from '@/components/selected-btn';
 import { createNamespacedHelpers } from 'vuex';
 import GifDialog from '@/components/gif-dialog';
 import ImageSetting from '@/components/image-setting';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
 export default {
+  components: { SelectedBtn, GifDialog, ImageSetting },
   data() {
     return {
       GLOBAL_CONSTANTS,
@@ -281,7 +258,6 @@ export default {
       offset: 0
     };
   },
-  components: { Gallery, GifDialog, ImageSetting },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
     maxGroupNum() {
