@@ -162,7 +162,9 @@ export default {
       })
     },
     showFile: function() {
+      // 过滤排序文件，根据当前是否showAll以及支持文件类型，正则等进行过滤
       return this.fileInfoList
+        .filter(item => item.name !== SORTING_FILE_NAME)
         .filter(item => {
           if (this.showAll) {
             return true;
