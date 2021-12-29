@@ -121,6 +121,9 @@ export default {
       position: absolute;
       left: 161px;
       top: 63px;
+      &:hover {
+        color: red;
+      }
     }
   }
   #hist-icon {

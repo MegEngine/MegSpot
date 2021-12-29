@@ -144,7 +144,7 @@ export default {
       this.$emit('getSortData', null, data => {
         const sortList = data.map(item => getFileName(item.path, false));
         this.sortList = sortList;
-        this.changed = false;
+        this.changed = true;
       });
     },
     // 外部直接调用

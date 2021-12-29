@@ -15,6 +15,7 @@
         type="text"
         @click="videoVisible = false"
         v-show="videoVisible == true"
+        :class="{ close: videoVisible }"
       >
       </el-button>
     </div>
@@ -30,7 +31,7 @@
       >
         <swiper-slide
           v-for="(video, index) in videoSource"
-          :key="video"
+          :key="index"
           class="video-container"
         >
           <span class="title">{{ video.title }}</span>
@@ -183,5 +184,8 @@ export default {
     position: absolute;
     bottom: 6px;
   }
+}
+.close:hover {
+  color: red;
 }
 </style>

@@ -104,6 +104,7 @@
         <el-button
           type="text"
           size="mini"
+          :disabled="!videoPaused"
           @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
           @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
           v-tip="$t('imageCenter.overlayLeft')"
@@ -115,6 +116,7 @@
         <el-button
           type="text"
           size="mini"
+          :disabled="!videoPaused"
           @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
           @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
           v-tip="$t('imageCenter.overlayRight')"
@@ -130,6 +132,7 @@
         <el-button
           type="text"
           size="mini"
+          :disabled="!videoPaused"
           @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
           @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
           v-tip="$t('imageCenter.overlayBottom')"
@@ -144,6 +147,7 @@
         <el-button
           type="text"
           size="mini"
+          :disabled="!videoPaused"
           @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
           @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
           v-tip="$t('imageCenter.overlayTop')"
