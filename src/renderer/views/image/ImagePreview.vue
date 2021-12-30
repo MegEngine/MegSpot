@@ -102,6 +102,9 @@ import SortToolBar from '@/components/sort-toolbar';
 import SortFileDialog from '@/components/sort-file-dialog';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
 
 export default {
   components: {
@@ -119,9 +122,16 @@ export default {
       thumbnailList: []
     };
   },
+  mounted() {
+    this.showType = this.defaultFileListShowType;
+  },
   computed: {
+    ...preferenceMapGetters(['preference']),
     ...mapGetters(['imageList', 'imageFolders', 'imageConfig']),
     ...mapGetters({ currentPathFromVuex: 'currentPath' }),
+    defaultFileListShowType() {
+      return this.preference.defaultFileListShowType;
+    },
     arr() {
       return this.imageList.filter(item => item.startsWith(this.currentPath));
     },
@@ -201,6 +211,12 @@ export default {
       } else {
         this.$message.error('File or folder does not exist ');
       }
+    }
+  },
+  watch: {
+    defaultFileListShowType(newVal) {
+      console.log();
+      this.showType = newVal;
     }
   }
 };

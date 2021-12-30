@@ -10,7 +10,9 @@ const preferenceStore = {
       },
       scaleOptions: [4, 2, 1, 0.5, 0.25],
       // 是否默认显示直方图
-      defaultShowHist: false
+      defaultShowHist: false,
+      // 列表显示模式 list(列表表格) / thumbnail(缩略图列表)
+      defaultFileListShowType: 'list'
     },
     lastRouterPath: '/dashboard'
   },

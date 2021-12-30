@@ -13,6 +13,7 @@
       range: true,
       checkMethod: checkSelectable
     }"
+    :edit-config="{ trigger: 'dblclick', mode: 'cell', showIcon: false }"
     :sort-config="{ sortMethod: customSortMethod }"
     show-overflow="tooltip"
     :tooltip-config="{ enterable: true }"
@@ -20,6 +21,7 @@
     header-cell-class-name="width_adaptive"
     :height="tableHeight"
     v-on="$listeners"
+    @cell-dblclick="handleCellDblClick"
     @checkbox-all="selectAll"
     @checkbox-change="select"
     @checkbox-range-end="handleRangeSelect"
@@ -42,6 +44,7 @@
       field="name"
       title="Name"
       sortable
+      :edit-render="{ autofocus: '.my-input', autoselect: true }"
     >
       <template #header>
         <div flex="cross:center">
@@ -69,6 +72,14 @@
           </search-input>
         </div>
       </template>
+      <template #edit="{ row }">
+        <input
+          :value="row.name"
+          type="text"
+          class="my-input"
+          @change="handleEditName"
+        />
+      </template>
     </vxe-column>
     <vxe-column
       sortable
@@ -85,6 +96,13 @@
       :title="$t('general.size')"
       field="size"
     >
+    </vxe-column>
+    <vxe-column show-overflow width="80" :title="$t('general.operate')">
+      <template #default="{ row }">
+        <el-button size="mini" type="text" @click="removeEvent(row)">
+          <svg-icon icon-class="bin" class="del-btn"></svg-icon>
+        </el-button>
+      </template>
     </vxe-column>
   </vxe-table>
 </template>
@@ -161,38 +179,43 @@ export default {
         this.searchString = newVal;
       })
     },
-    showFile: function() {
-      // 过滤排序文件，根据当前是否showAll以及支持文件类型，正则等进行过滤
-      return this.fileInfoList
-        .filter(item => item.name !== SORTING_FILE_NAME)
-        .filter(item => {
-          if (this.showAll) {
-            return true;
-          } else if (!this.showAll && this.checkItem(item)) {
-            return true;
-          }
-          return false;
-        })
-        .filter(item => {
-          let result;
-          try {
-            result =
-              !this.search ||
-              (this.regexpEnabled
-                ? new RegExp(this.search, 'ig').test(item.name)
-                : item.name
-                    .toString()
-                    .toLowerCase()
-                    .indexOf(this.search.toLowerCase()) > -1);
-          } catch {
-            result =
-              item.name
-                .toString()
-                .toLowerCase()
-                .indexOf(this.search.toLowerCase()) > -1;
-          }
-          return result;
-        });
+    showFile: {
+      get() {
+        // 过滤排序文件，根据当前是否showAll以及支持文件类型，正则等进行过滤
+        return this.fileInfoList
+          .filter(item => item.name !== SORTING_FILE_NAME)
+          .filter(item => {
+            if (this.showAll) {
+              return true;
+            } else if (!this.showAll && this.checkItem(item)) {
+              return true;
+            }
+            return false;
+          })
+          .filter(item => {
+            let result;
+            try {
+              result =
+                !this.search ||
+                (this.regexpEnabled
+                  ? new RegExp(this.search, 'ig').test(item.name)
+                  : item.name
+                      .toString()
+                      .toLowerCase()
+                      .indexOf(this.search.toLowerCase()) > -1);
+            } catch {
+              result =
+                item.name
+                  .toString()
+                  .toLowerCase()
+                  .indexOf(this.search.toLowerCase()) > -1;
+            }
+            return result;
+          });
+      },
+      set(data) {
+        console.log('setData', data);
+      }
     },
     sortFilePath() {
       return this.currentPath + DELIMITER + SORTING_FILE_NAME;
@@ -389,6 +412,29 @@ export default {
     handleRangeSelect({ records }) {
       this.addVuexItem(records.map(item => item.path));
     },
+    handleCellDblClick({ row }) {
+      this.oldFileName = row.name;
+    },
+    handleEditName(e) {
+      const newFileName = e.target.value;
+      const prefix = this.currentPath + DELIMITER;
+      if (this.oldFileName === newFileName) return;
+      fse
+        .move(prefix + this.oldFileName, prefix + newFileName)
+        .then(() => {
+          console.log(
+            'success rename file:' +
+              prefix +
+              this.oldFileName +
+              '->' +
+              prefix +
+              newFileName
+          );
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    },
     commonSelect(row) {
       const sortData = this.getSortData(); // 获取最终渲染的table数据
       const origin = this.origin; // 起点行
@@ -426,6 +472,32 @@ export default {
       } else {
         this.emptyVuexItems();
       }
+    },
+    async removeEvent(row) {
+      const filePath = this.currentPath + DELIMITER + row.name;
+      this.$confirm('确定删除该文件吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        'append-to-body': true
+      }).then(() => {
+        fse
+          .remove(filePath)
+          .then(() => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+            console.log('success delete file:' + filePath);
+          })
+          .catch(err => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });
+            console.error(err);
+          });
+      });
     },
     // 可外部直接调用触发逻辑
     async refreshFileList() {
@@ -470,7 +542,9 @@ export default {
 .table {
   width: 100%;
   background-color: #f0f3f6;
-
+  .del-btn:hover {
+    color: red;
+  }
   ::v-deep {
     .el-input-group__prepend,
     .el-input-group__append {

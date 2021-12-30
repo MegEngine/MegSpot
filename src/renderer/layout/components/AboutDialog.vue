@@ -31,7 +31,7 @@
       </el-tab-pane>
       <el-tab-pane label="settings" name="settings">
         <el-form label-position="right">
-          <el-form-item label="language">
+          <el-form-item :label="$t('general.language')">
             <el-select v-model="appLanguage">
               <el-option
                 v-for="item in langOptions"
@@ -39,6 +39,13 @@
                 :label="item.label"
                 :value="item.value"
               >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('general.defaultFileListShowType')">
+            <el-select v-model="defaultFileListShowType">
+              <el-option :label="$t('general.list')" value="list"> </el-option>
+              <el-option :label="$t('general.thumbnail')" value="thumbnail">
               </el-option>
             </el-select>
           </el-form-item>
@@ -163,6 +170,16 @@ export default {
       set(arg) {
         this.setPreference({
           appLanguage: arg
+        });
+      }
+    },
+    defaultFileListShowType: {
+      get() {
+        return this.preference.defaultFileListShowType;
+      },
+      set(arg) {
+        this.setPreference({
+          defaultFileListShowType: arg
         });
       }
     }
