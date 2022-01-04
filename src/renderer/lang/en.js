@@ -27,6 +27,7 @@ export default {
     thumbnail: 'thumbnail',
     fileName: 'file name',
     fileLoading: 'Loading files...',
+    enableRegular: 'Enable/Disable Regular',
     groupNum: 'group number\nCtrl + ← page backword\nCtrl + → page forward',
     lastModifyTime: 'lastModifyTime',
     operate: 'operate',

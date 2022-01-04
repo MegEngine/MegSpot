@@ -26,6 +26,7 @@ export default {
     thumbnail: '缩略图',
     fileName: '文件名',
     fileLoading: '加载文件中...',
+    enableRegular: '启用/禁用正则',
     groupNum: '分组序号\nCtrl + ← 向前翻页\nCtrl + → 向后翻页',
     lastModifyTime: '最后修改时间',
     operate: '操作',

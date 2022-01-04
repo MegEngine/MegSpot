@@ -27,6 +27,7 @@ export default {
     thumbnail: 'サムネイル画像',
     fileName: 'ファイル名',
     fileLoading: 'ファイルを読み込んでいます...',
+    enableRegular: '通常の有効化/無効化',
     groupNum: 'グループ番号\nCtrl + ← 戻る \nCtrl + → 進む',
     lastModifyTime: '更新日付',
     operate: '操作する',

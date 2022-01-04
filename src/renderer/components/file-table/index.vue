@@ -48,9 +48,7 @@
     >
       <template #header>
         <div flex="cross:center">
-          <el-tooltip
-            :content="(regexpEnabled ? 'Disable' : 'Enable') + ' Regexp'"
-          >
+          <el-tooltip :content="$t('general.enableRegular')">
             <vxe-checkbox v-model="regexpEnabled"></vxe-checkbox>
           </el-tooltip>
           <search-input
@@ -110,9 +108,13 @@
 <script>
 import fse from 'fs-extra';
 import dayjs from 'dayjs';
+import { createNamespacedHelpers } from 'vuex';
 import { throttle, debounce } from '@/utils';
 import { formatFileSize } from '@/utils/file';
 import SearchInput from '../search-input';
+import { isImage, isVideo } from '@/components/file-tree/lib/util';
+const { mapActions: imageMapActions } = createNamespacedHelpers('imageStore');
+const { mapActions: videoMapActions } = createNamespacedHelpers('videoStore');
 import { isDirectory, readDir, getFileStatSync } from '@/utils/file';
 import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants';
 import chokidar from 'chokidar';
@@ -183,8 +185,8 @@ export default {
       get() {
         // 过滤排序文件，根据当前是否showAll以及支持文件类型，正则等进行过滤
         return this.fileInfoList
-          .filter(item => item.name !== SORTING_FILE_NAME)
           .filter(item => {
+            if (item.name === SORTING_FILE_NAME) return false;
             if (this.showAll) {
               return true;
             } else if (!this.showAll && this.checkItem(item)) {
@@ -320,6 +322,8 @@ export default {
     }
   },
   methods: {
+    ...imageMapActions(['addImages', 'removeImages']),
+    ...videoMapActions(['addVideos', 'removeVideos']),
     async customSortMethod({ data, sortList }) {
       const extist = await fse.pathExists(this.sortFilePath);
       if (!this.sortList.length && extist) {
@@ -415,21 +419,32 @@ export default {
     handleCellDblClick({ row }) {
       this.oldFileName = row.name;
     },
-    handleEditName(e) {
+    async handleEditName(e) {
       const newFileName = e.target.value;
       const prefix = this.currentPath + DELIMITER;
       if (this.oldFileName === newFileName) return;
-      fse
-        .move(prefix + this.oldFileName, prefix + newFileName)
-        .then(() => {
-          console.log(
-            'success rename file:' +
-              prefix +
-              this.oldFileName +
-              '->' +
-              prefix +
-              newFileName
-          );
+      const filePath = prefix + this.oldFileName;
+      const newFilePath = prefix + newFileName;
+      await fse
+        .move(filePath, newFilePath)
+        .then(async () => {
+          await this.$bus.$emit('changeFile', {
+            fileName: this.oldFileName,
+            newFileName
+          });
+          if (isImage(filePath)) {
+            this.removeImages(filePath);
+            this.addImages(newFilePath);
+          } else if (isVideo(filePath)) {
+            this.removeVideos(filePath);
+            this.addVideos(newFilePath);
+          }
+          this.$message({
+            type: 'success',
+            message: '重命名成功!'
+          });
+          s;
+          console.log('success rename file:' + filePath + '->' + newFilePath);
         })
         .catch(err => {
           console.error(err);
@@ -480,24 +495,37 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
         'append-to-body': true
-      }).then(() => {
-        fse
-          .remove(filePath)
-          .then(() => {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
+      })
+        .then(() => {
+          fse
+            .remove(filePath)
+            .then(async () => {
+              await this.$bus.$emit('changeFile', { fileName: row.name });
+              if (isImage(filePath)) {
+                this.removeImages(filePath);
+              } else if (isVideo(filePath)) {
+                this.removeVideos(filePath);
+              }
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              });
+              console.log('success delete file:' + filePath);
+            })
+            .catch(err => {
+              this.$message({
+                type: 'danger',
+                message: '删除失败'
+              });
+              console.error('删除失败' + err);
             });
-            console.log('success delete file:' + filePath);
-          })
-          .catch(err => {
-            this.$message({
-              type: 'info',
-              message: '已取消删除'
-            });
-            console.error(err);
+        })
+        .catch(err => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
           });
-      });
+        });
     },
     // 可外部直接调用触发逻辑
     async refreshFileList() {

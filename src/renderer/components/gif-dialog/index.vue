@@ -100,6 +100,7 @@
     </div>
   </el-dialog>
 </template>
+
 <script>
 const { dialog } = require('electron').remote;
 const fs = require('fs');
@@ -309,6 +310,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 .gifDialog {
   ::v-deep {

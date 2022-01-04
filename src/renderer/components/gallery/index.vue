@@ -83,6 +83,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import { getImageUrlSync } from '@/utils/image';
 import { isImage, isVideo } from '@/components/file-tree/lib/util';
@@ -219,6 +220,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 @keyframes appearOpacity {
