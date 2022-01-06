@@ -174,6 +174,10 @@ export default {
         {
           event: 'videoResetTime',
           action: 'handleVideoResetTime'
+        },
+        {
+          event: 'initProcess',
+          action: 'handleInitProcess'
         }
       ],
       histVisible: true,
@@ -307,7 +311,12 @@ export default {
     executeAction(action) {
       switch (action) {
         case CONSTANTS.VIDEO_STATUS_START:
-          this.video.play();
+          this.cs.restore();
+          if (this.video.readyState > 0 && this.video.paused) {
+            this.video.play().catch(e => {
+              // console.log('error', e);
+            });
+          }
           this.paused = false;
           this.$bus.$emit('changeVideoPaused', false);
           break;
@@ -318,6 +327,7 @@ export default {
           this.requestGenerateHist();
           break;
         case CONSTANTS.VIDEO_STATUS_RESET:
+          this.cs.restore();
           this.video.currentTime = 0;
           break;
         default:
@@ -381,12 +391,22 @@ export default {
     handleVideoChangeTime(currentTime) {
       if (this.video.duration >= currentTime) {
         if (Math.abs(this.video.currentTime - currentTime) > 1) {
-          this.video.currentTime = currentTime;
-          this.video.play();
+          this.video.currentTime = Number(currentTime).toFixed(2);
+          if (this.video.readyState > 0 && this.video.paused) {
+            this.video.play().catch(e => {
+              // console.log('error', e);
+            });
+          }
         }
       } else {
         this.video.currentTime = this.video.duration;
-        this.video.pause();
+        if (this.video.readyState > 0 && !this.video.paused) {
+          try {
+            this.video.pause();
+          } catch (e) {
+            console.log(this.video.readyState, this.video.paused, e);
+          }
+        }
       }
     },
     handleBroadcast({ name, data }) {
@@ -400,7 +420,19 @@ export default {
     },
     handleVideoResetTime() {
       this.video.currentTime = 0;
-      this.video.play();
+      if (this.video.readyState > 0 && this.video.paused) {
+        this.video.play().catch(e => {
+          // console.log('error', e);
+        });
+      }
+    },
+    handleInitProcess(data, callback) {
+      if (this.video.duration > 0) {
+        callback({
+          currentTime: this.video.currentTime,
+          duration: this.video.duration
+        });
+      }
     },
     async initImage(initPosition = false) {
       if (!this.paused) {
@@ -413,8 +445,10 @@ export default {
         this.bitMap = await offsreen.transferToImageBitmap();
       }
       // 删除initPosition判断， 默认不进行图像位置重置
-      if (!this.imagePosition && isNaN(this.imagePosition?.height)) {
-        console.log('initPosition', initPosition, this.imagePosition);
+      if (
+        (!this.imagePosition && isNaN(this.imagePosition?.height)) ||
+        initPosition
+      ) {
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
       }
       this.doZoomEnd();
@@ -443,6 +477,7 @@ export default {
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d');
+      this.cs.save();
       this.$nextTick(() => {
         this.cs.imageSmoothingEnabled = this.videoConfig.smooth;
       });
@@ -755,51 +790,33 @@ export default {
       }
     },
     rotate(degree) {
-      let offscreenWidth = this.bitMap.height;
-      let offscreenHight = this.bitMap.width;
-      let offsreen = new OffscreenCanvas(offscreenWidth, offscreenHight);
-      let offCtx = offsreen.getContext('2d');
       if (degree < 0) {
-        offCtx.translate(0, this.bitMap.width);
-        offCtx.rotate((-90 * Math.PI) / 180);
-        [this.imagePosition.width, this.imagePosition.height] = [
-          this.imagePosition.height,
-          this.imagePosition.width
-        ];
+        this.cs.translate(0, this.video.videoWidth);
+        this.cs.rotate((-90 * Math.PI) / 180);
       } else if (degree > 0) {
-        offCtx.translate(this.bitMap.height, 0);
-        offCtx.rotate((90 * Math.PI) / 180);
-        [this.imagePosition.width, this.imagePosition.height] = [
-          this.imagePosition.height,
-          this.imagePosition.width
-        ];
+        this.cs.translate(this.video.videoHeight, 0);
+        this.cs.rotate((90 * Math.PI) / 180);
       }
-      offCtx.drawImage(this.bitMap, 0, 0);
-      this.bitMap.close();
-      this.bitMap = null;
-      this.bitMap = offsreen.transferToImageBitmap();
-      this.drawImage();
+      let { width, height } = this.imagePosition;
+      this.imagePosition = Object.assign(this.imagePosition, {
+        height: width,
+        width: height
+      });
+      // this.drawImage();
+      // this.cs.restore(); // 恢复坐标系
     },
     reverse(direction) {
-      console.log('reverse', direction);
-      let offscreenWidth = this.bitMap.width;
-      let offscreenHight = this.bitMap.height;
-      let offsreen = new OffscreenCanvas(offscreenWidth, offscreenHight);
-      let offCtx = offsreen.getContext('2d');
       if (direction > 0) {
         //左右翻转
-        offCtx.translate(this.bitMap.width, 0);
-        offCtx.scale(-1, 1);
+        this.cs.translate(this.canvas.width, 0);
+        this.cs.scale(-1, 1);
       } else if (direction < 0) {
         //上下翻转
-        offCtx.translate(0, this.bitMap.height);
-        offCtx.scale(1, -1);
+        this.cs.translate(0, this.canvas.height);
+        this.cs.scale(1, -1);
       }
-      offCtx.drawImage(this.bitMap, 0, 0);
-      this.bitMap.close();
-      this.bitMap = null;
-      this.bitMap = offsreen.transferToImageBitmap();
-      this.drawImage(this.bitMap);
+      // this.drawImage(); // 一直在绘制， 故不需要再次主动调用绘制
+      // this.cs.restore(); // 取消翻转，恢复坐标系
     },
     align({ name, data }) {
       const { beSameSize, position } = data;

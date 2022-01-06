@@ -1,16 +1,12 @@
 <template>
-  <div class="process-container" ref="container">
-    <el-slider
-      :value="currentTime"
-      :max="max"
-      :marks="marks"
-      :format-tooltip="formatter"
-      @input="handleInput"
-      @change="changed = true"
-      show-input
-      input-size="mini"
-    ></el-slider>
-  </div>
+  <el-slider
+    :value="currentTime"
+    :max="max"
+    :marks="marks"
+    :format-tooltip="formatter"
+    @input="handleInput"
+    class="process"
+  ></el-slider>
 </template>
 
 <script>
@@ -23,8 +19,8 @@ export default {
   data() {
     return {
       value: 0,
+      startTime: 0,
       lastValue: 0,
-      changed: false,
       max: 0,
       marks: {
         0: {
@@ -38,13 +34,18 @@ export default {
   },
   mounted() {
     this.$bus.$on('createMark', this.createMark);
-    this.$bus.$on('updateVideoTime', this.updateVideoTime);
     this.$bus.$on(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, this.executeAction);
-    this.countDown();
+    this.$bus.$emit('initProcess', null, ({ currentTime, duration }) => {
+      const _currentTime = Math.round(currentTime);
+      this.value = _currentTime;
+      this.lastValue = _currentTime;
+      this.startTime = _currentTime;
+      this.max = Math.max(Math.ceil(duration), this.max);
+      this.countDown(this.startTime || 0);
+    });
   },
   beforeDestroy() {
     this.$bus.$off('createMark', this.createMark);
-    this.$bus.$off('updateVideoTime', this.updateVideoTime);
     this.$bus.$off(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, this.executeAction);
   },
   methods: {
@@ -83,11 +84,7 @@ export default {
     stopVideoTime() {
       this.timer && clearTimeout(this.timer);
     },
-    updateVideoTime(obj) {
-      console.log('updateVideoTime', obj);
-    },
     handleInput(value) {
-      this.changed = value === this.lastValue;
       if (value !== this.lastValue) {
         this.lastValue = value;
         if (this.currentTime != value) {
@@ -121,7 +118,6 @@ export default {
             )
           }
         });
-        console.log(index, this.marks);
       }
     },
     formatter(seconds) {
@@ -163,34 +159,26 @@ export default {
     currentTime() {
       return this.videoConfig.currentTime;
     }
-  },
-  watch: {
-    changed(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.$parent.$emit('changed', newVal);
-      }
-    },
-    max() {
-      this.countDown();
-    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.process-container {
-  position: absolute;
-  display: block;
-  margin: 0 20px;
-  width: 100%;
+.process {
+  // position: absolute;
+  display: inline-block;
+  // margin: 0 20px;
+  // width: 100%;
+  width: 300px;
 
   ::v-deep {
     /** 进度条宽度 */
-    // .el-slider {
-    //   width: 500px;
-    // }
+    .el-slider {
+      width: 300px !important;
+    }
     .el-slider__marks-text {
       text-align: center;
+      transform: translateX(-16px) translateY(-10px);
     }
   }
 }

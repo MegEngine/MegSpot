@@ -669,7 +669,7 @@ export default {
       offCtx.drawImage(this.bitMap, 0, 0);
       this.bitMap.close();
       this.bitMap = offsreen.transferToImageBitmap();
-      this.drawImage(this.bitMap);
+      this.drawImage();
     },
     align({ name, data }) {
       const { beSameSize, position } = data;

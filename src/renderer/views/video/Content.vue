@@ -14,12 +14,21 @@
         :_height="canvasHeight"
       ></VideoCanvas>
     </div>
-    <Sticky v-if="isFloating">
+    <Sticky
+      v-if="isFloating"
+      :contentDragDisabled="false"
+      :disableDragFn="
+        event => {
+          return (
+            event.target.className.toString().includes('el-slider__') ||
+            event.target.tagName.toLowerCase() === 'strong'
+          );
+        }
+      "
+    >
       <template v-slot:icon>
         <el-button type="text">
-          <span class="svg-container">
-            <svg-icon icon-class="play" :clicked="true" />
-          </span>
+          <svg-icon icon-class="play" :clicked="true" class="svg-container" />
         </el-button>
       </template>
       <VideoProgressBar />

@@ -52,6 +52,17 @@
             </div>
           </el-select>
         </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('general.videoProcessBarStyle') }}:</span>
+          <el-select v-model="videoProcessBarStyle">
+            <el-option :label="$t('general.fixed')" value="fixed"> </el-option>
+            <el-option :label="$t('general.float')" value="float"> </el-option>
+          </el-select>
+        </div>
         <div flex="main:justify" class="setting-item">
           <span>scale options：</span>
           <el-select
@@ -147,6 +158,16 @@ export default {
               newVal.filter(item => !isNaN(item)).map(item => Number(item))
             )
           ]
+        });
+      }
+    },
+    videoProcessBarStyle: {
+      get() {
+        return this.preference.videoProcessBarStyle;
+      },
+      set(arg) {
+        this.setPreference({
+          videoProcessBarStyle: arg
         });
       }
     },

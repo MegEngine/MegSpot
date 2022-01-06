@@ -99,81 +99,7 @@
             <svg-icon icon-class="loop" :clicked="loop" />
           </span>
         </el-button>
-      </el-button-group>
-      <el-button-group class="gap">
-        <el-button
-          type="text"
-          size="mini"
-          :disabled="!videoPaused"
-          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
-          v-tip="$t('imageCenter.overlayLeft')"
-        >
-          <span class="svg-container">
-            <svg-icon icon-class="direction-left" />
-          </span>
-        </el-button>
-        <el-button
-          type="text"
-          size="mini"
-          :disabled="!videoPaused"
-          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
-          v-tip="$t('imageCenter.overlayRight')"
-        >
-          <span class="svg-container">
-            <svg-icon
-              icon-class="direction-left"
-              class="svg-container"
-              style="transform:rotate(180deg);"
-            />
-          </span>
-        </el-button>
-        <el-button
-          type="text"
-          size="mini"
-          :disabled="!videoPaused"
-          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
-          v-tip="$t('imageCenter.overlayBottom')"
-        >
-          <span class="svg-container">
-            <svg-icon
-              icon-class="direction-left"
-              style="transform:rotate(-90deg);"
-            />
-          </span>
-        </el-button>
-        <el-button
-          type="text"
-          size="mini"
-          :disabled="!videoPaused"
-          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
-          v-tip="$t('imageCenter.overlayTop')"
-        >
-          <span class="svg-container">
-            <svg-icon
-              icon-class="direction-left"
-              style="transform:rotate(90deg);"
-            />
-          </span>
-        </el-button>
-        <el-button
-          type="text"
-          size="mini"
-          v-tip.sure="`choose images to generate GIF`"
-          @click="$refs.gifDialog.show()"
-        >
-          <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
-            <svg-icon icon-class="gif" />
-          </span>
-        </el-button>
-        <GifDialog
-          ref="gifDialog"
-          :selectList="videoList.slice(startIndex, startIndex + groupCount)"
-        ></GifDialog>
-        <VideoProgressBar v-if="isFixed" />
+        <VideoProgressBar v-if="isFixed" class="progress-bar" />
       </el-button-group>
     </div>
     <div class="right">
@@ -190,16 +116,88 @@
                 ':cmd/ctrl+p'
             "
           >
-            <span class="svg-container" style="font-size: 20px">
-              <svg-icon icon-class="pick-color" :clicked="traggerRGB" />
+            <svg-icon
+              icon-class="pick-color"
+              :clicked="traggerRGB"
+              style="font-size: 20px; margin-right: 2px; transform: translateY(2px);"
+            />
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            v-tip.sure="`choose images to generate GIF`"
+            @click="$refs.gifDialog.show()"
+          >
+            <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
+              <svg-icon icon-class="gif" />
+            </span>
+          </el-button>
+          <GifDialog
+            ref="gifDialog"
+            :selectList="videoList.slice(startIndex, startIndex + groupCount)"
+          ></GifDialog>
+        </el-button-group>
+        <el-divider v-if="videoPaused" direction="vertical"></el-divider>
+        <el-button-group v-if="videoPaused" class="gap">
+          <el-button
+            type="text"
+            size="mini"
+            @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
+            v-tip="$t('imageCenter.overlayLeft')"
+          >
+            <span class="svg-container">
+              <svg-icon icon-class="direction-left" />
+            </span>
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
+            v-tip="$t('imageCenter.overlayRight')"
+          >
+            <span class="svg-container">
+              <svg-icon
+                icon-class="direction-left"
+                class="svg-container"
+                style="transform:rotate(180deg);"
+              />
+            </span>
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
+            v-tip="$t('imageCenter.overlayBottom')"
+          >
+            <span class="svg-container">
+              <svg-icon
+                icon-class="direction-left"
+                style="transform:rotate(-90deg);"
+              />
+            </span>
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
+            v-tip="$t('imageCenter.overlayTop')"
+          >
+            <span class="svg-container">
+              <svg-icon
+                icon-class="direction-left"
+                style="transform:rotate(90deg);"
+              />
             </span>
           </el-button>
         </el-button-group>
-        <el-divider direction="vertical"></el-divider>
-        <el-button-group class="gap">
+        <el-button-group v-if="videoPaused" class="gap">
           <el-button
+            v-show="false"
             type="text"
-            :disabled="!videoPaused"
             @click="rotate(90)"
             size="mini"
             v-tip="$t('imageCenter.rotate')"
@@ -210,7 +208,6 @@
           </el-button>
           <el-button
             type="text"
-            :disabled="!videoPaused"
             @click="reverse(1)"
             v-tip="$t('imageCenter.horizontalFlip')"
             size="mini"
@@ -222,7 +219,6 @@
           <el-button
             type="text"
             size="mini"
-            :disabled="!videoPaused"
             @click="reverse(-1)"
             v-tip="$t('imageCenter.verticalFlip')"
           >
@@ -568,6 +564,9 @@ export default {
     .el-button-group {
       .svg-container {
         margin-left: 0.3rem;
+      }
+      .progress-bar {
+        margin-left: 20px;
       }
     }
   }

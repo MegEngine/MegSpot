@@ -30,7 +30,7 @@ export default {
     },
     contentDragDisabled: {
       type: Boolean,
-      default: false
+      default: true
     },
     // 通过position来设置初始定位
     position: {
@@ -45,13 +45,18 @@ export default {
     backgroundColor: {
       type: String,
       default: '#fff'
+    },
+    disableDragFn: {
+      type: Function,
+      default: () => {
+        return false;
+      }
     }
   },
   data() {
     return {
       innerOpen: false, //  菜单展开状态
       mouseDownState: false, //  鼠标点击状态
-      changed: false, // 进度条是否完成了拖动过程
       iX: 0,
       iY: 0,
       dX: 0,
@@ -61,7 +66,6 @@ export default {
     };
   },
   mounted() {
-    this.$on('changed', this.handleChanged);
     this.$nextTick(() => {
       this.parentContainer = this.$parent.$refs[this.parentContainerName];
       this.parentContainer.addEventListener('mouseup', this.handleMouseUp);
@@ -69,22 +73,20 @@ export default {
     });
   },
   beforeDestroy() {
-    this.$off('changed', this.handleChanged);
     this.parentContainer.removeEventListener('mouseup', this.handleMouseUp);
     this.parentContainer.removeEventListener('mousemove', this.handleMouseMove);
   },
   methods: {
     handleClick() {
       this.innerOpen = false;
-      this.changed = true;
-    },
-    handleChanged(value) {
-      this.changed = value;
     },
     //  鼠标按下
     handleMouseDown(event) {
       //  如果进度条为拖动状态，则不做响应
-      if ((this.contentDragDisabled && this.innerOpen) || !this.changed) {
+      if (
+        (this.contentDragDisabled && this.innerOpen) ||
+        this.disableDragFn(event)
+      ) {
         this.mouseDownState = false;
         return;
       }
@@ -106,7 +108,7 @@ export default {
     },
     //  鼠标拖拽
     handleMouseMove(event) {
-      if ((this.contentDragDisabled && this.innerOpen) || !this.changed) {
+      if (this.contentDragDisabled && this.innerOpen) {
         this.mouseDownState = false;
         return;
       }
@@ -157,7 +159,7 @@ export default {
     },
     // 鼠标抬起
     handleMouseUp() {
-      if ((this.contentDragDisabled && this.innerOpen) || !this.changed) {
+      if (this.contentDragDisabled && this.innerOpen) {
         this.mouseDownState = false;
         return;
       }
@@ -258,10 +260,9 @@ export default {
   .process-bar-container {
     position: fixed;
     z-index: 9999;
-    width: 90vw;
+    padding: 0 10px;
     border-radius: 5px;
-    background: #1a1a1a;
-    color: #fff;
+    opacity: 0.9;
   }
 }
 </style>
