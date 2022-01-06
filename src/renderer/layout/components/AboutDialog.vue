@@ -42,6 +42,14 @@
               </el-option>
             </el-select>
           </el-form-item>
+          <el-form-item :label="$t('general.videoProcessBarStyle')">
+            <el-select v-model="videoProcessBarStyle">
+              <el-option :label="$t('general.fixed')" value="fixed">
+              </el-option>
+              <el-option :label="$t('general.float')" value="float">
+              </el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item :label="$t('general.defaultFileListShowType')">
             <el-select v-model="defaultFileListShowType">
               <el-option :label="$t('general.list')" value="list"> </el-option>
@@ -170,6 +178,16 @@ export default {
       set(arg) {
         this.setPreference({
           appLanguage: arg
+        });
+      }
+    },
+    videoProcessBarStyle: {
+      get() {
+        return this.preference.videoProcessBarStyle;
+      },
+      set(arg) {
+        this.setPreference({
+          videoProcessBarStyle: arg
         });
       }
     },

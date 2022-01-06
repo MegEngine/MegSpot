@@ -102,22 +102,27 @@ export default {
         this.max = Number(num);
       }
       if (!Reflect.has(this.marks, num)) {
-        this.marks[num] = {
-          label: this.$createElement('strong', index)
-        };
+        this.marks = Object.assign({}, this.marks, {
+          [num]: {
+            label: this.$createElement('strong', index)
+          }
+        });
       } else {
         const indexs = this.marks[num].label.children[0].text
           .toString()
           .split(',');
+        if (indexs.includes(index)) return;
         indexs.push(index);
-        this.marks[num] = {
-          label: this.$createElement(
-            'strong',
-            [...new Set(indexs)].sort((a, b) => a < b).join(',')
-          )
-        };
+        this.marks = Object.assign({}, this.marks, {
+          [num]: {
+            label: this.$createElement(
+              'strong',
+              [...new Set(indexs)].sort((a, b) => a < b).join(',')
+            )
+          }
+        });
+        console.log(index, this.marks);
       }
-      // console.log(index, this.marks);
     },
     formatter(seconds) {
       var hours = Math.floor(seconds / 3600);

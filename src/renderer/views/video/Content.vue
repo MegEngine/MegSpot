@@ -14,7 +14,7 @@
         :_height="canvasHeight"
       ></VideoCanvas>
     </div>
-    <Sticky>
+    <Sticky v-if="isFloating">
       <template v-slot:icon>
         <el-button type="text">
           <span class="svg-container">
@@ -26,6 +26,7 @@
     </Sticky>
   </div>
 </template>
+
 <script>
 import VideoCanvas from './components/videoCanvas';
 import Sticky from '@/components/sticky';
@@ -34,6 +35,10 @@ import { throttle } from '@/utils';
 import * as GLOBAL_CONSTANTS from '@/constants';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
+
 export default {
   components: { VideoCanvas, Sticky, VideoProgressBar },
   data() {
@@ -100,6 +105,7 @@ export default {
   },
   computed: {
     ...mapGetters(['videoList', 'videoConfig']),
+    ...preferenceMapGetters(['preference']),
     // 每组图片数量
     groupCount() {
       const str = this.videoConfig.layout,
@@ -155,6 +161,9 @@ export default {
             gridTemplateColumns: '1fr 1fr'
           };
       }
+    },
+    isFloating() {
+      return this.preference.videoProcessBarStyle === 'float';
     }
   },
   watch: {

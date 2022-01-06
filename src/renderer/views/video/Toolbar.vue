@@ -173,6 +173,7 @@
           ref="gifDialog"
           :selectList="videoList.slice(startIndex, startIndex + groupCount)"
         ></GifDialog>
+        <VideoProgressBar v-if="isFixed" />
       </el-button-group>
     </div>
     <div class="right">
@@ -302,14 +303,19 @@
     </div>
   </div>
 </template>
+
 <script>
 import * as GLOBAL_CONSTANTS from '@/constants';
 import * as CONSTANTS from './video-constants';
 import Gallery from '@/components/gallery';
+import VideoProgressBar from './components/videoProgressBar';
 import { createNamespacedHelpers } from 'vuex';
 import GifDialog from '@/components/gif-dialog';
 import ImageSetting from '@/components/image-setting';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
 
 export default {
   data() {
@@ -326,9 +332,10 @@ export default {
       videoPaused: false
     };
   },
-  components: { Gallery, GifDialog, ImageSetting },
+  components: { Gallery, GifDialog, ImageSetting, VideoProgressBar },
   computed: {
     ...mapGetters(['videoList', 'videoConfig']),
+    ...preferenceMapGetters(['preference']),
     maxGroupNum() {
       return Math.ceil(
         this.videoList.length / (this.layout[0] * this.layout[2])
@@ -364,6 +371,9 @@ export default {
         this.$bus.$emit('changeGroup', this.startIndex);
         this.groupNum = Math.floor(this.startIndex / this.groupCount);
       }
+    },
+    isFixed() {
+      return this.preference.videoProcessBarStyle === 'fixed';
     }
   },
   methods: {
@@ -373,6 +383,9 @@ export default {
       'setVideoConfig',
       'setVideos'
     ]),
+    handleVideoChangeTime() {
+      this.videoPaused = false;
+    },
     handleHotKey(event) {
       // esc
       if (event.keyCode === 27) {
@@ -490,14 +503,17 @@ export default {
     window.addEventListener('keydown', this.handleHotKey, true);
     this.$bus.$on('image_handleSelect', this.handleSelect);
     this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused);
+    this.$bus.$on('videoChangeTime', this.handleVideoChangeTime);
   },
   beforeDestroy() {
     window.removeEventListener('keydown', this.handleHotKey, true);
     this.$bus.$off('image_handleSelect', this.handleSelect);
     this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused);
+    this.$bus.$off('videoChangeTime', this.handleVideoChangeTime);
   }
 };
 </script>
+
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 .toolbar {

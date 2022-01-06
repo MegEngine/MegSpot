@@ -12,7 +12,9 @@ const preferenceStore = {
       // 是否默认显示直方图
       defaultShowHist: false,
       // 列表显示模式 list(列表表格) / thumbnail(缩略图列表)
-      defaultFileListShowType: 'list'
+      defaultFileListShowType: 'list',
+      // 视频控制条位置 fixed(固定在toolbar) / float (悬浮球)
+      videoProcessBarStyle: 'fixed'
     },
     lastRouterPath: '/dashboard'
   },
