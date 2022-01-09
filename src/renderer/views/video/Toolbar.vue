@@ -60,7 +60,8 @@
         }}</el-radio-button>
       </el-radio-group>
       <div class="select">
-        <span v-show="showSelectedMsg" class="msg">
+        <!-- 空间不足, 取消选中提示 -->
+        <span v-show="false" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
         </span>
       </div>
@@ -325,52 +326,21 @@ export default {
       startIndex: 0,
       offset: 0,
       loop: true,
-      videoPaused: false
+      videoPaused: true
     };
   },
   components: { Gallery, GifDialog, ImageSetting, VideoProgressBar },
-  computed: {
-    ...mapGetters(['videoList', 'videoConfig']),
-    ...preferenceMapGetters(['preference']),
-    maxGroupNum() {
-      return Math.ceil(
-        this.videoList.length / (this.layout[0] * this.layout[2])
-      );
-    },
-    // 每组图片数量
-    groupCount() {
-      const str = this.videoConfig.layout,
-        len = str.length;
-      return str[len - 3] * str[len - 1];
-    },
-    smooth: {
-      get() {
-        return this.videoConfig.smooth;
-      },
-      set(newVal) {
-        this.setVideoConfig({ smooth: newVal });
-      }
-    },
-    layout: {
-      get() {
-        return this.videoConfig.layout;
-      },
-      set(val) {
-        const preNum = this.groupCount * (this.groupNum - 1);
-        this.setVideoConfig({ layout: val });
-        const afterNum = this.groupCount * (this.groupNum - 1);
-        this.offset = preNum - afterNum;
-        this.startIndex = Math.max(
-          0,
-          (this.groupNum - 1) * this.groupCount + this.offset
-        );
-        this.$bus.$emit('changeGroup', this.startIndex);
-        this.groupNum = Math.floor(this.startIndex / this.groupCount);
-      }
-    },
-    isFixed() {
-      return this.preference.videoProcessBarStyle === 'fixed';
-    }
+  mounted() {
+    window.addEventListener('keydown', this.handleHotKey, true);
+    this.$bus.$on('image_handleSelect', this.handleSelect);
+    this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused);
+    this.$bus.$on('videoChangeTime', this.handleVideoChangeTime);
+  },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleHotKey, true);
+    this.$bus.$off('image_handleSelect', this.handleSelect);
+    this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused);
+    this.$bus.$off('videoChangeTime', this.handleVideoChangeTime);
   },
   methods: {
     ...mapActions([
@@ -495,17 +465,48 @@ export default {
       });
     }
   },
-  mounted() {
-    window.addEventListener('keydown', this.handleHotKey, true);
-    this.$bus.$on('image_handleSelect', this.handleSelect);
-    this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused);
-    this.$bus.$on('videoChangeTime', this.handleVideoChangeTime);
-  },
-  beforeDestroy() {
-    window.removeEventListener('keydown', this.handleHotKey, true);
-    this.$bus.$off('image_handleSelect', this.handleSelect);
-    this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused);
-    this.$bus.$off('videoChangeTime', this.handleVideoChangeTime);
+  computed: {
+    ...mapGetters(['videoList', 'videoConfig']),
+    ...preferenceMapGetters(['preference']),
+    maxGroupNum() {
+      return Math.ceil(
+        this.videoList.length / (this.layout[0] * this.layout[2])
+      );
+    },
+    // 每组图片数量
+    groupCount() {
+      const str = this.videoConfig.layout,
+        len = str.length;
+      return str[len - 3] * str[len - 1];
+    },
+    smooth: {
+      get() {
+        return this.videoConfig.smooth;
+      },
+      set(newVal) {
+        this.setVideoConfig({ smooth: newVal });
+      }
+    },
+    layout: {
+      get() {
+        return this.videoConfig.layout;
+      },
+      set(val) {
+        const preNum = this.groupCount * (this.groupNum - 1);
+        this.setVideoConfig({ layout: val });
+        const afterNum = this.groupCount * (this.groupNum - 1);
+        this.offset = preNum - afterNum;
+        this.startIndex = Math.max(
+          0,
+          (this.groupNum - 1) * this.groupCount + this.offset
+        );
+        this.$bus.$emit('changeGroup', this.startIndex);
+        this.groupNum = Math.floor(this.startIndex / this.groupCount);
+      }
+    },
+    isFixed() {
+      return this.preference.videoProcessBarStyle === 'fixed';
+    }
   }
 };
 </script>

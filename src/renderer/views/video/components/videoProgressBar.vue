@@ -14,6 +14,15 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 import * as CONSTANTS from '../video-constants';
 
+const defaultMarks = {
+  0: {
+    style: {
+      display: 'none'
+    },
+    label: '0'
+  }
+};
+
 export default {
   name: 'VideoProgressBar',
   data() {
@@ -22,30 +31,17 @@ export default {
       startTime: 0,
       lastValue: 0,
       max: 0,
-      marks: {
-        0: {
-          style: {
-            display: 'none'
-          },
-          label: '0'
-        }
-      }
+      marks: defaultMarks
     };
   },
   mounted() {
-    this.$bus.$on('createMark', this.createMark);
+    this.$bus.$emit('getMarks', null, this.handleVideoLoaded);
+    this.$bus.$on('videoLoaded', this.handleVideoLoaded);
     this.$bus.$on(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, this.executeAction);
-    this.$bus.$emit('initProcess', null, ({ currentTime, duration }) => {
-      const _currentTime = Math.round(currentTime);
-      this.value = _currentTime;
-      this.lastValue = _currentTime;
-      this.startTime = _currentTime;
-      this.max = Math.max(Math.ceil(duration), this.max);
-      this.countDown(this.startTime || 0);
-    });
   },
   beforeDestroy() {
-    this.$bus.$off('createMark', this.createMark);
+    this.timer && clearTimeout(this.timer);
+    this.$bus.$off('videoLoaded', this.handleVideoLoaded);
     this.$bus.$off(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, this.executeAction);
   },
   methods: {
@@ -53,16 +49,15 @@ export default {
     countDown(startTime = 0) {
       this.getTime(startTime);
     },
-    getTime(currentTime) {
+    getTime() {
       this.timer && clearTimeout(this.timer);
-      if (this.max > 0 && currentTime >= this.max) {
+      if (this.max > 0 && this.currentTime >= this.max) {
         this.$bus.$emit('videoResetTime');
-        this.countDown();
-        return;
+        this.setVideoConfig({ currentTime: 0 });
       }
       this.timer = setTimeout(() => {
-        this.setVideoConfig({ currentTime: currentTime + 1 });
-        this.getTime(currentTime + 1);
+        this.setVideoConfig({ currentTime: this.currentTime + 1 });
+        this.getTime();
       }, 1000);
     },
     executeAction(action) {
@@ -86,38 +81,12 @@ export default {
     },
     handleInput(value) {
       if (value !== this.lastValue) {
+        this.$bus.$emit('videoChangeTime', value);
         this.lastValue = value;
         if (this.currentTime != value) {
           this.setVideoConfig({ currentTime: value });
           this.countDown(value);
         }
-        this.$bus.$emit('videoChangeTime', value);
-      }
-    },
-    createMark({ index, num }) {
-      if (Number(num) > this.max) {
-        this.max = Number(num);
-      }
-      if (!Reflect.has(this.marks, num)) {
-        this.marks = Object.assign({}, this.marks, {
-          [num]: {
-            label: this.$createElement('strong', index)
-          }
-        });
-      } else {
-        const indexs = this.marks[num].label.children[0].text
-          .toString()
-          .split(',');
-        if (indexs.includes(index)) return;
-        indexs.push(index);
-        this.marks = Object.assign({}, this.marks, {
-          [num]: {
-            label: this.$createElement(
-              'strong',
-              [...new Set(indexs)].sort((a, b) => a < b).join(',')
-            )
-          }
-        });
       }
     },
     formatter(seconds) {
@@ -152,6 +121,43 @@ export default {
       } else {
         return ss + 's';
       }
+    },
+    handleVideoLoaded(marks) {
+      if (Object.keys(this.marks).length <= 1) {
+        this.generateMarks(marks);
+      }
+      if (this.timer == undefined) {
+        this.countDown(this.currentTime);
+      }
+    },
+    generateMarks(marksArr) {
+      marksArr.forEach(res => {
+        const [_num, label] = res;
+        const num = Math.round(_num).toString();
+        if (Number(num) > this.max) {
+          this.max = Number(num);
+        }
+        if (num == 0) {
+          return;
+        } else if (Reflect.has(this.marks, num)) {
+          const labels = this.marks[num].label.toString().split(',');
+          labels.push(label);
+          labels.sort((a, b) => a < b);
+          this.marks = Object.assign({}, this.marks, {
+            [num]: {
+              label: labels.join(',').toString(),
+              style: ''
+            }
+          });
+        } else {
+          this.marks = Object.assign({}, this.marks, {
+            [num]: {
+              label: label.toString(),
+              style: ''
+            }
+          });
+        }
+      });
     }
   },
   computed: {

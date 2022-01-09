@@ -12,6 +12,7 @@
         :path="video"
         :_width="canvasWidth"
         :_height="canvasHeight"
+        @loaded="handleVideoLoaded"
       ></VideoCanvas>
     </div>
     <Sticky
@@ -71,11 +72,18 @@ export default {
         {
           event: 'getCanvasSize',
           action: 'getCanvasSize'
+        },
+        {
+          event: 'getMarks',
+          action: 'getMarks'
         }
-      ]
+      ],
+      marks: []
     };
   },
   created() {
+    this.marks = [];
+    this.setVideoConfig({ currentTime: 0 });
     // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
     if (this.videoList.length <= 4) {
       let smartLayout;
@@ -403,6 +411,26 @@ export default {
         snapShotArr,
         coveredArr
       };
+    },
+    handleVideoLoaded() {
+      if (this.marks.length > 0) {
+        return;
+      }
+      this.$refs['video_canvas'].forEach((item, index) => {
+        console.log(`video-${index + 1}`, {
+          duration: item.video.duration,
+          currentTime: item.video.currentTime
+        });
+        this.marks.push([
+          Math.round(parseFloat(item.video.duration) * 100) / 100,
+          index + 1
+        ]);
+      });
+      this.$bus.$emit('videoLoaded', this.marks);
+    },
+    getMarks(data, callback) {
+      callback(this.marks);
+      return this.marks;
     },
     //执行覆盖
     snapAndCover(snapShotArr, coveredArr, status) {

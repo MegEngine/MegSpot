@@ -104,7 +104,6 @@ export default {
       wacther: undefined,
       header: null,
       canvas: null,
-      currentTime: 0,
       video: null,
       paused: true,
       maskDom: undefined,
@@ -174,10 +173,6 @@ export default {
         {
           event: 'videoResetTime',
           action: 'handleVideoResetTime'
-        },
-        {
-          event: 'initProcess',
-          action: 'handleInitProcess'
         }
       ],
       histVisible: true,
@@ -205,6 +200,9 @@ export default {
     },
     canvasStyle() {
       return this.preference.background.style;
+    },
+    globalCurrentTime() {
+      return this.videoConfig.currentTime;
     }
   },
   mounted() {
@@ -256,6 +254,9 @@ export default {
         this.setSmooth();
       },
       immediate: true
+    },
+    globalCurrentTime(newVal) {
+      this.handleVideoChangeTime(newVal);
     }
   },
   methods: {
@@ -312,7 +313,9 @@ export default {
       switch (action) {
         case CONSTANTS.VIDEO_STATUS_START:
           this.cs.restore();
-          if (this.video.readyState > 0 && this.video.paused) {
+          if (this.requestId == undefined) {
+            this.startAnimation();
+          } else if (this.video.readyState > 0 && this.video.paused) {
             this.video.play().catch(e => {
               // console.log('error', e);
             });
@@ -388,7 +391,18 @@ export default {
         this[name](data);
       }
     },
+    handleVideoResetTime() {
+      this.video.currentTime = 0;
+      if (this.video.readyState > 0 && this.video.paused) {
+        this.video.play().catch(e => {
+          // console.log('error', e);
+        });
+      }
+    },
     handleVideoChangeTime(currentTime) {
+      if (this.requestId == undefined) {
+        this.startAnimation();
+      }
       if (this.video.duration >= currentTime) {
         if (Math.abs(this.video.currentTime - currentTime) > 1) {
           this.video.currentTime = Number(currentTime).toFixed(2);
@@ -418,23 +432,7 @@ export default {
         this[name](data);
       }
     },
-    handleVideoResetTime() {
-      this.video.currentTime = 0;
-      if (this.video.readyState > 0 && this.video.paused) {
-        this.video.play().catch(e => {
-          // console.log('error', e);
-        });
-      }
-    },
-    handleInitProcess(data, callback) {
-      if (this.video.duration > 0) {
-        callback({
-          currentTime: this.video.currentTime,
-          duration: this.video.duration
-        });
-      }
-    },
-    async initImage(initPosition = false) {
+    async initImage() {
       if (!this.paused) {
         let offsreen = new OffscreenCanvas(
           this.video.videoWidth,
@@ -444,15 +442,9 @@ export default {
         offCtx.drawImage(this.video, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
       }
-      // 删除initPosition判断， 默认不进行图像位置重置
-      if (
-        (!this.imagePosition && isNaN(this.imagePosition?.height)) ||
-        initPosition
-      ) {
-        this.imagePosition = this.getImageInitPos(this.canvas, this.video);
-      }
+
       this.doZoomEnd();
-      this.drawImage();
+      // this.drawImage();
 
       if (!this.currentHist) {
         this.requestGenerateHist();
@@ -484,20 +476,17 @@ export default {
     },
     initVideo() {
       this.video = document.createElement('video');
-      this.video.addEventListener('canplay', () => {
+      this.video.addEventListener('loadeddata', () => {
+        this.$emit('loaded');
         this.paused = false;
-        if (!this.imagePosition || isNaN(this.imagePosition?.height)) {
+        if (
+          (this.imagePosition = undefined || isNaN(this.imagePosition?.height))
+        ) {
+          console.log('initVideo');
           this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         }
         this.doZoomEnd();
         this.initImage();
-        this.currentTime = 0;
-        // console.log(`video-${this.index + 1}: duration`, this.video.duration);
-        this.$bus.$emit('createMark', {
-          index: (this.index + 1).toString(),
-          num: Math.round(this.video.duration).toString()
-        });
-        this.startAnimation();
       });
       this.video.src = this.path;
       this.video.autoplay = true;
@@ -512,6 +501,9 @@ export default {
         this.requestId = window.requestAnimationFrame(render);
       };
       render();
+      if (this.video.readyState > 0 && this.video.paused) {
+        this.video.play();
+      }
     },
     stopAnimation() {
       if (this.requestId) {
@@ -520,9 +512,10 @@ export default {
     },
     // 供外部直接调用 待测试
     reMount() {
-      this.initImage(true);
+      this.initImage();
       this.initCanvas();
       this.image.onload = () => {
+        console.log('reMount');
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         this.drawImage();
       };
@@ -633,9 +626,11 @@ export default {
         this.afterFullSize = true;
         this.imagePosition = { x, y, width, height };
         this.doZoomEnd();
-        this.drawImage();
+        // this.drawImage();
       } else {
-        this.initImage(true);
+        console.log('reset');
+        this.imagePosition = this.getImageInitPos(this.canvas, this.video);
+        this.initImage();
       }
     },
     reDraw() {
