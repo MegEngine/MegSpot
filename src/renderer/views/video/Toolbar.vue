@@ -138,8 +138,8 @@
             :selectList="videoList.slice(startIndex, startIndex + groupCount)"
           ></GifDialog>
         </el-button-group>
-        <el-divider v-if="videoPaused" direction="vertical"></el-divider>
-        <el-button-group v-if="videoPaused" class="gap">
+        <el-divider direction="vertical"></el-divider>
+        <el-button-group class="gap">
           <el-button
             type="text"
             size="mini"
@@ -195,9 +195,8 @@
             </span>
           </el-button>
         </el-button-group>
-        <el-button-group v-if="videoPaused" class="gap">
+        <el-button-group class="gap">
           <el-button
-            v-show="false"
             type="text"
             @click="rotate(90)"
             size="mini"

@@ -208,6 +208,7 @@ export default {
   mounted() {
     this.header = this.$refs.header;
     this.canvas = this.$refs.canvas;
+    this.degree = 0;
 
     this.initCanvas();
     this.initVideo();
@@ -239,7 +240,8 @@ export default {
             })
             .on('change', (path, details) => {
               console.log('video--change', path, details);
-              this.initImage();
+              // this.initImage();
+              this.initVideo();
             })
             .on('unlink', (path, details) => {
               console.log('video--remove', path, details);
@@ -326,6 +328,7 @@ export default {
         case CONSTANTS.VIDEO_STATUS_PAUSE:
           this.video.pause();
           this.paused = true;
+          this.initImage();
           this.$bus.$emit('changeVideoPaused', true);
           this.requestGenerateHist();
           break;
@@ -432,8 +435,9 @@ export default {
         this[name](data);
       }
     },
+    // 初始化bitMap， 重新生成直方图hist
     async initImage() {
-      if (!this.paused) {
+      if (this.paused) {
         let offsreen = new OffscreenCanvas(
           this.video.videoWidth,
           this.video.videoHeight
@@ -441,14 +445,13 @@ export default {
         let offCtx = offsreen.getContext('2d');
         offCtx.drawImage(this.video, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
+        console.log('initImage', this.bitMap);
       }
 
-      this.doZoomEnd();
+      // this.doZoomEnd();
       // this.drawImage();
 
-      if (!this.currentHist) {
-        this.requestGenerateHist();
-      }
+      this.requestGenerateHist();
     },
     requestGenerateHist() {
       window.requestAnimationFrame(this.generateHist);
@@ -486,7 +489,7 @@ export default {
           this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         }
         this.doZoomEnd();
-        this.initImage();
+        // this.initImage();
       });
       this.video.src = this.path;
       this.video.autoplay = true;
@@ -498,6 +501,11 @@ export default {
         if (this.video !== null) {
           this.drawImage();
         }
+        if (this.paused) {
+          // this.initImage()
+          this.stopAnimation();
+          return;
+        }
         this.requestId = window.requestAnimationFrame(render);
       };
       render();
@@ -508,11 +516,12 @@ export default {
     stopAnimation() {
       if (this.requestId) {
         window.cancelAnimationFrame(this.requestId);
+        this.requestId = null;
       }
     },
     // 供外部直接调用 待测试
     reMount() {
-      this.initImage();
+      // this.initImage();
       this.initCanvas();
       this.image.onload = () => {
         console.log('reMount');
@@ -524,7 +533,12 @@ export default {
     drawImage() {
       let { x, y, width, height } = this.imagePosition;
       this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.cs.save();
+      this.cs.translate(x + width / 2, y + height / 2);
+      this.cs.rotate((this.degree * Math.PI) / 180);
+      this.cs.translate(-x - width / 2, -y - height / 2);
       this.cs.drawImage(this.video, x, y, width, height);
+      this.cs.restore();
     },
     handleDbclick() {
       if (!this.selected) {
@@ -630,12 +644,12 @@ export default {
       } else {
         console.log('reset');
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
-        this.initImage();
+        // this.initImage();
       }
     },
     reDraw() {
       // 待测试
-      window.requestAnimationFrame(this.initImage);
+      window.requestAnimationFrame(this.initVideo);
     },
     getImageInitPos(canvas, video) {
       const cw = canvas.width;
@@ -671,8 +685,10 @@ export default {
     doDrag(data) {
       if (this.imagePosition == null) return;
       let offset = data.offset;
-      let transX = this.imagePosition.x + offset.x;
-      let transY = this.imagePosition.y + offset.y;
+      let transX =
+        this.imagePosition.x + (this.cs.getTransform().a || 1) * offset.x;
+      let transY =
+        this.imagePosition.y + (this.cs.getTransform().d || 1) * offset.y;
       if (this.checkBorder(transX, transY)) {
         // 判断是否只在指定范围内拖动
         this.imagePosition.x = transX;
@@ -742,10 +758,6 @@ export default {
           width
         };
         this.imgScale = 'N/A';
-        // this.drawImage();
-        if (!this.paused) {
-          this.drawImage();
-        }
       }
     },
     doZoomEnd() {
@@ -785,20 +797,7 @@ export default {
       }
     },
     rotate(degree) {
-      if (degree < 0) {
-        this.cs.translate(0, this.video.videoWidth);
-        this.cs.rotate((-90 * Math.PI) / 180);
-      } else if (degree > 0) {
-        this.cs.translate(this.video.videoHeight, 0);
-        this.cs.rotate((90 * Math.PI) / 180);
-      }
-      let { width, height } = this.imagePosition;
-      this.imagePosition = Object.assign(this.imagePosition, {
-        height: width,
-        width: height
-      });
-      // this.drawImage();
-      // this.cs.restore(); // 恢复坐标系
+      this.degree = (this.degree + degree) % 360;
     },
     reverse(direction) {
       if (direction > 0) {
@@ -810,8 +809,6 @@ export default {
         this.cs.translate(0, this.canvas.height);
         this.cs.scale(1, -1);
       }
-      // this.drawImage(); // 一直在绘制， 故不需要再次主动调用绘制
-      // this.cs.restore(); // 取消翻转，恢复坐标系
     },
     align({ name, data }) {
       const { beSameSize, position } = data;
