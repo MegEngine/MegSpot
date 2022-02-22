@@ -70,6 +70,7 @@ import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
 import chokidar from 'chokidar';
 import * as CONSTANTS from '../video-constants';
+import { t } from 'vxe-table';
 
 export default {
   components: {
@@ -357,6 +358,8 @@ export default {
       // 叠加显示时候 生成快照
       return {
         snapShot: this.canvas,
+        position: this.imagePosition,
+        transform: this.cs.getTransform(),
         hist: this.currentHist
       };
     },
@@ -530,14 +533,18 @@ export default {
       };
       this.image.src = getImageUrlSyncNoCache(this.path);
     },
-    drawImage() {
+    clearCanvas() {
+      const maxLen = this.canvas.width * this.canvas.height * 4;
+      this.cs.clearRect(-maxLen, -maxLen, 2 * maxLen, 2 * maxLen);
+    },
+    drawImage(img) {
       let { x, y, width, height } = this.imagePosition;
-      this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.clearCanvas();
       this.cs.save();
       this.cs.translate(x + width / 2, y + height / 2);
       this.cs.rotate((this.degree * Math.PI) / 180);
       this.cs.translate(-x - width / 2, -y - height / 2);
-      this.cs.drawImage(this.video, x, y, width, height);
+      this.cs.drawImage(img ?? this.video, x, y, width, height);
       this.cs.restore();
     },
     handleDbclick() {
@@ -618,16 +625,22 @@ export default {
       });
     },
     // 外部直接调用
-    setCoverStatus({ snapShot, hist }, status) {
+    setCoverStatus({ snapShot, position, transform, hist }, status) {
       if (status) {
+        this._transform = this.cs.getTransform();
+        this.cs.save();
+        let { x, y, width, height } = position;
         this.stopAnimation();
-        this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.cs.drawImage(snapShot, 0, 0);
+        this.clearCanvas();
+        this.cs.setTransform(transform);
+        this.cs.drawImage(snapShot, x, y, width, height);
         if (this.$refs['hist-container'].visible) {
           this.maskDom = hist;
         }
       } else {
+        this.cs.restore();
         this.maskDom = null;
+        this.cs.setTransform(this._transform);
         this.startAnimation();
       }
     },
@@ -800,14 +813,19 @@ export default {
       this.degree = (this.degree + degree) % 360;
     },
     reverse(direction) {
+      const { x, y, width, height } = this.imagePosition;
       if (direction > 0) {
+        const dx = x + width / 2;
         //左右翻转
-        this.cs.translate(this.canvas.width, 0);
+        this.cs.translate(dx, 0);
         this.cs.scale(-1, 1);
+        this.cs.translate(-dx, 0);
       } else if (direction < 0) {
+        const dy = y + height / 2;
         //上下翻转
-        this.cs.translate(0, this.canvas.height);
+        this.cs.translate(0, dy);
         this.cs.scale(1, -1);
+        this.cs.translate(0, -dy);
       }
     },
     align({ name, data }) {
