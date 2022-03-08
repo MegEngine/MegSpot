@@ -128,6 +128,7 @@
             size="mini"
             v-tip.sure="`choose images to generate GIF`"
             @click="$refs.gifDialog.show()"
+            v-show="videoPaused"
           >
             <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
               <svg-icon icon-class="gif" />
@@ -139,7 +140,7 @@
           ></GifDialog>
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
-        <el-button-group class="gap">
+        <el-button-group class="gap" v-show="videoPaused">
           <el-button
             type="text"
             size="mini"

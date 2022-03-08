@@ -71,6 +71,7 @@ import {
   EffectFade,
   SwiperSlide
 } from 'vue-awesome-swiper';
+import 'swiper/css/swiper.css';
 
 export default {
   name: 'HelpVideo',
@@ -152,6 +153,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/variables.scss';
 @import 'swiper/swiper.scss';
 .swiper {
   margin-left: 20px;
@@ -183,6 +185,18 @@ export default {
   .swiper-pagination {
     position: absolute;
     bottom: 6px;
+  }
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    display: none;
+  }
+  &:hover {
+    .swiper-button-prev,
+    .swiper-button-next {
+      display: block;
+      color: $primaryColor;
+    }
   }
 }
 .close:hover {

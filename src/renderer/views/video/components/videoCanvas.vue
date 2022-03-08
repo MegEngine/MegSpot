@@ -328,6 +328,7 @@ export default {
           break;
         case CONSTANTS.VIDEO_STATUS_PAUSE:
           this.video.pause();
+          console.log('paused', this.video.readyState, this.video.paused);
           this.paused = true;
           this.initImage();
           this.$bus.$emit('changeVideoPaused', true);
@@ -357,7 +358,7 @@ export default {
     getSnapshot() {
       // 叠加显示时候 生成快照
       return {
-        snapShot: this.canvas,
+        snapShot: this.bitMap, //this.canvas,
         position: this.imagePosition,
         transform: this.cs.getTransform(),
         hist: this.currentHist
@@ -450,10 +451,6 @@ export default {
         this.bitMap = await offsreen.transferToImageBitmap();
         console.log('initImage', this.bitMap);
       }
-
-      // this.doZoomEnd();
-      // this.drawImage();
-
       this.requestGenerateHist();
     },
     requestGenerateHist() {
@@ -492,7 +489,6 @@ export default {
           this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         }
         this.doZoomEnd();
-        // this.initImage();
       });
       this.video.src = this.path;
       this.video.autoplay = true;
@@ -524,7 +520,6 @@ export default {
     },
     // 供外部直接调用 待测试
     reMount() {
-      // this.initImage();
       this.initCanvas();
       this.image.onload = () => {
         console.log('reMount');
@@ -544,7 +539,13 @@ export default {
       this.cs.translate(x + width / 2, y + height / 2);
       this.cs.rotate((this.degree * Math.PI) / 180);
       this.cs.translate(-x - width / 2, -y - height / 2);
-      this.cs.drawImage(img ?? this.video, x, y, width, height);
+      this.cs.drawImage(
+        img ?? this.paused ? this.bitMap : this.video,
+        x,
+        y,
+        width,
+        height
+      );
       this.cs.restore();
     },
     handleDbclick() {
@@ -627,13 +628,18 @@ export default {
     // 外部直接调用
     setCoverStatus({ snapShot, position, transform, hist }, status) {
       if (status) {
-        this._transform = this.cs.getTransform();
-        this.cs.save();
-        let { x, y, width, height } = position;
-        this.stopAnimation();
         this.clearCanvas();
-        this.cs.setTransform(transform);
+        let { x, y, width, height } = position;
         this.cs.drawImage(snapShot, x, y, width, height);
+
+        // TODO 尝试播放时进行叠加对比， 发现图片缩小
+        // this._transform = this.cs.getTransform();
+        // this.cs.save();
+        // let { x, y, width, height } = position;
+        // this.stopAnimation();
+        // this.clearCanvas();
+        // this.cs.setTransform(transform);
+        // this.cs.drawImage(snapShot, x, y, width, height);
         if (this.$refs['hist-container'].visible) {
           this.maskDom = hist;
         }
@@ -653,16 +659,20 @@ export default {
         this.afterFullSize = true;
         this.imagePosition = { x, y, width, height };
         this.doZoomEnd();
-        // this.drawImage();
       } else {
         console.log('reset');
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
-        // this.initImage();
       }
+      this.drawWhenPaused();
     },
     reDraw() {
       // 待测试
       window.requestAnimationFrame(this.initVideo);
+    },
+    drawWhenPaused() {
+      if (this.paused) {
+        this.drawImage();
+      }
     },
     getImageInitPos(canvas, video) {
       const cw = canvas.width;
@@ -706,7 +716,9 @@ export default {
         // 判断是否只在指定范围内拖动
         this.imagePosition.x = transX;
         this.imagePosition.y = transY;
-        this.drawImage();
+        if (this.paused) {
+          this.drawImage();
+        }
       }
     },
     /******************ScaleEditor START******************/
@@ -725,7 +737,9 @@ export default {
         imagePosition: { ...imagePosition }
       };
       this.imgScale = scale;
-      this.drawImage();
+      if (this.paused) {
+        this.drawImage();
+      }
     },
     setZoom(scale) {
       if (scale == this.imgScale) {
@@ -772,6 +786,7 @@ export default {
         };
         this.imgScale = 'N/A';
       }
+      this.drawImage();
     },
     doZoomEnd() {
       this.imgScale = this.video
@@ -811,6 +826,7 @@ export default {
     },
     rotate(degree) {
       this.degree = (this.degree + degree) % 360;
+      this.drawWhenPaused();
     },
     reverse(direction) {
       const { x, y, width, height } = this.imagePosition;
@@ -827,6 +843,7 @@ export default {
         this.cs.scale(1, -1);
         this.cs.translate(0, -dy);
       }
+      this.drawWhenPaused();
     },
     align({ name, data }) {
       const { beSameSize, position } = data;
@@ -843,7 +860,9 @@ export default {
           this.imagePosition.x = position.x;
           this.imagePosition.y = position.y;
         }
-        this.drawImage();
+        if (this.paused) {
+          this.drawImage();
+        }
       }
     },
     getSelectedPosition(data, callback) {
