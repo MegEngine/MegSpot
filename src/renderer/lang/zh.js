@@ -13,6 +13,9 @@ export default {
     feedback: '问题反馈'
   },
   general: {
+    success: '成功',
+    failure: '失败',
+    canceled: '取消',
     layout: '布局',
     aboutText: '关于',
     introduction: `MegSpot是一款跨平台本地应用，旨在为用户提供本地图片比较，视频比较，图片定制化处理等便捷功能。\r\n进入钉钉群了解详情。`,
@@ -21,6 +24,8 @@ export default {
     compare: '对比',
     selected: '已选',
     language: '语言',
+    import: '导入',
+    export: '导出',
     videoProcessBarStyle: '视频控制条位置',
     fixed: '固定',
     float: '悬浮球',

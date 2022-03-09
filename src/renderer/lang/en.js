@@ -13,6 +13,9 @@ export default {
     feedback: 'Feedback'
   },
   general: {
+    success: 'success',
+    failure: 'failure',
+    canceled: 'canceled',
     layout: 'layout',
     aboutText: 'about',
     introduction:
@@ -22,6 +25,8 @@ export default {
     compare: 'compare',
     selected: 'selected',
     language: 'Language',
+    import: 'import',
+    export: 'export',
     videoProcessBarStyle: 'Video Control Bar Position',
     fixed: 'fixed',
     float: 'floating ball',

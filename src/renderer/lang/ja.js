@@ -13,6 +13,9 @@ export default {
     feedback: 'フィードバック'
   },
   general: {
+    success: '成功',
+    failure: '失敗',
+    canceled: 'キャンセル',
     layout: 'レイアウト',
     aboutText: 'オン',
     introduction:
@@ -22,6 +25,8 @@ export default {
     compare: '比較',
     selected: '選択ファイル',
     language: '言語',
+    import: 'インポート',
+    export: 'エクスポート',
     videoProcessBarStyle: 'ビデオコントロールバーの位置',
     fixed: '安定',
     float: 'フローティングボール',
