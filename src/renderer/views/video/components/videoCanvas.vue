@@ -358,9 +358,7 @@ export default {
     getSnapshot() {
       // 叠加显示时候 生成快照
       return {
-        snapShot: this.bitMap, //this.canvas,
-        position: this.imagePosition,
-        transform: this.cs.getTransform(),
+        snapShot: this.canvas,
         hist: this.currentHist
       };
     },
@@ -626,31 +624,21 @@ export default {
       });
     },
     // 外部直接调用
-    setCoverStatus({ snapShot, position, transform, hist }, status) {
+    setCoverStatus({ snapShot, hist }, status) {
       if (status) {
         this.clearCanvas();
-        let { x, y, width, height } = position;
-        this.cs.drawImage(snapShot, x, y, width, height);
-
-        // TODO 尝试播放时进行叠加对比， 发现图片缩小
-        // this._transform = this.cs.getTransform();
-        // this.cs.save();
-        // let { x, y, width, height } = position;
-        // this.stopAnimation();
-        // this.clearCanvas();
-        // this.cs.setTransform(transform);
-        // this.cs.drawImage(snapShot, x, y, width, height);
+        this.cs.drawImage(snapShot, 0, 0);
         if (this.$refs['hist-container'].visible) {
           this.maskDom = hist;
         }
       } else {
-        this.cs.restore();
         this.maskDom = null;
-        this.cs.setTransform(this._transform);
         this.startAnimation();
       }
     },
     reset(val) {
+      this.degree = 0;
+      this.cs.setTransform(1, 0, 0, 1, 0, 0);
       if (val) {
         let x = 0,
           y = 0;
@@ -660,7 +648,6 @@ export default {
         this.imagePosition = { x, y, width, height };
         this.doZoomEnd();
       } else {
-        console.log('reset');
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
       }
       this.drawWhenPaused();
