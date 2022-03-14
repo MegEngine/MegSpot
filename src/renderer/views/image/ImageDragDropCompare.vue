@@ -7,40 +7,11 @@
             ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
           >
         </div>
-        <el-badge class="tool-item">
-          <Gallery
-            :selectedList="imageList"
-            :focusList="this.selectedList"
-            @update="setImages"
-            @remove="removeImages"
-            @click="handleClick"
-          >
-            <template v-slot:headButton>
-              <el-badge :value="imageList.length" class="item">
-                <el-button
-                  type="text"
-                  size="mini"
-                  :disabled="!imageList.length"
-                  v-tip.sure.right="
-                    'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
-                  "
-                >
-                  {{ $t('general.selected') }}
-                </el-button>
-              </el-badge>
-            </template>
-            <template v-slot:dragItem="item">
-              <img :src="item.src" :alt="item.alt" />
-            </template>
-          </Gallery>
-        </el-badge>
-        <el-button
-          type="text"
-          size="mini"
-          icon="el-icon-circle-close"
-          style="margin-right:10px"
-          title="unselected all"
-          :disabled="!imageList.length"
+        <SelectedBtn
+          :selectedList="imageList"
+          :focusList="this.selectedList"
+          @update="setImages"
+          @remove="removeImages"
           @click="emptyImages"
         />
         <el-radio-group
@@ -97,11 +68,11 @@ import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 import { throttle } from '@/utils';
 import { getImageUrlSync } from '@/utils/image';
-import Gallery from '@/components/gallery';
+import SelectedBtn from '@/components/selected-btn';
 
 export default {
   name: 'ImageDragDropCompare',
-  components: { Gallery },
+  components: { SelectedBtn },
   data() {
     return {
       status: true,

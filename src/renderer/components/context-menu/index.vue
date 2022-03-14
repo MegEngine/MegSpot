@@ -21,7 +21,9 @@
     </div>
   </div>
 </template>
+
 <script src="./ctx-menu.js"></script>
+
 <style scoped lang="scss">
 .ctx {
   position: relative;

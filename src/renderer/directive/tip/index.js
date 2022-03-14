@@ -105,7 +105,7 @@ class TipManager {
           if (tipInstance.tipTextEncoded === this.tipTextEncoded) {
             tipInstance.isKnown = true;
             tipInstance.tooltip.style.display = 'none';
-            tipInstance.circle.style.display = 'none';
+            if (tipInstance.circle) tipInstance.circle.style.display = 'none';
           }
         });
         this.isKnown = true;

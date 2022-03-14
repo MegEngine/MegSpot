@@ -21,7 +21,7 @@
       </div>
       <div flex="dir:top" class="setting-group">
         <div flex="main:justify" class="setting-item">
-          <span>show histogram：</span>
+          <span>default show histogram：</span>
           <el-switch v-model="defaultShowHist"></el-switch>
         </div>
         <div flex="main:justify" class="setting-item">
@@ -50,6 +50,17 @@
                 </div>
               </el-option>
             </div>
+          </el-select>
+        </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('general.videoProcessBarStyle') }}:</span>
+          <el-select v-model="videoProcessBarStyle">
+            <el-option :label="$t('general.fixed')" value="fixed"> </el-option>
+            <el-option :label="$t('general.float')" value="float"> </el-option>
           </el-select>
         </div>
         <div flex="main:justify" class="setting-item">
@@ -81,13 +92,12 @@
           ></el-input-number>
         </div>
       </div>
-      <el-button
-        slot="reference"
-        type="text"
-        @click="visible = !visible"
-        :class="{ enabled: visible }"
-      >
-        <svg-icon icon-class="settings" style="font-size: 22px;"></svg-icon>
+      <el-button slot="reference" type="text" @click="visible = !visible">
+        <svg-icon
+          :clicked="visible"
+          icon-class="settings"
+          style="font-size: 22px;"
+        ></svg-icon>
       </el-button>
     </el-popover>
   </div>
@@ -151,9 +161,19 @@ export default {
         });
       }
     },
+    videoProcessBarStyle: {
+      get() {
+        return this.preference.videoProcessBarStyle;
+      },
+      set(arg) {
+        this.setPreference({
+          videoProcessBarStyle: arg
+        });
+      }
+    },
     defaultShowHist: {
       get() {
-        return this.preference.defaultShowHist; // true
+        return this.preference.defaultShowHist; // false
       },
       set(newVal) {
         this.setPreference({ defaultShowHist: newVal });
@@ -223,11 +243,6 @@ export default {
     .setting-item {
       margin-top: 10px;
     }
-  }
-}
-.enabled {
-  .svg-icon {
-    color: $primaryColor;
   }
 }
 </style>

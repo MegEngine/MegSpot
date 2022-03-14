@@ -11,48 +11,21 @@
         >
           {{ $t('image.toolbar.addFolder') }}
         </el-button>
-        <el-badge :value="videoList.length" class="tool-item">
-          <Gallery
-            :selectedList="videoList"
-            @update="setVideos"
-            @remove="removeVideos"
-          >
-            <template v-slot:headButton>
-              <el-button
-                type="text"
-                size="mini"
-                :disabled="!videoList.length"
-                v-tip.bottom="
-                  'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
-                "
-              >
-                {{ $t('general.selected') }}
-              </el-button>
-            </template>
-            <template v-slot:dragItem="item">
-              <video :src="item.src" controls />
-            </template>
-          </Gallery>
-        </el-badge>
-        <el-button
-          type="text"
-          size="mini"
-          icon="el-icon-circle-close"
-          title="unselected all"
-          style="margin-right:10px"
-          :disabled="!videoList.length"
+        <SelectedBtn
+          :selectedList="videoList"
+          @update="setVideos"
+          @remove="removeVideos"
           @click="emptyVideos"
-        >
-        </el-button>
+        />
         <el-button
-          type="text"
-          size="small"
+          type="primary"
+          round
           class="tool-item"
           :disabled="!videoList.length"
           @click="compare"
           v-on:keyup.meta.enter="compare"
           v-on:keydown.tab="compare"
-          v-tip="`${$t('common.hotKey')}：cmd/ctrl+enter`"
+          :title="`${$t('common.hotKey')}：cmd/ctrl+enter`"
         >
           {{ $t('general.compare') }}
         </el-button>
@@ -95,14 +68,14 @@ import VueSplit from 'vue-split-panel';
 import VideoPreview from './VideoPreview';
 import { throttle } from '@/utils';
 import { createNamespacedHelpers } from 'vuex';
-import Gallery from '@/components/gallery';
+import SelectedBtn from '@/components/selected-btn';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 import addDragFolderListener from '@/utils/dragFolder.js';
 
 Vue.use(VueSplit);
 export default {
   name: 'VideoRoot',
-  components: { FileTree, VideoPreview, Gallery, ShowPath },
+  components: { FileTree, VideoPreview, SelectedBtn, ShowPath },
   data() {
     return {
       isDraging: false,
@@ -145,6 +118,10 @@ export default {
       // cmd+enter
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 13) {
         this.compare();
+      }
+      // cmd+delete
+      if ((event.metaKey || event.ctrlKey) && event.keyCode === 8) {
+        this.emptyVideos();
       }
     },
     calcSplitHeight() {

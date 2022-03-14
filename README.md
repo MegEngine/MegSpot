@@ -152,7 +152,7 @@ Linux 环境下支持通过命令行进行启动、对比等操作。
 - 每一名贡献者都需要签署贡献者许可协议（Contributor License Agreement，CLA）来明确贡献内容相关的知识产权许可。更多细节请参考 [协议内容](CONTRIBUTOR_LICENSE_AGREEMENT.md)。
 - 我们欢迎你通过以下方式来帮助 MegSpot 变得更好：
   - 贡献代码；
-  - 完善[文档](https://github.com/MegSpot/Docs)；
+  - 完善[文档](https://github.com/MegEngine/MegSpot/wiki)；
   - 在 [MegSpot 论坛](https://discuss.megengine.org.cn) 和 Stack Overflow 回答问题；
   - 报告使用中的 [Bugs 和 Issues](https://github.com/MegSpot/MegSpot/issues)；
   - 审查 [Pull Requests](https://github.com/MegSpot/MegSpot/pulls)；

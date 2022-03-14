@@ -5,25 +5,52 @@
     class="canvas-container"
     :style="containerStyle"
   >
-    <div v-for="imgs in imageGroupList" :key="imgs">
-      <ImageCanvas
-        ref="image_canvas"
-        :path="imgs"
+    <div v-for="(video, index) in videoGroupList" :key="index">
+      <VideoCanvas
+        ref="video_canvas"
+        :index="index"
+        :path="video"
         :_width="canvasWidth"
         :_height="canvasHeight"
-      ></ImageCanvas>
+        @loaded="handleVideoLoaded"
+      ></VideoCanvas>
     </div>
+    <Sticky
+      v-if="isFloating"
+      :contentDragDisabled="false"
+      :disableDragFn="
+        event => {
+          return (
+            event.target.className.toString().includes('el-slider__') ||
+            event.target.tagName.toLowerCase() === 'strong'
+          );
+        }
+      "
+    >
+      <template v-slot:icon>
+        <el-button type="text">
+          <svg-icon icon-class="play" :clicked="true" class="svg-container" />
+        </el-button>
+      </template>
+      <VideoProgressBar />
+    </Sticky>
   </div>
 </template>
+
 <script>
-import ImageCanvas from './components/ImageCanvas';
+import VideoCanvas from './components/videoCanvas';
+import Sticky from '@/components/sticky';
+import VideoProgressBar from './components/videoProgressBar';
 import { throttle } from '@/utils';
 import * as GLOBAL_CONSTANTS from '@/constants';
 import { createNamespacedHelpers } from 'vuex';
-const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
+const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
 
 export default {
-  components: { ImageCanvas },
+  components: { VideoCanvas, Sticky, VideoProgressBar },
   data() {
     return {
       canvasWidth: 0,
@@ -45,15 +72,22 @@ export default {
         {
           event: 'getCanvasSize',
           action: 'getCanvasSize'
+        },
+        {
+          event: 'getMarks',
+          action: 'getMarks'
         }
-      ]
+      ],
+      marks: []
     };
   },
   created() {
+    this.marks = [];
+    this.setVideoConfig({ currentTime: 0 });
     // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
-    if (this.imageList.length <= 4) {
+    if (this.videoList.length <= 4) {
       let smartLayout;
-      switch (this.imageList.length) {
+      switch (this.videoList.length) {
         case 1:
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X1;
           break;
@@ -67,9 +101,9 @@ export default {
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X2;
           break;
         default:
-          smartLayout = this.imageConfig.layout;
+          smartLayout = this.videoConfig.layout;
       }
-      this.setImageConfig({ layout: smartLayout });
+      this.setVideoConfig({ layout: smartLayout });
     }
   },
   mounted() {
@@ -87,24 +121,25 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(['imageList', 'imageConfig']),
+    ...mapGetters(['videoList', 'videoConfig']),
+    ...preferenceMapGetters(['preference']),
     // 每组图片数量
     groupCount() {
-      const str = this.imageConfig.layout,
+      const str = this.videoConfig.layout,
         len = str.length;
       return str[len - 3] * str[len - 1];
     },
     // 当前组的图片列表
-    imageGroupList() {
-      return this.imageList.length
-        ? this.imageList.slice(
+    videoGroupList() {
+      return this.videoList.length
+        ? this.videoList.slice(
             this.groupStartIndex,
             this.groupStartIndex + this.groupCount
           )
         : [];
     },
     containerStyle() {
-      switch (this.imageConfig.layout) {
+      switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
           return {
             display: 'flex',
@@ -143,21 +178,24 @@ export default {
             gridTemplateColumns: '1fr 1fr'
           };
       }
+    },
+    isFloating() {
+      return this.preference.videoProcessBarStyle === 'float';
     }
   },
   watch: {
-    imageList() {
+    videoList() {
       this.$nextTick(() => {
         this.calcCanvasSize();
       });
     },
-    imageGroupList() {
+    videoGroupList() {
       this.$nextTick(() => {
         this.calcCanvasSize();
         this.udpateAllCanvas();
       });
     },
-    'imageConfig.layout'() {
+    'videoConfig.layout'() {
       this.$nextTick(() => {
         this.calcCanvasSize();
         this.udpateAllCanvas();
@@ -165,11 +203,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['setVideoConfig']),
     // 接收改变当前图片分组的开始序号
     changeGroup(groupStartIndex) {
       this.groupStartIndex = groupStartIndex;
     },
-    ...mapActions(['setImageConfig']),
     handleResize: throttle(50, function() {
       this.calcCanvasSize();
       // 重新布局图片容器;
@@ -187,7 +225,8 @@ export default {
     },
     calcWidth() {
       const containerWidth = document.body.clientWidth;
-      switch (this.imageConfig.layout) {
+      this.containerWidth = containerWidth;
+      switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
           return containerWidth;
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
@@ -209,7 +248,8 @@ export default {
         .getBoundingClientRect();
       const containerHeight =
         document.body.clientHeight - toolbarInfo.height - headerInfo.height;
-      switch (this.imageConfig.layout) {
+      this.containerHeight = containerHeight;
+      switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
         case GLOBAL_CONSTANTS.LAYOUT_3X1:
@@ -229,7 +269,7 @@ export default {
       );
     },
     getImageDetails(imageNameList, callback) {
-      let canvasViews = this.$refs['image_canvas'];
+      let canvasViews = this.$refs['video_canvas'];
       try {
         let details = canvasViews
           .filter(
@@ -248,7 +288,7 @@ export default {
       }
     },
     udpateAllCanvas() {
-      this.$refs['image_canvas'].forEach(item => {
+      this.$refs['video_canvas'].forEach(item => {
         // 重新设定宽高 然后重新绘制canvas
         item.height = Math.floor(this.canvasHeight);
         item.width = Math.floor(this.canvasWidth);
@@ -257,7 +297,7 @@ export default {
     },
     handleCompareOptions(direction) {
       const columnLen = this.getColumnLine();
-      const canvasViews = this.$refs['image_canvas'];
+      const canvasViews = this.$refs['video_canvas'];
       let snapShotArr = [];
       let coveredArr = [];
       if (
@@ -372,6 +412,26 @@ export default {
         coveredArr
       };
     },
+    handleVideoLoaded() {
+      if (this.marks.length > 0) {
+        return;
+      }
+      this.$refs['video_canvas'].forEach((item, index) => {
+        console.log(`video-${index + 1}`, {
+          duration: item.video.duration,
+          currentTime: item.video.currentTime
+        });
+        this.marks.push([
+          Math.round(parseFloat(item.video.duration) * 100) / 100,
+          index + 1
+        ]);
+      });
+      this.$bus.$emit('videoLoaded', this.marks);
+    },
+    getMarks(data, callback) {
+      callback(this.marks);
+      return this.marks;
+    },
     //执行覆盖
     snapAndCover(snapShotArr, coveredArr, status) {
       for (let i = 0; i < snapShotArr.length; i++) {
@@ -383,22 +443,22 @@ export default {
       //获取列数
       if (
         [GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(
-          this.imageConfig.layout
+          this.videoConfig.layout
         )
       ) {
         return 3;
       }
       if (
         [GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(
-          this.imageConfig.layout
+          this.videoConfig.layout
         )
       ) {
         return 2;
       }
-      if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.videoConfig.layout)) {
         return 4;
       }
-      if ([GLOBAL_CONSTANTS.LAYOUT_1X1].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_1X1].includes(this.videoConfig.layout)) {
         return 1;
       }
     }
@@ -409,6 +469,8 @@ export default {
 #image-container {
   overflow-x: hidden;
   gap: 2px;
+  width: 100%;
+  height: 100%;
   .canvas-item + .canvas-item {
     border-left: 1px solid red;
   }
@@ -425,5 +487,8 @@ export default {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
+.svg-container {
+  font-size: 24px;
 }
 </style>

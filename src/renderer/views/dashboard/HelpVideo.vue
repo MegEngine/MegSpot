@@ -4,9 +4,19 @@
       <el-button
         type="text"
         size="medium"
-        @click="videoVisible = !videoVisible"
+        @click="videoVisible = true"
+        v-show="videoVisible == false"
       >
         {{ $t('common.showVideoTip') }}
+      </el-button>
+      <el-button
+        icon="el-icon-circle-close"
+        size="medium"
+        type="text"
+        @click="videoVisible = false"
+        v-show="videoVisible == true"
+        :class="{ close: videoVisible }"
+      >
       </el-button>
     </div>
     <div flex="main:center">
@@ -21,7 +31,7 @@
       >
         <swiper-slide
           v-for="(video, index) in videoSource"
-          :key="video"
+          :key="index"
           class="video-container"
         >
           <span class="title">{{ video.title }}</span>
@@ -61,6 +71,7 @@ import {
   EffectFade,
   SwiperSlide
 } from 'vue-awesome-swiper';
+import 'swiper/css/swiper.css';
 
 export default {
   name: 'HelpVideo',
@@ -142,6 +153,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/variables.scss';
 @import 'swiper/swiper.scss';
 .swiper {
   margin-left: 20px;
@@ -174,5 +186,20 @@ export default {
     position: absolute;
     bottom: 6px;
   }
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    display: none;
+  }
+  &:hover {
+    .swiper-button-prev,
+    .swiper-button-next {
+      display: block;
+      color: $primaryColor;
+    }
+  }
+}
+.close:hover {
+  color: red;
 }
 </style>

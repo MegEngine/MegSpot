@@ -10,7 +10,7 @@
       <el-tooltip placement="bottom" :open-delay="800">
         <span class="compare-name" flex-box="1" v-html="getTitle"></span>
         <div slot="content">
-          {{ imgSrc }}
+          {{ path }}
           <br /><br />
           <span class="size">
             {{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span
@@ -80,7 +80,7 @@ export default {
     EffectPreview
   },
   props: {
-    imgSrc: {
+    path: {
       type: String,
       default: ''
     },
@@ -167,12 +167,12 @@ export default {
     ...mapGetters(['imageConfig', 'imageList']),
     ...preferenceMapGetters(['preference']),
     selected() {
-      return this.imgSrc === this.selectedId;
+      return this.path === this.selectedId;
     },
     getTitle() {
       return this.preference.showTitle
         ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
-            this.$options.filters.getFileName(this.imgSrc)
+            this.$options.filters.getFileName(this.path)
         : ' ';
     },
     canvasStyle() {
@@ -191,7 +191,7 @@ export default {
     this.bitMap && this.bitMap.close();
   },
   watch: {
-    imgSrc: {
+    path: {
       handler: function(newVal, oldVal) {
         if (oldVal) {
           this.wacther && this.wacther.close();
@@ -236,8 +236,8 @@ export default {
         ch = this._height,
         iw = _width ?? this.imagePosition.width,
         ih = _height ?? this.imagePosition.height;
-      const constantsW = DRAG_CONSTANTS * iw,
-        constantsH = DRAG_CONSTANTS * ih;
+      const constantsW = DRAG_CONSTANTS * (cw < iw ? cw : iw),
+        constantsH = DRAG_CONSTANTS * (ch < ih ? ch : ih);
 
       let isFullFilled =
         transX <= constantsW &&
@@ -308,13 +308,13 @@ export default {
       });
     },
     dispatchCanvasAction({ name, data }) {
-      if (!this.selectedId || this.selectedId === this.imgSrc) {
+      if (!this.selectedId || this.selectedId === this.path) {
         this[name](data);
       }
     },
     handleBroadcast({ name, data }) {
       if (this.selectedId) {
-        if (data.id === this.imgSrc || this.selectedId === this.imgSrc) {
+        if (data.id === this.path || this.selectedId === this.path) {
           this[name](data);
         }
       } else {
@@ -336,7 +336,7 @@ export default {
           cv.imread(this.image)
         );
       };
-      this.image.src = getImageUrlSyncNoCache(this.imgSrc); //        'C:/Demo/1-1%20-%20副本.jpg'
+      this.image.src = getImageUrlSyncNoCache(this.path); //        'C:/Demo/1-1%20-%20副本.jpg'
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d');
@@ -352,7 +352,7 @@ export default {
         this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
         this.drawImage();
       };
-      this.image.src = getImageUrlSyncNoCache(this.imgSrc);
+      this.image.src = getImageUrlSyncNoCache(this.path);
     },
     drawImage() {
       let { x, y, width, height } = this.imagePosition;
@@ -361,7 +361,7 @@ export default {
     },
     handleDbclick() {
       if (!this.selected) {
-        this.$bus.$emit('image_handleSelect', this.imgSrc);
+        this.$bus.$emit('image_handleSelect', this.path);
       } else {
         this.$bus.$emit('image_handleSelect', null);
       }
@@ -598,13 +598,13 @@ export default {
     handleDrag(offset) {
       this.broadCast({
         name: 'doDrag',
-        data: { offset: offset, id: this.imgSrc }
+        data: { offset: offset, id: this.path }
       });
     },
     handleZoom(rate, mousePos) {
       this.broadCast({
         name: 'doZoom',
-        data: { rate: rate, mousePos: mousePos, id: this.imgSrc }
+        data: { rate: rate, mousePos: mousePos, id: this.path }
       });
     },
     handleZoomEnd() {
@@ -669,13 +669,13 @@ export default {
       offCtx.drawImage(this.bitMap, 0, 0);
       this.bitMap.close();
       this.bitMap = offsreen.transferToImageBitmap();
-      this.drawImage(this.bitMap);
+      this.drawImage();
     },
     align({ name, data }) {
       const { beSameSize, position } = data;
       if (
         this.selectedId ||
-        (!this.selectedId && this.imgSrc !== this.imageList[0])
+        (!this.selectedId && this.path !== this.imageList[0])
       ) {
         if (beSameSize) {
           let { x, y, width, height } = position;
@@ -692,11 +692,11 @@ export default {
     getSelectedPosition(data, callback) {
       if (
         this.selected ||
-        this.imgSrc === this.selectedId ||
-        (!this.selectedId && this.imgSrc === this.imageList[0])
+        this.path === this.selectedId ||
+        (!this.selectedId && this.path === this.imageList[0])
       ) {
         callback({
-          id: this.imgSrc,
+          id: this.path,
           position: this.imagePosition
         });
       }

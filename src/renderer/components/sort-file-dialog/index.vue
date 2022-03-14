@@ -76,6 +76,12 @@ export default {
         bar: {
           keepShow: true
         }
+      },
+      dragOptions: {
+        animation: 200,
+        group: 'description',
+        disabled: false,
+        ghostClass: 'ghost'
       }
     };
   },
@@ -83,10 +89,39 @@ export default {
     this.$bus.$on('showSortFileDialog', () => {
       this.visible = true;
     });
+    this.$bus.$on('fileChanged', this.handleFileChange);
+    this.$bus.$on('changeFile', this.changeFile);
     this.sortList = await this.getSortList();
   },
+  beforeDestroy() {
+    this.$bus.$off('showSortFileDialog');
+    this.$bus.$off('fileChanged', this.handleFileChange);
+    this.$bus.$off('changeFile', this.changeFile);
+  },
   methods: {
-    handleFileChange(data) {
+    async changeFile({ fileName, newFileName }) {
+      const index = this.sortList.findIndex(item => item === fileName);
+      if (index > -1) {
+        if (newFileName != undefined) {
+          this.sortList.splice(index, 1, newFileName);
+        } else {
+          this.sortList.splice(index, 1);
+        }
+        await fse
+          .outputFile(this.sortFilePath, this.sortList.join(EOF))
+          .then(async () => {
+            await this.$parent.$refs.fileTable.refreshFileList();
+          });
+      }
+    },
+    async handleFileChange(init = true) {
+      let data = [...this.sortList];
+      if (init) {
+        const exists = await fse.pathExists(this.sortFilePath);
+        if (exists) {
+          data = (await fse.readFile(this.sortFilePath, 'utf8')).split(EOF);
+        }
+      }
       if (this.changed) {
         this.$confirm('排序文件已更改，是否显示更改后的排序列表', '提示', {
           confirmButtonText: '确定',
@@ -144,7 +179,7 @@ export default {
       this.$emit('getSortData', null, data => {
         const sortList = data.map(item => getFileName(item.path, false));
         this.sortList = sortList;
-        this.changed = false;
+        this.changed = true;
       });
     },
     // 外部直接调用
@@ -172,14 +207,6 @@ export default {
     }
   },
   computed: {
-    dragOptions() {
-      return {
-        animation: 200,
-        group: 'description',
-        disabled: false,
-        ghostClass: 'ghost'
-      };
-    },
     sortFilePath() {
       return this.currentPath + DELIMITER + SORTING_FILE_NAME;
     }

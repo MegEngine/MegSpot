@@ -172,7 +172,7 @@ Download the installation package of the corresponding system in Github Releases
 - Every contributor needs to sign a contributor license agreement（Contributor License Agreement，CLA）to clarify the intellectual property license related to the content of the contribution,for details[CONTRIBUTOR_LICENSE_AGREEMENT](CONTRIBUTOR_LICENSE_AGREEMENT.md)。
 - We welcome you to help MegSpot become better in the following ways：
   - Contribute code;
-  - Complete[Documents](https://github.com/MegSpot/Docs)；
+  - Complete[Documents](https://github.com/MegEngine/MegSpot/wiki)；
   - Report in use [Bugs && Issues](https://github.com/MegEngine/MegSpot/issues)；
   - Review in use [Pull Requests](https://github.com/MegEngine/MegSpot/pulls)；
   - Light up a star for MegSpot
