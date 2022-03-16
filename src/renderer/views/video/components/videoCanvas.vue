@@ -17,6 +17,7 @@
           >
         </div>
       </el-tooltip>
+      <VideoProgressBar :time="time" class="progress-bar" />
       <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
       <EffectPreview @change="changeCanvasStyle" />
     </div>
@@ -60,6 +61,7 @@ import CoverMask from '@/components/cover-mask';
 import RGBAExhibit from '@/components/rgba-exhibit';
 import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
+import VideoProgressBar from './videoProgressBar';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
@@ -79,7 +81,8 @@ export default {
     CoverMask,
     RGBAExhibit,
     ScaleEditor,
-    EffectPreview
+    EffectPreview,
+    VideoProgressBar
   },
   props: {
     index: {
@@ -106,6 +109,7 @@ export default {
       header: null,
       canvas: null,
       video: null,
+      time: 1,
       paused: true,
       maskDom: undefined,
       currentHist: undefined,
@@ -875,6 +879,11 @@ export default {
     line-height: 16px;
     background-color: #f6f6f6;
     padding-right: 10px;
+
+    .progress-bar {
+      display: inline-block;
+      // margin-left: 20px;
+    }
   }
   .canvas-container {
     .canvas-item {

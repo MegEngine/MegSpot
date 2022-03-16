@@ -25,6 +25,12 @@ const defaultMarks = {
 
 export default {
   name: 'VideoProgressBar',
+  props: {
+    time: {
+      type: Number,
+      default: 0
+    }
+  },
   data() {
     return {
       value: 0,
