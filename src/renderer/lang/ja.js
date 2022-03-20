@@ -125,7 +125,8 @@ export default {
     loop: 'リピート',
     play: '再生',
     pause: '一時停止',
-    reset: 'リセット'
+    reset: 'リセット',
+    dynamicPickColor: 'カラーピッカー調和'
   },
   sortFile: {
     apply: '応用',

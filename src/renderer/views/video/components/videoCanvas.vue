@@ -1,13 +1,26 @@
 <template>
   <div :class="['image-canvas', { selected: selected }]" @click.stop>
-    <div ref="header" class="header" flex="cross:center">
-      <CoverMask :mask="maskDom" class="cover-mask">
-        <HistContainer
-          ref="hist-container"
-          @changeVisible="handleHistVisible"
-        />
-      </CoverMask>
-      <el-tooltip placement="bottom" :open-delay="800">
+    <div ref="header" class="header" flex="main:justify cross:center">
+      <div flex="cross:center">
+        <CoverMask :mask="maskDom" class="cover-mask">
+          <HistContainer
+            ref="hist-container"
+            @changeVisible="handleHistVisible"
+          />
+        </CoverMask>
+        <span
+          @click="handleVideoSliderVisible"
+          @dblclick="test"
+          class="svg-container"
+        >
+          <svg-icon icon-class="video-bar" />
+        </span>
+      </div>
+      <el-tooltip
+        v-if="!videoSliderVisible"
+        placement="bottom"
+        :open-delay="800"
+      >
         <span class="compare-name" flex-box="1" v-html="getTitle"></span>
         <div slot="content">
           {{ path }}
@@ -17,9 +30,15 @@
           >
         </div>
       </el-tooltip>
-      <VideoProgressBar :time="time" class="progress-bar" />
-      <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
-      <EffectPreview @change="changeCanvasStyle" />
+      <videoSlider
+        :time.sync="theTime"
+        :duration="duration"
+        :show="videoSliderVisible"
+      />
+      <div flex="main:right cross:center">
+        <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
+        <EffectPreview @change="changeCanvasStyle" />
+      </div>
     </div>
     <div
       ref="container"
@@ -61,7 +80,7 @@ import CoverMask from '@/components/cover-mask';
 import RGBAExhibit from '@/components/rgba-exhibit';
 import ScaleEditor from '@/components/scale-editor';
 import EffectPreview from '@/components/effect-preview';
-import VideoProgressBar from './videoProgressBar';
+import videoSlider from './videoSlider.vue';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
@@ -72,7 +91,6 @@ import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
 import chokidar from 'chokidar';
 import * as CONSTANTS from '../video-constants';
-import { t } from 'vxe-table';
 
 export default {
   components: {
@@ -82,7 +100,7 @@ export default {
     RGBAExhibit,
     ScaleEditor,
     EffectPreview,
-    VideoProgressBar
+    videoSlider
   },
   props: {
     index: {
@@ -109,7 +127,9 @@ export default {
       header: null,
       canvas: null,
       video: null,
-      time: 1,
+      duration: 60,
+      currentTime: 1,
+      videoSliderVisible: false,
       paused: true,
       maskDom: undefined,
       currentHist: undefined,
@@ -206,8 +226,19 @@ export default {
     canvasStyle() {
       return this.preference.background.style;
     },
-    globalCurrentTime() {
-      return this.videoConfig.currentTime;
+    // globalCurrentTime() {
+    //   return this.videoConfig.currentTime;
+    // },
+    dynamicPickColor() {
+      return this.videoConfig.dynamicPickColor;
+    },
+    theTime: {
+      get() {
+        return this.currentTime;
+      },
+      set(value) {
+        this.changeVideoTime(value);
+      }
     }
   },
   mounted() {
@@ -261,12 +292,18 @@ export default {
         this.setSmooth();
       },
       immediate: true
-    },
-    globalCurrentTime(newVal) {
-      this.handleVideoChangeTime(newVal);
     }
+    // currentTime(newVal) {
+    //   this.changeVideoTime(newVal);
+    // }
+    // globalCurrentTime(newVal) {
+    //   this.handleVideoChangeTime(newVal);
+    // }
   },
   methods: {
+    test() {
+      console.log('test');
+    },
     ...mapActions(['removeVideos']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, _width, _height) {
@@ -327,15 +364,11 @@ export default {
               // console.log('error', e);
             });
           }
-          this.paused = false;
-          this.$bus.$emit('changeVideoPaused', false);
+          this.handleVideoPaused(false);
           break;
         case CONSTANTS.VIDEO_STATUS_PAUSE:
-          this.video.pause();
-          console.log('paused', this.video.readyState, this.video.paused);
-          this.paused = true;
+          this.handleVideoPaused();
           this.initImage();
-          this.$bus.$emit('changeVideoPaused', true);
           this.requestGenerateHist();
           break;
         case CONSTANTS.VIDEO_STATUS_RESET:
@@ -400,6 +433,15 @@ export default {
         this[name](data);
       }
     },
+    handleVideoPaused(state = true) {
+      this.paused = state;
+      this.$bus.$emit('changeVideoPaused', state);
+      if (state) {
+        this.video.pause();
+        console.log('paused', this.video.readyState, this.video.paused);
+      } else {
+      }
+    },
     handleVideoResetTime() {
       this.video.currentTime = 0;
       if (this.video.readyState > 0 && this.video.paused) {
@@ -413,6 +455,37 @@ export default {
         this.startAnimation();
       }
       if (this.video.duration >= currentTime) {
+        if (Math.abs(this.video.currentTime - currentTime) > 1) {
+          this.video.currentTime = Number(currentTime).toFixed(2);
+          if (this.video.readyState > 0 && this.video.paused) {
+            this.video.play().catch(e => {
+              // console.log('error', e);
+            });
+          }
+        }
+      } else {
+        this.video.currentTime = this.video.duration;
+        if (this.video.readyState > 0 && !this.video.paused) {
+          try {
+            this.video.pause();
+          } catch (e) {
+            console.log(this.video.readyState, this.video.paused, e);
+          }
+        }
+      }
+    },
+    changeVideoTime(currentTime) {
+      this.handleVideoPaused(false);
+      if (this.requestId == undefined) {
+        this.startAnimation();
+      }
+      if (this.video.duration >= currentTime) {
+        // console.log(
+        //   'changeVideoTime',
+        //   this.video.currentTime,
+        //   currentTime,
+        //   this.video.currentTime - currentTime
+        // );
         if (Math.abs(this.video.currentTime - currentTime) > 1) {
           this.video.currentTime = Number(currentTime).toFixed(2);
           if (this.video.readyState > 0 && this.video.paused) {
@@ -483,7 +556,10 @@ export default {
       this.video = document.createElement('video');
       this.video.addEventListener('loadeddata', () => {
         this.$emit('loaded');
-        this.paused = false;
+        this.duration = isNaN(this.video.duration)
+          ? 60
+          : Number(Number(this.video.duration).toFixed(2));
+        this.handleVideoPaused(false);
         if (
           (this.imagePosition = undefined || isNaN(this.imagePosition?.height))
         ) {
@@ -492,6 +568,15 @@ export default {
         }
         this.doZoomEnd();
       });
+      this.video.addEventListener('timeupdate', () => {
+        if (this.paused) return;
+        this.currentTime = this.video.currentTime;
+        // console.log('currentTime', this.video.currentTime, this.currentTime);
+      });
+      this.video.addEventListener('pause', () => {
+        this.$bus.$emit('changeVideoPaused', true);
+      });
+
       this.video.src = this.path;
       this.video.autoplay = true;
       this.video.loop = false;
@@ -549,6 +634,9 @@ export default {
         height
       );
       this.cs.restore();
+      if (this.dynamicPickColor && this.traggerRGB) {
+        this.doHandleMove();
+      }
     },
     handleDbclick() {
       if (!this.selected) {
@@ -566,6 +654,15 @@ export default {
         data: { visible }
       });
     },
+    handleVideoSliderVisible() {
+      this.broadCast({
+        name: 'changeVideoSliderVisible',
+        data: null
+      });
+    },
+    changeVideoSliderVisible() {
+      this.videoSliderVisible = !this.videoSliderVisible;
+    },
     doHistVisible({ visible }) {
       this.$refs['hist-container'].setVisible(visible);
     },
@@ -579,6 +676,7 @@ export default {
     changeZoom(data) {
       console.log('changeZoom', data);
     },
+    // toolbar广播触发， 改变取色器显示状态
     pickColor({ status }) {
       this.traggerRGB = status;
     },
@@ -598,15 +696,22 @@ export default {
         data: { mousePos }
       });
     }),
-    doHandleMove({ mousePos }) {
+    async doHandleMove(e) {
       if (!this.traggerRGB) return;
+      let mousePos = undefined;
+      if (!e?.mousePos) {
+        mousePos = this.mousePos;
+      } else {
+        mousePos = e.mousePos;
+        this.mousePos = mousePos;
+      }
       const { x, y } = mousePos;
       const feedback = this.$refs.feedback;
       feedback.style.left = x - this.radius + 'px';
       feedback.style.top = y - this.radius + 'px';
       feedback.style.width = this.radius * 2 + 'px';
       feedback.style.height = this.radius * 2 + 'px';
-      Promise.resolve().then(() => {
+      await Promise.resolve().then(() => {
         const data = this.cs.getImageData(x, y, this.radius, this.radius).data;
         const count = data.length / 4;
         let r = 0,
@@ -880,6 +985,10 @@ export default {
     background-color: #f6f6f6;
     padding-right: 10px;
 
+    .svg-container {
+      margin: 0 5px;
+      font-size: 16px;
+    }
     .progress-bar {
       display: inline-block;
       // margin-left: 20px;

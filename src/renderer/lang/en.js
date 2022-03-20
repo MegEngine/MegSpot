@@ -125,7 +125,8 @@ export default {
     loop: 'loop',
     play: 'play',
     pause: 'pause',
-    reset: 'reset'
+    reset: 'reset',
+    dynamicPickColor: 'dynamic color picker'
   },
   sortFile: {
     apply: 'Apply',
