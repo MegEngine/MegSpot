@@ -1,7 +1,9 @@
 import { readFileSync, formatFileSize, getFileStat, getFileSize } from './file';
 import { NO_CACHE_FILE_PROTOCOL } from '@/constants';
 export const getImageUrlSync = path => {
-  return 'file://' + path;
+  const uri = path.split(/[/\\]/);
+  const name = uri.pop();
+  return 'file://' + [...uri, encodeURIComponent(name)].join('/');
 };
 export const getImageUrlSyncNoCache = path => {
   return `${NO_CACHE_FILE_PROTOCOL}://${path}`;

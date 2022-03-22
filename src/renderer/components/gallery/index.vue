@@ -45,7 +45,7 @@
                     >
                       <div>
                         <span
-                          @click="$emit('remove', item)"
+                          @click.stop="$emit('remove', item)"
                           class="close-button"
                           :title="$t('general.delete')"
                         >
