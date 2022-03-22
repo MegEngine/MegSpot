@@ -410,10 +410,6 @@ export default {
       this.imgScale = 1;
     },
     handleChangeVideoPaused() {
-      console.log(
-        'a',
-        this.$parent.$refs.content.$refs['video_canvas'].map(item => item.video)
-      );
       this.videoPaused = this.$parent.$refs.content.$refs['video_canvas'].every(
         item => item.video.paused === true
       );

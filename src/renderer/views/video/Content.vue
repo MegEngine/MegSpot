@@ -180,7 +180,9 @@ export default {
       }
     },
     isFloating() {
-      return this.preference.videoProcessBarStyle === 'float';
+      //TODO: 暂时不使用悬浮组件
+      // return this.preference.videoProcessBarStyle === 'float';
+      return false;
     }
   },
   watch: {

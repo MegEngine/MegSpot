@@ -8,13 +8,40 @@
             @changeVisible="handleHistVisible"
           />
         </CoverMask>
-        <span
-          @click="handleVideoSliderVisible"
-          @dblclick="test"
-          class="svg-container"
+
+        <el-popover
+          v-model="videoProcessBarInputVisible"
+          effect="light"
+          placement="left"
+          trigger="manual"
         >
-          <svg-icon icon-class="video-bar" />
-        </span>
+          <div>
+            <el-input-number
+              v-if="videoProcessBarInputVisible"
+              v-model="theTime"
+              :precision="3"
+              :min="0"
+              :max="duration || 60"
+            />
+            <span class="svg-container" @click="executeAction(1)">
+              <svg-icon icon-class="play" />
+            </span>
+            <span class="svg-container" @click="executeAction(0)">
+              <svg-icon icon-class="pause" />
+            </span>
+          </div>
+          <span
+            slot="reference"
+            @click="handleVideoSliderVisible"
+            @contextmenu.stop="changeVideoProcessBarInputVisible"
+            class="svg-container"
+          >
+            <svg-icon
+              icon-class="video-bar"
+              :class="[videoProcessBarInputVisible ? 'icon-hover' : '']"
+            />
+          </span>
+        </el-popover>
       </div>
       <el-tooltip
         v-if="!videoSliderVisible"
@@ -71,6 +98,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import Vue from 'vue';
 const cv = Vue.prototype.$cv;
@@ -130,6 +158,7 @@ export default {
       duration: 60,
       currentTime: 1,
       videoSliderVisible: false,
+      videoProcessBarInputVisible: false,
       paused: true,
       maskDom: undefined,
       currentHist: undefined,
@@ -301,8 +330,8 @@ export default {
     // }
   },
   methods: {
-    test() {
-      console.log('test');
+    changeVideoProcessBarInputVisible() {
+      this.videoProcessBarInputVisible = !this.videoProcessBarInputVisible;
     },
     ...mapActions(['removeVideos']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
@@ -355,6 +384,7 @@ export default {
     },
     executeAction(action) {
       switch (action) {
+        case 1:
         case CONSTANTS.VIDEO_STATUS_START:
           this.cs.restore();
           if (this.requestId == undefined) {
@@ -366,14 +396,17 @@ export default {
           }
           this.handleVideoPaused(false);
           break;
+        case 0:
         case CONSTANTS.VIDEO_STATUS_PAUSE:
           this.handleVideoPaused();
           this.initImage();
           this.requestGenerateHist();
           break;
+        case -1:
         case CONSTANTS.VIDEO_STATUS_RESET:
           this.cs.restore();
-          this.video.currentTime = 0;
+          // this.video.currentTime = 0;
+          this.theTime = 0;
           break;
         default:
           console.error('unknown actions:' + action);
@@ -438,7 +471,7 @@ export default {
       this.$bus.$emit('changeVideoPaused', state);
       if (state) {
         this.video.pause();
-        console.log('paused', this.video.readyState, this.video.paused);
+        // console.log('paused', this.video.readyState, this.video.paused);
       } else {
       }
     },
@@ -524,7 +557,7 @@ export default {
         let offCtx = offsreen.getContext('2d');
         offCtx.drawImage(this.video, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
-        console.log('initImage', this.bitMap);
+        // console.log('initImage', this.bitMap);
       }
       this.requestGenerateHist();
     },
@@ -988,7 +1021,11 @@ export default {
     .svg-container {
       margin: 0 5px;
       font-size: 16px;
+      .icon-hover {
+        color: $primaryColor;
+      }
     }
+
     .progress-bar {
       display: inline-block;
       // margin-left: 20px;
