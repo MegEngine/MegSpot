@@ -124,7 +124,8 @@ export default {
     loop: '循环播放',
     play: '播放',
     pause: '暂停',
-    reset: '复位'
+    reset: '复位',
+    dynamicPickColor: '取色器动态监听'
   },
   sortFile: {
     apply: '应用',

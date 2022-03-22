@@ -100,7 +100,7 @@
             <svg-icon icon-class="loop" :clicked="loop" />
           </span>
         </el-button>
-        <VideoProgressBar v-if="isFixed" class="progress-bar" />
+        <!-- <VideoProgressBar v-if="isFixed" class="progress-bar" /> -->
       </el-button-group>
     </div>
     <div class="right">
@@ -325,8 +325,8 @@ export default {
       groupNum: 0,
       startIndex: 0,
       offset: 0,
-      loop: true,
-      videoPaused: true
+      loop: false,
+      videoPaused: false
     };
   },
   components: { Gallery, GifDialog, ImageSetting, VideoProgressBar },
@@ -409,8 +409,10 @@ export default {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_RESET);
       this.imgScale = 1;
     },
-    handleChangeVideoPaused(videoPaused) {
-      this.videoPaused = videoPaused;
+    handleChangeVideoPaused() {
+      this.videoPaused = this.$parent.$refs.content.$refs['video_canvas'].every(
+        item => item.video.paused === true
+      );
     },
     goBack() {
       if (window.history.length > 1) {

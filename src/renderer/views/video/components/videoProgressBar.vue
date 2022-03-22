@@ -25,6 +25,12 @@ const defaultMarks = {
 
 export default {
   name: 'VideoProgressBar',
+  props: {
+    time: {
+      type: Number,
+      default: 0
+    }
+  },
   data() {
     return {
       value: 0,
@@ -123,9 +129,11 @@ export default {
       }
     },
     handleVideoLoaded(marks) {
+      // 是否已经获取过各个视频的时间并转化为标签
       if (Object.keys(this.marks).length <= 1) {
         this.generateMarks(marks);
       }
+      // 是否已有计时器
       if (this.timer == undefined) {
         this.countDown(this.currentTime);
       }
@@ -174,14 +182,13 @@ export default {
   // position: absolute;
   display: inline-block;
   // margin: 0 20px;
-  // width: 100%;
-  width: 300px;
+  min-width: 100px;
 
   ::v-deep {
     /** 进度条宽度 */
-    .el-slider {
-      width: 300px !important;
-    }
+    // .el-slider {
+    //   width: 300px !important;
+    // }
     .el-slider__marks-text {
       text-align: center;
       transform: translateX(-16px) translateY(-10px);

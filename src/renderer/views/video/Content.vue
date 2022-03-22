@@ -32,7 +32,7 @@
           <svg-icon icon-class="play" :clicked="true" class="svg-container" />
         </el-button>
       </template>
-      <VideoProgressBar />
+      <!-- <VideoProgressBar /> -->
     </Sticky>
   </div>
 </template>
@@ -180,7 +180,9 @@ export default {
       }
     },
     isFloating() {
-      return this.preference.videoProcessBarStyle === 'float';
+      //TODO: 暂时不使用悬浮组件
+      // return this.preference.videoProcessBarStyle === 'float';
+      return false;
     }
   },
   watch: {
@@ -413,20 +415,21 @@ export default {
       };
     },
     handleVideoLoaded() {
-      if (this.marks.length > 0) {
-        return;
-      }
-      this.$refs['video_canvas'].forEach((item, index) => {
-        console.log(`video-${index + 1}`, {
-          duration: item.video.duration,
-          currentTime: item.video.currentTime
-        });
-        this.marks.push([
-          Math.round(parseFloat(item.video.duration) * 100) / 100,
-          index + 1
-        ]);
-      });
-      this.$bus.$emit('videoLoaded', this.marks);
+      // TODO: 下次重构时使用， 多合一视频进度控制(el原生组件不支持，需采用其他组件)
+      // if (this.marks.length > 0) {
+      //   return;
+      // }
+      // this.$refs['video_canvas'].forEach((item, index) => {
+      //   console.log(`video-${index + 1}`, {
+      //     duration: item.video.duration,
+      //     currentTime: item.video.currentTime
+      //   });
+      //   this.marks.push([
+      //     Math.round(parseFloat(item.video.duration) * 100) / 100,
+      //     index + 1
+      //   ]);
+      // });
+      // this.$bus.$emit('videoLoaded', this.marks);
     },
     getMarks(data, callback) {
       callback(this.marks);

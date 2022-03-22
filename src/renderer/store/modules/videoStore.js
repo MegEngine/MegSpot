@@ -9,6 +9,7 @@ const videoStore = {
     videoConfig: {
       smooth: true,
       currentTime: 0,
+      dynamicPickColor: false,
       layout: GLABEL_CONSTANT.LAYOUT_2X1,
       defaultSort: {
         order: 'asc',

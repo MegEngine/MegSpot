@@ -63,6 +63,14 @@
             <el-option :label="$t('general.float')" value="float"> </el-option>
           </el-select>
         </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('video.dynamicPickColor') }}:</span>
+          <el-switch v-model="dynamicPickColor"></el-switch>
+        </div>
         <div flex="main:justify" class="setting-item">
           <span>scale options：</span>
           <el-select
@@ -106,6 +114,11 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore');
+const {
+  mapGetters: videoMapGetters,
+  mapActions: videoMapActions
+} = createNamespacedHelpers('videoStore');
+
 export default {
   name: 'ImageSetting',
   data() {
@@ -137,6 +150,7 @@ export default {
   },
   methods: {
     ...mapActions(['setPreference']),
+    ...videoMapActions(['setVideoConfig']),
     handleRadiusChange(newVal, oldVal) {
       this.$bus.$emit('radius', newVal);
     },
@@ -147,6 +161,7 @@ export default {
   },
   computed: {
     ...mapGetters(['preference']),
+    ...videoMapGetters(['videoConfig']),
     scaleOptions: {
       get() {
         return [...this.preference.scaleOptions].sort((a, b) => a - b);
@@ -168,6 +183,16 @@ export default {
       set(arg) {
         this.setPreference({
           videoProcessBarStyle: arg
+        });
+      }
+    },
+    dynamicPickColor: {
+      get() {
+        return this.videoConfig.dynamicPickColor;
+      },
+      set(arg) {
+        this.setVideoConfig({
+          dynamicPickColor: arg
         });
       }
     },

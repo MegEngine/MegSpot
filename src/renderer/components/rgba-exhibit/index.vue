@@ -1,5 +1,5 @@
 <template>
-  <div id="rgba-exhibit" flex="main:right">
+  <div id="rgba-exhibit">
     <div id="rgba-content" flex="cross:center">
       <div
         id="rgba-block"
@@ -34,11 +34,12 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 #rgba-exhibit {
   z-index: 1;
-  width: 150px;
-  margin-right: 5px;
+  width: 130px;
+  float: right;
+  // margin-left: 5px;
   #rgba-content {
     .text-style {
-      margin-right: 5px;
+      // margin-right: 5px;
       white-space: nowrap;
     }
     #rgba-block {
