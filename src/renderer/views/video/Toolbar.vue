@@ -6,16 +6,40 @@
           ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
         >
       </div>
-      <SelectedBtn
-        :selectedList="imageList"
+      <Gallery
+        :selectedList="videoList"
         :focusListIndex="
           new Array(groupCount).fill(0).map((_, index) => index + startIndex)
         "
-        @update="setImages"
-        @remove="removeImages"
-        @click="emptyImages"
+        @update="setVideos"
+        @remove="removeVideos"
       >
-      </SelectedBtn>
+        <template v-slot:headButton>
+          <el-badge :value="videoList.length" class="item">
+            <el-button
+              type="text"
+              :disabled="!videoList.length"
+              v-tip.sure.right="
+                'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
+              "
+            >
+              {{ $t('general.selected') }}
+            </el-button>
+          </el-badge>
+        </template>
+        <template v-slot:dragItem="item">
+          <img :src="item.src" :alt="item.alt" />
+        </template>
+      </Gallery>
+      <el-button
+        type="text"
+        size="large"
+        icon="el-icon-circle-close"
+        v-tip="$t('general.clearAll')"
+        class="clear-images"
+        :disabled="!videoList.length"
+        @click="emptyVideos"
+      />
       <el-input-number
         v-model="groupNum"
         @change="changeGroup"
@@ -36,7 +60,8 @@
         }}</el-radio-button>
       </el-radio-group>
       <div class="select">
-        <span v-show="showSelectedMsg" class="msg">
+        <!-- 空间不足, 取消选中提示 -->
+        <span v-show="false" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
         </span>
       </div>
@@ -45,72 +70,37 @@
       <el-button-group class="gap">
         <el-button
           type="text"
-          size="mini"
-          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
-          v-tip="$t('imageCenter.overlayLeft')"
+          v-tip="$t('video.play')"
+          @click="changeStatus(CONSTANTS.VIDEO_STATUS_START)"
         >
           <span class="svg-container">
-            <svg-icon icon-class="direction-left" />
+            <svg-icon icon-class="play" :clicked="!videoPaused" />
           </span>
         </el-button>
         <el-button
           type="text"
-          size="mini"
-          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
-          v-tip="$t('imageCenter.overlayRight')"
+          @click="changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE)"
+          v-tip="$t('video.pause')"
         >
           <span class="svg-container">
-            <svg-icon
-              icon-class="direction-left"
-              class="svg-container"
-              style="transform:rotate(180deg);"
-            />
+            <svg-icon icon-class="pause" :clicked="videoPaused" />
           </span>
         </el-button>
         <el-button
           type="text"
-          size="mini"
-          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
-          v-tip="$t('imageCenter.overlayBottom')"
+          @click="changeStatus(CONSTANTS.VIDEO_STATUS_RESET)"
+          v-tip="$t('video.reset')"
         >
           <span class="svg-container">
-            <svg-icon
-              icon-class="direction-left"
-              style="transform:rotate(-90deg);"
-            />
+            <svg-icon icon-class="restart" />
           </span>
         </el-button>
-        <el-button
-          type="text"
-          size="mini"
-          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
-          v-tip="$t('imageCenter.overlayTop')"
-        >
-          <span class="svg-container">
-            <svg-icon
-              icon-class="direction-left"
-              style="transform:rotate(90deg);"
-            />
+        <el-button type="text" @click="changeLoop" v-tip="$t('video.loop')">
+          <span class="svg-container" flex="cross:center">
+            <svg-icon icon-class="loop" :clicked="loop" />
           </span>
         </el-button>
-        <el-button
-          type="text"
-          size="mini"
-          v-tip.sure="`choose images to generate GIF`"
-          @click="$refs.gifDialog.show()"
-        >
-          <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
-            <svg-icon icon-class="gif" />
-          </span>
-        </el-button>
-        <GifDialog
-          ref="gifDialog"
-          :selectList="imageList.slice(startIndex, startIndex + groupCount)"
-        ></GifDialog>
+        <!-- <VideoProgressBar v-if="isFixed" class="progress-bar" /> -->
       </el-button-group>
     </div>
     <div class="right">
@@ -127,12 +117,85 @@
                 ':cmd/ctrl+p'
             "
           >
-            <span class="svg-container" style="font-size: 20px">
-              <svg-icon icon-class="pick-color" :clicked="traggerRGB" />
+            <svg-icon
+              icon-class="pick-color"
+              :clicked="traggerRGB"
+              style="font-size: 20px; margin-right: 2px; transform: translateY(2px);"
+            />
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            v-tip.sure="`choose images to generate GIF`"
+            @click="$refs.gifDialog.show()"
+            v-show="videoPaused"
+          >
+            <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
+              <svg-icon icon-class="gif" />
+            </span>
+          </el-button>
+          <GifDialog
+            ref="gifDialog"
+            :selectList="videoList.slice(startIndex, startIndex + groupCount)"
+          ></GifDialog>
+        </el-button-group>
+        <el-divider direction="vertical"></el-divider>
+        <el-button-group class="gap" v-show="videoPaused">
+          <el-button
+            type="text"
+            size="mini"
+            @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
+            v-tip="$t('imageCenter.overlayLeft')"
+          >
+            <span class="svg-container">
+              <svg-icon icon-class="direction-left" />
+            </span>
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
+            v-tip="$t('imageCenter.overlayRight')"
+          >
+            <span class="svg-container">
+              <svg-icon
+                icon-class="direction-left"
+                class="svg-container"
+                style="transform:rotate(180deg);"
+              />
+            </span>
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
+            v-tip="$t('imageCenter.overlayBottom')"
+          >
+            <span class="svg-container">
+              <svg-icon
+                icon-class="direction-left"
+                style="transform:rotate(-90deg);"
+              />
+            </span>
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
+            v-tip="$t('imageCenter.overlayTop')"
+          >
+            <span class="svg-container">
+              <svg-icon
+                icon-class="direction-left"
+                style="transform:rotate(90deg);"
+              />
             </span>
           </el-button>
         </el-button-group>
-        <el-divider direction="vertical"></el-divider>
         <el-button-group class="gap">
           <el-button
             type="text"
@@ -237,73 +300,58 @@
     </div>
   </div>
 </template>
+
 <script>
 import * as GLOBAL_CONSTANTS from '@/constants';
-import SelectedBtn from '@/components/selected-btn';
+import * as CONSTANTS from './video-constants';
+import Gallery from '@/components/gallery';
+import VideoProgressBar from './components/videoProgressBar';
 import { createNamespacedHelpers } from 'vuex';
 import GifDialog from '@/components/gif-dialog';
 import ImageSetting from '@/components/image-setting';
-const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
+const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
+  'preferenceStore'
+);
 
 export default {
-  components: { SelectedBtn, GifDialog, ImageSetting },
   data() {
     return {
+      CONSTANTS,
       GLOBAL_CONSTANTS,
       dialogVisible: false,
       traggerRGB: false,
       showSelectedMsg: false,
       groupNum: 0,
       startIndex: 0,
-      offset: 0
+      offset: 0,
+      loop: false,
+      videoPaused: false
     };
   },
-  computed: {
-    ...mapGetters(['imageList', 'imageConfig']),
-    maxGroupNum() {
-      return Math.ceil(
-        this.imageList.length / (this.layout[0] * this.layout[2])
-      );
-    },
-    // 每组图片数量
-    groupCount() {
-      const str = this.imageConfig.layout,
-        len = str.length;
-      return str[len - 3] * str[len - 1];
-    },
-    smooth: {
-      get() {
-        return this.imageConfig.smooth;
-      },
-      set(newVal) {
-        this.setImageConfig({ smooth: newVal });
-      }
-    },
-    layout: {
-      get() {
-        return this.imageConfig.layout;
-      },
-      set(val) {
-        const preNum = this.groupCount * (this.groupNum - 1);
-        this.setImageConfig({ layout: val });
-        const afterNum = this.groupCount * (this.groupNum - 1);
-        this.offset = preNum - afterNum;
-        this.startIndex = Math.max(
-          0,
-          (this.groupNum - 1) * this.groupCount + this.offset
-        );
-        this.$bus.$emit('changeGroup', this.startIndex);
-        this.groupNum = Math.floor(this.startIndex / this.groupCount);
-      }
-    }
+  components: { Gallery, GifDialog, ImageSetting, VideoProgressBar },
+  mounted() {
+    window.addEventListener('keydown', this.handleHotKey, true);
+    this.$bus.$on('image_handleSelect', this.handleSelect);
+    this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused);
+    this.$bus.$on('videoChangeTime', this.handleVideoChangeTime);
+  },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleHotKey, true);
+    this.$bus.$off('image_handleSelect', this.handleSelect);
+    this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused);
+    this.$bus.$off('videoChangeTime', this.handleVideoChangeTime);
   },
   methods: {
     ...mapActions([
-      'emptyImages',
-      'removeImages',
-      'setImageConfig',
-      'setImages'
+      'emptyVideos',
+      'removeVideos',
+      'setVideoConfig',
+      'setVideos'
     ]),
+    handleVideoChangeTime() {
+      this.videoPaused = false;
+    },
     handleHotKey(event) {
       // esc
       if (event.keyCode === 27) {
@@ -332,6 +380,13 @@ export default {
         this.changeGroup(this.groupNum, this.groupNum - 1);
       }
     },
+    changeStatus(status) {
+      this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status);
+    },
+    changeLoop() {
+      this.loop = !this.loop;
+      this.$bus.$emit('changeLoop', this.loop);
+    },
     changeGroup(groupNum, oldGroupNum) {
       this.startIndex = Math.max(
         0,
@@ -351,14 +406,20 @@ export default {
       this.showSelectedMsg = !!data;
     },
     handleReset() {
+      this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_RESET);
       this.imgScale = 1;
+    },
+    handleChangeVideoPaused() {
+      this.videoPaused = this.$parent.$refs.content.$refs['video_canvas'].every(
+        item => item.video.paused === true
+      );
     },
     goBack() {
       if (window.history.length > 1) {
         this.$router.back();
       } else {
         // 如果强制reload导致没有历史路由 唯一的历史就是当前页面 则回到默认的历史页面
-        this.$router.push('/image/index');
+        this.$router.push('/video/index');
       }
     },
     resetCanvas(data) {
@@ -406,16 +467,52 @@ export default {
       });
     }
   },
-  mounted() {
-    window.addEventListener('keydown', this.handleHotKey, true);
-    this.$bus.$on('image_handleSelect', this.handleSelect);
-  },
-  beforeDestroy() {
-    window.removeEventListener('keydown', this.handleHotKey, true);
-    this.$bus.$off('image_handleSelect', this.handleSelect);
+  computed: {
+    ...mapGetters(['videoList', 'videoConfig']),
+    ...preferenceMapGetters(['preference']),
+    maxGroupNum() {
+      return Math.ceil(
+        this.videoList.length / (this.layout[0] * this.layout[2])
+      );
+    },
+    // 每组图片数量
+    groupCount() {
+      const str = this.videoConfig.layout,
+        len = str.length;
+      return str[len - 3] * str[len - 1];
+    },
+    smooth: {
+      get() {
+        return this.videoConfig.smooth;
+      },
+      set(newVal) {
+        this.setVideoConfig({ smooth: newVal });
+      }
+    },
+    layout: {
+      get() {
+        return this.videoConfig.layout;
+      },
+      set(val) {
+        const preNum = this.groupCount * (this.groupNum - 1);
+        this.setVideoConfig({ layout: val });
+        const afterNum = this.groupCount * (this.groupNum - 1);
+        this.offset = preNum - afterNum;
+        this.startIndex = Math.max(
+          0,
+          (this.groupNum - 1) * this.groupCount + this.offset
+        );
+        this.$bus.$emit('changeGroup', this.startIndex);
+        this.groupNum = Math.floor(this.startIndex / this.groupCount);
+      }
+    },
+    isFixed() {
+      return this.preference.videoProcessBarStyle === 'fixed';
+    }
   }
 };
 </script>
+
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 .toolbar {
@@ -470,6 +567,9 @@ export default {
     .el-button-group {
       .svg-container {
         margin-left: 0.3rem;
+      }
+      .progress-bar {
+        margin-left: 20px;
       }
     }
   }

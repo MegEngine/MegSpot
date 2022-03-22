@@ -21,7 +21,7 @@
       </div>
       <div flex="dir:top" class="setting-group">
         <div flex="main:justify" class="setting-item">
-          <span>show histogram：</span>
+          <span>default show histogram：</span>
           <el-switch v-model="defaultShowHist"></el-switch>
         </div>
         <div flex="main:justify" class="setting-item">
@@ -52,6 +52,25 @@
             </div>
           </el-select>
         </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('general.videoProcessBarStyle') }}:</span>
+          <el-select v-model="videoProcessBarStyle">
+            <el-option :label="$t('general.fixed')" value="fixed"> </el-option>
+            <el-option :label="$t('general.float')" value="float"> </el-option>
+          </el-select>
+        </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('video.dynamicPickColor') }}:</span>
+          <el-switch v-model="dynamicPickColor"></el-switch>
+        </div>
         <div flex="main:justify" class="setting-item">
           <span>scale options：</span>
           <el-select
@@ -81,13 +100,12 @@
           ></el-input-number>
         </div>
       </div>
-      <el-button
-        slot="reference"
-        type="text"
-        @click="visible = !visible"
-        :class="{ enabled: visible }"
-      >
-        <svg-icon icon-class="settings" style="font-size: 22px;"></svg-icon>
+      <el-button slot="reference" type="text" @click="visible = !visible">
+        <svg-icon
+          :clicked="visible"
+          icon-class="settings"
+          style="font-size: 22px;"
+        ></svg-icon>
       </el-button>
     </el-popover>
   </div>
@@ -96,6 +114,11 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore');
+const {
+  mapGetters: videoMapGetters,
+  mapActions: videoMapActions
+} = createNamespacedHelpers('videoStore');
+
 export default {
   name: 'ImageSetting',
   data() {
@@ -127,6 +150,7 @@ export default {
   },
   methods: {
     ...mapActions(['setPreference']),
+    ...videoMapActions(['setVideoConfig']),
     handleRadiusChange(newVal, oldVal) {
       this.$bus.$emit('radius', newVal);
     },
@@ -137,6 +161,7 @@ export default {
   },
   computed: {
     ...mapGetters(['preference']),
+    ...videoMapGetters(['videoConfig']),
     scaleOptions: {
       get() {
         return [...this.preference.scaleOptions].sort((a, b) => a - b);
@@ -151,9 +176,29 @@ export default {
         });
       }
     },
+    videoProcessBarStyle: {
+      get() {
+        return this.preference.videoProcessBarStyle;
+      },
+      set(arg) {
+        this.setPreference({
+          videoProcessBarStyle: arg
+        });
+      }
+    },
+    dynamicPickColor: {
+      get() {
+        return this.videoConfig.dynamicPickColor;
+      },
+      set(arg) {
+        this.setVideoConfig({
+          dynamicPickColor: arg
+        });
+      }
+    },
     defaultShowHist: {
       get() {
-        return this.preference.defaultShowHist; // true
+        return this.preference.defaultShowHist; // false
       },
       set(newVal) {
         this.setPreference({ defaultShowHist: newVal });
@@ -223,11 +268,6 @@ export default {
     .setting-item {
       margin-top: 10px;
     }
-  }
-}
-.enabled {
-  .svg-icon {
-    color: $primaryColor;
   }
 }
 </style>

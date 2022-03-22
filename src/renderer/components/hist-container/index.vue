@@ -11,6 +11,15 @@
         @click="changeVisible(false)"
       >
       </canvas>
+      <el-button
+        class="close-icon"
+        icon="el-icon-circle-close"
+        size="medium"
+        type="text"
+        @click="changeVisible(false)"
+        v-show="visible"
+      >
+      </el-button>
     </div>
   </div>
 </template>
@@ -22,8 +31,12 @@ export default {
   name: 'HistContainer',
   data() {
     return {
+      visible: false,
       hist: undefined
     };
+  },
+  created() {
+    this.visible = this.preference.defaultShowHist;
   },
   mounted() {
     this.hist = this.$refs.hist;
@@ -87,15 +100,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['preference']),
-    visible: {
-      get() {
-        return this.preference.defaultShowHist;
-      },
-      set() {
-        this.setPreference({ defaultShowHist: !this.visible });
-      }
-    }
+    ...mapGetters(['preference'])
   }
 };
 </script>
@@ -111,6 +116,14 @@ export default {
     #hist {
       width: 160px;
       height: 90px;
+    }
+    .close-icon {
+      position: absolute;
+      left: 161px;
+      top: 63px;
+      &:hover {
+        color: red;
+      }
     }
   }
   #hist-icon {

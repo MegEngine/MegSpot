@@ -1,16 +1,17 @@
 <template>
   <el-header class="header" flex="cross:center" height="42px">
     <div class="nav-container" flex="main:justify cross:center" flex-box="1">
+      <img
+        src="../../assets/images/big_logo_white.png"
+        style="cursor: pointer;padding-top: 5px; height:40px"
+        @click="jumpToDashboard"
+      />
       <div class="left-menu">
         <el-breadcrumb class="nav" separator="|">
           <el-breadcrumb-item :to="{ path: '/dashboard' }">
-            <img
-              src="../../assets/images/big_logo_white.png"
-              style="vertical-align: middle; height:40px"
-            />
+            {{ $t('nav.toHome') }}
           </el-breadcrumb-item>
           <el-breadcrumb-item v-if="subNav">{{ subNav }}</el-breadcrumb-item>
-          <el-breadcrumb-item v-else>{{ $t('nav.toHome') }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="right-menu">
@@ -59,6 +60,13 @@ export default {
         }
       }
     }
+  },
+  methods: {
+    jumpToDashboard() {
+      this.$router.push({
+        path: '/dashboard'
+      });
+    }
   }
 };
 </script>
@@ -100,6 +108,9 @@ export default {
     .el-breadcrumb__item {
       line-height: inherit;
       float: none;
+    }
+    .el-breadcrumb__inner {
+      color: white !important;
     }
     .el-breadcrumb__separator {
       color: rgba(255, 255, 255, 0.2);

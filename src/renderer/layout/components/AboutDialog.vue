@@ -31,7 +31,7 @@
       </el-tab-pane>
       <el-tab-pane label="settings" name="settings">
         <el-form label-position="right">
-          <el-form-item label="language">
+          <el-form-item :label="$t('general.language')">
             <el-select v-model="appLanguage">
               <el-option
                 v-for="item in langOptions"
@@ -41,6 +41,21 @@
               >
               </el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('general.defaultFileListShowType')">
+            <el-select v-model="defaultFileListShowType">
+              <el-option :label="$t('general.list')" value="list"> </el-option>
+              <el-option :label="$t('general.thumbnail')" value="thumbnail">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="'导入/导出配置'">
+            <el-button type="primary" @click="settingsImport">{{
+              $t('general.import')
+            }}</el-button>
+            <el-button type="primary" @click="settingsExport">{{
+              $t('general.export')
+            }}</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -100,7 +115,10 @@
 </template>
 
 <script>
+const { dialog } = require('electron').remote;
 const { shell, ipcRenderer } = require('electron');
+import fse from 'fs-extra';
+import _ from 'lodash';
 import ShowPath from '@/components/show-path';
 const appVersion = require('@/../../package.json').version;
 const {
@@ -109,6 +127,8 @@ const {
 } = require('@/../../package.json').build.releaseInfo;
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore');
+import { i18nRender } from '@/lang';
+
 export default {
   name: 'AboutDialog',
   components: { ShowPath },
@@ -124,6 +144,10 @@ export default {
         {
           cmd: 'jump to compare',
           key: 'cmd/ctrl+enter'
+        },
+        {
+          cmd: 'empty all selected files',
+          key: 'cmd/ctrl+delete'
         },
         {
           cmd: 'back to file select',
@@ -161,6 +185,16 @@ export default {
           appLanguage: arg
         });
       }
+    },
+    defaultFileListShowType: {
+      get() {
+        return this.preference.defaultFileListShowType;
+      },
+      set(arg) {
+        this.setPreference({
+          defaultFileListShowType: arg
+        });
+      }
     }
   },
   watch: {
@@ -194,6 +228,72 @@ export default {
     },
     clickManual() {
       shell.openExternal('https://github.com/MegEngine/MegSpot/wiki');
+    },
+    settingsImport() {
+      dialog
+        .showOpenDialog({
+          title: 'import settings',
+          filters: [
+            {
+              name: 'json',
+              extensions: ['json']
+            }
+          ]
+        })
+        .then(async ({ canceled, filePaths }) => {
+          if (canceled) {
+            this.$message.info(i18nRender('general.canceled'));
+            return;
+          }
+          if (filePaths && filePaths.length) {
+            const filePath = filePaths[0];
+            try {
+              await fse.readJson(filePath).then(json => {
+                this.$store.replaceState(json);
+              });
+              this.$message.success(
+                i18nRender('general.import') +
+                  ' ' +
+                  i18nRender('general.success')
+              );
+            } catch (err) {
+              console.error(err);
+              this.$message.error(err);
+            }
+          }
+        });
+    },
+    settingsExport() {
+      const obj = _.cloneDeep(this.$store.state);
+      this.saveFile(obj);
+    },
+    saveFile(data) {
+      dialog
+        .showSaveDialog({
+          title: 'select folder',
+          filters: [{ name: 'json', extensions: ['json'] }]
+        })
+        .then(async ({ canceled, filePath }) => {
+          if (canceled) {
+            this.$message.info(i18nRender('general.canceled'));
+            return;
+          }
+          if (filePath) {
+            try {
+              await fse.outputFile(filePath, JSON.stringify(data, null, 2));
+              this.$message({
+                message: `${i18nRender('general.export')} ${i18nRender(
+                  'general.success'
+                )}:  <a style="color: blue;">${filePath}</a>`,
+                type: 'success',
+                dangerouslyUseHTMLString: true
+              });
+            } catch (err) {
+              console.error(err);
+              this.$message.error(err);
+            }
+          }
+        });
     }
   }
 };
@@ -205,6 +305,9 @@ export default {
 }
 
 ::v-deep {
+  .el-dialog__body {
+    z-index: 10000;
+  }
   #pane-log {
     display: flex;
     flex-direction: column;

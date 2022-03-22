@@ -18,23 +18,23 @@
       </entry-card>
     </div>
     <div class="help">
-      <VideoSwiper
+      <HelpVideo
         :videoSource="videoSource"
         :_width="size.width"
         :_height="size.height"
-      ></VideoSwiper>
+      ></HelpVideo>
     </div>
   </div>
 </template>
 
 <script>
 import EntryCard from './EntryCard';
-import VideoSwiper from './HelpVideo';
+import HelpVideo from './HelpVideo';
 import { throttle } from '@/utils';
 
 export default {
   name: 'dashboard',
-  components: { EntryCard, VideoSwiper },
+  components: { EntryCard, HelpVideo },
   data() {
     return {
       videoSource: [
@@ -50,13 +50,13 @@ export default {
       tools: [
         {
           title: 'dashboard.entries.image.title',
-          supportTypes: ' jpg, jpeg, png, svg...',
+          supportTypes: ' jpg, jpeg, png, svg',
           icon: 'el-icon-picture-outline',
           route: '/image/index'
         },
         {
           title: 'dashboard.entries.video.title',
-          supportTypes: ' mp4, mov, rmvb, avi...',
+          supportTypes: ' mp4, mov, rmvb, avi',
           icon: 'el-icon-video-camera',
           route: '/video/index'
         }

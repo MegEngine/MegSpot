@@ -1,8 +1,16 @@
 <template>
   <div class="gallery">
-    <div @click="showModal">
-      <slot name="headButton"></slot>
-    </div>
+    <el-button
+      type="text"
+      size="mini"
+      @click="showModal"
+      :disabled="!sortList.length"
+      v-tip.sure="
+        'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
+      "
+    >
+      {{ $t('general.selected') }}
+    </el-button>
     <div class="modal" @click="handleWrapperClick">
       <Split :gutterSize="4">
         <SplitArea
@@ -38,7 +46,6 @@
                       <div>
                         <span
                           @click.stop="$emit('remove', item)"
-                          title="close this item"
                           class="close-button"
                           :title="$t('general.delete')"
                         >
@@ -46,11 +53,16 @@
                         </span>
                       </div>
                       <div class="content" flex="main:center cross:center">
-                        <slot
+                        <img
                           name="dragItem"
                           :src="getImageUrlSync(item)"
-                          :alt="item | getFileName"
-                        ></slot>
+                          v-if="isImage(item)"
+                        />
+                        <video
+                          name="dragItem"
+                          :src="getImageUrlSync(item)"
+                          v-if="isVideo(item)"
+                        />
                       </div>
                       <div class="name" v-tip="item">
                         <span
@@ -71,8 +83,10 @@
     </div>
   </div>
 </template>
+
 <script>
 import { getImageUrlSync } from '@/utils/image';
+import { isImage, isVideo } from '@/components/file-tree/lib/util';
 import draggable from 'vuedraggable';
 
 export default {
@@ -164,6 +178,8 @@ export default {
     window.removeEventListener('keydown', this.handleHotKey, true);
   },
   methods: {
+    isImage,
+    isVideo,
     getImageUrlSync,
     handleHotKey(event) {
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 70) {
@@ -204,6 +220,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 @keyframes appearOpacity {

@@ -1,5 +1,5 @@
 <template>
-  <svg :class="svgClass" aria-hidden="true">
+  <svg :class="[svgClass, clicked ? 'primary-color' : '']" aria-hidden="true">
     <use :xlink:href="iconName"></use>
   </svg>
 </template>
@@ -14,6 +14,10 @@ export default {
     },
     className: {
       type: String
+    },
+    clicked: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -47,5 +51,9 @@ export default {
 // 如果 svg-icon 用在el-button 中 应该由el-button设置颜色  所以这里设置为继承
 .el-radio-button__inner .svg-icon {
   color: inherit;
+}
+
+.primary-color {
+  color: $primaryColor;
 }
 </style>

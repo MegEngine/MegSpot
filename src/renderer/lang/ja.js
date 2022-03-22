@@ -13,6 +13,9 @@ export default {
     feedback: 'フィードバック'
   },
   general: {
+    success: '成功',
+    failure: '失敗',
+    canceled: 'キャンセル',
     layout: 'レイアウト',
     aboutText: 'オン',
     introduction:
@@ -21,12 +24,21 @@ export default {
     videoCompare: '画像比較',
     compare: '比較',
     selected: '選択ファイル',
+    language: '言語',
+    import: 'インポート',
+    export: 'エクスポート',
+    videoProcessBarStyle: 'ビデオコントロールバーの位置',
+    fixed: '安定',
+    float: 'フローティングボール',
+    defaultFileListShowType: 'ファイルリストのデフォルトの表示タイプ',
     list: 'リスト',
     thumbnail: 'サムネイル画像',
     fileName: 'ファイル名',
     fileLoading: 'ファイルを読み込んでいます...',
+    enableRegular: '通常の有効化/無効化',
     groupNum: 'グループ番号\nCtrl + ← 戻る \nCtrl + → 進む',
     lastModifyTime: '更新日付',
+    operate: '操作する',
     size: 'ファイルサイズ',
     scale: '拡大倍率',
     sortDialogTips: 'ヒント：ファイル名をドラッグして表示順を変更できます',
@@ -113,7 +125,8 @@ export default {
     loop: 'リピート',
     play: '再生',
     pause: '一時停止',
-    reset: 'リセット'
+    reset: 'リセット',
+    dynamicPickColor: 'カラーピッカー調和'
   },
   sortFile: {
     apply: '応用',

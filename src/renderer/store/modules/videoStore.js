@@ -8,6 +8,8 @@ const videoStore = {
     videoFolders: [],
     videoConfig: {
       smooth: true,
+      currentTime: 0,
+      dynamicPickColor: false,
       layout: GLABEL_CONSTANT.LAYOUT_2X1,
       defaultSort: {
         order: 'asc',
@@ -21,6 +23,7 @@ const videoStore = {
   },
   getters: {
     videoList: state => state.videoList,
+    currentTime: state => state.currentTime,
     videoFolders: state => state.videoFolders,
     getVideoFolders: state => () => state.videoFolders,
     videoConfig: state => state.videoConfig,

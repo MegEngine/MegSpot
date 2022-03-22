@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip effect="light" placement="bottom" :open-delay='800'>
+  <el-tooltip effect="light" placement="bottom" :open-delay="800">
     <div slot="content" class="image-style-container">
       <el-row :gutter="10">
         <el-col :span="6">
@@ -155,7 +155,6 @@ export default {
   #preview {
     position: absolute;
     top: 0;
-    right: 14px;
     z-index: 1;
     padding: 0;
   }

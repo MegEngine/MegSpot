@@ -13,6 +13,9 @@ export default {
     feedback: '问题反馈'
   },
   general: {
+    success: '成功',
+    failure: '失败',
+    canceled: '取消',
     layout: '布局',
     aboutText: '关于',
     introduction: `MegSpot是一款跨平台本地应用，旨在为用户提供本地图片比较，视频比较，图片定制化处理等便捷功能。\r\n进入钉钉群了解详情。`,
@@ -20,12 +23,21 @@ export default {
     videoCompare: '图片对比',
     compare: '对比',
     selected: '已选',
+    language: '语言',
+    import: '导入',
+    export: '导出',
+    videoProcessBarStyle: '视频控制条位置',
+    fixed: '固定',
+    float: '悬浮球',
+    defaultFileListShowType: '文件列表的默认显示类型',
     list: '列表',
     thumbnail: '缩略图',
     fileName: '文件名',
     fileLoading: '加载文件中...',
+    enableRegular: '启用/禁用正则',
     groupNum: '分组序号\nCtrl + ← 向前翻页\nCtrl + → 向后翻页',
     lastModifyTime: '最后修改时间',
+    operate: '操作',
     size: '大小',
     scale: '缩放比例',
     sortDialogTips: 'tips:上下拖动可调整顺序',
@@ -112,7 +124,8 @@ export default {
     loop: '循环播放',
     play: '播放',
     pause: '暂停',
-    reset: '复位'
+    reset: '复位',
+    dynamicPickColor: '取色器动态监听'
   },
   sortFile: {
     apply: '应用',

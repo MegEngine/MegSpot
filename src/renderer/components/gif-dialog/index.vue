@@ -100,6 +100,7 @@
     </div>
   </el-dialog>
 </template>
+
 <script>
 const { dialog } = require('electron').remote;
 const fs = require('fs');
@@ -194,7 +195,7 @@ export default {
 
       this.$bus.$emit('getImageDetails', [...this.imageNameList], details => {
         this.imageDetails = details.map(item => ({
-          path: item.imgSrc,
+          path: item.path,
           imageName: getFileName(item.path, false),
           canvas: item.canvas
         }));
@@ -309,6 +310,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 .gifDialog {
   ::v-deep {

@@ -76,7 +76,7 @@
 
 ## 视频对比
 
-**视频对比**区别于**图片对比**的地方在于，视频对比多了一个**视频预览**的页面，需要在**视频预览页**确定各个视频想要进行对比的截屏画面，然后点击 **"图片对比"**，即可进入[视频截屏对比](https://github.com/MegEngine/MegSpot/wiki/%E8%A7%86%E9%A2%91%E5%AF%B9%E6%AF%94#%E8%A7%86%E9%A2%91%E6%88%AA%E5%B1%8F%E5%AF%B9%E6%AF%94)模式
+**视频对比**区别于**图片对比**的地方在于，视频对比需要控制视频的播放进度或进行暂停，其他操作与图片对比相同。
 
 [查看手册](https://github.com/MegEngine/MegSpot/wiki/视频对比)
 
@@ -152,7 +152,7 @@ Linux 环境下支持通过命令行进行启动、对比等操作。
 - 每一名贡献者都需要签署贡献者许可协议（Contributor License Agreement，CLA）来明确贡献内容相关的知识产权许可。更多细节请参考 [协议内容](CONTRIBUTOR_LICENSE_AGREEMENT.md)。
 - 我们欢迎你通过以下方式来帮助 MegSpot 变得更好：
   - 贡献代码；
-  - 完善[文档](https://github.com/MegSpot/Docs)；
+  - 完善[文档](https://github.com/MegEngine/MegSpot/wiki)；
   - 在 [MegSpot 论坛](https://discuss.megengine.org.cn) 和 Stack Overflow 回答问题；
   - 报告使用中的 [Bugs 和 Issues](https://github.com/MegSpot/MegSpot/issues)；
   - 审查 [Pull Requests](https://github.com/MegSpot/MegSpot/pulls)；

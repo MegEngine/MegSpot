@@ -141,10 +141,7 @@ export default {
       this.generateVisible = !exists;
       // 更改dialog中的排序列表
       if (exists) {
-        const data = await fse.readFile(this.sortFilePath, 'utf8');
-        this.$parent.$refs['sort_file_dialog'].handleFileChange(
-          data.split(EOF)
-        );
+        this.$bus.$emit('fileChanged');
       }
     }
   },
