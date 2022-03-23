@@ -18,10 +18,11 @@
           <div>
             <el-input-number
               v-if="videoProcessBarInputVisible"
-              v-model="theTime"
+              :value="currentTimeData"
               :precision="3"
               :min="0"
               :max="duration || 60"
+              @change="val => changeVideoTime(val)"
             />
             <span class="svg-container" @click="executeAction(1)">
               <svg-icon icon-class="play" />
@@ -58,9 +59,10 @@
         </div>
       </el-tooltip>
       <videoSlider
-        :time.sync="theTime"
+        :time.sync="currentTimeData"
         :duration="duration"
         :show="videoSliderVisible"
+        :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
       />
       <div flex="main:right cross:center">
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
@@ -227,6 +229,10 @@ export default {
         {
           event: 'videoResetTime',
           action: 'handleVideoResetTime'
+        },
+        {
+          event: 'changeVideoSliderVisible',
+          action: 'changeVideoSliderVisible'
         }
       ],
       histVisible: true,
@@ -255,13 +261,10 @@ export default {
     canvasStyle() {
       return this.preference.background.style;
     },
-    // globalCurrentTime() {
-    //   return this.videoConfig.currentTime;
-    // },
     dynamicPickColor() {
       return this.videoConfig.dynamicPickColor;
     },
-    theTime: {
+    currentTimeData: {
       get() {
         return this.currentTime;
       },
@@ -322,12 +325,6 @@ export default {
       },
       immediate: true
     }
-    // currentTime(newVal) {
-    //   this.changeVideoTime(newVal);
-    // }
-    // globalCurrentTime(newVal) {
-    //   this.handleVideoChangeTime(newVal);
-    // }
   },
   methods: {
     changeVideoProcessBarInputVisible() {
@@ -406,7 +403,7 @@ export default {
         case CONSTANTS.VIDEO_STATUS_RESET:
           this.cs.restore();
           // this.video.currentTime = 0;
-          this.theTime = 0;
+          this.currentTimeData = 0;
           break;
         default:
           console.error('unknown actions:' + action);
@@ -487,7 +484,7 @@ export default {
       if (this.requestId == undefined) {
         this.startAnimation();
       }
-      if (this.video.duration >= currentTime) {
+      if (this.duration >= currentTime) {
         if (Math.abs(this.video.currentTime - currentTime) > 1) {
           this.video.currentTime = Number(currentTime).toFixed(2);
           if (this.video.readyState > 0 && this.video.paused) {
@@ -497,7 +494,7 @@ export default {
           }
         }
       } else {
-        this.video.currentTime = this.video.duration;
+        this.video.currentTime = this.duration;
         if (this.video.readyState > 0 && !this.video.paused) {
           try {
             this.video.pause();
@@ -508,27 +505,34 @@ export default {
       }
     },
     changeVideoTime(currentTime) {
+      const paused = this.video.paused;
+      if (!this.video) return;
+
       this.handleVideoPaused(false);
       if (this.requestId == undefined) {
         this.startAnimation();
       }
-      if (this.video.duration >= currentTime) {
-        // console.log(
-        //   'changeVideoTime',
-        //   this.video.currentTime,
-        //   currentTime,
-        //   this.video.currentTime - currentTime
-        // );
+
+      // 设置时间节点是否在视频时长范围之内
+      if (currentTime <= this.duration) {
         if (Math.abs(this.video.currentTime - currentTime) > 1) {
           this.video.currentTime = Number(currentTime).toFixed(2);
-          if (this.video.readyState > 0 && this.video.paused) {
-            this.video.play().catch(e => {
-              // console.log('error', e);
-            });
+
+          if (this.video.readyState > 0) {
+            this.video
+              .play()
+              .then(() => {
+                if (paused) {
+                  this.video.pause();
+                }
+              })
+              .catch(e => {
+                console.log('error', e);
+              });
           }
         }
       } else {
-        this.video.currentTime = this.video.duration;
+        this.video.currentTime = this.duration;
         if (this.video.readyState > 0 && !this.video.paused) {
           try {
             this.video.pause();
@@ -612,7 +616,8 @@ export default {
 
       this.video.src = this.path;
       this.video.autoplay = true;
-      this.video.loop = false;
+      // 默认开启视频循环
+      this.video.loop = true;
     },
     startAnimation() {
       this.stopAnimation();
@@ -653,6 +658,7 @@ export default {
       this.cs.clearRect(-maxLen, -maxLen, 2 * maxLen, 2 * maxLen);
     },
     drawImage(img) {
+      if (!this.imagePosition) return;
       let { x, y, width, height } = this.imagePosition;
       this.clearCanvas();
       this.cs.save();
@@ -688,13 +694,10 @@ export default {
       });
     },
     handleVideoSliderVisible() {
-      this.broadCast({
-        name: 'changeVideoSliderVisible',
-        data: null
-      });
+      this.$bus.$emit('changeVideoSliderVisible', !this.videoSliderVisible);
     },
-    changeVideoSliderVisible() {
-      this.videoSliderVisible = !this.videoSliderVisible;
+    changeVideoSliderVisible(value) {
+      this.videoSliderVisible = value ?? !this.videoSliderVisible;
     },
     doHistVisible({ visible }) {
       this.$refs['hist-container'].setVisible(visible);

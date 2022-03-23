@@ -325,7 +325,8 @@ export default {
       groupNum: 0,
       startIndex: 0,
       offset: 0,
-      loop: false,
+      // 默认开启视频循环
+      loop: true,
       videoPaused: false
     };
   },
