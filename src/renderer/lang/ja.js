@@ -126,7 +126,9 @@ export default {
     play: '再生',
     pause: '一時停止',
     reset: 'リセット',
-    dynamicPickColor: 'カラーピッカー調和'
+    dynamicPickColor: 'カラーピッカー調和',
+    processTip:
+      '左クリックしてビデオプログレスバーを表示/非表示にし、右クリックしてビデオプログレスの正確なコントロールコンポーネントを表示/非表示にします'
   },
   sortFile: {
     apply: '応用',

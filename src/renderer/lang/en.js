@@ -126,7 +126,9 @@ export default {
     play: 'play',
     pause: 'pause',
     reset: 'reset',
-    dynamicPickColor: 'dynamic color picker'
+    dynamicPickColor: 'dynamic color picker',
+    processTip:
+      'Left click to show/hide video progress bar, right click to show/hide precise control component of video progress'
   },
   sortFile: {
     apply: 'Apply',

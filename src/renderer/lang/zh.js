@@ -125,7 +125,9 @@ export default {
     play: '播放',
     pause: '暂停',
     reset: '复位',
-    dynamicPickColor: '取色器动态监听'
+    dynamicPickColor: '取色器动态监听',
+    processTip:
+      '左键点击可 显示/隐藏 视频进度条，右键点击可 显示/隐藏 视频进度的精确控制组件'
   },
   sortFile: {
     apply: '应用',

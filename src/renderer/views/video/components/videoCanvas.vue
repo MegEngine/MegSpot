@@ -36,6 +36,7 @@
             @click="handleVideoSliderVisible"
             @contextmenu.stop="changeVideoProcessBarInputVisible"
             class="svg-container"
+            v-tip.sure="$t('video.processTip')"
           >
             <svg-icon
               icon-class="video-bar"
