@@ -6,38 +6,13 @@
           ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
         >
       </div>
-      <Gallery
+      <SelectedBtn
         :selectedList="videoList"
         :focusListIndex="
           new Array(groupCount).fill(0).map((_, index) => index + startIndex)
         "
         @update="setVideos"
         @remove="removeVideos"
-      >
-        <template v-slot:headButton>
-          <el-badge :value="videoList.length" class="item">
-            <el-button
-              type="text"
-              :disabled="!videoList.length"
-              v-tip.sure.right="
-                'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
-              "
-            >
-              {{ $t('general.selected') }}
-            </el-button>
-          </el-badge>
-        </template>
-        <template v-slot:dragItem="item">
-          <img :src="item.src" :alt="item.alt" />
-        </template>
-      </Gallery>
-      <el-button
-        type="text"
-        size="large"
-        icon="el-icon-circle-close"
-        v-tip="$t('general.clearAll')"
-        class="clear-images"
-        :disabled="!videoList.length"
         @click="emptyVideos"
       />
       <el-input-number
@@ -304,7 +279,7 @@
 <script>
 import * as GLOBAL_CONSTANTS from '@/constants';
 import * as CONSTANTS from './video-constants';
-import Gallery from '@/components/gallery';
+import SelectedBtn from '@/components/selected-btn';
 import VideoProgressBar from './components/videoProgressBar';
 import { createNamespacedHelpers } from 'vuex';
 import GifDialog from '@/components/gif-dialog';
@@ -330,7 +305,7 @@ export default {
       videoPaused: false
     };
   },
-  components: { Gallery, GifDialog, ImageSetting, VideoProgressBar },
+  components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
   mounted() {
     window.addEventListener('keydown', this.handleHotKey, true);
     this.$bus.$on('image_handleSelect', this.handleSelect);

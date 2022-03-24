@@ -5,6 +5,7 @@
         <CoverMask :mask="maskDom" class="cover-mask">
           <HistContainer
             ref="hist-container"
+            v-tip="$t('general.histogram')"
             @changeVisible="handleHistVisible"
           />
         </CoverMask>
@@ -516,7 +517,7 @@ export default {
 
       // 设置时间节点是否在视频时长范围之内
       if (currentTime <= this.duration) {
-        if (Math.abs(this.video.currentTime - currentTime) > 1) {
+        if (Math.abs(this.video.currentTime - currentTime) > 0.1) {
           this.video.currentTime = Number(currentTime).toFixed(2);
 
           if (this.video.readyState > 0) {
