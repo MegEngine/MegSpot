@@ -36,7 +36,7 @@
       </el-radio-group>
       <div class="select">
         <!-- 空间不足, 取消选中提示 -->
-        <span v-show="false" class="msg">
+        <span v-show="showSelectedMsg" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
         </span>
       </div>
@@ -171,6 +171,7 @@
             </span>
           </el-button>
         </el-button-group>
+        <el-divider direction="vertical" v-if="videoPaused"></el-divider>
         <el-button-group class="gap">
           <el-button
             type="text"
@@ -200,6 +201,16 @@
           >
             <span class="svg-container">
               <svg-icon icon-class="vertical-flip" />
+            </span>
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @click="frameSteps()"
+            v-tip="$t('imageCenter.frameSteps')"
+          >
+            <span class="svg-container">
+              <svg-icon icon-class="frame" style="transform:rotate(180deg);" />
             </span>
           </el-button>
         </el-button-group>
@@ -355,6 +366,10 @@ export default {
         this.groupNum++;
         this.changeGroup(this.groupNum, this.groupNum - 1);
       }
+      // cmd/ctrl + n 触发逐帧对比
+      if ((event.metaKey || event.ctrlKey) && event.keyCode === 78) {
+        this.frameSteps();
+      }
     },
     changeStatus(status) {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status);
@@ -420,11 +435,29 @@ export default {
         data: { status: this.traggerRGB }
       });
     },
+    /**
+     * 图像旋转
+     * @param {deg} data 旋转的角度
+     */
     rotate(data) {
       this.$bus.$emit('imageCenter_rotate', { name: 'rotate', data });
     },
+    /**
+     * 图像镜像翻转
+     * @param {boolean} data 1为水平镜像翻转， -1为垂直镜像翻转
+     */
     reverse(data) {
       this.$bus.$emit('imageCenter_reverse', { name: 'reverse', data });
+    },
+    /**
+     * 逐帧对比
+     * @param {number} interval 帧间隔
+     */
+    frameSteps(interval) {
+      this.$bus.$emit('imageCenter_frameSteps', {
+        name: 'frameSteps',
+        data: interval ?? this.interval
+      });
     },
     async align(beSameSize) {
       const data = await new Promise(resolve => {
@@ -453,6 +486,10 @@ export default {
       const str = this.videoConfig.layout,
         len = str.length;
       return str[len - 3] * str[len - 1];
+    },
+    // 视频逐帧对比间隔，默认为近似1/12秒
+    interval() {
+      return this.videoConfig.interval;
     },
     smooth: {
       get() {

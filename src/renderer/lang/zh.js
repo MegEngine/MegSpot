@@ -96,6 +96,7 @@ export default {
     overlayTop: '向上叠加显示',
     verticalFlip: '纵向翻转',
     horizontalFlip: '水平翻转翻转',
+    frameSteps: '逐帧对比\nCtrl + n',
     fullsize: '原图',
     adaptive: '自适应',
     align: '对齐(大小不变)',

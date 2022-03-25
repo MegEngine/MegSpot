@@ -95,6 +95,7 @@ export default {
     overlayBottom: '下にオーバーレイ表示',
     overlayTop: '上にオーバーレイ表示',
     verticalFlip: '上下に反転',
+    frameSteps: '一つ一つ比較する\nCtrl + n',
     horizontalFlip: '左右に反転',
     fullsize: 'フルサイズ',
     adaptive: '全体を見る',

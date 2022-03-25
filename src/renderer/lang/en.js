@@ -95,6 +95,7 @@ export default {
     overlayBottom: 'overlay bottom',
     overlayTop: 'overlay top',
     verticalFlip: 'vertical flip',
+    frameSteps: 'Compare video frame by frame\nCtrl + n',
     horizontalFlip: 'horizontal flip',
     fullsize: 'fullsize',
     adaptive: 'adaptive',

@@ -1,7 +1,7 @@
 <template>
   <div :class="['image-canvas', { selected: selected }]" @click.stop>
     <div ref="header" class="header" flex="main:justify cross:center">
-      <div flex="cross:center">
+      <div ref="header-left" flex="cross:center">
         <CoverMask :mask="maskDom" class="cover-mask">
           <HistContainer
             ref="hist-container"
@@ -20,7 +20,7 @@
             <el-input-number
               v-if="videoProcessBarInputVisible"
               :value="currentTimeData"
-              :precision="3"
+              :precision="4"
               :min="0"
               :max="duration || 60"
               @change="val => changeVideoTime(val)"
@@ -64,9 +64,10 @@
         :time.sync="currentTimeData"
         :duration="duration"
         :show="videoSliderVisible"
+        :_width="processWidth"
         :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
       />
-      <div flex="main:right cross:center">
+      <div ref="header-right" flex="main:right cross:center">
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
         <EffectPreview @change="changeCanvasStyle" />
       </div>
@@ -161,6 +162,7 @@ export default {
       video: null,
       duration: 60,
       currentTime: 1,
+      processWidth: 100,
       videoSliderVisible: false,
       videoProcessBarInputVisible: false,
       paused: true,
@@ -213,6 +215,10 @@ export default {
           action: 'align'
         },
         {
+          event: 'imageCenter_frameSteps',
+          action: 'handleFrameSteps'
+        },
+        {
           event: 'radius',
           action: 'setRadius'
         },
@@ -263,8 +269,16 @@ export default {
     canvasStyle() {
       return this.preference.background.style;
     },
+    // 视频逐帧对比间隔，默认为近似1/12秒
+    interval() {
+      return this.videoConfig.interval;
+    },
     dynamicPickColor() {
       return this.videoConfig.dynamicPickColor;
+    },
+    // 视频最小渲染间隔， 默认为 0.01s
+    minRenderInterval() {
+      return this.videoConfig.minRenderInterval;
     },
     currentTimeData: {
       get() {
@@ -283,6 +297,7 @@ export default {
     this.initCanvas();
     this.initVideo();
     this.listenEvents();
+    // window.addEventListener('resize', this.calcWidth, true);
   },
   beforeDestroy() {
     this.removeEvents();
@@ -491,7 +506,7 @@ export default {
       }
       if (this.duration >= currentTime) {
         if (Math.abs(this.video.currentTime - currentTime) > 1) {
-          this.video.currentTime = Number(currentTime).toFixed(2);
+          this.video.currentTime = Number(currentTime).toFixed(5);
           if (this.video.readyState > 0 && this.video.paused) {
             this.video.play().catch(e => {
               // console.log('error', e);
@@ -520,8 +535,11 @@ export default {
 
       // 设置时间节点是否在视频时长范围之内
       if (currentTime <= this.duration) {
-        if (Math.abs(this.video.currentTime - currentTime) > 0.1) {
-          this.video.currentTime = Number(currentTime).toFixed(2);
+        if (
+          Math.abs(this.video.currentTime - currentTime) >
+          this.minRenderInterval
+        ) {
+          this.video.currentTime = Number(currentTime).toFixed(5);
 
           if (this.video.readyState > 0) {
             this.video
@@ -600,7 +618,7 @@ export default {
         this.$emit('loaded');
         this.duration = isNaN(this.video.duration)
           ? 60
-          : Number(Number(this.video.duration).toFixed(2));
+          : Number(Number(this.video.duration).toFixed(5));
         this.handleVideoPaused(false);
         if (
           this.imagePosition == undefined ||
@@ -657,6 +675,34 @@ export default {
         this.drawImage();
       };
       this.video.src = getImageUrlSyncNoCache(this.path);
+    },
+    calcWidth() {
+      // const headerInfo = document
+      //   .getElementsByClassName('header')[0]
+      //   .getBoundingClientRect();
+      // const headerLeftInfo = document
+      //   .getElementsByClassName('header-left')[0]
+      //   .getBoundingClientRect();
+      // const headerRightInfo = document
+      //   .getElementsByClassName('header-right')[0]
+      //   .getBoundingClientRect();
+      const headerInfo = this.$refs.header;
+      const headerLeftInfo = this.$refs['header-left'];
+      const headerRightInfo = this.$refs['header-right'];
+      console.log(
+        'calcWidth',
+        this.processWidth,
+        headerInfo,
+        headerLeftInfo,
+        headerRightInfo
+      );
+      this.processWidth =
+        headerInfo.clientWidth -
+        headerLeftInfo.clientWidth -
+        headerRightInfo.clientWidth;
+      // this.processWidth =
+      //   headerInfo.width - headerLeftInfo.width - headerRightInfo.width;
+      console.log('calcWidth', this.processWidth);
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4;
@@ -1002,6 +1048,12 @@ export default {
         }
       }
     },
+    handleFrameSteps({ name, data }) {
+      this.currentTime = Math.min(
+        Math.max(this.currentTime + data ?? this.interval, 0),
+        this.duration
+      );
+    },
     getSelectedPosition(data, callback) {
       if (
         this.selected ||
@@ -1019,6 +1071,7 @@ export default {
 </script>
 <style scoped lang="scss">
 @import '@/styles/variables.scss';
+
 .image-canvas {
   .header {
     height: 18px;
