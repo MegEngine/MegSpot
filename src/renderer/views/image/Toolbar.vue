@@ -389,20 +389,17 @@ export default {
     reverse(data) {
       this.$bus.$emit('imageCenter_reverse', { name: 'reverse', data });
     },
-    align(beSameSize) {
-      new Promise(resolve => {
+    async align(beSameSize) {
+      const data = await new Promise(resolve => {
         this.$bus.$emit(
           'imageCenter_getSelectedPosition',
           { name: 'getSelectedPosition', data: beSameSize },
-          res => {
-            resolve(res);
-          }
+          res => resolve(res)
         );
-      }).then(data => {
-        this.$bus.$emit('imageCenter_align', {
-          name: 'align',
-          data: { beSameSize, ...data }
-        });
+      });
+      this.$bus.$emit('imageCenter_align', {
+        name: 'align',
+        data: { beSameSize, ...data }
       });
     }
   },

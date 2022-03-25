@@ -292,6 +292,9 @@ export default {
   watch: {
     path: {
       handler: function(newVal, oldVal) {
+        if (oldVal && newVal && oldVal !== newVal) {
+          this.initVideo(true);
+        }
         if (oldVal) {
           this.wacther && this.wacther.close();
         }
@@ -600,7 +603,8 @@ export default {
           : Number(Number(this.video.duration).toFixed(2));
         this.handleVideoPaused(false);
         if (
-          (this.imagePosition = undefined || isNaN(this.imagePosition?.height))
+          this.imagePosition == undefined ||
+          isNaN(this.imagePosition?.height)
         ) {
           console.log('initVideo');
           this.imagePosition = this.getImageInitPos(this.canvas, this.video);
@@ -608,15 +612,14 @@ export default {
         this.doZoomEnd();
       });
       this.video.addEventListener('timeupdate', () => {
-        if (this.paused) return;
+        if (this.paused || !this.video) return;
         this.currentTime = this.video.currentTime;
         // console.log('currentTime', this.video.currentTime, this.currentTime);
       });
       this.video.addEventListener('pause', () => {
         this.$bus.$emit('changeVideoPaused', true);
       });
-
-      this.video.src = this.path;
+      this.video.src = getImageUrlSyncNoCache(this.path);
       this.video.autoplay = true;
       // 默认开启视频循环
       this.video.loop = true;
@@ -648,12 +651,12 @@ export default {
     // 供外部直接调用 待测试
     reMount() {
       this.initCanvas();
-      this.image.onload = () => {
+      this.video.onload = () => {
         console.log('reMount');
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         this.drawImage();
       };
-      this.image.src = getImageUrlSyncNoCache(this.path);
+      this.video.src = getImageUrlSyncNoCache(this.path);
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4;
