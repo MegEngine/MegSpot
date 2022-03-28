@@ -65,7 +65,7 @@
         :time.sync="currentTimeData"
         :duration="duration"
         :show="videoSliderVisible"
-        :_width="eeprocessWidth"
+        :_width="processWidth"
         :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
       />
       <div ref="header-right" flex="main:right cross:center">
@@ -163,7 +163,6 @@ export default {
       video: null,
       duration: 60,
       currentTime: 1,
-      processWidth: 100,
       videoSliderVisible: false,
       videoProcessBarInputVisible: false,
       paused: true,
@@ -270,11 +269,12 @@ export default {
     canvasStyle() {
       return this.preference.background.style;
     },
-    eeprocessWidth() {
+    processWidth() {
       return (
-        this._width -
-          this.$refs['header-left'].offsetWidth -
-          this.$refs['header-right'].offsetWidth || 300
+        (this._width -
+          (this.$refs['header-left']?.offsetWidth || 44) -
+          (this.$refs['header-right']?.offsetWidth || 150)) *
+        0.7
       );
     },
     // 视频逐帧对比间隔，默认为近似1/12秒
@@ -305,7 +305,6 @@ export default {
     this.initCanvas();
     this.initVideo();
     this.listenEvents();
-    // window.addEventListener('resize', this.calcWidth, true);
   },
   beforeDestroy() {
     this.removeEvents();
@@ -684,34 +683,6 @@ export default {
         this.drawImage();
       };
       this.video.src = getImageUrlSyncNoCache(this.path);
-    },
-    calcWidth() {
-      // const headerInfo = document
-      //   .getElementsByClassName('header')[0]
-      //   .getBoundingClientRect();
-      // const headerLeftInfo = document
-      //   .getElementsByClassName('header-left')[0]
-      //   .getBoundingClientRect();
-      // const headerRightInfo = document
-      //   .getElementsByClassName('header-right')[0]
-      //   .getBoundingClientRect();
-      const headerInfo = this.$refs.header;
-      const headerLeftInfo = this.$refs['header-left'];
-      const headerRightInfo = this.$refs['header-right'];
-      console.log(
-        'calcWidth',
-        this.processWidth,
-        headerInfo,
-        headerLeftInfo,
-        headerRightInfo
-      );
-      this.processWidth =
-        headerInfo.clientWidth -
-        headerLeftInfo.clientWidth -
-        headerRightInfo.clientWidth;
-      // this.processWidth =
-      //   headerInfo.width - headerLeftInfo.width - headerRightInfo.width;
-      console.log('calcWidth', this.processWidth);
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4;
