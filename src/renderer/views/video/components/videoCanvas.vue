@@ -23,6 +23,7 @@
               :precision="4"
               :min="0"
               :max="duration || 60"
+              controls-position="right"
               @change="val => changeVideoTime(val)"
             />
             <span class="svg-container" @click="executeAction(1)">
@@ -64,7 +65,7 @@
         :time.sync="currentTimeData"
         :duration="duration"
         :show="videoSliderVisible"
-        :_width="processWidth"
+        :_width="eeprocessWidth"
         :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
       />
       <div ref="header-right" flex="main:right cross:center">
@@ -269,6 +270,13 @@ export default {
     canvasStyle() {
       return this.preference.background.style;
     },
+    eeprocessWidth() {
+      return (
+        this._width -
+          this.$refs['header-left'].offsetWidth -
+          this.$refs['header-right'].offsetWidth || 300
+      );
+    },
     // 视频逐帧对比间隔，默认为近似1/12秒
     interval() {
       return this.videoConfig.interval;
@@ -276,7 +284,7 @@ export default {
     dynamicPickColor() {
       return this.videoConfig.dynamicPickColor;
     },
-    // 视频最小渲染间隔， 默认为 0.01s
+    // 视频最小渲染间隔(默认为 0.01s)
     minRenderInterval() {
       return this.videoConfig.minRenderInterval;
     },
@@ -535,8 +543,9 @@ export default {
 
       // 设置时间节点是否在视频时长范围之内
       if (currentTime <= this.duration) {
+        // 比较当前时间和设置的时间差值 是否大于 视频最小渲染间隔(默认为0.01s)
         if (
-          Math.abs(this.video.currentTime - currentTime) >
+          Math.abs(this.video.currentTime - currentTime) >=
           this.minRenderInterval
         ) {
           this.video.currentTime = Number(currentTime).toFixed(5);
@@ -1048,9 +1057,12 @@ export default {
         }
       }
     },
+    // 逐帧对比
     handleFrameSteps({ name, data }) {
+      // // 存在选中使只使选中视频进行逐帧操作
+      // if (this.selectedId && this.selectedId !== this.path) return;
       this.currentTime = Math.min(
-        Math.max(this.currentTime + data ?? this.interval, 0),
+        Math.max(this.currentTime + (data ?? this.interval), 0),
         this.duration
       );
     },

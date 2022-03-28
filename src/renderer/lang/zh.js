@@ -89,6 +89,7 @@ export default {
     bilinearInterpolation: '双线性',
     selectedMsg: '图片已选中，可单独操作',
     colorPicker: '取色器',
+    region: '取色器大小',
     nearestInterpolation: '最邻近',
     overlayLeft: '向左叠加显示',
     overlayRight: '向右叠加显示',
@@ -96,7 +97,8 @@ export default {
     overlayTop: '向上叠加显示',
     verticalFlip: '纵向翻转',
     horizontalFlip: '水平翻转翻转',
-    frameSteps: '逐帧对比\nCtrl + n',
+    frameStep: '逐帧对比播放间隔',
+    frameSteps: '逐帧对比\n向前播放: Ctrl + b\n向后播放: Ctrl + n',
     fullsize: '原图',
     adaptive: '自适应',
     align: '对齐(大小不变)',
@@ -130,6 +132,7 @@ export default {
     pause: '暂停',
     reset: '复位',
     dynamicPickColor: '取色器动态监听',
+    minRenderInterval: '视频渲染最小间隔',
     processTip:
       '左键点击可 显示/隐藏 视频进度条，右键点击可 显示/隐藏 视频进度的精确控制组件'
   },

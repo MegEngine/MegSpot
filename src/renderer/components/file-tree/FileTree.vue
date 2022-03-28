@@ -123,7 +123,7 @@
 <script>
 import SearchInput from '@/components/search-input';
 import ContextMenu from '@/components/context-menu';
-import { listDir } from './lib/file.js';
+import { generateFileInfo, listDir } from './lib/file.js';
 import { defaultIcon } from './lib/consts.js';
 import { DELIMITER, SORTING_FILE_NAME } from '@/constants';
 import { throttle } from '@/utils';
@@ -302,8 +302,11 @@ export default {
         include: this.includes,
         onlyDir: this.onlyDir
       });
-      const result = await this.loadMultiDir(nodeData.children);
-      resolve(result);
+
+      // 取消递归第二层目录，直接返回包装过后的一层目录文件信息
+      // const result = await this.loadMultiDir(nodeData.children);
+      // resolve(result);
+      resolve(nodeData.children.map(generateFileInfo));
     },
     async handleRefresh(node, data) {
       node.loaded = false;

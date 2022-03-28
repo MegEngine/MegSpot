@@ -204,9 +204,21 @@
             </span>
           </el-button>
           <el-button
+            v-show="videoPaused"
             type="text"
             size="mini"
-            @click="frameSteps()"
+            @click="frameSteps(-1)"
+            v-tip="$t('imageCenter.frameSteps')"
+          >
+            <span class="svg-container">
+              <svg-icon icon-class="frame" />
+            </span>
+          </el-button>
+          <el-button
+            v-show="videoPaused"
+            type="text"
+            size="mini"
+            @click="frameSteps(1)"
             v-tip="$t('imageCenter.frameSteps')"
           >
             <span class="svg-container">
@@ -366,9 +378,22 @@ export default {
         this.groupNum++;
         this.changeGroup(this.groupNum, this.groupNum - 1);
       }
-      // cmd/ctrl + n 触发逐帧对比
-      if ((event.metaKey || event.ctrlKey) && event.keyCode === 78) {
-        this.frameSteps();
+      // cmd/ctrl + b 触发逐帧对比 向前播放 (暂停时可用)
+      if (
+        this.videoPaused &&
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 66
+      ) {
+        this.frameSteps(-1);
+      }
+
+      // cmd/ctrl + n 触发逐帧对比 向后播放 (暂停时可用)
+      if (
+        this.videoPaused &&
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 78
+      ) {
+        this.frameSteps(1);
       }
     },
     changeStatus(status) {
@@ -451,12 +476,12 @@ export default {
     },
     /**
      * 逐帧对比
-     * @param {number} interval 帧间隔
+     * @param {number} flag 向后播放为1，向前播放为-1
      */
-    frameSteps(interval) {
+    frameSteps(flag = 1) {
       this.$bus.$emit('imageCenter_frameSteps', {
         name: 'frameSteps',
-        data: interval ?? this.interval
+        data: flag * this.interval
       });
     },
     async align(beSameSize) {

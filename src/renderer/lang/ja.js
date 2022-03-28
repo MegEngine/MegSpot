@@ -45,6 +45,7 @@ export default {
     size: 'ファイルサイズ',
     scale: '拡大倍率',
     sortDialogTips: 'ヒント：ファイル名をドラッグして表示順を変更できます',
+    selectAll: 'すべて選択',
     clearAll: 'すべて選択解除',
     delete: 'このアイテムを削除',
     showAll: 'すべて表示',
@@ -89,13 +90,16 @@ export default {
     bilinearInterpolation: 'バイリニア補間',
     selectedMsg: 'この画像は選択されており、独立して操作できます',
     colorPicker: 'カラーピッカー',
+    region: 'カラーピッカーのサイズ',
     nearestInterpolation: '最近傍補間',
     overlayLeft: '左側にオーバーレイ表示',
     overlayRight: '右側にオーバーレイ表示',
     overlayBottom: '下にオーバーレイ表示',
     overlayTop: '上にオーバーレイ表示',
     verticalFlip: '上下に反転',
-    frameSteps: '一つ一つ比較する\nCtrl + n',
+    frameStep: 'フレーム比較の間隔',
+    frameSteps:
+      '一つ一つ比較する\n逆さまに: Ctrl + b\n再生を再開します: Ctrl + n',
     horizontalFlip: '左右に反転',
     fullsize: 'フルサイズ',
     adaptive: '全体を見る',
@@ -131,6 +135,7 @@ export default {
     pause: '一時停止',
     reset: 'リセット',
     dynamicPickColor: 'カラーピッカー調和',
+    minRenderInterval: 'ビデオレンダリングの最小間隔',
     processTip:
       '左クリックしてビデオプログレスバーを表示/非表示にし、右クリックしてビデオプログレスの正確なコントロールコンポーネントを表示/非表示にします'
   },

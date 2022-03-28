@@ -45,6 +45,7 @@ export default {
     size: 'size',
     scale: 'scale',
     sortDialogTips: 'tips:drag to change order',
+    selectAll: 'select all',
     clearAll: 'unselect all',
     delete: 'delete this item',
     showAll: 'show all',
@@ -88,14 +89,17 @@ export default {
     bilinearInterpolation: 'bilinar',
     selectedMsg:
       'The picture has been selected and can be operated individually',
-    colorPicker: 'colorPicker',
+    colorPicker: 'color picker',
+    region: 'size of color picker',
     nearestInterpolation: 'nearest',
     overlayLeft: 'overlay left',
     overlayRight: 'overlay right',
     overlayBottom: 'overlay bottom',
     overlayTop: 'overlay top',
     verticalFlip: 'vertical flip',
-    frameSteps: 'Compare video frame by frame\nCtrl + n',
+    frameStep: 'the interval of Frame Compare',
+    frameSteps:
+      'Compare video frame by frame\nplay forward: Ctrl + b\nplay backward: Ctrl + n',
     horizontalFlip: 'horizontal flip',
     fullsize: 'fullsize',
     adaptive: 'adaptive',
@@ -131,6 +135,7 @@ export default {
     pause: 'pause',
     reset: 'reset',
     dynamicPickColor: 'dynamic color picker',
+    minRenderInterval: 'min-interval of video rendering',
     processTip:
       'Left click to show/hide video progress bar, right click to show/hide precise control component of video progress'
   },

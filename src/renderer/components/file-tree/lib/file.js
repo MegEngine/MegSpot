@@ -18,6 +18,17 @@ const getFileIcon = (fileIcons, filePath) => {
   }
 };
 
+const generateFileInfo = dir => {
+  return {
+    id: getId(),
+    label: path.basename(dir),
+    path: path.resolve(dir),
+    type: DEF.TYPE_DIRECTORY,
+    hovering: false,
+    children: []
+  };
+};
+
 /**
  * @function 递归地遍历文件目录，返回所有文件清单
  * @param {String} dir 文件目录
@@ -84,4 +95,4 @@ const listDir = async (dir, fileIcons, options = {}) => {
   return dirData;
 };
 
-export { listDir };
+export { generateFileInfo, listDir };
