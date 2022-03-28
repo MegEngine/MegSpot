@@ -184,36 +184,43 @@ export default {
     showFile: {
       get() {
         // 过滤排序文件，根据当前是否showAll以及支持文件类型，正则等进行过滤
-        return this.fileInfoList
-          .filter(item => {
-            if (item.name === SORTING_FILE_NAME) return false;
-            if (this.showAll) {
-              return true;
-            } else if (!this.showAll && this.checkItem(item)) {
-              return true;
-            }
-            return false;
-          })
-          .filter(item => {
-            let result;
-            try {
-              result =
-                !this.search ||
-                (this.regexpEnabled
-                  ? new RegExp(this.search, 'ig').test(item.name)
-                  : item.name
-                      .toString()
-                      .toLowerCase()
-                      .indexOf(this.search.toLowerCase()) > -1);
-            } catch {
-              result =
-                item.name
-                  .toString()
-                  .toLowerCase()
-                  .indexOf(this.search.toLowerCase()) > -1;
-            }
-            return result;
-          });
+        const data = this.fileInfoList.filter(item => {
+          if (item.name === SORTING_FILE_NAME) return false;
+          let result1 = false,
+            result2 = false;
+          if (this.showAll || (!this.showAll && this.checkItem(item))) {
+            result1 = true;
+          }
+
+          try {
+            result2 =
+              !this.search ||
+              (this.regexpEnabled
+                ? new RegExp(this.search, 'ig').test(item.name)
+                : item.name
+                    .toString()
+                    .toLowerCase()
+                    .indexOf(this.search.toLowerCase()) > -1);
+          } catch {
+            result2 =
+              item.name
+                .toString()
+                .toLowerCase()
+                .indexOf(this.search.toLowerCase()) > -1;
+          }
+          return result1 && result2;
+        });
+
+        if (!this.$refs.xTable?.getSortColumns()?.length) {
+          return this.mySort(
+            data,
+            this.defaultSort?.field || 'field',
+            this.defaultSort?.order || 'asc'
+          );
+        }
+
+        const { property, order } = this.$refs.xTable.getSortColumns()[0];
+        return this.mySort(data, property, order);
       },
       set(data) {
         console.log('setData', data);
@@ -324,15 +331,7 @@ export default {
   methods: {
     ...imageMapActions(['addImages', 'removeImages']),
     ...videoMapActions(['addVideos', 'removeVideos']),
-    async customSortMethod({ data, sortList }) {
-      const extist = await fse.pathExists(this.sortFilePath);
-      if (!this.sortList.length && extist) {
-        const data = await fse.readFile(this.sortFilePath, 'utf8');
-        this.sortList = data.split(EOF);
-      }
-      const sortItem = sortList[0];
-      // 取出第一个排序的列
-      const { property, order } = sortItem;
+    mySort(data, property, order) {
       let list = [];
       // 是否根据排序文件排序
       if (property === 'name' && this.sortList.length) {
@@ -352,6 +351,21 @@ export default {
       if (order === 'desc') {
         list.reverse();
       }
+      return list;
+    },
+    async customSortMethod({ data, sortList }) {
+      const exist = await fse.pathExists(this.sortFilePath);
+      if (!this.sortList.length && exist) {
+        // if (exist) {
+        const data = await fse.readFile(this.sortFilePath, 'utf8');
+        this.sortList = data.split(EOF);
+      }
+
+      const sortItem = sortList[0];
+      // 取出第一个排序的列
+      const { property, order } = sortItem;
+
+      const list = this.mySort(data, property, order);
 
       if (this.searchString !== '') {
         this.canApply = false;
@@ -371,8 +385,8 @@ export default {
 
       return list;
     },
-    applySortFile(data, callback) {
-      this.$refs.xTable.clearSort();
+    async applySortFile(data, callback) {
+      await this.$refs.xTable.clearSort();
       // 重新触发排序
       this.$nextTick(() => {
         this.$refs.xTable.sort('name', 'asc').then(() => {
