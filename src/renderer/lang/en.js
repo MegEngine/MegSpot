@@ -98,8 +98,8 @@ export default {
     overlayTop: 'overlay top',
     verticalFlip: 'vertical flip',
     frameStep: 'the interval of Frame Compare',
-    frameSteps:
-      'Compare video frame by frame\nplay forward: Ctrl + b\nplay backward: Ctrl + n',
+    frameSteps1: 'Compare video frame by frame\nplay forward: Cmd/Ctrl + b',
+    frameSteps2: 'Compare video frame by frame\nplay backward: Cmd/Ctrl + n',
     horizontalFlip: 'horizontal flip',
     fullsize: 'fullsize',
     adaptive: 'adaptive',

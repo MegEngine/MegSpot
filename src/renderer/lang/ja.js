@@ -98,8 +98,8 @@ export default {
     overlayTop: '上にオーバーレイ表示',
     verticalFlip: '上下に反転',
     frameStep: 'フレーム比較の間隔',
-    frameSteps:
-      '一つ一つ比較する\n逆さまに: Ctrl + b\n再生を再開します: Ctrl + n',
+    frameSteps1: '一つ一つ比較する\n逆さまに: Cmd/Ctrl + b',
+    frameSteps2: '一つ一つ比較する\n再生を再開します: Cmd/Ctrl + n',
     horizontalFlip: '左右に反転',
     fullsize: 'フルサイズ',
     adaptive: '全体を見る',

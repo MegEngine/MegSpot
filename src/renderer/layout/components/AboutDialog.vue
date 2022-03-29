@@ -155,7 +155,19 @@ export default {
         },
         {
           cmd: 'show/hide select file gallery',
+          key: 'cmd/ctrl+ <- / ->'
+        },
+        {
+          cmd: 'change compare group',
           key: 'cmd/ctrl+f'
+        },
+        {
+          cmd: 'Compare video frame by frame (video play forward <-)',
+          key: 'cmd/ctrl + b'
+        },
+        {
+          cmd: 'Compare video frame by frame (video play backwards ->)',
+          key: 'cmd/ctrl + n'
         }
       ],
       langOptions: [

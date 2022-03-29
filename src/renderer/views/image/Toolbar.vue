@@ -1,7 +1,8 @@
 <template>
   <div flex="main:justify cross:center" class="toolbar">
     <div class="left" flex="cross:center">
-      <div class="router-back" v-tip.sure="`${$t('common.hotKey')}：esc`">
+      <div class="router-back">
+        <!-- v-tip.sure="`${$t('common.hotKey')}：esc`" -->
         <span @click="goBack" class="btn"
           ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
         >

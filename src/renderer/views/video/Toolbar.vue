@@ -1,7 +1,8 @@
 <template>
   <div flex="main:justify cross:center" class="toolbar">
     <div class="left" flex="cross:center">
-      <div class="router-back" v-tip.sure="`${$t('common.hotKey')}：esc`">
+      <div class="router-back">
+        <!-- v-tip.sure="`${$t('common.hotKey')}：esc`" -->
         <span @click="goBack" class="btn"
           ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
         >
@@ -43,6 +44,28 @@
     </div>
     <div class="middle">
       <el-button-group class="gap">
+        <el-button
+          v-show="videoPaused"
+          type="text"
+          size="mini"
+          @click="frameSteps(-1)"
+          v-tip.sure="$t('imageCenter.frameSteps1')"
+        >
+          <span class="svg-container" v-tip="$t('imageCenter.frameSteps1')">
+            <svg-icon icon-class="frame" />
+          </span>
+        </el-button>
+        <el-button
+          v-show="videoPaused"
+          type="text"
+          size="mini"
+          @click="frameSteps(1)"
+          v-tip.sure="$t('imageCenter.frameSteps2')"
+        >
+          <span class="svg-container" v-tip="$t('imageCenter.frameSteps2')">
+            <svg-icon icon-class="frame" style="transform:rotate(180deg);" />
+          </span>
+        </el-button>
         <el-button
           type="text"
           v-tip="$t('video.play')"
@@ -201,28 +224,6 @@
           >
             <span class="svg-container">
               <svg-icon icon-class="vertical-flip" />
-            </span>
-          </el-button>
-          <el-button
-            v-show="videoPaused"
-            type="text"
-            size="mini"
-            @click="frameSteps(-1)"
-            v-tip="$t('imageCenter.frameSteps')"
-          >
-            <span class="svg-container">
-              <svg-icon icon-class="frame" />
-            </span>
-          </el-button>
-          <el-button
-            v-show="videoPaused"
-            type="text"
-            size="mini"
-            @click="frameSteps(1)"
-            v-tip="$t('imageCenter.frameSteps')"
-          >
-            <span class="svg-container">
-              <svg-icon icon-class="frame" style="transform:rotate(180deg);" />
             </span>
           </el-button>
         </el-button-group>
