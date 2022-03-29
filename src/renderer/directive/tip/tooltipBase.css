@@ -40,6 +40,7 @@
   height: 8px;
   border-radius: 4px;
   background-color: rgb(224, 36, 36);
+  z-index: 999;
 }
 
 .tooltip .inner_text {
@@ -100,6 +101,5 @@
 }
 
 .tooltip[data-popper-placement^='right'] > .arrow {
-
   left: -4px;
 }

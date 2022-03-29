@@ -32,6 +32,9 @@ export default {
     float: 'floating ball',
     defaultFileListShowType: 'Default Show Type of File List',
     list: 'list',
+    show: 'show',
+    hide: 'hide',
+    histogram: 'histogram',
     thumbnail: 'thumbnail',
     fileName: 'file name',
     fileLoading: 'Loading files...',
@@ -42,6 +45,7 @@ export default {
     size: 'size',
     scale: 'scale',
     sortDialogTips: 'tips:drag to change order',
+    selectAll: 'select all',
     clearAll: 'unselect all',
     delete: 'delete this item',
     showAll: 'show all',
@@ -85,13 +89,17 @@ export default {
     bilinearInterpolation: 'bilinar',
     selectedMsg:
       'The picture has been selected and can be operated individually',
-    colorPicker: 'colorPicker',
+    colorPicker: 'color picker',
+    region: 'size of color picker',
     nearestInterpolation: 'nearest',
     overlayLeft: 'overlay left',
     overlayRight: 'overlay right',
     overlayBottom: 'overlay bottom',
     overlayTop: 'overlay top',
     verticalFlip: 'vertical flip',
+    frameStep: 'the interval of Frame Compare',
+    frameSteps1: 'Compare video frame by frame\nplay forward: Cmd/Ctrl + b',
+    frameSteps2: 'Compare video frame by frame\nplay backward: Cmd/Ctrl + n',
     horizontalFlip: 'horizontal flip',
     fullsize: 'fullsize',
     adaptive: 'adaptive',
@@ -126,7 +134,10 @@ export default {
     play: 'play',
     pause: 'pause',
     reset: 'reset',
-    dynamicPickColor: 'dynamic color picker'
+    dynamicPickColor: 'dynamic color picker',
+    minRenderInterval: 'min-interval of video rendering',
+    processTip:
+      'Left click to show/hide video progress bar, right click to show/hide precise control component of video progress'
   },
   sortFile: {
     apply: 'Apply',

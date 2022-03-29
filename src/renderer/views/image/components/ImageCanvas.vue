@@ -4,6 +4,7 @@
       <CoverMask :mask="maskDom" class="cover-mask">
         <HistContainer
           ref="hist-container"
+          v-tip="$t('general.histogram')"
           @changeVisible="handleHistVisible"
         />
       </CoverMask>

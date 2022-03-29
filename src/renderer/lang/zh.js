@@ -31,6 +31,9 @@ export default {
     float: '悬浮球',
     defaultFileListShowType: '文件列表的默认显示类型',
     list: '列表',
+    show: '显示',
+    hide: '隐藏',
+    histogram: '直方图',
     thumbnail: '缩略图',
     fileName: '文件名',
     fileLoading: '加载文件中...',
@@ -86,6 +89,7 @@ export default {
     bilinearInterpolation: '双线性',
     selectedMsg: '图片已选中，可单独操作',
     colorPicker: '取色器',
+    region: '取色器大小',
     nearestInterpolation: '最邻近',
     overlayLeft: '向左叠加显示',
     overlayRight: '向右叠加显示',
@@ -93,6 +97,9 @@ export default {
     overlayTop: '向上叠加显示',
     verticalFlip: '纵向翻转',
     horizontalFlip: '水平翻转翻转',
+    frameStep: '逐帧对比播放间隔',
+    frameSteps1: '逐帧对比\n向前播放: Cmd/Ctrl + b',
+    frameSteps2: '逐帧对比\n向后播放: Cmd/Ctrl + n',
     fullsize: '原图',
     adaptive: '自适应',
     align: '对齐(大小不变)',
@@ -125,7 +132,10 @@ export default {
     play: '播放',
     pause: '暂停',
     reset: '复位',
-    dynamicPickColor: '取色器动态监听'
+    dynamicPickColor: '取色器动态监听',
+    minRenderInterval: '视频渲染最小间隔',
+    processTip:
+      '左键点击可 显示/隐藏 视频进度条，右键点击可 显示/隐藏 视频进度的精确控制组件'
   },
   sortFile: {
     apply: '应用',

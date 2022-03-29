@@ -15,7 +15,7 @@
       :step="0.01"
       :format-tooltip="formatter"
       @input="handleChange"
-      class="process"
+      :style="processStyle"
     ></el-slider>
     <span v-show="show && labelVisible" class="label">{{
       currentTime.toFixed(1)
@@ -105,6 +105,12 @@ export default {
       set() {
         this.$emit('update:time', this.value);
       }
+    },
+    processStyle() {
+      return {
+        marginLeft: '5px',
+        minWidth: `${this._width}px`
+      };
     }
   },
   methods: {
@@ -136,10 +142,10 @@ export default {
   .svg-container {
     font-size: 20px;
   }
-  .process {
-    margin-left: 5px;
-    min-width: 100px;
-  }
+  // .process {
+  //   margin-left: 5px;
+  //   min-width: 100px;
+  // }
   .label {
     margin-left: 8px;
   }

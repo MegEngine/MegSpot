@@ -1,43 +1,19 @@
 <template>
   <div flex="main:justify cross:center" class="toolbar">
     <div class="left" flex="cross:center">
-      <div class="router-back" v-tip.sure="`${$t('common.hotKey')}：esc`">
+      <div class="router-back">
+        <!-- v-tip.sure="`${$t('common.hotKey')}：esc`" -->
         <span @click="goBack" class="btn"
           ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
         >
       </div>
-      <Gallery
+      <SelectedBtn
         :selectedList="videoList"
         :focusListIndex="
           new Array(groupCount).fill(0).map((_, index) => index + startIndex)
         "
         @update="setVideos"
         @remove="removeVideos"
-      >
-        <template v-slot:headButton>
-          <el-badge :value="videoList.length" class="item">
-            <el-button
-              type="text"
-              :disabled="!videoList.length"
-              v-tip.sure.right="
-                'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
-              "
-            >
-              {{ $t('general.selected') }}
-            </el-button>
-          </el-badge>
-        </template>
-        <template v-slot:dragItem="item">
-          <img :src="item.src" :alt="item.alt" />
-        </template>
-      </Gallery>
-      <el-button
-        type="text"
-        size="large"
-        icon="el-icon-circle-close"
-        v-tip="$t('general.clearAll')"
-        class="clear-images"
-        :disabled="!videoList.length"
         @click="emptyVideos"
       />
       <el-input-number
@@ -61,13 +37,35 @@
       </el-radio-group>
       <div class="select">
         <!-- 空间不足, 取消选中提示 -->
-        <span v-show="false" class="msg">
+        <span v-show="showSelectedMsg" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
         </span>
       </div>
     </div>
     <div class="middle">
       <el-button-group class="gap">
+        <el-button
+          v-show="videoPaused"
+          type="text"
+          size="mini"
+          @click="frameSteps(-1)"
+          v-tip.sure="$t('imageCenter.frameSteps1')"
+        >
+          <span class="svg-container" v-tip="$t('imageCenter.frameSteps1')">
+            <svg-icon icon-class="frame" />
+          </span>
+        </el-button>
+        <el-button
+          v-show="videoPaused"
+          type="text"
+          size="mini"
+          @click="frameSteps(1)"
+          v-tip.sure="$t('imageCenter.frameSteps2')"
+        >
+          <span class="svg-container" v-tip="$t('imageCenter.frameSteps2')">
+            <svg-icon icon-class="frame" style="transform:rotate(180deg);" />
+          </span>
+        </el-button>
         <el-button
           type="text"
           v-tip="$t('video.play')"
@@ -196,6 +194,7 @@
             </span>
           </el-button>
         </el-button-group>
+        <el-divider direction="vertical" v-if="videoPaused"></el-divider>
         <el-button-group class="gap">
           <el-button
             type="text"
@@ -304,7 +303,7 @@
 <script>
 import * as GLOBAL_CONSTANTS from '@/constants';
 import * as CONSTANTS from './video-constants';
-import Gallery from '@/components/gallery';
+import SelectedBtn from '@/components/selected-btn';
 import VideoProgressBar from './components/videoProgressBar';
 import { createNamespacedHelpers } from 'vuex';
 import GifDialog from '@/components/gif-dialog';
@@ -325,11 +324,12 @@ export default {
       groupNum: 0,
       startIndex: 0,
       offset: 0,
-      loop: false,
+      // 默认开启视频循环
+      loop: true,
       videoPaused: false
     };
   },
-  components: { Gallery, GifDialog, ImageSetting, VideoProgressBar },
+  components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
   mounted() {
     window.addEventListener('keydown', this.handleHotKey, true);
     this.$bus.$on('image_handleSelect', this.handleSelect);
@@ -378,6 +378,23 @@ export default {
       ) {
         this.groupNum++;
         this.changeGroup(this.groupNum, this.groupNum - 1);
+      }
+      // cmd/ctrl + b 触发逐帧对比 向前播放 (暂停时可用)
+      if (
+        this.videoPaused &&
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 66
+      ) {
+        this.frameSteps(-1);
+      }
+
+      // cmd/ctrl + n 触发逐帧对比 向后播放 (暂停时可用)
+      if (
+        this.videoPaused &&
+        (event.metaKey || event.ctrlKey) &&
+        event.keyCode === 78
+      ) {
+        this.frameSteps(1);
       }
     },
     changeStatus(status) {
@@ -444,26 +461,41 @@ export default {
         data: { status: this.traggerRGB }
       });
     },
+    /**
+     * 图像旋转
+     * @param {deg} data 旋转的角度
+     */
     rotate(data) {
       this.$bus.$emit('imageCenter_rotate', { name: 'rotate', data });
     },
+    /**
+     * 图像镜像翻转
+     * @param {boolean} data 1为水平镜像翻转， -1为垂直镜像翻转
+     */
     reverse(data) {
       this.$bus.$emit('imageCenter_reverse', { name: 'reverse', data });
     },
-    align(beSameSize) {
-      new Promise(resolve => {
+    /**
+     * 逐帧对比
+     * @param {number} flag 向后播放为1，向前播放为-1
+     */
+    frameSteps(flag = 1) {
+      this.$bus.$emit('imageCenter_frameSteps', {
+        name: 'frameSteps',
+        data: flag * this.interval
+      });
+    },
+    async align(beSameSize) {
+      const data = await new Promise(resolve => {
         this.$bus.$emit(
           'imageCenter_getSelectedPosition',
           { name: 'getSelectedPosition', data: beSameSize },
-          res => {
-            resolve(res);
-          }
+          res => resolve(res)
         );
-      }).then(data => {
-        this.$bus.$emit('imageCenter_align', {
-          name: 'align',
-          data: { beSameSize, ...data }
-        });
+      });
+      this.$bus.$emit('imageCenter_align', {
+        name: 'align',
+        data: { beSameSize, ...data }
       });
     }
   },
@@ -480,6 +512,10 @@ export default {
       const str = this.videoConfig.layout,
         len = str.length;
       return str[len - 3] * str[len - 1];
+    },
+    // 视频逐帧对比间隔，默认为近似1/12秒
+    interval() {
+      return this.videoConfig.interval;
     },
     smooth: {
       get() {

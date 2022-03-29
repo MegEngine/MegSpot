@@ -92,7 +92,7 @@ export const readDir = dir => {
   });
 };
 
-// // [同步] 检查是否为文件
+// [同步] 检查是否为文件
 export const isFile = file => {
   if (!isExist(file)) return false;
   const stat = fs.statSync(path.resolve(file));

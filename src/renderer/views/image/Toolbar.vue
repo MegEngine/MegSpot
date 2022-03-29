@@ -1,7 +1,8 @@
 <template>
   <div flex="main:justify cross:center" class="toolbar">
     <div class="left" flex="cross:center">
-      <div class="router-back" v-tip.sure="`${$t('common.hotKey')}：esc`">
+      <div class="router-back">
+        <!-- v-tip.sure="`${$t('common.hotKey')}：esc`" -->
         <span @click="goBack" class="btn"
           ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
         >
@@ -389,20 +390,17 @@ export default {
     reverse(data) {
       this.$bus.$emit('imageCenter_reverse', { name: 'reverse', data });
     },
-    align(beSameSize) {
-      new Promise(resolve => {
+    async align(beSameSize) {
+      const data = await new Promise(resolve => {
         this.$bus.$emit(
           'imageCenter_getSelectedPosition',
           { name: 'getSelectedPosition', data: beSameSize },
-          res => {
-            resolve(res);
-          }
+          res => resolve(res)
         );
-      }).then(data => {
-        this.$bus.$emit('imageCenter_align', {
-          name: 'align',
-          data: { beSameSize, ...data }
-        });
+      });
+      this.$bus.$emit('imageCenter_align', {
+        name: 'align',
+        data: { beSameSize, ...data }
       });
     }
   },

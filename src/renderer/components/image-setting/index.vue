@@ -90,12 +90,41 @@
             </el-option>
           </el-select>
         </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('imageCenter.frameStep') }}(s):</span>
+          <el-input-number
+            v-model="frameCompareInterval"
+            :step="0.01"
+            :min="0.001"
+            :precision="4"
+            controls-position="right"
+          ></el-input-number>
+        </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('video.minRenderInterval') }}(s):</span>
+          <el-input-number
+            v-model="renderInterval"
+            :step="0.01"
+            :min="0.001"
+            :precision="4"
+            controls-position="right"
+          ></el-input-number>
+        </div>
         <div flex="main:justify" class="setting-item">
-          <span>region：</span>
+          <span>{{ $t('imageCenter.region') }}(px)：</span>
           <el-input-number
             v-model="radius"
             :min="1"
             :max="200"
+            controls-position="right"
             @change="handleRadiusChange"
           ></el-input-number>
         </div>
@@ -193,6 +222,26 @@ export default {
       set(arg) {
         this.setVideoConfig({
           dynamicPickColor: arg
+        });
+      }
+    },
+    frameCompareInterval: {
+      get() {
+        return this.videoConfig.interval;
+      },
+      set(arg) {
+        this.setVideoConfig({
+          interval: arg
+        });
+      }
+    },
+    renderInterval: {
+      get() {
+        return this.videoConfig.minRenderInterval;
+      },
+      set(arg) {
+        this.setVideoConfig({
+          minRenderInterval: arg
         });
       }
     },
