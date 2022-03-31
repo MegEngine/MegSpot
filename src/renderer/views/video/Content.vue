@@ -12,6 +12,7 @@
         :path="video"
         :_width="canvasWidth"
         :_height="canvasHeight"
+        :subVideoControlMenu="subVideoControlMenu"
         @loaded="handleVideoLoaded"
       ></VideoCanvas>
     </div>
@@ -78,7 +79,9 @@ export default {
           action: 'getMarks'
         }
       ],
-      marks: []
+      marks: [],
+      containerWidth: 9999,
+      subVideoControlMenu: false
     };
   },
   created() {
@@ -223,6 +226,8 @@ export default {
     },
     calcCanvasSize() {
       this.canvasWidth = this.calcWidth();
+      this.subVideoControlMenu =
+        422 * parseInt(this.videoConfig.layout[0]) <= this.containerWidth;
       this.canvasHeight = this.calcHeight() - 18;
     },
     calcWidth() {

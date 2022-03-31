@@ -34,7 +34,8 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 #rgba-exhibit {
   z-index: 1;
-  width: 130px;
+  width: 110px;
+  font-size: 14px;
   float: right;
   // margin-left: 5px;
   #rgba-content {
@@ -43,8 +44,8 @@ export default {
       white-space: nowrap;
     }
     #rgba-block {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       margin-right: 5px;
       display: inline-block;
     }

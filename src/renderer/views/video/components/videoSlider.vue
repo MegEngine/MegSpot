@@ -17,7 +17,7 @@
       @input="handleChange"
       :style="processStyle"
     ></el-slider>
-    <span v-show="show && labelVisible" class="label">{{
+    <span v-show="show && showTime && labelVisible" class="label">{{
       currentTime.toFixed(1)
     }}</span>
   </div>
@@ -36,6 +36,10 @@ export default {
     time: {
       type: Number,
       default: 0
+    },
+    showTime: {
+      type: Boolean,
+      default: false
     },
     duration: {
       type: Number,
