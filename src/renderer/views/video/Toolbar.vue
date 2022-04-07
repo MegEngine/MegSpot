@@ -45,7 +45,7 @@
     <div class="middle">
       <el-button-group class="gap">
         <el-button
-          v-show="videoPaused"
+          :disabled="!videoPaused"
           type="text"
           size="mini"
           @click="frameSteps(-1)"
@@ -56,7 +56,7 @@
           </span>
         </el-button>
         <el-button
-          v-show="videoPaused"
+          :disabled="!videoPaused"
           type="text"
           size="mini"
           @click="frameSteps(1)"
@@ -126,7 +126,7 @@
             size="mini"
             v-tip.sure="`choose images to generate GIF`"
             @click="$refs.gifDialog.show()"
-            v-show="videoPaused"
+            :disabled="!videoPaused"
           >
             <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
               <svg-icon icon-class="gif" />
@@ -138,10 +138,11 @@
           ></GifDialog>
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
-        <el-button-group class="gap" v-show="videoPaused">
+        <el-button-group class="gap">
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
             @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
             v-tip="$t('imageCenter.overlayLeft')"
@@ -153,6 +154,7 @@
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
             @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
             v-tip="$t('imageCenter.overlayRight')"
@@ -168,6 +170,7 @@
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
             @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
             v-tip="$t('imageCenter.overlayBottom')"
@@ -182,6 +185,7 @@
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
             @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
             v-tip="$t('imageCenter.overlayTop')"
@@ -194,7 +198,6 @@
             </span>
           </el-button>
         </el-button-group>
-        <el-divider direction="vertical" v-if="videoPaused"></el-divider>
         <el-button-group class="gap">
           <el-button
             type="text"

@@ -347,7 +347,7 @@ export default {
     path: {
       handler: function(newVal, oldVal) {
         if (oldVal && newVal && oldVal !== newVal) {
-          this.initVideo(true);
+          this.initVideo();
         }
         if (oldVal) {
           this.wacther && this.wacther.close();
@@ -626,9 +626,7 @@ export default {
         let offCtx = offsreen.getContext('2d');
         offCtx.drawImage(this.video, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
-        // console.log('initImage', this.bitMap);
       }
-      this.requestGenerateHist();
     },
     requestGenerateHist() {
       window.requestAnimationFrame(this.generateHist);
@@ -661,12 +659,12 @@ export default {
         this.duration = isNaN(this.video.duration)
           ? 60
           : Number(Number(this.video.duration).toFixed(5));
-        this.handleVideoPaused(false);
+        this.handleVideoPaused(true);
+        this.initImage();
         if (
           this.imagePosition == undefined ||
           isNaN(this.imagePosition?.height)
         ) {
-          console.log('initVideo');
           this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         }
         this.doZoomEnd();
@@ -710,9 +708,12 @@ export default {
     },
     // 供外部直接调用 待测试
     reMount() {
+      console.log('reMount');
       this.initCanvas();
+      this.initImage();
+      this.drawImage();
       this.video.onload = () => {
-        console.log('reMount');
+        console.log('video onload');
         this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         this.drawImage();
       };
