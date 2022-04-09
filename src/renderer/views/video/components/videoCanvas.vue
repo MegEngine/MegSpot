@@ -707,10 +707,10 @@ export default {
       }
     },
     // 供外部直接调用 待测试
-    reMount() {
+    async reMount() {
       console.log('reMount');
       this.initCanvas();
-      this.initImage();
+      await this.initImage();
       this.drawImage();
       this.video.onload = () => {
         console.log('video onload');
