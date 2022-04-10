@@ -40,7 +40,6 @@
 
 <script>
 import fse from 'fs-extra';
-import chokidar from 'chokidar';
 import getFileName from '@/filter/get-file-name';
 const { dialog } = require('electron').remote;
 import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants';
@@ -148,37 +147,6 @@ export default {
   computed: {
     sortFilePath() {
       return this.currentPath + DELIMITER + SORTING_FILE_NAME;
-    }
-  },
-  watch: {
-    currentPath: {
-      handler: function(newVal, oldVal) {
-        if (oldVal) {
-          this.wacther.close();
-        }
-        if (newVal) {
-          this.wacther = chokidar
-            .watch(newVal, {
-              // 持续监听
-              persistent: true,
-              // 忽略初始化的目录检测（即：认为监听时目录是从空变为当前目录的过程 会触发很多的addDir,add file回调）
-              ignoreInitial: true,
-              // 等待写入完成
-              awaitWriteFinish: {
-                stabilityThreshold: 2000,
-                pollInterval: 100
-              }
-            })
-            .on('all', async (event, path) => {
-              console.log(event, path, this.sortFilePath);
-              if (path === this.sortFilePath) {
-                this.confirmBtnVisible();
-              }
-            });
-          this.confirmBtnVisible();
-        }
-      },
-      immediate: true
     }
   }
 };
