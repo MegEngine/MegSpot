@@ -37,13 +37,13 @@
       </el-radio-group>
       <div class="select">
         <!-- 空间不足, 取消选中提示 -->
-        <span v-show="showSelectedMsg" class="msg">
+        <span v-show="false && showSelectedMsg" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
         </span>
       </div>
     </div>
     <div class="middle">
-      <el-button-group class="gap">
+      <el-button-group class="gap" flex="cross:center">
         <el-button
           :disabled="!videoPaused"
           type="text"
@@ -98,6 +98,24 @@
             <svg-icon icon-class="loop" :clicked="loop" />
           </span>
         </el-button>
+        <!-- 不加allow-create属性， 即不允许创建自定义速度，因为经测试发现视频设置3及之上的播放速度时，时快时慢 -->
+        <el-select
+          v-model="speed"
+          placeholder="speed"
+          size="mini"
+          filterable
+          default-first-option
+          v-tip="$t('video.speed')"
+          class="layout-selector"
+        >
+          <el-option
+            v-for="({ label, value }, index) in speedOpts"
+            :key="index"
+            :label="label"
+            :value="value"
+          >
+          </el-option>
+        </el-select>
         <!-- <VideoProgressBar v-if="isFixed" class="progress-bar" /> -->
       </el-button-group>
     </div>
@@ -329,7 +347,33 @@ export default {
       offset: 0,
       // 默认开启视频循环
       loop: true,
-      videoPaused: false
+      videoPaused: false,
+      speedOpts: [
+        {
+          label: '2.0x',
+          value: 2.0
+        },
+        {
+          label: '1.5x',
+          value: 1.5
+        },
+        {
+          label: '1.0x',
+          value: 1
+        },
+        {
+          label: '0.75x',
+          value: 0.75
+        },
+        {
+          label: '0.5x',
+          value: 0.5
+        },
+        {
+          label: '0.25x',
+          value: 0.25
+        }
+      ]
     };
   },
   components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
@@ -545,6 +589,34 @@ export default {
         this.groupNum = Math.floor(this.startIndex / this.groupCount);
       }
     },
+    speed: {
+      get() {
+        return this.videoConfig.speed;
+      },
+      set(val) {
+        console.log(val, typeof val);
+        const type = typeof val;
+        let _speed = 1.0;
+        switch (type) {
+          case 'number':
+            _speed = val;
+            break;
+          case 'string':
+            const reg = /^(?<num>\d+\.?\d*)[xX]?/;
+            const {
+              groups: { num }
+            } = reg.exec(val);
+            if (num) {
+              _speed = parseFloat(num);
+            } else return;
+            break;
+          default:
+            return;
+        }
+        console.log('_speed', _speed);
+        this.setVideoConfig({ speed: _speed });
+      }
+    },
     isFixed() {
       return this.preference.videoProcessBarStyle === 'fixed';
     }
@@ -603,6 +675,10 @@ export default {
   }
 
   .middle {
+    .layout-selector {
+      width: 80px;
+      margin-left: 10px;
+    }
     .el-button-group {
       .svg-container {
         margin-left: 0.3rem;

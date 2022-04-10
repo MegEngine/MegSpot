@@ -132,6 +132,7 @@ export default {
     play: '播放',
     pause: '暂停',
     reset: '复位',
+    muted: '静音',
     dynamicPickColor: '取色器动态监听',
     minRenderInterval: '视频渲染最小间隔',
     processTip:

@@ -310,6 +310,14 @@ export default {
     minRenderInterval() {
       return this.videoConfig.minRenderInterval;
     },
+    // 视频是否静音
+    muted() {
+      return this.videoConfig.muted;
+    },
+    // 视频播放速度
+    speed() {
+      return this.videoConfig.speed;
+    },
     currentTimeData: {
       get() {
         return this.currentTime;
@@ -377,6 +385,21 @@ export default {
         }
       },
       immediate: true
+    },
+    muted: {
+      handler: function(newVal, oldVal) {
+        if (newVal !== oldVal && this.video) {
+          this.video.muted = newVal;
+        }
+      }
+    },
+    speed: {
+      handler: function(newVal, oldVal) {
+        if (newVal !== oldVal && this.video) {
+          this.video.defaultPlaybackRate = newVal;
+          this.video.playbackRate = newVal;
+        }
+      }
     },
     'videoConfig.smooth': {
       handler(newVal, oldVal) {
@@ -681,6 +704,11 @@ export default {
       this.video.autoplay = true;
       // 默认开启视频循环
       this.video.loop = true;
+      // 视频是否静音
+      this.video.muted = this.muted;
+      // 视频播放速度
+      this.video.defaultPlaybackRate = this.speed;
+      this.video.playbackRate = this.speed;
     },
     startAnimation() {
       this.stopAnimation();
@@ -718,6 +746,11 @@ export default {
         this.drawImage();
       };
       this.video.src = getImageUrlSyncNoCache(this.path);
+      // 视频是否静音
+      this.video.muted = this.muted;
+      // 视频播放速度
+      this.video.defaultPlaybackRate = this.speed;
+      this.video.playbackRate = this.speed;
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4;

@@ -134,6 +134,7 @@ export default {
     play: '再生',
     pause: '一時停止',
     reset: 'リセット',
+    muted: 'ミュート',
     dynamicPickColor: 'カラーピッカー調和',
     minRenderInterval: 'ビデオレンダリングの最小間隔',
     processTip:

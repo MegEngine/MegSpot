@@ -134,6 +134,7 @@ export default {
     play: 'play',
     pause: 'pause',
     reset: 'reset',
+    muted: 'muted',
     dynamicPickColor: 'dynamic color picker',
     minRenderInterval: 'min-interval of video rendering',
     processTip:
