@@ -14,6 +14,7 @@
         :_height="canvasHeight"
         :subVideoControlMenu="subVideoControlMenu"
         @loaded="handleVideoLoaded"
+        @fullScreen="handleFullscreen"
       ></VideoCanvas>
     </div>
     <Sticky
@@ -186,6 +187,9 @@ export default {
       //TODO: 暂时不使用悬浮组件
       // return this.preference.videoProcessBarStyle === 'float';
       return false;
+    },
+    fullScreening() {
+      return this.videoConfig.fullScreening;
     }
   },
   watch: {
@@ -215,9 +219,16 @@ export default {
     },
     handleResize: throttle(50, function() {
       this.calcCanvasSize();
-      // 重新布局图片容器;
-      this.udpateAllCanvas();
+      // 非全屏状态时重新布局图片容器;
+      if (!this.fullScreening) {
+        this.udpateAllCanvas();
+      }
     }),
+    handleFullscreen(status) {
+      this.setVideoConfig({
+        fullScreening: status ?? !this.fullScreening
+      });
+    },
     getCanvasSize(data, callback) {
       callback({
         width: this.canvasWidth,
@@ -227,7 +238,7 @@ export default {
     calcCanvasSize() {
       this.canvasWidth = this.calcWidth();
       this.subVideoControlMenu =
-        422 * parseInt(this.videoConfig.layout[0]) <= this.containerWidth;
+        512 * parseInt(this.videoConfig.layout[0]) <= this.containerWidth;
       this.canvasHeight = this.calcHeight() - 18;
     },
     calcWidth() {

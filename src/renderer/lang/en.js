@@ -87,6 +87,7 @@ export default {
   imagePreview: {},
   imageCenter: {
     bilinearInterpolation: 'bilinar',
+    shortSelectedMsg: 'selected',
     selectedMsg:
       'The picture has been selected and can be operated individually',
     colorPicker: 'color picker',
@@ -135,6 +136,7 @@ export default {
     pause: 'pause',
     reset: 'reset',
     muted: 'muted',
+    fullscreen: 'fullscreen\nESC exit fullscreen',
     dynamicPickColor: 'dynamic color picker',
     minRenderInterval: 'min-interval of video rendering',
     processTip:

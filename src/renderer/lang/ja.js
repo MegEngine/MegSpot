@@ -88,6 +88,7 @@ export default {
   imagePreview: {},
   imageCenter: {
     bilinearInterpolation: 'バイリニア補間',
+    shortSelectedMsg: 'が選択されています',
     selectedMsg: 'この画像は選択されており、独立して操作できます',
     colorPicker: 'カラーピッカー',
     region: 'カラーピッカーのサイズ',
@@ -135,6 +136,7 @@ export default {
     pause: '一時停止',
     reset: 'リセット',
     muted: 'ミュート',
+    fullscreen: 'フルスクリーン\nESC終了フルスクリーン',
     dynamicPickColor: 'カラーピッカー調和',
     minRenderInterval: 'ビデオレンダリングの最小間隔',
     processTip:

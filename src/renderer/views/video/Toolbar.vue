@@ -35,7 +35,12 @@
           $t('imageCenter.bilinearInterpolation')
         }}</el-radio-button>
       </el-radio-group>
+    </div>
+    <div class="tip" flex="cross:center">
       <div class="select">
+        <span v-show="showSelectedMsg" class="msg">
+          {{ $t('imageCenter.shortSelectedMsg') }}
+        </span>
         <!-- 空间不足, 取消选中提示 -->
         <span v-show="false && showSelectedMsg" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
@@ -402,7 +407,18 @@ export default {
     handleHotKey(event) {
       // esc
       if (event.keyCode === 27) {
-        this.goBack();
+        // 默认返回上一页， 若为  全屏状态则退出全屏
+        if (
+          this.fullScreening &&
+          document.fullscreenElement &&
+          document.fullscreenElement.nodeName === 'VIDEO'
+        ) {
+          document.exitFullscreen();
+          this.setVideoConfig({ fullScreening: false });
+          document.body.removeChild(document.body.lastChild);
+        } else {
+          this.goBack();
+        }
       }
       // cmd/ctrl+p
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
@@ -577,6 +593,7 @@ export default {
         return this.videoConfig.layout;
       },
       set(val) {
+        this.$bus.$emit('changeVideoSliderVisible', { value: false });
         const preNum = this.groupCount * (this.groupNum - 1);
         this.setVideoConfig({ layout: val });
         const afterNum = this.groupCount * (this.groupNum - 1);
@@ -616,6 +633,9 @@ export default {
         console.log('_speed', _speed);
         this.setVideoConfig({ speed: _speed });
       }
+    },
+    fullScreening() {
+      return this.videoConfig.fullScreening;
     },
     isFixed() {
       return this.preference.videoProcessBarStyle === 'fixed';
@@ -664,17 +684,23 @@ export default {
   .group-number {
     margin-right: 10px;
   }
-
-  .select {
+  .tip {
     position: relative;
-    height: 22px;
-    .msg {
-      font-size: 12px;
-      color: red;
+    width: 0;
+    .select {
+      position: absolute;
+      left: 0;
+      width: 100px;
+      transform: translateX(-50%);
+      .msg {
+        font-size: 12px;
+        color: red;
+      }
     }
   }
 
   .middle {
+    position: relative;
     .layout-selector {
       width: 80px;
       margin-left: 10px;
@@ -688,6 +714,7 @@ export default {
       }
     }
   }
+
   .right {
     .layout-selector {
       width: 80px;

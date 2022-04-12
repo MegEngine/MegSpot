@@ -76,19 +76,33 @@
         :_width="processWidth"
         :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
       />
-      <el-input-number
-        v-show="subVideoControlMenu && videoSliderVisible"
-        :value="currentTimeData"
-        :precision="4"
-        :min="0"
-        :max="duration || 60"
-        size="small"
-        @change="val => changeVideoTime(val)"
-        class="video-process-input"
-      />
-      <div ref="header-right" flex="main:right cross:center">
+      <span ref="num" v-show="!subVideoControlMenu && videoSliderVisible">{{
+        Number(currentTimeData).toFixed(1)
+      }}</span>
+      <div
+        ref="header-right"
+        class="header-right"
+        flex="main:right cross:center"
+      >
+        <el-input-number
+          v-show="subVideoControlMenu && videoSliderVisible"
+          :value="currentTimeData"
+          :precision="4"
+          :min="0"
+          :max="duration || 60"
+          size="small"
+          @change="val => changeVideoTime(val)"
+          class="video-process-input"
+        />
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
         <EffectPreview @change="changeCanvasStyle" />
+        <span
+          class="svg-container"
+          @click="fullScreen"
+          v-tip="$t('video.fullscreen')"
+        >
+          <svg-icon icon-class="fullscreen" />
+        </span>
       </div>
     </div>
     <div
@@ -294,8 +308,9 @@ export default {
     processWidth() {
       return (
         (this._width -
-          (this.$refs['header-left']?.offsetWidth || 44) -
-          (this.$refs['header-right']?.offsetWidth || 150)) *
+          (this.$refs['header-left']?.offsetWidth || 83) -
+          (this.$refs['header-right']?.offsetWidth || 191) -
+          (this.$refs['num']?.offsetWidth || 20)) *
         0.6
       );
     },
@@ -347,6 +362,7 @@ export default {
           console.log(e);
         }
       }
+      this.video.remove();
       this.video = null;
     }
     this.bitMap && this.bitMap.close();
@@ -409,6 +425,13 @@ export default {
     }
   },
   methods: {
+    fullScreen() {
+      this.$emit('fullScreen');
+      if (this.video.requestFullscreen) {
+        document.body.appendChild(this.video);
+        this.video.requestFullscreen();
+      }
+    },
     changeVideoProcessBarInputVisible() {
       this.videoProcessBarInputVisible =
         !this.subVideoControlMenu && !this.videoProcessBarInputVisible;
@@ -740,17 +763,12 @@ export default {
       this.initCanvas();
       await this.initImage();
       this.drawImage();
-      this.video.onload = () => {
-        console.log('video onload');
-        this.imagePosition = this.getImageInitPos(this.canvas, this.video);
-        this.drawImage();
-      };
-      this.video.src = getImageUrlSyncNoCache(this.path);
-      // 视频是否静音
-      this.video.muted = this.muted;
-      // 视频播放速度
-      this.video.defaultPlaybackRate = this.speed;
-      this.video.playbackRate = this.speed;
+      // this.video.src = getImageUrlSyncNoCache(this.path);
+      // // 视频是否静音
+      // this.video.muted = this.muted;
+      // // 视频播放速度
+      // this.video.defaultPlaybackRate = this.speed;
+      // this.video.playbackRate = this.speed;
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4;
@@ -792,10 +810,13 @@ export default {
         data: { visible }
       });
     },
-    handleVideoSliderVisible() {
-      this.$bus.$emit('changeVideoSliderVisible', !this.videoSliderVisible);
+    handleVideoSliderVisible(status) {
+      this.$bus.$emit(
+        'changeVideoSliderVisible',
+        status ?? !this.videoSliderVisible
+      );
     },
-    changeVideoSliderVisible(value) {
+    changeVideoSliderVisible({ value }) {
       this.videoSliderVisible = value ?? !this.videoSliderVisible;
     },
     doHistVisible({ visible }) {
@@ -1129,8 +1150,9 @@ export default {
     height: 18px;
     line-height: 16px;
     background-color: #f6f6f6;
-    padding-right: 10px;
+    // padding-right: 10px;
     .svg-container {
+      cursor: pointer;
       margin-right: 5px;
       font-size: 16px;
       .icon-hover {
@@ -1159,6 +1181,12 @@ export default {
             height: 12px !important;
           }
         }
+      }
+    }
+
+    .header-right {
+      .svg-container {
+        font-size: 20px;
       }
     }
   }

@@ -87,6 +87,7 @@ export default {
   imagePreview: {},
   imageCenter: {
     bilinearInterpolation: '双线性',
+    shortSelectedMsg: '已选中',
     selectedMsg: '图片已选中，可单独操作',
     colorPicker: '取色器',
     region: '取色器大小',
@@ -133,6 +134,7 @@ export default {
     pause: '暂停',
     reset: '复位',
     muted: '静音',
+    fullscreen: '全屏\nESC退出全屏',
     dynamicPickColor: '取色器动态监听',
     minRenderInterval: '视频渲染最小间隔',
     processTip:
