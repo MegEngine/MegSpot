@@ -35,17 +35,22 @@
           $t('imageCenter.bilinearInterpolation')
         }}</el-radio-button>
       </el-radio-group>
+    </div>
+    <div class="tip" flex="cross:center">
       <div class="select">
-        <!-- 空间不足, 取消选中提示 -->
         <span v-show="showSelectedMsg" class="msg">
+          {{ $t('imageCenter.shortSelectedMsg') }}
+        </span>
+        <!-- 空间不足, 取消选中提示 -->
+        <span v-show="false && showSelectedMsg" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
         </span>
       </div>
     </div>
     <div class="middle">
-      <el-button-group class="gap">
+      <el-button-group class="gap" flex="cross:center">
         <el-button
-          v-show="videoPaused"
+          :disabled="!videoPaused"
           type="text"
           size="mini"
           @click="frameSteps(-1)"
@@ -56,7 +61,7 @@
           </span>
         </el-button>
         <el-button
-          v-show="videoPaused"
+          :disabled="!videoPaused"
           type="text"
           size="mini"
           @click="frameSteps(1)"
@@ -98,6 +103,24 @@
             <svg-icon icon-class="loop" :clicked="loop" />
           </span>
         </el-button>
+        <!-- 不加allow-create属性， 即不允许创建自定义速度，因为经测试发现视频设置3及之上的播放速度时，时快时慢 -->
+        <el-select
+          v-model="speed"
+          placeholder="speed"
+          size="mini"
+          filterable
+          default-first-option
+          v-tip="$t('video.speed')"
+          class="layout-selector"
+        >
+          <el-option
+            v-for="({ label, value }, index) in speedOpts"
+            :key="index"
+            :label="label"
+            :value="value"
+          >
+          </el-option>
+        </el-select>
         <!-- <VideoProgressBar v-if="isFixed" class="progress-bar" /> -->
       </el-button-group>
     </div>
@@ -126,7 +149,7 @@
             size="mini"
             v-tip.sure="`choose images to generate GIF`"
             @click="$refs.gifDialog.show()"
-            v-show="videoPaused"
+            :disabled="!videoPaused"
           >
             <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
               <svg-icon icon-class="gif" />
@@ -138,10 +161,11 @@
           ></GifDialog>
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
-        <el-button-group class="gap" v-show="videoPaused">
+        <el-button-group class="gap">
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
             @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
             v-tip="$t('imageCenter.overlayLeft')"
@@ -153,6 +177,7 @@
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
             @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
             v-tip="$t('imageCenter.overlayRight')"
@@ -168,6 +193,7 @@
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
             @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
             v-tip="$t('imageCenter.overlayBottom')"
@@ -182,6 +208,7 @@
           <el-button
             type="text"
             size="mini"
+            :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
             @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
             v-tip="$t('imageCenter.overlayTop')"
@@ -194,7 +221,6 @@
             </span>
           </el-button>
         </el-button-group>
-        <el-divider direction="vertical" v-if="videoPaused"></el-divider>
         <el-button-group class="gap">
           <el-button
             type="text"
@@ -286,6 +312,7 @@
               GLOBAL_CONSTANTS.LAYOUT_4X1,
               GLOBAL_CONSTANTS.LAYOUT_1X1
             ]"
+            :disabled="videoList.length < parseInt(item[0]) * parseInt(item[2])"
             :key="item"
             :label="item"
             :value="item"
@@ -326,7 +353,33 @@ export default {
       offset: 0,
       // 默认开启视频循环
       loop: true,
-      videoPaused: false
+      videoPaused: false,
+      speedOpts: [
+        {
+          label: '2.0x',
+          value: 2.0
+        },
+        {
+          label: '1.5x',
+          value: 1.5
+        },
+        {
+          label: '1.0x',
+          value: 1
+        },
+        {
+          label: '0.75x',
+          value: 0.75
+        },
+        {
+          label: '0.5x',
+          value: 0.5
+        },
+        {
+          label: '0.25x',
+          value: 0.25
+        }
+      ]
     };
   },
   components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
@@ -355,7 +408,18 @@ export default {
     handleHotKey(event) {
       // esc
       if (event.keyCode === 27) {
-        this.goBack();
+        // 默认返回上一页， 若为  全屏状态则退出全屏
+        if (
+          this.fullScreening &&
+          document.fullscreenElement &&
+          document.fullscreenElement.nodeName === 'VIDEO'
+        ) {
+          document.exitFullscreen();
+          this.setVideoConfig({ fullScreening: false });
+          document.body.removeChild(document.body.lastChild);
+        } else {
+          this.goBack();
+        }
       }
       // cmd/ctrl+p
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
@@ -530,6 +594,7 @@ export default {
         return this.videoConfig.layout;
       },
       set(val) {
+        this.$bus.$emit('changeVideoSliderVisible', { value: false });
         const preNum = this.groupCount * (this.groupNum - 1);
         this.setVideoConfig({ layout: val });
         const afterNum = this.groupCount * (this.groupNum - 1);
@@ -541,6 +606,37 @@ export default {
         this.$bus.$emit('changeGroup', this.startIndex);
         this.groupNum = Math.floor(this.startIndex / this.groupCount);
       }
+    },
+    speed: {
+      get() {
+        return this.videoConfig.speed;
+      },
+      set(val) {
+        console.log(val, typeof val);
+        const type = typeof val;
+        let _speed = 1.0;
+        switch (type) {
+          case 'number':
+            _speed = val;
+            break;
+          case 'string':
+            const reg = /^(?<num>\d+\.?\d*)[xX]?/;
+            const {
+              groups: { num }
+            } = reg.exec(val);
+            if (num) {
+              _speed = parseFloat(num);
+            } else return;
+            break;
+          default:
+            return;
+        }
+        console.log('_speed', _speed);
+        this.setVideoConfig({ speed: _speed });
+      }
+    },
+    fullScreening() {
+      return this.videoConfig.fullScreening;
     },
     isFixed() {
       return this.preference.videoProcessBarStyle === 'fixed';
@@ -589,17 +685,27 @@ export default {
   .group-number {
     margin-right: 10px;
   }
-
-  .select {
+  .tip {
     position: relative;
-    height: 22px;
-    .msg {
-      font-size: 12px;
-      color: red;
+    width: 0;
+    .select {
+      position: absolute;
+      left: 0;
+      width: 100px;
+      transform: translateX(-50%);
+      .msg {
+        font-size: 12px;
+        color: red;
+      }
     }
   }
 
   .middle {
+    position: relative;
+    .layout-selector {
+      width: 80px;
+      margin-left: 10px;
+    }
     .el-button-group {
       .svg-container {
         margin-left: 0.3rem;
@@ -609,6 +715,7 @@ export default {
       }
     }
   }
+
   .right {
     .layout-selector {
       width: 80px;

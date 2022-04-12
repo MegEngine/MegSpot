@@ -225,6 +225,7 @@
               GLOBAL_CONSTANTS.LAYOUT_4X1,
               GLOBAL_CONSTANTS.LAYOUT_1X1
             ]"
+            :disabled="imageList.length < parseInt(item[0]) * parseInt(item[2])"
             :key="item"
             :label="item"
             :value="item"

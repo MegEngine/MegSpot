@@ -28,6 +28,22 @@
           <span>show image name：</span>
           <el-switch v-model="showTitle"></el-switch>
         </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('video.dynamicPickColor') }}:</span>
+          <el-switch v-model="dynamicPickColor"></el-switch>
+        </div>
+        <div
+          v-if="$route.path.includes('video')"
+          flex="main:justify"
+          class="setting-item"
+        >
+          <span>{{ $t('video.muted') }}:</span>
+          <el-switch v-model="videoMuted"></el-switch>
+        </div>
         <div flex="main:justify" class="setting-item">
           <span>background mode：</span>
           <el-select
@@ -62,14 +78,6 @@
             <el-option :label="$t('general.fixed')" value="fixed"> </el-option>
             <el-option :label="$t('general.float')" value="float"> </el-option>
           </el-select>
-        </div>
-        <div
-          v-if="$route.path.includes('video')"
-          flex="main:justify"
-          class="setting-item"
-        >
-          <span>{{ $t('video.dynamicPickColor') }}:</span>
-          <el-switch v-model="dynamicPickColor"></el-switch>
         </div>
         <div flex="main:justify" class="setting-item">
           <span>scale options：</span>
@@ -222,6 +230,16 @@ export default {
       set(arg) {
         this.setVideoConfig({
           dynamicPickColor: arg
+        });
+      }
+    },
+    videoMuted: {
+      get() {
+        return this.videoConfig.muted;
+      },
+      set(arg) {
+        this.setVideoConfig({
+          muted: arg
         });
       }
     },

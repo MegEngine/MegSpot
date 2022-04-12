@@ -151,7 +151,7 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 .image-style-container {
   width: 300px;
-  padding-right: 5px;
+  // padding-right: 5px;
   #preview {
     position: absolute;
     top: 0;

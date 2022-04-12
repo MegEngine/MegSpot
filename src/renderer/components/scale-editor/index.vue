@@ -98,7 +98,7 @@ export default {
   left: 2px;
   ::v-deep {
     .el-input-number {
-      width: 80px;
+      width: 100px;
       line-height: 30px;
       .el-input--small {
         height: 20px;

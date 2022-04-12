@@ -8,11 +8,13 @@ const videoStore = {
     videoFolders: [],
     videoConfig: {
       smooth: true,
+      speed: 1.0,
       currentTime: 0,
       dynamicPickColor: false,
       layout: GLABEL_CONSTANT.LAYOUT_2X1,
       minRenderInterval: 0.01, // 视频最小渲染间隔，
       interval: 0.0833, // 视频逐帧对比间隔，默认为近似1/12秒
+      muted: true, // 视频是否静音
       defaultSort: {
         order: 'asc',
         field: 'name'

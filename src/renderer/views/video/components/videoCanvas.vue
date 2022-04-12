@@ -1,7 +1,7 @@
 <template>
   <div :class="['image-canvas', { selected: selected }]" @click.stop>
     <div ref="header" class="header" flex="main:justify cross:center">
-      <div ref="header-left" flex="cross:center">
+      <div ref="header-left" class="header-left" flex="cross:center">
         <CoverMask :mask="maskDom" class="cover-mask">
           <HistContainer
             ref="hist-container"
@@ -9,14 +9,13 @@
             @changeVisible="handleHistVisible"
           />
         </CoverMask>
-
-        <el-popover
-          v-model="videoProcessBarInputVisible"
-          effect="light"
-          placement="left"
-          trigger="manual"
-        >
-          <div>
+        <div class="icon-btn-group" flex="main:justify cross:center">
+          <el-popover
+            v-model="videoProcessBarInputVisible"
+            effect="light"
+            placement="left"
+            trigger="manual"
+          >
             <el-input-number
               v-if="videoProcessBarInputVisible"
               :value="currentTimeData"
@@ -26,26 +25,35 @@
               controls-position="right"
               @change="val => changeVideoTime(val)"
             />
-            <span class="svg-container" @click="executeAction(1)">
-              <svg-icon icon-class="play" />
+            <span
+              slot="reference"
+              @click="handleVideoSliderVisible"
+              @contextmenu.stop="changeVideoProcessBarInputVisible"
+              class="svg-container"
+              v-tip.sure="$t('video.processTip')"
+            >
+              <svg-icon
+                icon-class="video-bar"
+                v-tip="$t('video.processTip')"
+                :class="[videoProcessBarInputVisible ? 'icon-hover' : '']"
+              />
             </span>
-            <span class="svg-container" @click="executeAction(0)">
-              <svg-icon icon-class="pause" />
-            </span>
-          </div>
+          </el-popover>
           <span
-            slot="reference"
-            @click="handleVideoSliderVisible"
-            @contextmenu.stop="changeVideoProcessBarInputVisible"
-            class="svg-container"
-            v-tip.sure="$t('video.processTip')"
+            v-show="videoSliderVisible"
+            class="svg-containe"
+            @click="executeAction(1)"
           >
-            <svg-icon
-              icon-class="video-bar"
-              :class="[videoProcessBarInputVisible ? 'icon-hover' : '']"
-            />
+            <svg-icon :clicked="!paused" icon-class="play" />
           </span>
-        </el-popover>
+          <span
+            v-show="videoSliderVisible"
+            class="svg-containe"
+            @click="executeAction(0)"
+          >
+            <svg-icon :clicked="paused" icon-class="pause" />
+          </span>
+        </div>
       </div>
       <el-tooltip
         v-if="!videoSliderVisible"
@@ -68,9 +76,33 @@
         :_width="processWidth"
         :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
       />
-      <div ref="header-right" flex="main:right cross:center">
+      <span ref="num" v-show="!subVideoControlMenu && videoSliderVisible">{{
+        Number(currentTimeData).toFixed(1)
+      }}</span>
+      <div
+        ref="header-right"
+        class="header-right"
+        flex="main:right cross:center"
+      >
+        <el-input-number
+          v-show="subVideoControlMenu && videoSliderVisible"
+          :value="currentTimeData"
+          :precision="4"
+          :min="0"
+          :max="duration || 60"
+          size="small"
+          @change="val => changeVideoTime(val)"
+          class="video-process-input"
+        />
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
         <EffectPreview @change="changeCanvasStyle" />
+        <span
+          class="svg-container"
+          @click="fullScreen"
+          v-tip="$t('video.fullscreen')"
+        >
+          <svg-icon icon-class="fullscreen" />
+        </span>
       </div>
     </div>
     <div
@@ -152,6 +184,10 @@ export default {
     _height: {
       type: Number,
       default: 500
+    },
+    subVideoControlMenu: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -272,9 +308,10 @@ export default {
     processWidth() {
       return (
         (this._width -
-          (this.$refs['header-left']?.offsetWidth || 44) -
-          (this.$refs['header-right']?.offsetWidth || 150)) *
-        0.7
+          (this.$refs['header-left']?.offsetWidth || 83) -
+          (this.$refs['header-right']?.offsetWidth || 191) -
+          (this.$refs['num']?.offsetWidth || 20)) *
+        0.6
       );
     },
     // 视频逐帧对比间隔，默认为近似1/12秒
@@ -287,6 +324,14 @@ export default {
     // 视频最小渲染间隔(默认为 0.01s)
     minRenderInterval() {
       return this.videoConfig.minRenderInterval;
+    },
+    // 视频是否静音
+    muted() {
+      return this.videoConfig.muted;
+    },
+    // 视频播放速度
+    speed() {
+      return this.videoConfig.speed;
     },
     currentTimeData: {
       get() {
@@ -308,14 +353,25 @@ export default {
   },
   beforeDestroy() {
     this.removeEvents();
-    this.video && (this.video = null);
+    this.stopAnimation();
+    if (this.video) {
+      if (this.video?.readyState > 0 && !this.video.paused) {
+        try {
+          this.video.pause();
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      this.video.remove();
+      this.video = null;
+    }
     this.bitMap && this.bitMap.close();
   },
   watch: {
     path: {
       handler: function(newVal, oldVal) {
         if (oldVal && newVal && oldVal !== newVal) {
-          this.initVideo(true);
+          this.initVideo();
         }
         if (oldVal) {
           this.wacther && this.wacther.close();
@@ -346,6 +402,21 @@ export default {
       },
       immediate: true
     },
+    muted: {
+      handler: function(newVal, oldVal) {
+        if (newVal !== oldVal && this.video) {
+          this.video.muted = newVal;
+        }
+      }
+    },
+    speed: {
+      handler: function(newVal, oldVal) {
+        if (newVal !== oldVal && this.video) {
+          this.video.defaultPlaybackRate = newVal;
+          this.video.playbackRate = newVal;
+        }
+      }
+    },
     'videoConfig.smooth': {
       handler(newVal, oldVal) {
         this.setSmooth();
@@ -354,8 +425,16 @@ export default {
     }
   },
   methods: {
+    fullScreen() {
+      this.$emit('fullScreen');
+      if (this.video.requestFullscreen) {
+        document.body.appendChild(this.video);
+        this.video.requestFullscreen();
+      }
+    },
     changeVideoProcessBarInputVisible() {
-      this.videoProcessBarInputVisible = !this.videoProcessBarInputVisible;
+      this.videoProcessBarInputVisible =
+        !this.subVideoControlMenu && !this.videoProcessBarInputVisible;
     },
     ...mapActions(['removeVideos']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
@@ -475,6 +554,7 @@ export default {
         },
         false
       );
+      //TODO *.addEventListener('resize', this.handleResize, true);
     },
     removeEvents() {
       this.scheduleCanvasActions.forEach(item => {
@@ -592,9 +672,7 @@ export default {
         let offCtx = offsreen.getContext('2d');
         offCtx.drawImage(this.video, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
-        // console.log('initImage', this.bitMap);
       }
-      this.requestGenerateHist();
     },
     requestGenerateHist() {
       window.requestAnimationFrame(this.generateHist);
@@ -627,12 +705,12 @@ export default {
         this.duration = isNaN(this.video.duration)
           ? 60
           : Number(Number(this.video.duration).toFixed(5));
-        this.handleVideoPaused(false);
+        this.handleVideoPaused(true);
+        this.initImage();
         if (
           this.imagePosition == undefined ||
           isNaN(this.imagePosition?.height)
         ) {
-          console.log('initVideo');
           this.imagePosition = this.getImageInitPos(this.canvas, this.video);
         }
         this.doZoomEnd();
@@ -649,6 +727,11 @@ export default {
       this.video.autoplay = true;
       // 默认开启视频循环
       this.video.loop = true;
+      // 视频是否静音
+      this.video.muted = this.muted;
+      // 视频播放速度
+      this.video.defaultPlaybackRate = this.speed;
+      this.video.playbackRate = this.speed;
     },
     startAnimation() {
       this.stopAnimation();
@@ -675,14 +758,17 @@ export default {
       }
     },
     // 供外部直接调用 待测试
-    reMount() {
+    async reMount() {
+      console.log('reMount');
       this.initCanvas();
-      this.video.onload = () => {
-        console.log('reMount');
-        this.imagePosition = this.getImageInitPos(this.canvas, this.video);
-        this.drawImage();
-      };
-      this.video.src = getImageUrlSyncNoCache(this.path);
+      await this.initImage();
+      this.drawImage();
+      // this.video.src = getImageUrlSyncNoCache(this.path);
+      // // 视频是否静音
+      // this.video.muted = this.muted;
+      // // 视频播放速度
+      // this.video.defaultPlaybackRate = this.speed;
+      // this.video.playbackRate = this.speed;
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4;
@@ -724,10 +810,13 @@ export default {
         data: { visible }
       });
     },
-    handleVideoSliderVisible() {
-      this.$bus.$emit('changeVideoSliderVisible', !this.videoSliderVisible);
+    handleVideoSliderVisible(status) {
+      this.$bus.$emit(
+        'changeVideoSliderVisible',
+        status ?? !this.videoSliderVisible
+      );
     },
-    changeVideoSliderVisible(value) {
+    changeVideoSliderVisible({ value }) {
       this.videoSliderVisible = value ?? !this.videoSliderVisible;
     },
     doHistVisible({ visible }) {
@@ -1052,6 +1141,7 @@ export default {
   }
 };
 </script>
+
 <style scoped lang="scss">
 @import '@/styles/variables.scss';
 
@@ -1060,10 +1150,10 @@ export default {
     height: 18px;
     line-height: 16px;
     background-color: #f6f6f6;
-    padding-right: 10px;
-
+    // padding-right: 10px;
     .svg-container {
-      margin: 0 5px;
+      cursor: pointer;
+      margin-right: 5px;
       font-size: 16px;
       .icon-hover {
         color: $primaryColor;
@@ -1073,6 +1163,31 @@ export default {
     .progress-bar {
       display: inline-block;
       // margin-left: 20px;
+    }
+    .header-left {
+      .svg-container + .svg-container {
+        margin-right: 3px;
+      }
+      .video-process-input {
+        .el-input-number,
+        .el-input-number__increase,
+        .el-input-number__decrease {
+          height: 12px !important;
+        }
+        ::v-deep {
+          .el-input-number,
+          .el-input-number__increase,
+          .el-input-number__decrease {
+            height: 12px !important;
+          }
+        }
+      }
+    }
+
+    .header-right {
+      .svg-container {
+        font-size: 20px;
+      }
     }
   }
   .canvas-container {
@@ -1123,5 +1238,38 @@ export default {
       }
     }
   }
+}
+
+::v-deep {
+  .el-input-number--small {
+    width: 100px;
+  }
+  .el-input-number {
+    line-height: 30px;
+
+    .el-input--small {
+      width: 100px;
+      height: 18px;
+      line-height: 18px;
+      .el-input__inner {
+        padding: 5px;
+        height: 18px;
+        color: black;
+      }
+    }
+    .el-input-number__increase,
+    .el-input-number__decrease {
+      width: 14px;
+      height: 16px;
+      line-height: 16px;
+    }
+  }
+  .el-button {
+    padding: 2.5px 6px;
+  }
+}
+
+.primary-color {
+  color: $primaryColor;
 }
 </style>
