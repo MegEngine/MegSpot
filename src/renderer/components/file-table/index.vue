@@ -95,13 +95,6 @@
       field="size"
     >
     </vxe-column>
-    <vxe-column show-overflow width="80" :title="$t('general.operate')">
-      <template #default="{ row }">
-        <el-button size="mini" type="text" @click="removeEvent(row)">
-          <svg-icon icon-class="bin" class="del-btn"></svg-icon>
-        </el-button>
-      </template>
-    </vxe-column>
   </vxe-table>
 </template>
 
@@ -501,45 +494,6 @@ export default {
       } else {
         this.emptyVuexItems();
       }
-    },
-    async removeEvent(row) {
-      const filePath = this.currentPath + DELIMITER + row.name;
-      this.$confirm('确定删除该文件吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-        'append-to-body': true
-      })
-        .then(() => {
-          fse
-            .remove(filePath)
-            .then(async () => {
-              await this.$bus.$emit('changeFile', { fileName: row.name });
-              if (isImage(filePath)) {
-                this.removeImages(filePath);
-              } else if (isVideo(filePath)) {
-                this.removeVideos(filePath);
-              }
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              });
-              console.log('success delete file:' + filePath);
-            })
-            .catch(err => {
-              this.$message({
-                type: 'danger',
-                message: '删除失败'
-              });
-              console.error('删除失败' + err);
-            });
-        })
-        .catch(err => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
     },
     // 可外部直接调用触发逻辑
     async refreshFileList() {

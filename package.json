@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -42,8 +42,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1. 优化视频对比中的进度条控制，如暂停时调整进度不再自动播放等。\n2. 视频对比支持逐帧对比, 并绑定快捷键。\n3. 支持自定义视频最小渲染间隔及帧对比间隔。\n4. 视频进度条的宽度支持动态变化。\n5. 文件目录树优化懒加载策略。\n6. 修复若干bug。",
-      "releaseDate": "2022.03.29"
+      "releaseNotes": "1. 新增功能：支持控制视频播放速率，全屏显示，视频静音。\n2. 优化布局：屏幕宽度足够时显示所有的视频进度控制组件，不再需要通过右键图标调出。\n3. 优化性能：减少不必要的文件监听来提升性能,  减少额外渲染，及时释放后台播放的video。\n4. 默认配置改动： 视频默认静音且不播放。\n5. 修复若干bug。",
+      "releaseDate": "2022.04.12"
     },
     "directories": {
       "output": "build"
