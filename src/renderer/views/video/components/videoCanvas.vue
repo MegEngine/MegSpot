@@ -44,14 +44,14 @@
             class="svg-containe"
             @click="executeAction(1)"
           >
-            <svg-icon :clicked="!paused" icon-class="play" />
+            <svg-icon :clicked="!allVideoPaused && !paused" icon-class="play" />
           </span>
           <span
             v-show="videoSliderVisible"
             class="svg-containe"
             @click="executeAction(0)"
           >
-            <svg-icon :clicked="paused" icon-class="pause" />
+            <svg-icon :clicked="allVideoPaused || paused" icon-class="pause" />
           </span>
         </div>
       </div>
@@ -197,13 +197,15 @@ export default {
       header: null,
       canvas: null,
       video: null,
+      requestId: undefined,
       duration: 60,
-      currentTime: 1,
+      currentTime: 0,
       videoSliderVisible: false,
       videoProcessBarInputVisible: false,
       paused: true,
       maskDom: undefined,
       currentHist: undefined,
+      snapShot: null,
       histImage: null,
       cs: null,
       image: {
@@ -267,10 +269,6 @@ export default {
           action: 'changeLoop'
         },
         {
-          event: 'videoChangeTime',
-          action: 'handleVideoChangeTime'
-        },
-        {
           event: 'videoResetTime',
           action: 'handleVideoResetTime'
         },
@@ -313,6 +311,10 @@ export default {
           (this.$refs['num']?.offsetWidth || 20)) *
         0.6
       );
+    },
+    // 是否所有视频都为暂停状态
+    allVideoPaused() {
+      return this.videoConfig.allVideoPaused;
     },
     // 视频逐帧对比间隔，默认为近似1/12秒
     interval() {
@@ -570,12 +572,13 @@ export default {
         this[name](data);
       }
     },
-    handleVideoPaused(state = true) {
+    async handleVideoPaused(state = true) {
       this.paused = state;
       this.$bus.$emit('changeVideoPaused', state);
       if (state) {
         this.video.pause();
-        // console.log('paused', this.video.readyState, this.video.paused);
+        await this.initImage();
+        this.paused = true;
       } else {
       }
     },
@@ -587,37 +590,14 @@ export default {
         });
       }
     },
-    handleVideoChangeTime(currentTime) {
-      if (this.requestId == undefined) {
-        this.startAnimation();
-      }
-      if (this.duration >= currentTime) {
-        if (Math.abs(this.video.currentTime - currentTime) > 1) {
-          this.video.currentTime = Number(currentTime).toFixed(5);
-          if (this.video.readyState > 0 && this.video.paused) {
-            this.video.play().catch(e => {
-              // console.log('error', e);
-            });
-          }
-        }
-      } else {
-        this.video.currentTime = this.duration;
-        if (this.video.readyState > 0 && !this.video.paused) {
-          try {
-            this.video.pause();
-          } catch (e) {
-            console.log(this.video.readyState, this.video.paused, e);
-          }
-        }
-      }
-    },
     changeVideoTime(currentTime) {
       const paused = this.video.paused;
       if (!this.video) return;
 
       this.handleVideoPaused(false);
       if (this.requestId == undefined) {
-        this.startAnimation();
+        // console.log('requestId undefined, startAnimation');
+        this.startAnimation(false);
       }
 
       // 设置时间节点是否在视频时长范围之内
@@ -635,6 +615,7 @@ export default {
               .then(() => {
                 if (paused) {
                   this.video.pause();
+                  this.handleVideoPaused();
                 }
               })
               .catch(e => {
@@ -705,7 +686,7 @@ export default {
         this.duration = isNaN(this.video.duration)
           ? 60
           : Number(Number(this.video.duration).toFixed(5));
-        this.handleVideoPaused(true);
+        this.handleVideoPaused();
         this.initImage();
         if (
           this.imagePosition == undefined ||
@@ -733,7 +714,7 @@ export default {
       this.video.defaultPlaybackRate = this.speed;
       this.video.playbackRate = this.speed;
     },
-    startAnimation() {
+    startAnimation(play = true) {
       this.stopAnimation();
       const render = () => {
         if (this.video !== null) {
@@ -747,7 +728,7 @@ export default {
         this.requestId = window.requestAnimationFrame(render);
       };
       render();
-      if (this.video.readyState > 0 && this.video.paused) {
+      if (play && this.video.readyState > 0 && this.video.paused) {
         this.video.play();
       }
     },
@@ -782,13 +763,18 @@ export default {
       this.cs.translate(x + width / 2, y + height / 2);
       this.cs.rotate((this.degree * Math.PI) / 180);
       this.cs.translate(-x - width / 2, -y - height / 2);
-      this.cs.drawImage(
-        img ?? this.paused ? this.bitMap : this.video,
-        x,
-        y,
-        width,
-        height
-      );
+      if (this.snapShot) {
+        this.cs.drawImage(this.snapShot, 0, 0);
+      } else {
+        this.cs.drawImage(
+          img ?? this.paused ? this.bitMap : this.video,
+          x,
+          y,
+          width,
+          height
+        );
+      }
+
       this.cs.restore();
       if (this.dynamicPickColor && this.traggerRGB) {
         this.doHandleMove();
@@ -891,14 +877,16 @@ export default {
     // 外部直接调用
     setCoverStatus({ snapShot, hist }, status) {
       if (status) {
-        this.clearCanvas();
-        this.cs.drawImage(snapShot, 0, 0);
+        this.snapShot = snapShot;
+        // this.clearCanvas();
+        // this.cs.drawImage(snapShot, 0, 0);
         if (this.$refs['hist-container'].visible) {
           this.maskDom = hist;
         }
       } else {
+        this.snapShot = null;
         this.maskDom = null;
-        this.startAnimation();
+        this.startAnimation(false);
       }
     },
     reset(val) {

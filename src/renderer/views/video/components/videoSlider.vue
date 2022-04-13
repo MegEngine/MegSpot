@@ -11,6 +11,7 @@
     <el-slider
       v-show="show"
       :value="currentTime"
+      :min="0"
       :max="duration"
       :step="0.01"
       :format-tooltip="formatter"

@@ -154,13 +154,13 @@ export default {
     imageGroupList() {
       this.$nextTick(() => {
         this.calcCanvasSize();
-        this.udpateAllCanvas();
+        this.updateAllCanvas();
       });
     },
     'imageConfig.layout'() {
       this.$nextTick(() => {
         this.calcCanvasSize();
-        this.udpateAllCanvas();
+        this.updateAllCanvas();
       });
     }
   },
@@ -173,7 +173,7 @@ export default {
     handleResize: throttle(50, function() {
       this.calcCanvasSize();
       // 重新布局图片容器;
-      this.udpateAllCanvas();
+      this.updateAllCanvas();
     }),
     getCanvasSize(data, callback) {
       callback({
@@ -247,7 +247,7 @@ export default {
         this.$message.error(error.toString() || error.message);
       }
     },
-    udpateAllCanvas() {
+    updateAllCanvas() {
       this.$refs['image_canvas'].forEach(item => {
         // 重新设定宽高 然后重新绘制canvas
         item.height = Math.floor(this.canvasHeight);

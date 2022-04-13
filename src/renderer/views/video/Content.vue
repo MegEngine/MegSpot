@@ -123,6 +123,7 @@ export default {
     this.scheduleCanvasActions.forEach(item => {
       this.$bus.$off(item.event, this[item.action]);
     });
+    window.removeEventListener('resize', this.handleResize, true);
   },
   computed: {
     ...mapGetters(['videoList', 'videoConfig']),
@@ -198,16 +199,21 @@ export default {
         this.calcCanvasSize();
       });
     },
-    videoGroupList() {
-      this.$nextTick(() => {
-        this.calcCanvasSize();
-        this.udpateAllCanvas();
-      });
+    videoGroupList(newVal, oldVal) {
+      if (
+        newVal.length !== oldVal.length ||
+        newVal.join(',') !== oldVal.join(',')
+      ) {
+        this.$nextTick(() => {
+          this.calcCanvasSize();
+          this.updateAllCanvas();
+        });
+      }
     },
     'videoConfig.layout'() {
       this.$nextTick(() => {
         this.calcCanvasSize();
-        this.udpateAllCanvas();
+        this.updateAllCanvas();
       });
     }
   },
@@ -221,7 +227,7 @@ export default {
       this.calcCanvasSize();
       // 非全屏状态时重新布局图片容器;
       if (!this.fullScreening) {
-        this.udpateAllCanvas();
+        this.updateAllCanvas();
       }
     }),
     handleFullscreen(status) {
@@ -305,7 +311,7 @@ export default {
         this.$message.error(error.toString() || error.message);
       }
     },
-    udpateAllCanvas() {
+    updateAllCanvas() {
       this.$refs['video_canvas'].forEach(item => {
         // 重新设定宽高 然后重新绘制canvas
         item.height = Math.floor(this.canvasHeight);

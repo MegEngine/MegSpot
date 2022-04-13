@@ -353,7 +353,6 @@ export default {
       offset: 0,
       // 默认开启视频循环
       loop: true,
-      videoPaused: false,
       speedOpts: [
         {
           label: '2.0x',
@@ -387,13 +386,11 @@ export default {
     window.addEventListener('keydown', this.handleHotKey, true);
     this.$bus.$on('image_handleSelect', this.handleSelect);
     this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused);
-    this.$bus.$on('videoChangeTime', this.handleVideoChangeTime);
   },
   beforeDestroy() {
     window.removeEventListener('keydown', this.handleHotKey, true);
     this.$bus.$off('image_handleSelect', this.handleSelect);
     this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused);
-    this.$bus.$off('videoChangeTime', this.handleVideoChangeTime);
   },
   methods: {
     ...mapActions([
@@ -402,9 +399,6 @@ export default {
       'setVideoConfig',
       'setVideos'
     ]),
-    handleVideoChangeTime() {
-      this.videoPaused = false;
-    },
     handleHotKey(event) {
       // esc
       if (event.keyCode === 27) {
@@ -491,9 +485,12 @@ export default {
       this.imgScale = 1;
     },
     handleChangeVideoPaused() {
-      this.videoPaused = this.$parent.$refs.content.$refs['video_canvas'].every(
+      const paused = this.$parent.$refs.content.$refs['video_canvas'].every(
         item => item.video.paused === true
       );
+      if (this.videoPaused !== paused) {
+        this.videoPaused = paused;
+      }
     },
     goBack() {
       if (window.history.length > 1) {
@@ -581,6 +578,15 @@ export default {
     interval() {
       return this.videoConfig.interval;
     },
+    // 所有视频都为暂停状态
+    videoPaused: {
+      get() {
+        return this.videoConfig.allVideoPaused;
+      },
+      set(newVal) {
+        this.setVideoConfig({ allVideoPaused: newVal });
+      }
+    },
     smooth: {
       get() {
         return this.videoConfig.smooth;
@@ -612,7 +618,6 @@ export default {
         return this.videoConfig.speed;
       },
       set(val) {
-        console.log(val, typeof val);
         const type = typeof val;
         let _speed = 1.0;
         switch (type) {
@@ -631,7 +636,7 @@ export default {
           default:
             return;
         }
-        console.log('_speed', _speed);
+        console.log('current speed:', _speed);
         this.setVideoConfig({ speed: _speed });
       }
     },
