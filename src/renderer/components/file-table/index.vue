@@ -101,6 +101,7 @@
 <script>
 import fse from 'fs-extra';
 import dayjs from 'dayjs';
+import { arraySortByName } from '@/utils/file';
 import { createNamespacedHelpers } from 'vuex';
 import { throttle, debounce } from '@/utils';
 import { formatFileSize } from '@/utils/file';
@@ -326,6 +327,7 @@ export default {
     ...videoMapActions(['addVideos', 'removeVideos']),
     mySort(data, property, order) {
       let list = [];
+      data.sort((a, b) => arraySortByName(a.name, b.name));
       // 是否根据排序文件排序
       if (property === 'name' && this.sortList.length) {
         list = data.sort((a, b) => {
@@ -344,6 +346,7 @@ export default {
       if (order === 'desc') {
         list.reverse();
       }
+      console.log('mySort', property);
       return list;
     },
     async customSortMethod({ data, sortList }) {
