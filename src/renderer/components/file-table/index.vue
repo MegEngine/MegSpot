@@ -346,7 +346,7 @@ export default {
       if (order === 'desc') {
         list.reverse();
       }
-      console.log('mySort', property);
+      console.log('reSort by', property);
       return list;
     },
     async customSortMethod({ data, sortList }) {

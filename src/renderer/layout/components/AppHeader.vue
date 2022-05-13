@@ -16,7 +16,7 @@
       </div>
       <div class="right-menu">
         <i @click="$refs.aboutDialog.show()">
-          <svg-icon icon-class="about"></svg-icon
+          <svg-icon icon-class="system-settings"></svg-icon
         ></i>
         <!-- 先隐藏自动更新主动触发按钮  <i
           <svg-icon icon-class="update"></svg-icon> -->
@@ -86,7 +86,12 @@ export default {
         vertical-align: bottom;
       }
       .svg-icon {
-        font-size: 20px;
+        color: #f2f4f6;
+        font-size: 26px;
+        &:hover {
+          color: $primaryColor;
+          cursor: pointer;
+        }
       }
     }
     .left-menu {

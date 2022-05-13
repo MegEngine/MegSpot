@@ -9,13 +9,17 @@
           :filePath.sync="currentPath"
         >
         </file-path-input>
-        <el-button
-          class="addFolder"
-          type="primary"
-          :disabled="imageFolders.includes(currentPath)"
-          @click="addFolder"
-          >{{ $t('image.toolbar.addFolder') }}</el-button
+        <el-tooltip
+          v-if="imageFolders.includes(currentPath)"
+          :content="$t('image.toolbar.openFolderTip')"
         >
+          <el-button type="primary" @click="openFolder" class="addFolder">{{
+            $t('image.toolbar.openFolder')
+          }}</el-button>
+        </el-tooltip>
+        <el-button v-else type="primary" @click="addFolder" class="addFolder">{{
+          $t('image.toolbar.addFolder')
+        }}</el-button>
         <el-switch
           class="show-all-switch"
           v-model="showAll"
@@ -93,6 +97,7 @@
 </template>
 
 <script>
+const { shell } = require('electron');
 import { isDirectory, isExist } from '@/utils/file';
 import { isImage } from '@/components/file-tree/lib/util';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
@@ -192,7 +197,6 @@ export default {
     handleCanApplyChange(canApply) {
       this.btnDisabled = !canApply;
     },
-    // FIX ME: 不可添加则直接禁用按钮
     addFolder() {
       let folderPath = this.currentPath;
       if (folderPath.length && isExist(folderPath)) {
@@ -211,11 +215,13 @@ export default {
       } else {
         this.$message.error('File or folder does not exist ');
       }
+    },
+    openFolder() {
+      shell.openPath(this.currentPath);
     }
   },
   watch: {
     defaultFileListShowType(newVal) {
-      console.log();
       this.showType = newVal;
     }
   }

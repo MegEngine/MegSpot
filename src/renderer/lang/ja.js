@@ -77,6 +77,8 @@ export default {
     toolbar: {
       openFolder: 'フォルダを開く',
       addFolder: 'フォルダーを追加',
+      openFolderTip:
+        'システムファイルリソースマネージャーのディレクトリを開きます',
       imageQueue: '画像リスト',
       compareImages: '画像を比較',
       cleanImageQueue: 'リストをクリア'
@@ -149,6 +151,9 @@ export default {
     generateTip:
       'クリックして、現在のディレクトリに.MegSpotSort.iniソート構成ファイルを生成します',
     sortFile: 'ファイルを並べ替える',
-    useTableFileList: '現在のテーブル並べ替えリストを適用する'
+    useTableFileList: '現在のテーブル並べ替えリストを適用する',
+    clearSortList: 'ソート済みリストをクリア',
+    useDefaultSort: 'デフォルトの並べ替え',
+    defaultSortTip: '名前でファイルを並べ替える'
   }
 };

@@ -9,8 +9,20 @@
       $t('sortFile.edit') + $t('sortFile.sortFile')
     }}</span>
     <div class="toolbar" flex="dir:right">
-      <el-button type="warning" @click="showTableFileList">{{
+      <el-button type="warning" @click="showTableFileList" class="item">{{
         $t('sortFile.useTableFileList')
+      }}</el-button>
+      <el-tooltip>
+        <template #content>
+          {{ $t('sortFile.defaultSortTip') }}
+        </template>
+        <el-button type="success" @click="defaultSort" class="item">{{
+          $t('sortFile.useDefaultSort')
+        }}</el-button>
+      </el-tooltip>
+
+      <el-button type="info" @click="clearAll" class="item">{{
+        $t('sortFile.clearSortList')
       }}</el-button>
     </div>
     <div class="file-list">
@@ -48,6 +60,7 @@
 <script>
 import fse from 'fs-extra';
 import getFileName from '@/filter/get-file-name';
+import { arraySortByName } from '@/utils/file';
 import draggable from 'vuedraggable';
 import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants';
 
@@ -99,6 +112,38 @@ export default {
     this.$bus.$off('changeFile', this.changeFile);
   },
   methods: {
+    defaultSort() {
+      this.$emit('getSortData', null, data => {
+        if (this.sortList.length === 0) {
+          const sortList = data
+            .map(item => getFileName(item.path, false))
+            .sort(arraySortByName);
+          this.sortList = sortList;
+        } else {
+          this.sortList.sort(arraySortByName);
+        }
+        this.changed = true;
+      });
+    },
+    clearAll() {
+      this.$confirm(
+        '是否确认清除排序文件内容(仅影响排序效果，不影响其他文件)',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+          'append-to-body': true
+        }
+      ).then(() => {
+        this.sortList = [];
+        const path = this.sortFilePath;
+        fse.outputFile(path, undefined).then(() => {
+          this.$message.success('清除成功');
+          this.changed = true;
+        });
+      });
+    },
     async changeFile({ fileName, newFileName }) {
       const index = this.sortList.findIndex(item => item === fileName);
       if (index > -1) {
@@ -222,7 +267,10 @@ export default {
   height: 100%;
   overflow: hidden;
   .toolbar {
-    .right-btn {
+    // .right-btn {
+    //   margin-right: 10px;
+    // }
+    .item {
       margin-left: 10px;
     }
   }

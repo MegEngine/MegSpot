@@ -124,8 +124,8 @@ export const watchFile = filePath => {
   return fs.watch(filePath);
 };
 
-const useCollator = () => {
-  const collator = new Intl.Collator(undefined, {
+const useCollator = (locale = 'zh') => {
+  const collator = new Intl.Collator(locale, {
     numeric: true,
     sensitivity: 'base'
   });
@@ -154,7 +154,7 @@ function extractNameAndExtension(str, dotFilesAsNames) {
   return result;
 }
 
-const { collator, collatorIsNumeric } = useCollator();
+const { collator, collatorIsNumeric } = useCollator('en');
 
 // Compares fileNames by extension, then by name
 export const arraySortByName = (a, b) => {

@@ -76,6 +76,7 @@ export default {
   image: {
     toolbar: {
       openFolder: '打开文件夹',
+      openFolderTip: '在系统文件资源管理器中打开该目录',
       addFolder: '添加文件夹',
       imageQueue: '相册',
       cleanImageQueue: '清空相册'
@@ -146,6 +147,9 @@ export default {
     generate: '生成',
     generateTip: '点击即可在当前目录下生成.MegSpotSort.ini排序配置文件',
     sortFile: '排序文件',
-    useTableFileList: '应用当前表格排序'
+    useTableFileList: '应用当前表格排序',
+    clearSortList: '清空排序列表',
+    useDefaultSort: '使用默认排序',
+    defaultSortTip: '根据文件名排序'
   }
 };

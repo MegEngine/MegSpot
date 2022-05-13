@@ -9,13 +9,17 @@
           :filePath.sync="videoCurrentPath"
         >
         </file-path-input>
-        <el-button
-          class="addFolder"
-          type="primary"
-          :disabled="videoFolders.includes(videoCurrentPath)"
-          @click="addFolder"
-          >{{ $t('image.toolbar.addFolder') }}</el-button
+        <el-tooltip
+          v-if="videoFolders.includes(videoCurrentPath)"
+          :content="$t('image.toolbar.openFolderTip')"
         >
+          <el-button type="primary" @click="openFolder" class="addFolder">{{
+            $t('image.toolbar.openFolder')
+          }}</el-button>
+        </el-tooltip>
+        <el-button v-else type="primary" @click="addFolder" class="addFolder">{{
+          $t('image.toolbar.addFolder')
+        }}</el-button>
         <el-switch
           class="show-all-switch"
           v-model="showAll"
@@ -91,6 +95,7 @@
 </template>
 
 <script>
+const { shell } = require('electron');
 import { isDirectory, isExist } from '@/utils/file';
 import { isVideo } from '@/components/file-tree/lib/util';
 import SearchInput from '@/components/search-input';
@@ -198,6 +203,9 @@ export default {
       } else {
         this.$message.error('File or folder does not exist ');
       }
+    },
+    openFolder() {
+      shell.openPath(this.videoCurrentPath);
     }
   }
 };

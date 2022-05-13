@@ -76,6 +76,7 @@ export default {
   image: {
     toolbar: {
       openFolder: 'Open Folder',
+      openFolderTip: 'Open the directory in the system file resource manager',
       addFolder: 'Add Folder',
       imageQueue: 'Image List',
       cleanImageQueue: 'clean list'
@@ -149,6 +150,9 @@ export default {
     generateTip:
       'Click to generate the .MegSpotSort.ini sorting configuration file in the current directory',
     sortFile: ' Sorting File',
-    useTableFileList: 'Apply current table sorting list'
+    useTableFileList: 'Apply current table sorting list',
+    clearSortList: 'Clear SortList',
+    useDefaultSort: 'Default Sort',
+    defaultSortTip: 'sort files by name'
   }
 };
