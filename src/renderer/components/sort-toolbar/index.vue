@@ -20,14 +20,14 @@
     <span v-show="generateVisible" class="tip">{{
       $t('sortFile.generateTip')
     }}</span>
-    <el-button
+    <!-- <el-button
       v-show="!generateVisible"
       :disabled="btnDisabled"
       v-tip="'Apply Sorting File'"
       @click="applySortFile"
     >
       {{ $t('sortFile.apply') }}
-    </el-button>
+    </el-button> -->
     <el-button
       v-show="!generateVisible"
       v-tip="'Edit Sorting File'"
