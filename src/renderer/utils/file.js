@@ -156,24 +156,21 @@ function extractNameAndExtension(str, dotFilesAsNames) {
 
 const { collator, collatorIsNumeric } = useCollator('en');
 
-// Compares fileNames by extension, then by name
+// Compares fileNames by name, then by extension
 export const arraySortByName = (a, b) => {
   const [nameA, extensionA] = extractNameAndExtension(a);
   const [nameB, extensionB] = extractNameAndExtension(b);
 
-  let result = collator.compare(extensionA, extensionB);
+  let result = (result = collator.compare(nameA, nameB));
 
-  if (result === 0) {
+  if (collatorIsNumeric && result === 0 && nameA !== nameB) {
+    return nameA < nameB ? -1 : 1;
+  } else if (result === 0 && nameA === nameB) {
+    // filename are equal, compare extensions
+    result = collator.compare(extensionA, extensionB);
     // compare(`foo1`, `foo01`) === 0
-    if (collatorIsNumeric && extensionA !== extensionB) {
+    if (collatorIsNumeric && result === 0 && extensionA !== extensionB) {
       return extensionA < extensionB ? -1 : 1;
-    }
-
-    // Extensions are equal, compare filename
-    result = collator.compare(nameA, nameB);
-
-    if (collatorIsNumeric && result === 0 && nameA !== nameB) {
-      return nameA < nameB ? -1 : 1;
     }
   }
 
