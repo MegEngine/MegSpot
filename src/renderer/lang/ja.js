@@ -5,6 +5,7 @@ export default {
       'MegSpotは、画像比較、ビデオ比較、画像カスタマイズ処理などの便利な機能をユーザーに提供するように設計されたクロスプラットフォームのネイティブアプリケーションです。 \r\nqqグループ（782365536）に参加して、詳細を確認し、最新情報を入手してください。',
     manual: 'マニュアル',
     hotKey: 'ホットキー',
+    please: 'お願いします',
     showVideoTip: 'デモビデオを表示'
   },
   nav: {
@@ -56,6 +57,7 @@ export default {
     imageBrowser: '画像ブラウザ',
     imageList: '画像リスト',
     videoList: 'ビデオリスト',
+    invalidFolderTip: 'フォルダが存在しません。有効なパスを入力してください',
     imageFolderList: '画像フォルダ一覧',
     videoFolderList: 'ビデオフォルダリスト'
   },
@@ -153,7 +155,9 @@ export default {
   },
   sortFile: {
     apply: '応用',
-    edit: 'カスタムファイルの並べ替え構成',
+    addFolder: 'フォルダーを追加',
+    afterAddFolder: '并从左侧目录树选择文件夹',
+    edit: '次に、左側のディレクトリツリーからフォルダを選択します',
     generate: '生成',
     generateTip:
       'クリックして、現在のディレクトリに.MegSpotSort.iniソート構成ファイルを生成します',

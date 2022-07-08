@@ -73,7 +73,8 @@ export default {
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 .header {
-  background: #132f51;
+  background: #174680;
+  // background: $primaryColor;
   box-shadow: 0px 3px 7px 0px rgba(36, 46, 66, 0.15);
   color: #ffffff;
   padding-left: 0px;

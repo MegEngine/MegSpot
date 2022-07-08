@@ -5,6 +5,7 @@ export default {
       'MegSpot是一款跨平台的本地应用，旨在为用户提供本地图片对比、视频对比、图片定制处理等便捷功能。\r\n可进入QQ交流群(782365536)了解详情、获取最新资讯。',
     manual: '使用手册',
     hotKey: '快捷键',
+    please: '请',
     showVideoTip: '查看演示'
   },
   nav: {
@@ -55,6 +56,7 @@ export default {
     imageBrowser: '图片查看器',
     imageList: '图片列表',
     videoList: '视频列表',
+    invalidFolderTip: '文件夹不存在，请输入有效路径',
     imageFolderList: '图片目录列表',
     videoFolderList: '视频目录列表'
   },
@@ -150,6 +152,8 @@ export default {
   },
   sortFile: {
     apply: '应用',
+    addFolder: '添加文件夹',
+    afterAddFolder: '并从左侧目录树选择文件夹',
     edit: '自定义文件排序',
     generate: '生成',
     generateTip: '点击即可在当前目录下生成.MegSpotSort.ini排序配置文件',
