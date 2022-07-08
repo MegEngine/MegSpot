@@ -98,6 +98,7 @@
 
 <script>
 const { shell } = require('electron');
+import { i18nRender } from '@/lang';
 import { isDirectory, isExist } from '@/utils/file';
 import { isImage } from '@/components/file-tree/lib/util';
 import Thumbnail from '@/components/thumbnail/Thumbnail.vue';
@@ -110,7 +111,6 @@ const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
   'preferenceStore'
 );
-
 export default {
   components: {
     Thumbnail,
@@ -206,14 +206,14 @@ export default {
           } else {
             this.setImageFolders([...this.imageFolders, folderPath]);
             this.$nextTick(() => {
-              this.$message.success('Successed to add folder');
+              this.$message.success('Folder added successfully');
             });
           }
         } else {
           this.$message.error('Can only add folders');
         }
       } else {
-        this.$message.error('File or folder does not exist ');
+        this.$message.error(i18nRender('general.invalidFolderTip'));
       }
     },
     openFolder() {

@@ -96,6 +96,7 @@
 
 <script>
 const { shell } = require('electron');
+import { i18nRender } from '@/lang';
 import { isDirectory, isExist } from '@/utils/file';
 import { isVideo } from '@/components/file-tree/lib/util';
 import SearchInput from '@/components/search-input';
@@ -201,7 +202,7 @@ export default {
           this.$message.error('Can only add folders');
         }
       } else {
-        this.$message.error('File or folder does not exist ');
+        this.$message.error(i18nRender('general.invalidFolderTip'));
       }
     },
     openFolder() {

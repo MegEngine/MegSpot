@@ -5,6 +5,7 @@ export default {
       'MegSpot is a cross-platform native application designed to provide users with convenient functions such as picture comparison, video comparison. \r\nYou can enter the QQ group(782365536) to learn more and get the latest information.',
     manual: 'manual',
     hotKey: 'hotKey',
+    please: 'please',
     showVideoTip: 'show help videos'
   },
   nav: {
@@ -54,6 +55,7 @@ export default {
     imageBrowser: 'image browser',
     imageList: 'Image List',
     videoList: 'Video List',
+    invalidFolderTip: 'Folder does not exist,please input valid path',
     imageFolderList: 'Image Folder List',
     videoFolderList: 'Video Folder List'
   },
@@ -145,6 +147,8 @@ export default {
   },
   sortFile: {
     apply: 'Apply',
+    addFolder: 'add folder',
+    afterAddFolder: 'and select one',
     edit: 'Custom file sorting configuration',
     generate: 'Generate',
     generateTip:

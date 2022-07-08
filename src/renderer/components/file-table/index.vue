@@ -28,11 +28,11 @@
   >
     <template #empty>
       <span v-if="!currentPath"
-        >please
+        >{{ $t('common.please') }}
         <el-button type="text" size="small" @click="$emit('addFolder')">
-          add folder first
+          {{ $t('sortFile.addFolder') }}
         </el-button>
-        and select one.
+        {{ $t('sortFile.afterAddFolder') }}
       </span>
       <span v-else>There is no available files in current directory.</span>
     </template>
