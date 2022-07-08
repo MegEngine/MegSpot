@@ -150,7 +150,7 @@ export default {
   },
   sortFile: {
     apply: '应用',
-    edit: '编辑',
+    edit: '自定义文件排序',
     generate: '生成',
     generateTip: '点击即可在当前目录下生成.MegSpotSort.ini排序配置文件',
     sortFile: '排序文件',

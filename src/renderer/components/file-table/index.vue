@@ -21,7 +21,6 @@
     header-cell-class-name="width_adaptive"
     :height="tableHeight"
     v-on="$listeners"
-    @cell-dblclick="handleCellDblClick"
     @checkbox-all="selectAll"
     @checkbox-change="select"
     @checkbox-range-end="handleRangeSelect"
@@ -44,7 +43,6 @@
       field="name"
       title="Name"
       sortable
-      :edit-render="{ autofocus: '.my-input', autoselect: true }"
     >
       <template #header>
         <div flex="cross:center">
@@ -69,14 +67,6 @@
             >
           </search-input>
         </div>
-      </template>
-      <template #edit="{ row }">
-        <input
-          :value="row.name"
-          type="text"
-          class="my-input"
-          @change="handleEditName"
-        />
       </template>
     </vxe-column>
     <vxe-column
@@ -208,7 +198,7 @@ export default {
         if (!this.$refs.xTable?.getSortColumns()?.length) {
           return this.mySort(
             data,
-            this.defaultSort?.field || 'field',
+            this.defaultSort?.field || 'name',
             this.defaultSort?.order || 'asc'
           );
         }
@@ -327,9 +317,14 @@ export default {
     ...videoMapActions(['addVideos', 'removeVideos']),
     mySort(data, property, order) {
       let list = [];
-      data.sort((a, b) => arraySortByName(a.name, b.name));
-      // 是否根据排序文件排序
-      if (property === 'name' && this.sortList.length) {
+      // whether to sort by filename
+      if (property === 'name') {
+        list = data.sort((a, b) => arraySortByName(a.name, b.name));
+        // other sort filed (size,lastModifyTime)
+      } else {
+        list = data.sort((a, b) => a[property] - b[property]);
+      }
+      if (this.sortList.length) {
         list = data.sort((a, b) => {
           let indexA = this.sortList.indexOf(a[property]);
           let indexB = this.sortList.indexOf(b[property]);
@@ -338,18 +333,15 @@ export default {
           if (indexB === -1) return -1;
           return indexA - indexB;
         });
-      } else {
-        if (order === 'asc' || order === 'desc') {
-          list = data.sort((a, b) => a[property] < b[property]);
-        }
       }
+      // reverse sort
       if (order === 'desc') {
         list.reverse();
       }
-      console.log('reSort by', property);
+      // console.log(`sort by ${property}, result:`, list);
       return list;
     },
-    async customSortMethod({ data, sortList }) {
+    async customSortMethod({ data, sortList, ...rest }) {
       const exist = await fse.pathExists(this.sortFilePath);
       if (!this.sortList.length && exist) {
         // if (exist) {
@@ -426,40 +418,6 @@ export default {
     handleRangeSelect({ records }) {
       this.addVuexItem(records.map(item => item.path));
     },
-    handleCellDblClick({ row }) {
-      this.oldFileName = row.name;
-    },
-    async handleEditName(e) {
-      const newFileName = e.target.value;
-      const prefix = this.currentPath + DELIMITER;
-      if (this.oldFileName === newFileName) return;
-      const filePath = prefix + this.oldFileName;
-      const newFilePath = prefix + newFileName;
-      await fse
-        .move(filePath, newFilePath)
-        .then(async () => {
-          await this.$bus.$emit('changeFile', {
-            fileName: this.oldFileName,
-            newFileName
-          });
-          if (isImage(filePath)) {
-            this.removeImages(filePath);
-            this.addImages(newFilePath);
-          } else if (isVideo(filePath)) {
-            this.removeVideos(filePath);
-            this.addVideos(newFilePath);
-          }
-          this.$message({
-            type: 'success',
-            message: '重命名成功!'
-          });
-          s;
-          console.log('success rename file:' + filePath + '->' + newFilePath);
-        })
-        .catch(err => {
-          console.error(err);
-        });
-    },
     commonSelect(row) {
       const sortData = this.getSortData(); // 获取最终渲染的table数据
       const origin = this.origin; // 起点行
@@ -520,6 +478,7 @@ export default {
       }
       // 重新触发排序
       this.$nextTick(() => {
+        console.log('refreshFileList');
         this.$refs.xTable
           .sort(this.defaultSort.field, this.defaultSort.order ?? 'null')
           .then(() => {

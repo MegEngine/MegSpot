@@ -153,7 +153,7 @@ export default {
   },
   sortFile: {
     apply: '応用',
-    edit: '編集',
+    edit: 'カスタムファイルの並べ替え構成',
     generate: '生成',
     generateTip:
       'クリックして、現在のディレクトリに.MegSpotSort.iniソート構成ファイルを生成します',

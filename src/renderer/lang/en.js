@@ -152,7 +152,7 @@ export default {
   },
   sortFile: {
     apply: 'Apply',
-    edit: 'Edit',
+    edit: 'Custom file sorting configuration',
     generate: 'Generate',
     generateTip:
       'Click to generate the .MegSpotSort.ini sorting configuration file in the current directory',
