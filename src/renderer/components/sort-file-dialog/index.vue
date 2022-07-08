@@ -127,7 +127,7 @@ export default {
     },
     clearAll() {
       this.$confirm(
-        '是否确认清除排序文件内容(仅影响排序效果，不影响其他文件)',
+        '是否确认清除排序文件配置(仅影响排序效果，不影响本地文件)',
         '提示',
         {
           confirmButtonText: '确定',
