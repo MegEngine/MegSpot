@@ -162,5 +162,12 @@ export default {
     clearSortList: '清空排序列表',
     useDefaultSort: '使用默认排序',
     defaultSortTip: '根据文件名排序'
+  },
+  gallery: {
+    clear: '清空',
+    enableNameSort: '名称排序',
+    enableNameSortTip: '是否按照名称进行先后排序',
+    smartSort: '智能排序',
+    smartSortTip: '不同文件夹下的同名文件排序在一起，便于对比'
   }
 };

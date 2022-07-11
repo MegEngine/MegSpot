@@ -166,5 +166,13 @@ export default {
     clearSortList: 'ソート済みリストをクリア',
     useDefaultSort: 'デフォルトの並べ替え',
     defaultSortTip: '名前でファイルを並べ替える'
+  },
+  gallery: {
+    clear: '空の',
+    enableNameSort: '名前順',
+    enableNameSortTip: '名前で並べ替えるかどうか',
+    smartSort: 'スマートソーティング',
+    smartSortTip:
+      '異なるフォルダにある同じ名前のファイルは、簡単に比較できるように一緒に並べ替えられます'
   }
 };
