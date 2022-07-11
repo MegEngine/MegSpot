@@ -19,6 +19,34 @@
           :style="{ minWidth: minSize + 'px', maxWidth: maxSize + 'px' }"
         >
           <div class="container" @animationend="disappearModal" @click.stop>
+            <div class="toolbar" flex="cross:center">
+              <el-tooltip
+                :content="$t('gallery.smartSortTip')"
+                placement="right-start"
+              >
+                <el-button type="primary" class="btn" @click="smartSort">{{
+                  $t('gallery.smartSort')
+                }}</el-button>
+              </el-tooltip>
+              <el-tooltip
+                :content="$t('gallery.enableNameSortTip')"
+                placement="right-start"
+              >
+                <el-checkbox v-model="enableNameSort" class="btn">{{
+                  $t('gallery.enableNameSort')
+                }}</el-checkbox>
+              </el-tooltip>
+              <div>
+                <el-tooltip
+                  :content="$t('gallery.clear')"
+                  placement="right-start"
+                >
+                  <span @click="handleClearAll" class="clear-btn">
+                    <svg-icon icon-class="bin" style="color:red" />
+                  </span>
+                </el-tooltip>
+              </div>
+            </div>
             <vue-scroll>
               <draggable
                 v-model="sortList"
@@ -88,6 +116,8 @@
 import { getImageUrlSync } from '@/utils/image';
 import { isImage, isVideo } from '@/components/file-tree/lib/util';
 import draggable from 'vuedraggable';
+import { arraySortByName } from '@/utils/file';
+import { DELIMITER } from '@/constants';
 
 export default {
   name: 'gallery',
@@ -115,11 +145,13 @@ export default {
     return {
       modalItem: null,
       visible: false,
+      enableNameSort: true,
       size: 70,
       itemSize: {
-        width: 200,
-        height: 156,
-        padding: 14
+        width: 212,
+        height: 168,
+        padding: 2,
+        margin: 10
       },
       dragOptions: {
         animation: 200,
@@ -138,10 +170,13 @@ export default {
   },
   computed: {
     maxColumnLength() {
-      return Math.floor(document.body.clientWidth / (this.itemSize.width + 10));
+      return Math.floor(document.body.clientWidth / this.itemSize.width);
     },
     columnItemNum() {
-      return Math.floor(document.body.clientHeight / this.itemSize.height) || 1;
+      return Math.max(
+        1,
+        Math.floor(document.body.clientHeight / this.itemSize.height)
+      );
     },
     minSize() {
       return this.itemSize.width + 24;
@@ -216,6 +251,40 @@ export default {
     },
     handleClick(path) {
       this.$emit('click', path);
+    },
+    handleClearAll() {
+      this.sortList = [];
+      this.hideModal();
+    },
+    smartSort() {
+      if (!this.sortList.length) return;
+      const nameMap = new Map();
+      let iterator = nameMap;
+      const multiple = [];
+      const single = [];
+      this.sortList.forEach(path => {
+        const fileName = path.split(DELIMITER).pop();
+        const name = fileName.split('.')[0];
+        if (nameMap.has(name)) {
+          nameMap.get(name).push(path);
+        } else {
+          nameMap.set(name, [path]);
+        }
+      });
+      if (this.enableNameSort) {
+        iterator = Array.from(nameMap.entries()).sort(([nameA], [nameB]) =>
+          arraySortByName(nameA, nameB)
+        );
+      }
+      for (const [name, pathArr] of iterator) {
+        if (pathArr.length === 1) {
+          single.push(pathArr[0]);
+        } else {
+          multiple.push(...pathArr);
+        }
+      }
+      this.sortList = [...multiple, ...single];
+      console.log('smartSort', this.sortList);
     }
   }
 };
@@ -269,74 +338,97 @@ export default {
     left: 0;
     display: none;
     z-index: 1000;
-    .container {
-      background-color: #f1f0ed;
-      width: 100%;
-      height: 100%;
-      left: -200px;
-      .sortList {
-        padding-right: 10px;
-        ::v-deep {
-          .el-button--mini {
-            padding: 1px 5px;
+    .split {
+      overflow-y: hidden;
+
+      .container {
+        position: relative;
+        background-color: #f1f0ed;
+        width: 100%;
+        height: 100%;
+        left: -200px;
+        overflow-y: hidden;
+        .toolbar {
+          height: 28px;
+          margin-top: 5px;
+          .btn {
+            margin-left: 10px;
           }
-        }
-        .setting-btn {
-          float: right;
-          .svg-icon {
-            font-size: 18px;
-          }
-        }
-        #drag {
-          :first-child {
-            // margin-top: 0 !important;
-          }
-          width: 100%;
-          display: flex;
-          flex-wrap: wrap;
-          .dragItem:hover {
-            .close-button {
-              display: initial;
-            }
-          }
-          .dragItem {
-            position: relative;
-            margin: 10px 0 0 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-            border: 1px solid #dee1e5;
-            .close-button {
-              display: none;
-              position: absolute;
-              top: 10px;
-              right: 10px;
-              z-index: 1000;
-              .svg-icon {
-                color: $primaryColor;
-              }
-            }
-            .close-button:hover {
+          .clear-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            // margin-left: 20px;
+            &:hover {
               cursor: pointer;
-              .svg-icon {
-                color: red;
+            }
+          }
+        }
+        .sortList {
+          padding-right: 10px;
+          padding-bottom: 33px;
+          ::v-deep {
+            .el-button--mini {
+              padding: 1px 5px;
+            }
+          }
+          .setting-btn {
+            float: right;
+            .svg-icon {
+              font-size: 18px;
+            }
+          }
+          #drag {
+            :first-child {
+              // margin-top: 0 !important;
+            }
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            .dragItem:hover {
+              .close-button {
+                display: initial;
               }
             }
-            .content {
-              width: 200px;
-              height: 130px;
-              :first-child {
-                max-width: 200px;
-                max-height: 130px;
+            .dragItem {
+              position: relative;
+              margin: 10px 0 0 10px;
+              border-radius: 5px;
+              box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+              border: 1px solid #dee1e5;
+              .close-button {
+                display: none;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
+                .svg-icon {
+                  color: $primaryColor;
+                }
               }
-            }
-            .name {
-              width: 200px;
-              text-align: center;
-              padding: 5px 3px;
-              font-size: 12px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              word-break: break-word;
+              .close-button:hover {
+                cursor: pointer;
+                .svg-icon {
+                  color: red;
+                }
+              }
+              .content {
+                width: 200px;
+                height: 130px;
+                :first-child {
+                  max-width: 200px;
+                  max-height: 130px;
+                }
+              }
+              .name {
+                width: 200px;
+                text-align: center;
+                padding: 5px 3px;
+                font-size: 12px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-break: break-word;
+              }
             }
           }
         }

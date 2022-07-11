@@ -158,5 +158,13 @@ export default {
     clearSortList: 'Clear SortList',
     useDefaultSort: 'Default Sort',
     defaultSortTip: 'sort files by name'
+  },
+  gallery: {
+    clear: 'Clear All',
+    enableNameSort: 'Sort by name',
+    enableNameSortTip: 'Whether to sort by name',
+    smartSort: 'Smart Sort',
+    smartSortTip:
+      'files with the same name in different folders are sorted together for easy comparison'
   }
 };
