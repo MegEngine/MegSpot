@@ -184,8 +184,8 @@ export default {
     },
     async saveSortFile(checked = false) {
       const path = this.sortFilePath;
-      let exstis = await fse.pathExists(path);
-      if (checked && exstis) {
+      let exist = await fse.pathExists(path);
+      if (checked && exist) {
         this.$confirm('排序文件已存在，是否覆盖', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

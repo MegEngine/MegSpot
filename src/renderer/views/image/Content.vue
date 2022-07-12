@@ -11,13 +11,20 @@
         :path="imgs"
         :_width="canvasWidth"
         :_height="canvasHeight"
+        :share="shareConfigAble"
+        :shareConfig="shareConfig"
       ></ImageCanvas>
     </div>
   </div>
 </template>
 <script>
+import JSZip from 'jszip';
 import ImageCanvas from './components/ImageCanvas';
+import fse from 'fs-extra';
+import _ from 'lodash';
+import { saveAs } from 'file-saver';
 import { throttle } from '@/utils';
+const { dialog } = require('electron').remote;
 import * as GLOBAL_CONSTANTS from '@/constants';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
@@ -26,6 +33,11 @@ export default {
   components: { ImageCanvas },
   data() {
     return {
+      GLOBAL_CONSTANTS,
+      dirPath: undefined,
+      JSZip: null,
+      shareConfig: null,
+      shareConfigAble: false,
       canvasWidth: 0,
       canvasHeight: 0,
       groupStartIndex: 0,
@@ -45,6 +57,10 @@ export default {
         {
           event: 'getCanvasSize',
           action: 'getCanvasSize'
+        },
+        {
+          event: 'share',
+          action: 'share'
         }
       ]
     };
@@ -80,6 +96,7 @@ export default {
     });
     // resize 后重新计算宽高并渲染
     window.addEventListener('resize', this.handleResize, true);
+    this.updateShareConfigStatus();
   },
   beforeDestroy() {
     this.scheduleCanvasActions.forEach(item => {
@@ -102,6 +119,19 @@ export default {
             this.groupStartIndex + this.groupCount
           )
         : [];
+    },
+    groupIsFromSameDir() {
+      this.dirPath = this.imageGroupList[0]
+        .split(GLOBAL_CONSTANTS.DELIMITER)
+        .slice(0, -1)
+        .join(GLOBAL_CONSTANTS.DELIMITER);
+      return this.imageGroupList.every(
+        item =>
+          item
+            .split(GLOBAL_CONSTANTS.DELIMITER)
+            .slice(0, -1)
+            .join(GLOBAL_CONSTANTS.DELIMITER) === this.dirPath
+      );
     },
     containerStyle() {
       switch (this.imageConfig.layout) {
@@ -152,6 +182,7 @@ export default {
       });
     },
     imageGroupList() {
+      this.updateShareConfigStatus();
       this.$nextTick(() => {
         this.calcCanvasSize();
         this.updateAllCanvas();
@@ -179,6 +210,157 @@ export default {
       callback({
         width: this.canvasWidth,
         height: this.canvasHeight
+      });
+    },
+    async updateShareConfigStatus() {
+      const path =
+        (this.dirPath ??
+          this.imageGroupList[0]
+            .split(GLOBAL_CONSTANTS.DELIMITER)
+            .slice(0, -1)
+            .join(GLOBAL_CONSTANTS.DELIMITER)) +
+        GLOBAL_CONSTANTS.DELIMITER +
+        GLOBAL_CONSTANTS.SHARE_FILE_NAME;
+      const exists = await fse.pathExists(path);
+      this.shareConfigAble = exists && this.groupIsFromSameDir;
+      if (this.shareConfigAble) {
+        this.shareConfig = JSON.parse(await fse.readFile(path));
+        console.log('shareConfig', this.shareConfig);
+      }
+    },
+    share() {
+      // shareProject
+      const configObj = _.cloneDeep(this.$store.state);
+      delete configObj.videoStore;
+      const shareProject = GLOBAL_CONSTANTS.SHARE_PROJECT_DEFAULT_PROPS();
+      const modules = ['imageStore', 'preferenceStore'];
+      modules.forEach(moduleKey => {
+        const module = shareProject.config[moduleKey];
+        Object.keys(module).forEach(key => {
+          if (configObj[moduleKey][key] !== undefined) {
+            module[key] = configObj[moduleKey][key];
+          }
+        });
+        // module.enabled = true;
+      });
+      // shareCanvas
+      const canvasViews = this.$refs['image_canvas'];
+      let base = '_width'; // '_width' or '_height'
+      shareProject.canvas = canvasViews.map(canvas => {
+        const shareCanvas = GLOBAL_CONSTANTS.SHARE_CANVAS_DEFAULT_PROPS();
+        Object.keys(shareCanvas).forEach(key => {
+          if (canvas[key] !== undefined) {
+            shareCanvas[key] = canvas[key];
+          }
+        });
+        const { path, image, imagePosition } = canvas;
+        shareCanvas.path = path;
+        shareCanvas.name = path.split(GLOBAL_CONSTANTS.DELIMITER).pop();
+        shareCanvas.image = image;
+        if (
+          ['x', 'y', 'width', 'height'].every(
+            key => imagePosition[key] !== undefined
+          )
+        ) {
+          const { x, y, width, height } = imagePosition;
+          const baseLength = canvas[base]; // _width or _height
+          shareCanvas.xOffsetRation = Number(x / baseLength).toFixed(2);
+          shareCanvas.yOffsetRation = Number(y / baseLength).toFixed(2);
+          shareCanvas.withRatio = Number(width / baseLength).toFixed(2);
+          shareCanvas.heightRatio = Number(height / baseLength).toFixed(2);
+        }
+        return shareCanvas;
+      });
+      let depth = 2;
+      while (
+        _.unionBy(shareProject.canvas, 'name').length <
+        shareProject.canvas.length
+      ) {
+        shareProject.canvas.forEach(canvas => {
+          canvas.name = canvas.path
+            .split(GLOBAL_CONSTANTS.DELIMITER)
+            .slice(-depth)
+            .join('-');
+        });
+        depth++;
+      }
+      // console.log('shareProject saving...', shareProject);
+      // this.saveShareInfo(JSON.stringify(shareProject, null, 4));
+      this.saveAsZip(shareProject);
+    },
+    async pathDirectoryPath() {
+      const { canceled, filePaths } = await dialog.showOpenDialog({
+        title: 'select a save location',
+        properties: ['openDirectory']
+      });
+      return !canceled && filePaths.length > 0 ? filePaths[0] : false;
+    },
+    // 存储当前组的图像信息至本地配置文件
+    async saveShareInfo(data) {
+      const pathPrefix = await this.pathDirectoryPath();
+      if (!pathPrefix) {
+        this.$message({
+          type: 'info',
+          message: 'cancel'
+        });
+        return;
+      }
+      const path =
+        pathPrefix +
+        GLOBAL_CONSTANTS.DELIMITER +
+        GLOBAL_CONSTANTS.SHARE_FILE_NAME;
+      let exist = await fse.pathExists(path);
+      let cancel = false;
+      if (exist) {
+        await this.$confirm('分享配置文件已存在，是否覆盖', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).catch(() => {
+          cancel = true;
+          this.$message({
+            type: 'info',
+            message: '已取消覆盖'
+          });
+        });
+      }
+      if (cancel) return;
+      await fse.outputFile(path, data);
+      this.$message.success('save success');
+    },
+    async saveAsZip(shareProject) {
+      this.JSZip = new JSZip();
+      // const directoryPath = await this.pathDirectoryPath();
+      // if (!directoryPath) {
+      //   this.$message({
+      //     type: 'info',
+      //     message: 'cancel'
+      //   });
+      //   return;
+      // }
+      // const zipPath =
+      //   directoryPath +
+      //   GLOBAL_CONSTANTS.DELIMITER +
+      //   GLOBAL_CONSTANTS.SHARE_ZIP_NAME;
+      shareProject.canvas.forEach(canvas => {
+        const { name, image } = canvas;
+        const offsreen = new OffscreenCanvas(image.width, image.height);
+        const offCtx = offsreen.getContext('2d');
+        offCtx.drawImage(image, 0, 0);
+        const imageData = offsreen.convertToBlob();
+        this.JSZip.file(name, imageData, { binary: true });
+        delete canvas.path;
+        delete canvas.image;
+      });
+      // config file
+      this.JSZip.file(
+        GLOBAL_CONSTANTS.SHARE_FILE_NAME,
+        JSON.stringify(shareProject, null, 4)
+      );
+      this.JSZip.generateAsync({ type: 'blob' }).then(content => {
+        saveAs(content, GLOBAL_CONSTANTS.SHARE_ZIP_NAME, {
+          type: 'application/zip'
+        });
       });
     },
     calcCanvasSize() {

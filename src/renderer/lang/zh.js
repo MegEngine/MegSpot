@@ -31,6 +31,8 @@ export default {
     float: '悬浮球',
     defaultFileListShowType: '文件列表的默认显示类型',
     list: '列表',
+    share: '分享',
+    shareAsProject: '导出为工程文件进行分享',
     show: '显示',
     hide: '隐藏',
     histogram: '直方图',

@@ -1,29 +1,4 @@
-import path from 'path';
-import os from 'os';
-
-export const DELIMITER = path.sep; // 分割符
-export const EOF = os.EOL; // 换行符
-export const SORTING_FILE_NAME = '.MegSpotSort.ini';
-export const DIRECTION_LEFT = 'direction_left';
-export const DIRECTION_RIGHT = 'direction_right';
-export const DIRECTION_BOTTOM = 'direction_bottom';
-export const DIRECTION_TOP = 'direction_top';
-
-export const LAYOUT_1X1 = '1x1';
-export const LAYOUT_2X1 = '2x1';
-export const LAYOUT_3X1 = '3x1';
-export const LAYOUT_4X1 = '4x1';
-export const LAYOUT_2X2 = '2x2';
-export const LAYOUT_3X2 = '3x2';
-
-export const SCALE_CONSTANTS = 1 / 6;
-export const DRAG_CONSTANTS = 1 / 4;
-
-export const VIEWER_DEFAULT_CMD_TEMPLATE =
-  '/usr/local/bin/python3 ${viewer} ${config}';
-export const VIEWER_DEFAULT_OUTPUT_PATH = '${viewerPath}';
-
-export const NO_CACHE_FILE_PROTOCOL = 'no-cache-file';
+import JSZip from 'jszip';
 
 export const SHARE_FILE_NAME = '.MegSpotShare.ini';
 export const SHARE_ZIP_NAME = 'MegSpotShare.zip';
@@ -71,3 +46,15 @@ export const SHARE_CANVAS_DEFAULT_PROPS = () => ({
   radius: 10,
   imgScale: '1'
 });
+
+export class MegSpotProject {
+  zip;
+  content;
+  constructor(content) {
+    this.zip = new JSZip();
+    this.content = content;
+  }
+  compress() {}
+  decompress() {}
+  validate() {}
+}

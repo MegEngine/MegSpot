@@ -32,6 +32,8 @@ export default {
     float: 'floating ball',
     defaultFileListShowType: 'Default Show Type of File List',
     list: 'list',
+    share: 'share',
+    shareAsProject: 'Export as project file for sharing',
     show: 'show',
     hide: 'hide',
     histogram: 'histogram',

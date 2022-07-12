@@ -98,9 +98,9 @@ export default {
     },
     async generateSortFile() {
       const path = this.sortFilePath;
-      let exstis = await fse.pathExists(path);
+      let exist = await fse.pathExists(path);
       let cancel = false;
-      if (exstis) {
+      if (exist) {
         this.$confirm('排序文件已存在，是否覆盖', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

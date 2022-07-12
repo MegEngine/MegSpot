@@ -112,6 +112,16 @@
           ref="gifDialog"
           :selectList="imageList.slice(startIndex, startIndex + groupCount)"
         ></GifDialog>
+        <el-button
+          type="text"
+          size="mini"
+          v-tip.sure="$t('general.shareAsProject')"
+          @click="handleShare"
+        >
+          <span class="svg-container" v-tip="$t('general.share')">
+            <svg-icon icon-class="share" />
+          </span>
+        </el-button>
       </el-button-group>
     </div>
     <div class="right">
@@ -377,6 +387,9 @@ export default {
         direction,
         status: false
       });
+    },
+    handleShare() {
+      this.$bus.$emit('share');
     },
     pickColor() {
       this.traggerRGB = !this.traggerRGB;

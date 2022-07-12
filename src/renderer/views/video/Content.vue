@@ -78,6 +78,10 @@ export default {
         {
           event: 'getMarks',
           action: 'getMarks'
+        },
+        {
+          event: 'share',
+          action: 'share'
         }
       ],
       marks: [],
@@ -456,6 +460,9 @@ export default {
     getMarks(data, callback) {
       callback(this.marks);
       return this.marks;
+    },
+    share() {
+      console.log('share', this.$refs['video_canvas']);
     },
     //执行覆盖
     snapAndCover(snapShotArr, coveredArr, status) {

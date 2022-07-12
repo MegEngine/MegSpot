@@ -32,6 +32,8 @@ export default {
     float: 'フローティングボール',
     defaultFileListShowType: 'ファイルリストのデフォルトの表示タイプ',
     list: 'リスト',
+    share: '共有',
+    shareAsProject: '共有用のプロジェクトファイルとしてエクスポート',
     show: '見せる',
     hide: '隠れる',
     histogram: 'ヒストグラム',
