@@ -250,10 +250,11 @@ export default {
       const directoryPath = await getDirectoryPath();
       const canvasViews = this.$refs['image_canvas'];
       const promises = canvasViews.map(
-        ({ getTitle: name, image }) =>
+        canvasView =>
           new Promise(async (resolve, reject) => {
+            const name = canvasView.getName();
             try {
-              const imageBlob = await this.imageToBlob(image);
+              const imageBlob = await this.imageToBlob(canvasView.image);
               const arraybuffer = await imageBlob.arrayBuffer();
               const buffer = Buffer.from(arraybuffer);
               const filePath = path.resolve(directoryPath, name);

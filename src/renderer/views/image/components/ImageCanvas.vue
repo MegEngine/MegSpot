@@ -189,9 +189,7 @@ export default {
     getTitle() {
       return this.preference.showTitle
         ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
-            (this.snapshotMode
-              ? this.snapInfo.name
-              : this.$options.filters.getFileName(this.path))
+            this.getName()
         : ' ';
     },
     canvasStyle() {
@@ -296,6 +294,11 @@ export default {
         snapShot: this.canvas,
         hist: this.currentHist
       };
+    },
+    getName() {
+      return this.snapshotMode
+        ? this.snapInfo.name
+        : this.$options.filters.getFileName(this.path);
     },
     listenEvents() {
       // 广播调度事件

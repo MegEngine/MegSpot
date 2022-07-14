@@ -199,14 +199,20 @@ export default {
     },
     async loadShareProject() {
       const snapshotHelper = new SnapshotHelper();
-      const { config, files } = await snapshotHelper.load();
-      this.$router.push({
-        path: '/image/compare',
-        query: { snapshotMode: true }
-      });
-      console.log('store', store, { config, files });
-      store.dispatch('imageSnapshotStore/setSnapshotConfig', config);
-      store.dispatch('imageSnapshotStore/setFiles', files);
+      const res = await snapshotHelper.load();
+      console.log('res', res);
+      if (res) {
+        const { config, files } = res;
+        this.$router.push({
+          path: '/image/compare',
+          query: { snapshotMode: true }
+        });
+        console.log('store', store, { config, files });
+        store.dispatch('imageSnapshotStore/setSnapshotConfig', config);
+        store.dispatch('imageSnapshotStore/setFiles', files);
+      } else {
+        this.$message.info('cancel');
+      }
     }
   }
 };

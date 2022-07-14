@@ -6,7 +6,7 @@ import { getFilePath } from '@/utils/file';
 import { isImage } from '@/components/file-tree/lib/util';
 
 export const SHARE_FILE_NAME = '.MegSpotShare.ini';
-export const SHARE_ZIP_EXT = 'megspot';
+export const SHARE_ZIP_EXT = 'mgt';
 export const SHARE_ZIP_NAME = 'MegSpotShare.' + SHARE_ZIP_EXT;
 export const TEMP_PATH = '/tmp/megspot';
 
