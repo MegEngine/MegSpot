@@ -1,43 +1,66 @@
 <template>
-  <div
-    id="image-container"
-    ref="container"
-    class="canvas-container"
-    :style="containerStyle"
-  >
-    <div v-for="imgs in imageGroupList" :key="imgs">
-      <ImageCanvas
-        ref="image_canvas"
-        :path="imgs"
-        :_width="canvasWidth"
-        :_height="canvasHeight"
-        :share="shareConfigAble"
-        :shareConfig="shareConfig"
-      ></ImageCanvas>
+  <div>
+    <div
+      v-if="snapshotMode"
+      id="image-container"
+      ref="container"
+      class="canvas-container"
+      :style="containerStyle"
+    >
+      <div v-for="(snapInfo, index) in files" :key="index">
+        <ImageCanvas
+          ref="image_canvas"
+          :path="snapInfo.path"
+          :snapInfo="snapInfo"
+          :_width="canvasWidth"
+          :_height="canvasHeight"
+        ></ImageCanvas>
+      </div>
+    </div>
+    <div
+      v-else
+      id="image-container"
+      ref="container"
+      class="canvas-container"
+      :style="containerStyle"
+    >
+      <div v-for="(imgs, index) in imageGroupList" :key="index">
+        <ImageCanvas
+          ref="image_canvas"
+          :path="imgs"
+          :_width="canvasWidth"
+          :_height="canvasHeight"
+        ></ImageCanvas>
+      </div>
     </div>
   </div>
 </template>
 <script>
-import JSZip from 'jszip';
-import ImageCanvas from './components/ImageCanvas';
-import fse from 'fs-extra';
 import _ from 'lodash';
-import { saveAs } from 'file-saver';
+import path from 'path';
+import fse from 'fs-extra';
+import ImageCanvas from './components/ImageCanvas';
 import { throttle } from '@/utils';
-const { dialog } = require('electron').remote;
+import { getDirectoryPath } from '@/utils/file';
+import { SnapshotHelper } from '@/tools/compress';
 import * as GLOBAL_CONSTANTS from '@/constants';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
+const {
+  mapGetters: snapMapGetters,
+  mapActions: snapMapActions
+} = createNamespacedHelpers('imageSnapshotStore');
 
 export default {
   components: { ImageCanvas },
+  props: {
+    snapshotMode: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
-      GLOBAL_CONSTANTS,
-      dirPath: undefined,
-      JSZip: null,
-      shareConfig: null,
-      shareConfigAble: false,
       canvasWidth: 0,
       canvasHeight: 0,
       groupStartIndex: 0,
@@ -61,13 +84,24 @@ export default {
         {
           event: 'share',
           action: 'share'
+        },
+        {
+          event: 'imageCenter_exportImage',
+          action: 'exportImage'
+        },
+        {
+          event: 'imageCenter_resetSnapshotPos',
+          action: 'resetSnapshotPos'
         }
       ]
     };
   },
   created() {
+    if (this.snapshotMode) {
+      console.log('snapshot mode');
+    }
     // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
-    if (this.imageList.length <= 4) {
+    else if (this.imageList.length <= 4) {
       let smartLayout;
       switch (this.imageList.length) {
         case 1:
@@ -86,6 +120,7 @@ export default {
           smartLayout = this.imageConfig.layout;
       }
       this.setImageConfig({ layout: smartLayout });
+      // this.setSnapshotConfig({ layout: smartLayout });
     }
   },
   mounted() {
@@ -96,7 +131,6 @@ export default {
     });
     // resize 后重新计算宽高并渲染
     window.addEventListener('resize', this.handleResize, true);
-    this.updateShareConfigStatus();
   },
   beforeDestroy() {
     this.scheduleCanvasActions.forEach(item => {
@@ -105,6 +139,7 @@ export default {
   },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
+    ...snapMapGetters(['files', 'snapshotConfig']),
     // 每组图片数量
     groupCount() {
       const str = this.imageConfig.layout,
@@ -120,21 +155,13 @@ export default {
           )
         : [];
     },
-    groupIsFromSameDir() {
-      this.dirPath = this.imageGroupList[0]
-        .split(GLOBAL_CONSTANTS.DELIMITER)
-        .slice(0, -1)
-        .join(GLOBAL_CONSTANTS.DELIMITER);
-      return this.imageGroupList.every(
-        item =>
-          item
-            .split(GLOBAL_CONSTANTS.DELIMITER)
-            .slice(0, -1)
-            .join(GLOBAL_CONSTANTS.DELIMITER) === this.dirPath
-      );
-    },
     containerStyle() {
-      switch (this.imageConfig.layout) {
+      switch (
+        (this.snapshotMode
+          ? this.snapshotConfig?.config?.imageStore?.imageConfig?.layout
+          : this.imageConfig.layout) ??
+        this.imageConfig.layout
+      ) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
           return {
             display: 'flex',
@@ -182,7 +209,6 @@ export default {
       });
     },
     imageGroupList() {
-      this.updateShareConfigStatus();
       this.$nextTick(() => {
         this.calcCanvasSize();
         this.updateAllCanvas();
@@ -201,6 +227,7 @@ export default {
       this.groupStartIndex = groupStartIndex;
     },
     ...mapActions(['setImageConfig']),
+    ...snapMapActions(['setSnapshotConfig']),
     handleResize: throttle(50, function() {
       this.calcCanvasSize();
       // 重新布局图片容器;
@@ -212,26 +239,50 @@ export default {
         height: this.canvasHeight
       });
     },
-    async updateShareConfigStatus() {
-      const path =
-        (this.dirPath ??
-          this.imageGroupList[0]
-            .split(GLOBAL_CONSTANTS.DELIMITER)
-            .slice(0, -1)
-            .join(GLOBAL_CONSTANTS.DELIMITER)) +
-        GLOBAL_CONSTANTS.DELIMITER +
-        GLOBAL_CONSTANTS.SHARE_FILE_NAME;
-      const exists = await fse.pathExists(path);
-      this.shareConfigAble = exists && this.groupIsFromSameDir;
-      if (this.shareConfigAble) {
-        this.shareConfig = JSON.parse(await fse.readFile(path));
-        console.log('shareConfig', this.shareConfig);
-      }
+    async imageToBlob(image) {
+      const offscreen = new OffscreenCanvas(image.width, image.height);
+      const offCtx = offscreen.getContext('2d');
+      offCtx.drawImage(image, 0, 0);
+      const blob = await offscreen.convertToBlob();
+      return blob;
+    },
+    async exportImage(data, callback) {
+      const directoryPath = await getDirectoryPath();
+      const canvasViews = this.$refs['image_canvas'];
+      const promises = canvasViews.map(
+        ({ getTitle: name, image }) =>
+          new Promise(async (resolve, reject) => {
+            try {
+              const imageBlob = await this.imageToBlob(image);
+              const arraybuffer = await imageBlob.arrayBuffer();
+              const buffer = Buffer.from(arraybuffer);
+              const filePath = path.resolve(directoryPath, name);
+              await fse.writeFile(filePath, buffer, 'binary');
+              const successTip = `${name} export success!`;
+              // console.log(successTip);
+              resolve(successTip);
+            } catch (error) {
+              const errorTip = `${name} export failed!`;
+              console.error(errorTip, error);
+              reject(errorTip);
+            }
+          })
+      );
+      const results = await Promise.allSettled(promises);
+      console.log('export results: ', directoryPath, results);
+      callback({ directoryPath, results });
+    },
+    resetSnapshotPos() {
+      const canvasViews = this.$refs['image_canvas'];
+      canvasViews.forEach(canvasContainer => {
+        canvasContainer.reDraw(true);
+      });
     },
     share() {
       // shareProject
       const configObj = _.cloneDeep(this.$store.state);
       delete configObj.videoStore;
+      let snapshotMode = false;
       const shareProject = GLOBAL_CONSTANTS.SHARE_PROJECT_DEFAULT_PROPS();
       const modules = ['imageStore', 'preferenceStore'];
       modules.forEach(moduleKey => {
@@ -245,7 +296,7 @@ export default {
       });
       // shareCanvas
       const canvasViews = this.$refs['image_canvas'];
-      let base = '_width'; // '_width' or '_height'
+      // let base = '_width'; // '_width' or '_height'
       shareProject.canvas = canvasViews.map(canvas => {
         const shareCanvas = GLOBAL_CONSTANTS.SHARE_CANVAS_DEFAULT_PROPS();
         Object.keys(shareCanvas).forEach(key => {
@@ -253,115 +304,50 @@ export default {
             shareCanvas[key] = canvas[key];
           }
         });
-        const { path, image, imagePosition } = canvas;
+        const { snapshotMode: _snapshotMode, getTitle, path, image } = canvas;
+        snapshotMode = _snapshotMode;
         shareCanvas.path = path;
-        shareCanvas.name = path.split(GLOBAL_CONSTANTS.DELIMITER).pop();
+        shareCanvas.name = getTitle;
         shareCanvas.image = image;
-        if (
-          ['x', 'y', 'width', 'height'].every(
-            key => imagePosition[key] !== undefined
-          )
-        ) {
-          const { x, y, width, height } = imagePosition;
-          const baseLength = canvas[base]; // _width or _height
-          shareCanvas.xOffsetRation = Number(x / baseLength).toFixed(2);
-          shareCanvas.yOffsetRation = Number(y / baseLength).toFixed(2);
-          shareCanvas.withRatio = Number(width / baseLength).toFixed(2);
-          shareCanvas.heightRatio = Number(height / baseLength).toFixed(2);
-        }
+        // console.log('save canvas pos info', { ...shareCanvas });
         return shareCanvas;
       });
-      let depth = 2;
-      while (
-        _.unionBy(shareProject.canvas, 'name').length <
-        shareProject.canvas.length
-      ) {
-        shareProject.canvas.forEach(canvas => {
-          canvas.name = canvas.path
-            .split(GLOBAL_CONSTANTS.DELIMITER)
-            .slice(-depth)
-            .join('-');
-        });
-        depth++;
+      if (!snapshotMode) {
+        try {
+          let depth = 2;
+          while (
+            _.unionBy(shareProject.canvas, 'name').length <
+            shareProject.canvas.length
+          ) {
+            shareProject.canvas.forEach(canvas => {
+              canvas.name = canvas.path
+                .split(GLOBAL_CONSTANTS.DELIMITER)
+                .slice(-depth)
+                .join('-');
+            });
+            depth++;
+          }
+        } catch (error) {
+          console.error(error);
+        }
       }
       // console.log('shareProject saving...', shareProject);
-      // this.saveShareInfo(JSON.stringify(shareProject, null, 4));
-      this.saveAsZip(shareProject);
+      this.saveShareProject(shareProject);
     },
-    async pathDirectoryPath() {
-      const { canceled, filePaths } = await dialog.showOpenDialog({
-        title: 'select a save location',
-        properties: ['openDirectory']
-      });
-      return !canceled && filePaths.length > 0 ? filePaths[0] : false;
-    },
-    // 存储当前组的图像信息至本地配置文件
-    async saveShareInfo(data) {
-      const pathPrefix = await this.pathDirectoryPath();
-      if (!pathPrefix) {
-        this.$message({
-          type: 'info',
-          message: 'cancel'
-        });
-        return;
-      }
-      const path =
-        pathPrefix +
-        GLOBAL_CONSTANTS.DELIMITER +
-        GLOBAL_CONSTANTS.SHARE_FILE_NAME;
-      let exist = await fse.pathExists(path);
-      let cancel = false;
-      if (exist) {
-        await this.$confirm('分享配置文件已存在，是否覆盖', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).catch(() => {
-          cancel = true;
-          this.$message({
-            type: 'info',
-            message: '已取消覆盖'
-          });
-        });
-      }
-      if (cancel) return;
-      await fse.outputFile(path, data);
-      this.$message.success('save success');
-    },
-    async saveAsZip(shareProject) {
-      this.JSZip = new JSZip();
-      // const directoryPath = await this.pathDirectoryPath();
-      // if (!directoryPath) {
-      //   this.$message({
-      //     type: 'info',
-      //     message: 'cancel'
-      //   });
-      //   return;
-      // }
-      // const zipPath =
-      //   directoryPath +
-      //   GLOBAL_CONSTANTS.DELIMITER +
-      //   GLOBAL_CONSTANTS.SHARE_ZIP_NAME;
-      shareProject.canvas.forEach(canvas => {
-        const { name, image } = canvas;
-        const offsreen = new OffscreenCanvas(image.width, image.height);
-        const offCtx = offsreen.getContext('2d');
-        offCtx.drawImage(image, 0, 0);
-        const imageData = offsreen.convertToBlob();
-        this.JSZip.file(name, imageData, { binary: true });
-        delete canvas.path;
-        delete canvas.image;
-      });
-      // config file
-      this.JSZip.file(
-        GLOBAL_CONSTANTS.SHARE_FILE_NAME,
-        JSON.stringify(shareProject, null, 4)
+    async saveShareProject(config) {
+      const results = await Promise.allSettled(
+        config.canvas.map(async canvas => {
+          const { name, image } = canvas;
+          const imageBlob = await this.imageToBlob(image);
+          delete canvas.path;
+          delete canvas.image;
+          return { name, fileData: imageBlob };
+        })
       );
-      this.JSZip.generateAsync({ type: 'blob' }).then(content => {
-        saveAs(content, GLOBAL_CONSTANTS.SHARE_ZIP_NAME, {
-          type: 'application/zip'
-        });
-      });
+      const files = results.map(item => item.value);
+      const snapshotHelper = new SnapshotHelper();
+      snapshotHelper.save(config, files);
+      // shareProject.load('E://Temp//MegSpotShare.megspot');
     },
     calcCanvasSize() {
       this.canvasWidth = this.calcWidth();

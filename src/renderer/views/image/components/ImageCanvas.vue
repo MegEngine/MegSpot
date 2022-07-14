@@ -68,7 +68,7 @@ const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
 );
 import { getImageUrlSyncNoCache } from '@/utils/image';
 import { throttle } from '@/utils';
-import { DELIMITER, SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
+import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
 import chokidar from 'chokidar';
 
 export default {
@@ -81,10 +81,6 @@ export default {
     EffectPreview
   },
   props: {
-    path: {
-      type: String,
-      default: ''
-    },
     _width: {
       type: Number,
       default: 500
@@ -93,15 +89,24 @@ export default {
       type: Number,
       default: 500
     },
-    share: {
-      type: Boolean,
-      default: false
+    path: {
+      type: String,
+      default: ''
     },
-    shareConfig: {
+    // name: {
+    //   type: String,
+    //   default: ''
+    // },
+    // imageData: {
+    //   type: [Object, Blob],
+    //   default: () => {}
+    // },
+    snapInfo: {
       type: Object,
-      default: () => ({})
+      default: () => {}
     }
   },
+  inject: ['getSnapshotMode'],
   data() {
     return {
       // 监听图像文件的变化,变化后自动刷新图像
@@ -175,13 +180,18 @@ export default {
   computed: {
     ...mapGetters(['imageConfig', 'imageList']),
     ...preferenceMapGetters(['preference']),
+    snapshotMode() {
+      return this.getSnapshotMode() || false;
+    },
     selected() {
       return this.path === this.selectedId;
     },
     getTitle() {
       return this.preference.showTitle
         ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) +
-            this.$options.filters.getFileName(this.path)
+            (this.snapshotMode
+              ? this.snapInfo.name
+              : this.$options.filters.getFileName(this.path))
         : ' ';
     },
     canvasStyle() {
@@ -193,21 +203,13 @@ export default {
     this.canvas = this.$refs.canvas;
     this.initCanvas();
     this.initImage();
-    this.share && this.setValuesFromShare();
     this.listenEvents();
-    console.log('shareConfig1', this.shareConfig);
   },
   beforeDestroy() {
     this.removeEvents();
     this.bitMap && this.bitMap.close();
   },
   watch: {
-    shareConfig: {
-      handler(newVal, oldVal) {
-        this.share && this.setValuesFromShare();
-      },
-      deep: true
-    },
     path: {
       handler: function(newVal, oldVal) {
         if (oldVal) {
@@ -228,12 +230,7 @@ export default {
             })
             .on('change', (path, details) => {
               console.log('image--change', path, details);
-              if (this.share) {
-                this.image.src = getImageUrlSyncNoCache(this.path);
-                this.setValuesFromShare();
-              } else {
-                this.initImage(false);
-              }
+              this.initImage(false);
             })
             .on('unlink', (path, details) => {
               console.log('image--remove', path, details);
@@ -252,35 +249,6 @@ export default {
   },
   methods: {
     ...mapActions(['removeImages']),
-    setValuesFromShare() {
-      const config = this.shareConfig?.canvas?.find(
-        canvasItem => canvasItem.name === this.path.split(DELIMITER).pop()
-      );
-      console.log('config', config);
-      if (config) {
-        const {
-          radius,
-          imgScale,
-          xOffsetRation,
-          yOffsetRation,
-          withRatio,
-          heightRatio
-        } = config;
-        this.imgScale = imgScale;
-        this.radius = radius;
-        this.imagePosition = {
-          x: Number(xOffsetRation) * this._width,
-          y: Number(yOffsetRation) * this._width,
-          width: Number(withRatio) * this._width,
-          height: Number(heightRatio) * this._width
-        };
-        if (this.bitMap) {
-          this.doZoomEnd();
-          this.drawImage();
-        }
-        console.log('imagePosition', this.shareConfig, this.imagePosition);
-      }
-    },
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
     checkBorder(transX, transY, _width, _height) {
       const cw = this._width,
@@ -372,25 +340,45 @@ export default {
         this[name](data);
       }
     },
-    initImage(initPosition = true) {
+    async initImage(initPosition = true) {
       this.image = new Image();
       this.image.onload = async () => {
         let offsreen = new OffscreenCanvas(this.image.width, this.image.height);
         let offCtx = offsreen.getContext('2d');
         offCtx.drawImage(this.image, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
-        !this.share &&
-          initPosition &&
-          (this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap));
-        if (this.bitMap) {
-          this.doZoomEnd();
-          this.drawImage();
+        initPosition && this.reDraw(true);
+        // console.log('image', this.image, this.image.width);
+        if (this.image && this.image.width) {
+          this.currentHist = this.$refs['hist-container'].generateHist(
+            cv.imread(this.image)
+          );
         }
-        this.currentHist = this.$refs['hist-container'].generateHist(
-          cv.imread(this.image)
-        );
       };
-      this.image.src = getImageUrlSyncNoCache(this.path); //        'C:/Demo/1-1%20-%20副本.jpg'
+      if (this.snapshotMode) {
+        fetch(this.path)
+          .then(() => {
+            this.image.src = this.path;
+          })
+          .catch(err => {
+            // TODO: A: reload后imageData为空，（从vuex）取imageData
+            // B: 或退回文件浏览器页
+            console.log(err);
+
+            // method A
+            // const path = URL.createObjectURL(
+            //   new Blob([this.snapInfo.imageData])
+            // );
+            // this.image.src = path;
+
+            // method B
+            this.$router.push({
+              path: '/image/index'
+            });
+          });
+      } else {
+        this.image.src = getImageUrlSyncNoCache(this.path); //        'C:/Demo/1-1%20-%20副本.jpg'
+      }
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d');
@@ -400,23 +388,13 @@ export default {
     },
     // 供外部直接调用 待测试
     reMount() {
-      this.initImage();
       this.initCanvas();
-      this.image.onload = () => {
-        if (this.bitMap && this.bitMap.width) {
-          this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
-        }
-        this.drawImage();
-      };
-      this.image.src = getImageUrlSyncNoCache(this.path);
+      this.initImage();
     },
     drawImage() {
-      if (this.imagePosition === null) {
-        this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
-      }
       let { x, y, width, height } = this.imagePosition;
       this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.bitMap && this.cs.drawImage(this.bitMap, x, y, width, height);
+      this.cs.drawImage(this.bitMap, x, y, width, height);
     },
     handleDbclick() {
       if (!this.selected) {
@@ -519,11 +497,41 @@ export default {
         this.doZoomEnd();
         this.drawImage();
       } else {
-        this.initImage();
+        this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap);
+        this.doZoomEnd();
+        this.drawImage();
       }
     },
-    reDraw() {
-      window.requestAnimationFrame(this.drawImage);
+    reDraw(init = false) {
+      window.requestAnimationFrame(() => {
+        if (init) {
+          this.imagePosition = this.snapshotMode
+            ? this.snapshotModeInitPos()
+            : this.getImageInitPos(this.canvas, this.bitMap);
+          this.doZoomEnd();
+        }
+        this.drawImage();
+      });
+    },
+    snapshotModeInitPos() {
+      const positionInfo = {};
+      const {
+        _width: snap_width,
+        _height: snap_height,
+        imagePosition
+      } = this.snapInfo;
+      const { x, y, width, height } = imagePosition;
+      const base =
+        this._width / this._height <= snap_width / snap_height
+          ? '_width'
+          : '_height';
+      const baseLength = this.snapInfo[base]; // _width or _height
+      positionInfo.x = Number(x / baseLength) * this[base];
+      positionInfo.y = Number(y / baseLength) * this[base];
+      positionInfo.width = Number(width / baseLength) * this[base];
+      positionInfo.height = Number(height / baseLength) * this[base];
+      // console.log('snapshotModeInitPos', positionInfo);
+      return positionInfo;
     },
     getImageInitPos(canvas, image) {
       const cw = canvas.width;
@@ -650,18 +658,9 @@ export default {
       }
     },
     doZoomEnd() {
-      if (
-        this.bitMap &&
-        this.bitMap.width &&
-        this.imagePosition &&
-        this.imagePosition.width
-      ) {
-        this.imgScale = Number(
-          this.imagePosition.width / this.bitMap.width
-        ).toFixed(2);
-      } else {
-        this.imgScale = 'N/A';
-      }
+      this.imgScale = Number(
+        this.imagePosition.width / this.bitMap.width
+      ).toFixed(2);
     },
     handleDrag(offset) {
       this.broadCast({

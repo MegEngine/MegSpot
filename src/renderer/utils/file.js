@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 var sizeof = require('image-size');
+const { dialog } = require('electron').remote;
+import { SHARE_ZIP_EXT } from '@/tools/compress';
 
 export const trimSep = pathStr => {
   let trimPath = pathStr;
@@ -122,6 +124,26 @@ export const getExtname = (filepath, filterDot = false) => {
 
 export const watchFile = filePath => {
   return fs.watch(filePath);
+};
+
+export const getFilePath = async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    title: 'select a file path',
+    properties: ['openFile'],
+    filters: [
+      { name: 'MegSpot Project', extensions: [SHARE_ZIP_EXT] },
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  });
+  return !canceled && filePaths.length > 0 ? filePaths[0] : false;
+};
+
+export const getDirectoryPath = async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    title: 'select a directory path',
+    properties: ['openDirectory']
+  });
+  return !canceled && filePaths.length > 0 ? filePaths[0] : false;
 };
 
 const useCollator = (locale = 'zh') => {

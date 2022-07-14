@@ -1,7 +1,11 @@
 <template>
   <div class="image-center" flex="dir:top box:first">
-    <Toolbar></Toolbar>
-    <Content ref="content" class="content-container"></Content>
+    <Toolbar v-bind:snapshotMode="snapshotMode"></Toolbar>
+    <Content
+      v-bind:snapshotMode="snapshotMode"
+      ref="content"
+      class="content-container"
+    ></Content>
   </div>
 </template>
 
@@ -14,6 +18,16 @@ export default {
   components: {
     Toolbar,
     Content
+  },
+  computed: {
+    snapshotMode() {
+      return Boolean(this.$route.query.snapshotMode) || false;
+    }
+  },
+  provide() {
+    return {
+      getSnapshotMode: () => this.snapshotMode
+    };
   }
 };
 </script>

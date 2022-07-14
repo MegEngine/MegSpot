@@ -1,7 +1,7 @@
 import * as GLOBAL_CONSTANT from '../../constants';
 import { trimSep } from '@/utils/file';
 
-const imageStore = {
+const imageSnapshotStore = {
   namespaced: true,
   state: {
     imageFolders: [],
@@ -16,8 +16,24 @@ const imageStore = {
     },
     //当前文件夹路径
     currentPath: '',
-    // 记忆文件树展开
-    expandData: []
+    preference: {
+      // appLanguage: 'en',
+      showTitle: true,
+      background: {
+        mode: 'default',
+        style:
+          'background: #e3e7e9; background-image: linear-gradient(45deg, #f6fafc 25%, transparent 0), linear-gradient(45deg, transparent 75%, #f6fafc 0), linear-gradient(45deg, #f6fafc 25%, transparent 0), linear-gradient(45deg, transparent 75%, #f6fafc 0); background-position: 0 0, 10px 10px, 10px 10px, 20px 20px; background-size: 20px 20px;'
+      },
+      scaleOptions: [4, 2, 1, 0.5, 0.25],
+      // 是否默认显示直方图
+      defaultShowHist: false,
+      // 列表显示模式 list(列表表格) / thumbnail(缩略图列表)
+      defaultFileListShowType: 'list'
+      // // 视频控制条位置 fixed(固定在toolbar) / float (悬浮球)
+      // videoProcessBarStyle: 'fixed'
+    },
+    snapshotConfig: {},
+    files: []
   },
   getters: {
     imageList: state => state.imageList,
@@ -25,7 +41,9 @@ const imageStore = {
     getImageFolders: state => () => state.imageFolders,
     imageConfig: state => state.imageConfig,
     currentPath: state => state.currentPath,
-    expandData: state => state.expandData
+    preference: state => state.preference,
+    snapshotConfig: state => state.snapshotConfig,
+    files: state => state.files
   },
   mutations: {
     SET_IMAGE_CONFIG: (state, configOb) => {
@@ -79,14 +97,16 @@ const imageStore = {
     SET_CURRENT_FOLDER_PATH: (state, newFolderPath) => {
       state.currentPath = newFolderPath;
     },
-    // 记忆文件树展开情况
-    ADD_IMAGE_EXPAND_DATA: (state, newOpenFolder) => {
-      state.expandData.push(newOpenFolder);
+    SET_PREFERENCE: (state, newPreOb) => {
+      const newPreference = Object.assign({}, state.preference, newPreOb);
+      state.preference = newPreference;
     },
-    REMOVE_IMAGE_EXPAND_DATA: (state, closeFolder) => {
-      state.expandData = state.expandData.filter(item => {
-        return !item.startsWith(closeFolder);
-      });
+    SET_SNAPSHOT_CONFIG: (state, newConfig) => {
+      const newConfigObj = Object.assign({}, state.snapshotConfig, newConfig);
+      state.snapshotConfig = newConfigObj;
+    },
+    SET_FILES: (state, newFiles) => {
+      state.files = newFiles;
     }
   },
   actions: {
@@ -130,14 +150,16 @@ const imageStore = {
     setFolderPath({ commit }, newFolderPath) {
       commit('SET_CURRENT_FOLDER_PATH', newFolderPath);
     },
-    // 记忆文件树展开
-    addExpandData({ commit }, newFolder) {
-      commit('ADD_IMAGE_EXPAND_DATA', newFolder);
+    setPreference({ commit }, newPreOb) {
+      commit('SET_PREFERENCE', newPreOb);
     },
-    removeExpandData({ commit }, newFolderArr) {
-      commit('REMOVE_IMAGE_EXPAND_DATA', newFolderArr);
+    setSnapshotConfig({ commit }, newConfig) {
+      commit('SET_SNAPSHOT_CONFIG', newConfig);
+    },
+    setFiles({ commit }, newFiles) {
+      commit('SET_FILES', newFiles);
     }
   }
 };
 
-export default imageStore;
+export default imageSnapshotStore;

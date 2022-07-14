@@ -8,6 +8,7 @@
         >
       </div>
       <SelectedBtn
+        v-if="!snapshotMode"
         :selectedList="imageList"
         :focusListIndex="
           new Array(groupCount).fill(0).map((_, index) => index + startIndex)
@@ -18,6 +19,7 @@
       >
       </SelectedBtn>
       <el-input-number
+        v-if="!snapshotMode"
         v-model="groupNum"
         @change="changeGroup"
         size="mini"
@@ -36,6 +38,27 @@
           $t('imageCenter.bilinearInterpolation')
         }}</el-radio-button>
       </el-radio-group>
+      <el-button
+        v-if="snapshotMode"
+        type="text"
+        size="mini"
+        @click="resetSnapshotPos"
+        v-tip="$t('image.toolbar.resetPositionTip')"
+        style="margin-left: 10px;"
+      >
+        {{ $t('image.toolbar.resetPosition') }}
+      </el-button>
+      <el-button
+        v-if="snapshotMode"
+        type="text"
+        size="mini"
+        @click="exportImage"
+        v-tip.sure="$t('image.toolbar.exportTip')"
+      >
+        <span class="svg-container" v-tip="$t('image.toolbar.exportTip')">
+          <svg-icon icon-class="export" />
+        </span>
+      </el-button>
       <div class="select">
         <span v-show="showSelectedMsg" class="msg">
           {{ $t('imageCenter.selectedMsg') }}
@@ -220,6 +243,7 @@
           </el-button>
         </el-button-group>
         <el-select
+          v-if="!snapshotMode"
           v-model="layout"
           placeholder="layout"
           class="layout-selector"
@@ -259,6 +283,12 @@ const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 
 export default {
   components: { SelectedBtn, GifDialog, ImageSetting },
+  props: {
+    snapshotMode: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       GLOBAL_CONSTANTS,
@@ -416,6 +446,20 @@ export default {
         name: 'align',
         data: { beSameSize, ...data }
       });
+    },
+    exportImage() {
+      this.$bus.$emit(
+        'imageCenter_exportImage',
+        null,
+        ({ directoryPath, results }) => {
+          results.every(result => result.status === 'fulfilled')
+            ? this.$message.success(`导出成功,文件路径：${directoryPath}`)
+            : this.$message.error('导出失败');
+        }
+      );
+    },
+    resetSnapshotPos() {
+      this.$bus.$emit('imageCenter_resetSnapshotPos');
     }
   },
   mounted() {

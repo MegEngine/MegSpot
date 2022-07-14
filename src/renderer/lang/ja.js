@@ -33,7 +33,7 @@ export default {
     defaultFileListShowType: 'ファイルリストのデフォルトの表示タイプ',
     list: 'リスト',
     share: '共有',
-    shareAsProject: '共有用のプロジェクトファイルとしてエクスポート',
+    shareAsProject: '共有するスナップショットファイルを作成する',
     show: '見せる',
     hide: '隠れる',
     histogram: 'ヒストグラム',
@@ -81,6 +81,11 @@ export default {
       addFolder: 'フォルダーを追加',
       openFolderTip:
         'システムファイルリソースマネージャーのディレクトリを開きます',
+      loadShareProject: 'スナップショットのロード',
+      resetPosition: 'リセット',
+      resetPositionTip: 'スナップショットの元の位置にリセット',
+      export: 'をエクスポート',
+      exportTip: 'スナップショットの元の画像ファイルをエクスポートします',
       imageQueue: '画像リスト',
       compareImages: '画像を比較',
       cleanImageQueue: 'リストをクリア'

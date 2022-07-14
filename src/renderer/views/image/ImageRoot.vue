@@ -37,6 +37,14 @@
         >
           {{ $t('general.dragDropCompare') }}
         </el-button>
+        <el-button
+          type="primary"
+          round
+          class="tool-item"
+          @click="loadShareProject"
+        >
+          {{ $t('image.toolbar.loadShareProject') }}
+        </el-button>
         <!-- <el-button
           type="text"
           size="small"
@@ -80,11 +88,13 @@
 </template>
 
 <script>
+import store from '@/store';
 const { dialog } = require('electron').remote;
 import FileTree from '@/components/file-tree/FileTree.vue';
 import SelectedBtn from '@/components/selected-btn';
 import ShowPath from '@/components/show-path';
 import ImagePreview from './ImagePreview';
+import { SnapshotHelper } from '@/tools/compress';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 import addDragFolderListener from '@/utils/dragFolder.js';
@@ -186,6 +196,17 @@ export default {
           this.setFolderPath(data.path);
         });
       }
+    },
+    async loadShareProject() {
+      const snapshotHelper = new SnapshotHelper();
+      const { config, files } = await snapshotHelper.load();
+      this.$router.push({
+        path: '/image/compare',
+        query: { snapshotMode: true }
+      });
+      console.log('store', store, { config, files });
+      store.dispatch('imageSnapshotStore/setSnapshotConfig', config);
+      store.dispatch('imageSnapshotStore/setFiles', files);
     }
   }
 };
@@ -204,7 +225,7 @@ export default {
   .tool {
     padding: 0 10px;
     border-bottom: 1px solid #eee;
-    .tool-items{
+    .tool-items {
       position: relative;
     }
     .tool-item + .tool-item {

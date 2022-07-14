@@ -30,6 +30,7 @@ export const SHARE_ZIP_NAME = 'MegSpotShare.zip';
 
 export const SHARE_PROJECT_DEFAULT_PROPS = () => ({
   name: '',
+  snapPath: '',
   config: {
     imageStore: {
       imageConfig: {
@@ -64,10 +65,13 @@ export const SHARE_PROJECT_DEFAULT_PROPS = () => ({
 export const SHARE_CANVAS_DEFAULT_PROPS = () => ({
   // oldPath: '',
   name: '', // directory + "-" + filename
-  xOffsetRation: 0,
-  yOffsetRation: 0,
-  withRatio: 1,
-  heightRatio: 1,
+  // xOffsetRation: 0,
+  // yOffsetRation: 0,
+  // withRatio: 1,
+  // heightRatio: 1,
+  _width: 0,
+  _height: 0,
+  imagePosition: {},
   radius: 10,
   imgScale: '1'
 });
