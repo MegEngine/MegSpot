@@ -26,7 +26,8 @@
   - [选中操作(推荐了解)](https://github.com/MegEngine/MegSpot/wiki/选中)
   - [普通对比](https://github.com/MegEngine/MegSpot/wiki/图片对比)
   - [拖拽对比](https://github.com/MegEngine/MegSpot/wiki/拖拽对比)
-  - [图片查看器](https://github.com/MegEngine/MegSpot/wiki/图片查看器)
+  - [图像快照](https://github.com/MegEngine/MegSpot/wiki/%E5%9B%BE%E5%83%8F%E5%BF%AB%E7%85%A7)
+  - ~~图片查看器~~
 - [视频对比](https://github.com/MegEngine/MegSpot/wiki/视频对比)
   - [视频预览](https://github.com/MegEngine/MegSpot/wiki/%E8%A7%86%E9%A2%91%E5%AF%B9%E6%AF%94#%E8%A7%86%E9%A2%91%E9%A2%84%E8%A7%88)
   - [视频截屏对比](https://github.com/MegEngine/MegSpot/wiki/%E8%A7%86%E9%A2%91%E5%AF%B9%E6%AF%94#%E8%A7%86%E9%A2%91%E6%88%AA%E5%B1%8F%E5%AF%B9%E6%AF%94)
@@ -66,11 +67,16 @@
 
 ---
 
-## 图片查看器
+## 图像快照 
 
-通过[文件选择页面](https://github.com/MegEngine/MegSpot/wiki/文件选择)进入。基于 OpenCV 完成图片查看功能，包括：缩放，拖拽，直方图，RGBA 值获取等。
+支持将当前对比的图像(包括图像位置信息)保存为MegSpot的快照文件.mgt  
 
-[查看手册](https://github.com/MegEngine/MegSpot/wiki/图片查看器)
+[查看手册](https://github.com/MegEngine/MegSpot/wiki/图像快照)
+
+---
+
+## ~~图片查看器~~
+
 
 ---
 
