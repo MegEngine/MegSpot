@@ -70,6 +70,7 @@ import { getImageUrlSyncNoCache } from '@/utils/image';
 import { throttle } from '@/utils';
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants';
 import chokidar from 'chokidar';
+import { getFileName } from '@/filter/get-file-name';
 
 export default {
   components: {
@@ -295,10 +296,12 @@ export default {
         hist: this.currentHist
       };
     },
-    getName() {
+    getName(filter = true) {
       return this.snapshotMode
         ? this.snapInfo.name
-        : this.$options.filters.getFileName(this.path);
+        : filter
+        ? this.$options.filters.getFileName(this.path)
+        : getFileName(this.path);
     },
     listenEvents() {
       // 广播调度事件

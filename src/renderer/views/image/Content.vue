@@ -305,10 +305,10 @@ export default {
             shareCanvas[key] = canvas[key];
           }
         });
-        const { snapshotMode: _snapshotMode, getTitle, path, image } = canvas;
+        const { snapshotMode: _snapshotMode, path, image } = canvas;
         snapshotMode = _snapshotMode;
         shareCanvas.path = path;
-        shareCanvas.name = getTitle;
+        shareCanvas.name = canvas.getName(false);
         shareCanvas.image = image;
         // console.log('save canvas pos info', { ...shareCanvas });
         return shareCanvas;
