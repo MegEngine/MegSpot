@@ -384,11 +384,13 @@ export default {
   components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
   mounted() {
     window.addEventListener('keydown', this.handleHotKey, true);
+    window.addEventListener('keyup', this.handleHotKeyUp, true);
     this.$bus.$on('image_handleSelect', this.handleSelect);
     this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused);
   },
   beforeDestroy() {
     window.removeEventListener('keydown', this.handleHotKey, true);
+    window.removeEventListener('keyup', this.handleHotKeyUp, true);
     this.$bus.$off('image_handleSelect', this.handleSelect);
     this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused);
   },
@@ -416,11 +418,11 @@ export default {
         }
       }
       // cmd/ctrl+p
-      if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
+      else if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
         this.pickColor();
       }
       // cmd/ctrl + ← 向前切换一个分组
-      if (
+      else if (
         (event.metaKey || event.ctrlKey) &&
         event.keyCode === 37 &&
         this.groupNum > 1
@@ -429,7 +431,7 @@ export default {
         this.changeGroup(this.groupNum, this.groupNum + 1);
       }
       // cmd/ctrl + → 向后切换一个分组
-      if (
+      else if (
         (event.metaKey || event.ctrlKey) &&
         event.keyCode === 39 &&
         this.groupNum < this.maxGroupNum
@@ -438,7 +440,7 @@ export default {
         this.changeGroup(this.groupNum, this.groupNum - 1);
       }
       // cmd/ctrl + b 触发逐帧对比 向前播放 (暂停时可用)
-      if (
+      else if (
         this.videoPaused &&
         (event.metaKey || event.ctrlKey) &&
         event.keyCode === 66
@@ -447,12 +449,62 @@ export default {
       }
 
       // cmd/ctrl + n 触发逐帧对比 向后播放 (暂停时可用)
-      if (
+      else if (
         this.videoPaused &&
         (event.metaKey || event.ctrlKey) &&
         event.keyCode === 78
       ) {
         this.frameSteps(1);
+      }
+      // 空格键触发 播放/暂停
+      else if (event.key === ' ') {
+        this.changeStatus(
+          this.videoPaused
+            ? CONSTANTS.VIDEO_STATUS_START
+            : CONSTANTS.VIDEO_STATUS_PAUSE
+        );
+      }
+      // 向上overlay 的快捷键
+      else if (event.key.toLowerCase() === 'w' || event.key === 'ArrowUp') {
+        event.stopPropagation();
+        this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+      }
+      // 向下overlay 的快捷键
+      else if (event.key.toLowerCase() === 's' || event.key === 'ArrowDown') {
+        event.stopPropagation();
+        this.overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+      }
+      // 向左overlay 的快捷键
+      else if (event.key.toLowerCase() === 'a' || event.key === 'ArrowLeft') {
+        event.stopPropagation();
+        this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+      }
+      // 向右overlay 的快捷键
+      else if (event.key.toLowerCase() === 'd' || event.key === 'ArrowRight') {
+        event.stopPropagation();
+        this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+      }
+    },
+    handleHotKeyUp(event) {
+      // 向上overlay 的快捷键
+      if (event.key.toLowerCase() === 'w' || event.key === 'ArrowUp') {
+        event.stopPropagation();
+        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+      }
+      // 向下overlay 的快捷键
+      else if (event.key.toLowerCase() === 's' || event.key === 'ArrowDown') {
+        event.stopPropagation();
+        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+      }
+      // 向左overlay 的快捷键
+      else if (event.key.toLowerCase() === 'a' || event.key === 'ArrowLeft') {
+        event.stopPropagation();
+        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+      }
+      // 向右overlay 的快捷键
+      else if (event.key.toLowerCase() === 'd' || event.key === 'ArrowRight') {
+        event.stopPropagation();
+        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
       }
     },
     changeStatus(status) {
