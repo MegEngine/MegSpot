@@ -344,14 +344,15 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     this.header = this.$refs.header;
     this.canvas = this.$refs.canvas;
     this.degree = 0;
 
     this.initCanvas();
-    this.initVideo();
     this.listenEvents();
+    await this.initVideo();
+    this.requestGenerateHist();
   },
   beforeDestroy() {
     this.removeEvents();
@@ -680,39 +681,50 @@ export default {
       });
     },
     initVideo() {
-      this.video = document.createElement('video');
-      this.video.addEventListener('loadeddata', () => {
-        this.$emit('loaded');
-        this.duration = isNaN(this.video.duration)
-          ? 60
-          : Number(Number(this.video.duration).toFixed(5));
-        this.handleVideoPaused();
-        this.initImage();
-        if (
-          this.imagePosition == undefined ||
-          isNaN(this.imagePosition?.height)
-        ) {
-          this.imagePosition = this.getImageInitPos(this.canvas, this.video);
+      return new Promise((resolve, reject) => {
+        try {
+          this.video = document.createElement('video');
+          this.video.addEventListener('loadeddata', () => {
+            this.$emit('loaded');
+            this.duration = isNaN(this.video.duration)
+              ? 60
+              : Number(Number(this.video.duration).toFixed(5));
+            this.handleVideoPaused();
+            this.initImage();
+            if (
+              this.imagePosition == undefined ||
+              isNaN(this.imagePosition?.height)
+            ) {
+              this.imagePosition = this.getImageInitPos(
+                this.canvas,
+                this.video
+              );
+            }
+            this.doZoomEnd();
+            resolve();
+          });
+          this.video.addEventListener('timeupdate', () => {
+            if (this.paused || !this.video) return;
+            this.currentTime = this.video.currentTime;
+            // console.log('currentTime', this.video.currentTime, this.currentTime);
+          });
+          this.video.addEventListener('pause', () => {
+            this.$bus.$emit('changeVideoPaused', true);
+          });
+          this.video.src = getImageUrlSyncNoCache(this.path);
+          this.video.autoplay = true;
+          // 默认开启视频循环
+          this.video.loop = true;
+          // 视频是否静音
+          this.video.muted = this.muted;
+          // 视频播放速度
+          this.video.defaultPlaybackRate = this.speed;
+          this.video.playbackRate = this.speed;
+        } catch (error) {
+          console.error('init video error:', error);
+          reject(error);
         }
-        this.doZoomEnd();
       });
-      this.video.addEventListener('timeupdate', () => {
-        if (this.paused || !this.video) return;
-        this.currentTime = this.video.currentTime;
-        // console.log('currentTime', this.video.currentTime, this.currentTime);
-      });
-      this.video.addEventListener('pause', () => {
-        this.$bus.$emit('changeVideoPaused', true);
-      });
-      this.video.src = getImageUrlSyncNoCache(this.path);
-      this.video.autoplay = true;
-      // 默认开启视频循环
-      this.video.loop = true;
-      // 视频是否静音
-      this.video.muted = this.muted;
-      // 视频播放速度
-      this.video.defaultPlaybackRate = this.speed;
-      this.video.playbackRate = this.speed;
     },
     startAnimation(play = true) {
       this.stopAnimation();
@@ -878,8 +890,8 @@ export default {
     setCoverStatus({ snapShot, hist }, status) {
       if (status) {
         this.snapShot = snapShot;
-        // this.clearCanvas();
-        // this.cs.drawImage(snapShot, 0, 0);
+        this.clearCanvas();
+        this.cs.drawImage(snapShot, 0, 0);
         if (this.$refs['hist-container'].visible) {
           this.maskDom = hist;
         }
