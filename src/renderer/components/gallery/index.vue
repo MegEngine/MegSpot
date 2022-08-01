@@ -258,13 +258,14 @@ export default {
     },
     smartSort() {
       if (!this.sortList.length) return;
+      const getName = filePath =>
+        this.$options.filters.getFileName(filePath, false);
       const nameMap = new Map();
       let iterator = nameMap;
       const multiple = [];
       const single = [];
       this.sortList.forEach(path => {
-        const fileName = path.split(DELIMITER).pop();
-        const name = fileName.split('.')[0];
+        const name = getName(path);
         if (nameMap.has(name)) {
           nameMap.get(name).push(path);
         } else {
@@ -284,7 +285,7 @@ export default {
         }
       }
       this.sortList = [...multiple, ...single];
-      console.log('smartSort', this.sortList);
+      // console.log('smartSort', this.sortList);
     }
   }
 };

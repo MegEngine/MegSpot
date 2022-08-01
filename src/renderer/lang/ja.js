@@ -6,6 +6,10 @@ export default {
     manual: 'マニュアル',
     hotKey: 'ホットキー',
     please: 'お願いします',
+    reset: 'リセット',
+    edit: '編集',
+    save: '保存',
+    cancel: 'キャンセル',
     showVideoTip: 'デモビデオを表示'
   },
   nav: {
@@ -60,6 +64,24 @@ export default {
     invalidFolderTip: 'フォルダが存在しません。有効なパスを入力してください',
     imageFolderList: '画像フォルダ一覧',
     videoFolderList: 'ビデオフォルダリスト'
+  },
+  hotkey: {
+    desc: '説明',
+    key: 'ショートカットキー',
+    gotoCompare: '比較ページにジャンプします',
+    emptyAll: '選択したすべての画像またはビデオを空にします',
+    back: 'ファイル選択ページに戻る',
+    gallery: 'ギャラリーを開く/閉じる',
+    previousGroup: '前のグループ',
+    nextGroup: '次のグループ',
+    previousFrame: '前のフレーム',
+    nextFrame: '次のフレーム',
+    togglePlay: '再生/一時停止',
+    top: '比較のために積み重ねる',
+    left: '左にコントラストをオーバーレイ',
+    right: '右にコントラストを重ねる',
+    bottom: '比較のために積み重ねる',
+    pickColor: 'カラーピッカーのオン/オフを切り替えます'
   },
   dashboard: {
     entries: {
@@ -132,7 +154,7 @@ export default {
     title: '比較働画GIFを生成',
     image: '比較図',
     description: '説明',
-    operation: '操作',
+    operation: '操作する',
     tips: {
       wait: '生成しています、お待ちください',
       saved: 'GIFファイルを保存しました！',
@@ -168,7 +190,7 @@ export default {
     defaultSortTip: '名前でファイルを並べ替える'
   },
   gallery: {
-    clear: '空の',
+    clear: 'クリア',
     enableNameSort: '名前順',
     enableNameSortTip: '名前で並べ替えるかどうか',
     smartSort: 'スマートソーティング',

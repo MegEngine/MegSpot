@@ -2,47 +2,19 @@
   <div class="home" flex="dir:top">
     <div class="tool" flex="main:justify cross:center">
       <div class="tool-items">
-        <el-button
-          @click="addFolder"
-          type="text"
-          class="tool-item add-folder"
-          title="add folder to root"
-          size="small"
-        >
+        <el-button @click="addFolder" type="text" class="tool-item add-folder" title="add folder to root" size="small">
           {{ $t('image.toolbar.addFolder') }}
         </el-button>
-        <SelectedBtn
-          :selectedList="imageList"
-          @update="setImages"
-          @remove="removeImages"
-          @click="emptyImages"
-        />
-        <el-button
-          type="primary"
-          round
-          :title="`${$t('common.hotKey')}：cmd/ctrl+enter`"
-          class="tool-item"
-          :disabled="!imageList.length"
-          @click="compare"
-        >
+        <SelectedBtn :selectedList="imageList" @update="setImages" @remove="removeImages" @click="emptyImages" />
+        <el-button type="primary" round :title="`${$t('common.hotKey')}：cmd/ctrl+enter`" class="tool-item"
+          :disabled="!imageList.length" @click="compare">
           {{ $t('general.compare') }}
         </el-button>
-        <el-button
-          type="primary"
-          round
-          title="drag-drop-compare"
-          class="tool-item"
-          :disabled="!imageList.length"
-          @click="dragDropCompare"
-        >
+        <el-button type="primary" round title="drag-drop-compare" class="tool-item" :disabled="!imageList.length"
+          @click="dragDropCompare">
           {{ $t('general.dragDropCompare') }}
         </el-button>
-        <el-button
-          type="primary"
-          round
-          class="tool-item"
-          @click="loadShareProject"
-        >
+        <el-button type="primary" round class="tool-item" @click="loadShareProject">
           {{ $t('image.toolbar.loadShareProject') }}
         </el-button>
         <!-- <el-button
@@ -61,26 +33,13 @@
     <div class="content" flex-box="1">
       <Split :gutterSize="4">
         <SplitArea :size="23" :maxSize="1000" :minSize="200">
-          <FileTree
-            ref="folderTree"
-            id="folderTree"
-            :currentPath="currentPath"
-            :openedFolders="imageFolders"
-            :checkedFiles="checkedFiles"
-            @close="onClose"
-            :addFolder="addFolder"
-            :defaultExpand="expandData"
-            @select="onSelect"
-            @addExpand="addExpandData"
-            @removeExpand="removeExpandData"
-          >
+          <FileTree ref="folderTree" id="folderTree" :currentPath="currentPath" :openedFolders="imageFolders"
+            :checkedFiles="checkedFiles" @close="onClose" :addFolder="addFolder" :defaultExpand="expandData"
+            @select="onSelect" @addExpand="addExpandData" @removeExpand="removeExpandData">
           </FileTree>
         </SplitArea>
         <SplitArea :size="77">
-          <ImagePreview
-            ref="ImagePreview"
-            @addFolder="addFolder"
-          ></ImagePreview>
+          <ImagePreview ref="ImagePreview" @addFolder="addFolder"></ImagePreview>
         </SplitArea>
       </Split>
     </div>
@@ -98,6 +57,7 @@ import { SnapshotHelper } from '@/tools/compress';
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
 import addDragFolderListener from '@/utils/dragFolder.js';
+import { handleEvent } from '@/tools/hotkey';
 
 export default {
   name: 'ImageRoot',
@@ -106,13 +66,15 @@ export default {
     return {
       isDraging: false,
       checkedFiles: [],
-      dragFiles: []
+      dragFiles: [],
+      hotkeyEvents: undefined
     };
   },
   computed: {
     ...mapGetters(['imageList', 'imageFolders', 'expandData', 'currentPath'])
   },
   mounted() {
+    this.initHotkeyEvents();
     addDragFolderListener(document.getElementById('folderTree'));
   },
   activated() {
@@ -131,16 +93,18 @@ export default {
       'addExpandData',
       'removeExpandData'
     ]),
-
+    initHotkeyEvents() {
+      this.hotkeyEvents = new Map([
+        ['gotoCompare', () => {
+          this.compare();
+        }],
+        ['emptyAll', () => {
+          this.emptyImages();
+        }]
+      ]);
+    },
     handleHotKey(event) {
-      // cmd+enter
-      if ((event.metaKey || event.ctrlKey) && event.keyCode === 13) {
-        this.compare();
-      }
-      // cmd+delete
-      if ((event.metaKey || event.ctrlKey) && event.keyCode === 8) {
-        this.emptyImages();
-      }
+      handleEvent(event, this.hotkeyEvents)
     },
     compare() {
       this.$router.push('/image/compare');
@@ -220,6 +184,7 @@ export default {
 
 <style scoped lang="scss">
 @import '@/styles/variables.scss';
+
 .home {
   color: $labelColor;
   height: 100%;
@@ -228,13 +193,16 @@ export default {
   padding: 0px;
   box-sizing: border-box;
   position: relative;
+
   .tool {
     padding: 0 10px;
     border-bottom: 1px solid #eee;
+
     .tool-items {
       position: relative;
     }
-    .tool-item + .tool-item {
+
+    .tool-item+.tool-item {
       margin-left: 10px;
     }
   }

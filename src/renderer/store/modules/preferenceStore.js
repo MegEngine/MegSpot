@@ -15,7 +15,8 @@ const preferenceStore = {
       // 列表显示模式 list(列表表格) / thumbnail(缩略图列表)
       defaultFileListShowType: 'list',
       // 视频控制条位置 fixed(固定在toolbar) / float (悬浮球)
-      videoProcessBarStyle: 'fixed'
+      videoProcessBarStyle: 'fixed',
+      hotkeys: []
     },
     lastRouterPath: '/dashboard'
   },

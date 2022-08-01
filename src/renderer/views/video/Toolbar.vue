@@ -3,36 +3,19 @@
     <div class="left" flex="cross:center">
       <div class="router-back">
         <!-- v-tip.sure="`${$t('common.hotKey')}：esc`" -->
-        <span @click="goBack" class="btn"
-          ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
-        >
+        <span @click="goBack" class="btn"><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span>
       </div>
-      <SelectedBtn
-        :selectedList="videoList"
-        :focusListIndex="
-          new Array(groupCount).fill(0).map((_, index) => index + startIndex)
-        "
-        @update="setVideos"
-        @remove="removeVideos"
-        @click="emptyVideos"
-      />
-      <el-input-number
-        v-model="groupNum"
-        @change="changeGroup"
-        size="mini"
-        :step="1"
-        :min="1"
-        :max="maxGroupNum"
-        v-tip="$t('general.groupNum')"
-        label="groupNum"
-        class="group-number"
-      ></el-input-number>
+      <SelectedBtn :selectedList="videoList" :focusListIndex="
+        new Array(groupCount).fill(0).map((_, index) => index + startIndex)
+      " @update="setVideos" @remove="removeVideos" @click="emptyVideos" />
+      <el-input-number v-model="groupNum" @change="changeGroup" size="mini" :step="1" :min="1" :max="maxGroupNum"
+        v-tip="$t('general.groupNum')" label="groupNum" class="group-number"></el-input-number>
       <el-radio-group v-model="smooth" class="gap" size="mini">
         <el-radio-button :label="false">{{
-          $t('imageCenter.nearestInterpolation')
+            $t('imageCenter.nearestInterpolation')
         }}</el-radio-button>
         <el-radio-button :label="true">{{
-          $t('imageCenter.bilinearInterpolation')
+            $t('imageCenter.bilinearInterpolation')
         }}</el-radio-button>
       </el-radio-group>
     </div>
@@ -49,51 +32,29 @@
     </div>
     <div class="middle">
       <el-button-group class="gap" flex="cross:center">
-        <el-button
-          :disabled="!videoPaused"
-          type="text"
-          size="mini"
-          @click="frameSteps(-1)"
-          v-tip.sure="$t('imageCenter.frameSteps1')"
-        >
+        <el-button :disabled="!videoPaused" type="text" size="mini" @click="frameSteps(-1)"
+          v-tip.sure="$t('imageCenter.frameSteps1')">
           <span class="svg-container" v-tip="$t('imageCenter.frameSteps1')">
             <svg-icon icon-class="frame" />
           </span>
         </el-button>
-        <el-button
-          :disabled="!videoPaused"
-          type="text"
-          size="mini"
-          @click="frameSteps(1)"
-          v-tip.sure="$t('imageCenter.frameSteps2')"
-        >
+        <el-button :disabled="!videoPaused" type="text" size="mini" @click="frameSteps(1)"
+          v-tip.sure="$t('imageCenter.frameSteps2')">
           <span class="svg-container" v-tip="$t('imageCenter.frameSteps2')">
             <svg-icon icon-class="frame" style="transform:rotate(180deg);" />
           </span>
         </el-button>
-        <el-button
-          type="text"
-          v-tip="$t('video.play')"
-          @click="changeStatus(CONSTANTS.VIDEO_STATUS_START)"
-        >
+        <el-button type="text" v-tip="$t('video.play')" @click="changeStatus(CONSTANTS.VIDEO_STATUS_START)">
           <span class="svg-container">
             <svg-icon icon-class="play" :clicked="!videoPaused" />
           </span>
         </el-button>
-        <el-button
-          type="text"
-          @click="changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE)"
-          v-tip="$t('video.pause')"
-        >
+        <el-button type="text" @click="changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE)" v-tip="$t('video.pause')">
           <span class="svg-container">
             <svg-icon icon-class="pause" :clicked="videoPaused" />
           </span>
         </el-button>
-        <el-button
-          type="text"
-          @click="changeStatus(CONSTANTS.VIDEO_STATUS_RESET)"
-          v-tip="$t('video.reset')"
-        >
+        <el-button type="text" @click="changeStatus(CONSTANTS.VIDEO_STATUS_RESET)" v-tip="$t('video.reset')">
           <span class="svg-container">
             <svg-icon icon-class="restart" />
           </span>
@@ -104,21 +65,9 @@
           </span>
         </el-button>
         <!-- 不加allow-create属性， 即不允许创建自定义速度，因为经测试发现视频设置3及之上的播放速度时，时快时慢 -->
-        <el-select
-          v-model="speed"
-          placeholder="speed"
-          size="mini"
-          filterable
-          default-first-option
-          v-tip="$t('video.speed')"
-          class="layout-selector"
-        >
-          <el-option
-            v-for="({ label, value }, index) in speedOpts"
-            :key="index"
-            :label="label"
-            :value="value"
-          >
+        <el-select v-model="speed" placeholder="speed" size="mini" filterable default-first-option
+          v-tip="$t('video.speed')" class="layout-selector">
+          <el-option v-for="({ label, value }, index) in speedOpts" :key="index" :label="label" :value="value">
           </el-option>
         </el-select>
         <!-- <VideoProgressBar v-if="isFixed" class="progress-bar" /> -->
@@ -127,127 +76,66 @@
     <div class="right">
       <div class="tool-btns">
         <el-button-group class="gap">
-          <el-button
-            type="text"
-            @click="pickColor"
-            size="mini"
-            v-tip="
-              $t('imageCenter.colorPicker') +
-                ' ' +
-                $t('common.hotKey') +
-                ':cmd/ctrl+p'
-            "
-          >
-            <svg-icon
-              icon-class="pick-color"
-              :clicked="traggerRGB"
-              style="font-size: 20px; margin-right: 2px; transform: translateY(2px);"
-            />
+          <el-button type="text" @click="pickColor" size="mini" v-tip="
+            $t('imageCenter.colorPicker') +
+            ' ' +
+            $t('common.hotKey') +
+            ':cmd/ctrl+p'
+          ">
+            <svg-icon icon-class="pick-color" :clicked="traggerRGB"
+              style="font-size: 20px; margin-right: 2px; transform: translateY(2px);" />
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            v-tip.sure="`choose images to generate GIF`"
-            @click="$refs.gifDialog.show()"
-            :disabled="!videoPaused"
-          >
+          <el-button type="text" size="mini" v-tip.sure="`choose images to generate GIF`"
+            @click="$refs.gifDialog.show()" :disabled="!videoPaused">
             <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
               <svg-icon icon-class="gif" />
             </span>
           </el-button>
-          <GifDialog
-            ref="gifDialog"
-            :selectList="videoList.slice(startIndex, startIndex + groupCount)"
-          ></GifDialog>
+          <GifDialog ref="gifDialog" :selectList="videoList.slice(startIndex, startIndex + groupCount)"></GifDialog>
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
         <el-button-group class="gap">
-          <el-button
-            type="text"
-            size="mini"
-            :disabled="!videoPaused"
+          <el-button type="text" size="mini" :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
-            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
-            v-tip="$t('imageCenter.overlayLeft')"
-          >
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)" v-tip="$t('imageCenter.overlayLeft')">
             <span class="svg-container">
               <svg-icon icon-class="direction-left" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            :disabled="!videoPaused"
+          <el-button type="text" size="mini" :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
-            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
-            v-tip="$t('imageCenter.overlayRight')"
-          >
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)" v-tip="$t('imageCenter.overlayRight')">
             <span class="svg-container">
-              <svg-icon
-                icon-class="direction-left"
-                class="svg-container"
-                style="transform:rotate(180deg);"
-              />
+              <svg-icon icon-class="direction-left" class="svg-container" style="transform:rotate(180deg);" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            :disabled="!videoPaused"
+          <el-button type="text" size="mini" :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
-            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
-            v-tip="$t('imageCenter.overlayBottom')"
-          >
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)" v-tip="$t('imageCenter.overlayBottom')">
             <span class="svg-container">
-              <svg-icon
-                icon-class="direction-left"
-                style="transform:rotate(-90deg);"
-              />
+              <svg-icon icon-class="direction-left" style="transform:rotate(-90deg);" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            :disabled="!videoPaused"
+          <el-button type="text" size="mini" :disabled="!videoPaused"
             @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
-            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
-            v-tip="$t('imageCenter.overlayTop')"
-          >
+            @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)" v-tip="$t('imageCenter.overlayTop')">
             <span class="svg-container">
-              <svg-icon
-                icon-class="direction-left"
-                style="transform:rotate(90deg);"
-              />
+              <svg-icon icon-class="direction-left" style="transform:rotate(90deg);" />
             </span>
           </el-button>
         </el-button-group>
         <el-button-group class="gap">
-          <el-button
-            type="text"
-            @click="rotate(90)"
-            size="mini"
-            v-tip="$t('imageCenter.rotate')"
-          >
+          <el-button type="text" @click="rotate(90)" size="mini" v-tip="$t('imageCenter.rotate')">
             <span class="svg-container">
               <svg-icon icon-class="rotate" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            @click="reverse(1)"
-            v-tip="$t('imageCenter.horizontalFlip')"
-            size="mini"
-          >
+          <el-button type="text" @click="reverse(1)" v-tip="$t('imageCenter.horizontalFlip')" size="mini">
             <span class="svg-container">
               <svg-icon icon-class="horizontal-flip" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="reverse(-1)"
-            v-tip="$t('imageCenter.verticalFlip')"
-          >
+          <el-button type="text" size="mini" @click="reverse(-1)" v-tip="$t('imageCenter.verticalFlip')">
             <span class="svg-container">
               <svg-icon icon-class="vertical-flip" />
             </span>
@@ -255,68 +143,38 @@
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
         <el-button-group class="gap">
-          <el-button
-            type="text"
-            size="mini"
-            @click="align(false)"
-            v-tip="$t('imageCenter.align')"
-          >
+          <el-button type="text" size="mini" @click="align(false)" v-tip="$t('imageCenter.align')">
             <span class="svg-container">
               <svg-icon icon-class="align" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="align(true)"
-            v-tip="$t('imageCenter.align2')"
-          >
+          <el-button type="text" size="mini" @click="align(true)" v-tip="$t('imageCenter.align2')">
             <span class="svg-container">
               <svg-icon icon-class="align2" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="resetCanvas(false)"
-            v-tip="$t('imageCenter.adaptive')"
-          >
+          <el-button type="text" size="mini" @click="resetCanvas(false)" v-tip="$t('imageCenter.adaptive')">
             <span class="svg-container">
               <svg-icon icon-class="adaptive" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="resetCanvas(true)"
-            v-tip="$t('imageCenter.fullsize')"
-          >
+          <el-button type="text" size="mini" @click="resetCanvas(true)" v-tip="$t('imageCenter.fullsize')">
             <span class="svg-container">
               <svg-icon icon-class="fullsize" />
             </span>
           </el-button>
         </el-button-group>
-        <el-select
-          v-model="layout"
-          placeholder="layout"
-          class="layout-selector"
-          size="mini"
-          v-tip.left="$t('general.layout')"
-        >
-          <el-option
-            v-for="item in [
-              GLOBAL_CONSTANTS.LAYOUT_2X2,
-              GLOBAL_CONSTANTS.LAYOUT_2X1,
-              GLOBAL_CONSTANTS.LAYOUT_3X1,
-              GLOBAL_CONSTANTS.LAYOUT_3X2,
-              GLOBAL_CONSTANTS.LAYOUT_4X1,
-              GLOBAL_CONSTANTS.LAYOUT_1X1
-            ]"
-            :disabled="videoList.length < parseInt(item[0]) * parseInt(item[2])"
-            :key="item"
-            :label="item"
-            :value="item"
-          >
+        <el-select v-model="layout" placeholder="layout" class="layout-selector" size="mini"
+          v-tip.left="$t('general.layout')">
+          <el-option v-for="item in [
+            GLOBAL_CONSTANTS.LAYOUT_2X2,
+            GLOBAL_CONSTANTS.LAYOUT_2X1,
+            GLOBAL_CONSTANTS.LAYOUT_3X1,
+            GLOBAL_CONSTANTS.LAYOUT_3X2,
+            GLOBAL_CONSTANTS.LAYOUT_4X1,
+            GLOBAL_CONSTANTS.LAYOUT_1X1
+          ]" :disabled="videoList.length < parseInt(item[0]) * parseInt(item[2])" :key="item" :label="item"
+            :value="item">
           </el-option>
         </el-select>
         <el-button-group class="gap">
@@ -339,6 +197,7 @@ const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
   'preferenceStore'
 );
+import { handleEvent } from '@/tools/hotkey';
 
 export default {
   data() {
@@ -378,11 +237,14 @@ export default {
           label: '0.25x',
           value: 0.25
         }
-      ]
+      ],
+      hotkeyDownEvents: undefined,
+      hotkeyUpEvents: undefined
     };
   },
   components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
   mounted() {
+    this.initHotkeyEvents();
     window.addEventListener('keydown', this.handleHotKey, true);
     window.addEventListener('keyup', this.handleHotKeyUp, true);
     this.$bus.$on('image_handleSelect', this.handleSelect);
@@ -401,111 +263,198 @@ export default {
       'setVideoConfig',
       'setVideos'
     ]),
-    handleHotKey(event) {
-      // esc
-      if (event.keyCode === 27) {
-        // 默认返回上一页， 若为  全屏状态则退出全屏
-        if (
-          this.fullScreening &&
-          document.fullscreenElement &&
-          document.fullscreenElement.nodeName === 'VIDEO'
-        ) {
-          document.exitFullscreen();
-          this.setVideoConfig({ fullScreening: false });
-          document.body.removeChild(document.body.lastChild);
-        } else {
-          this.goBack();
-        }
-      }
-      // cmd/ctrl+p
-      else if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
-        this.pickColor();
-      }
-      // cmd/ctrl + ← 向前切换一个分组
-      else if (
-        (event.metaKey || event.ctrlKey) &&
-        event.keyCode === 37 &&
-        this.groupNum > 1
-      ) {
-        this.groupNum--;
-        this.changeGroup(this.groupNum, this.groupNum + 1);
-      }
-      // cmd/ctrl + → 向后切换一个分组
-      else if (
-        (event.metaKey || event.ctrlKey) &&
-        event.keyCode === 39 &&
-        this.groupNum < this.maxGroupNum
-      ) {
-        this.groupNum++;
-        this.changeGroup(this.groupNum, this.groupNum - 1);
-      }
-      // cmd/ctrl + b 触发逐帧对比 向前播放 (暂停时可用)
-      else if (
-        this.videoPaused &&
-        (event.metaKey || event.ctrlKey) &&
-        event.keyCode === 66
-      ) {
-        this.frameSteps(-1);
-      }
+    initHotkeyEvents() {
+      this.hotkeyDownEvents = new Map([
+        ['back', () => {
+          if (
+            this.fullScreening &&
+            document.fullscreenElement &&
+            document.fullscreenElement.nodeName === 'VIDEO'
+          ) {
+            document.exitFullscreen();
+            this.setVideoConfig({ fullScreening: false });
+            document.body.removeChild(document.body.lastChild);
+          } else {
+            this.goBack();
+          }
+        }],
+        ['pickColor', () => {
+          this.pickColor();
+        }],
+        ['previousGroup', () => {
+          if (
+            this.groupNum > 1
+          ) {
+            this.groupNum--;
+            this.changeGroup(this.groupNum, this.groupNum + 1);
+          }
+        }],
+        ['nextGroup', () => {
+          if (
+            this.groupNum < this.maxGroupNum
+          ) {
+            this.groupNum++;
+            this.changeGroup(this.groupNum, this.groupNum - 1);
+          }
+        }],
+        ['previousFrame', () => {
+          if (
+            this.videoPaused
+          ) {
+            this.frameSteps(-1);
+          }
+        }],
+        ['nextFrame', () => {
+          if (
+            this.videoPaused
+          ) {
+            this.frameSteps(1);
+          }
+        }],
+        ['top', () => {
+          this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+        }],
+        ['left', () => {
+          this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+        }],
+        ['bottom', () => {
+          this.overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+        }],
+        ['right', () => {
+          this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+        }],
+        ['togglePlay', () => {
+          this.changeStatus(
+            this.videoPaused
+              ? CONSTANTS.VIDEO_STATUS_START
+              : CONSTANTS.VIDEO_STATUS_PAUSE
+          );
+        }]
+      ]);
 
-      // cmd/ctrl + n 触发逐帧对比 向后播放 (暂停时可用)
-      else if (
-        this.videoPaused &&
-        (event.metaKey || event.ctrlKey) &&
-        event.keyCode === 78
-      ) {
-        this.frameSteps(1);
-      }
-      // 空格键触发 播放/暂停
-      else if (event.key === ' ') {
-        this.changeStatus(
-          this.videoPaused
-            ? CONSTANTS.VIDEO_STATUS_START
-            : CONSTANTS.VIDEO_STATUS_PAUSE
-        );
-      }
-      // 向上overlay 的快捷键
-      else if (event.key.toLowerCase() === 'w' || event.key === 'ArrowUp') {
-        event.stopPropagation();
-        this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
-      }
-      // 向下overlay 的快捷键
-      else if (event.key.toLowerCase() === 's' || event.key === 'ArrowDown') {
-        event.stopPropagation();
-        this.overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
-      }
-      // 向左overlay 的快捷键
-      else if (event.key.toLowerCase() === 'a' || event.key === 'ArrowLeft') {
-        event.stopPropagation();
-        this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
-      }
-      // 向右overlay 的快捷键
-      else if (event.key.toLowerCase() === 'd' || event.key === 'ArrowRight') {
-        event.stopPropagation();
-        this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
-      }
+      this.hotkeyUpEvents = new Map([
+        ['top', () => {
+          this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+          console.log('top');
+        }],
+        ['left', () => {
+          this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+        }],
+        ['bottom', () => {
+          this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+        }],
+        ['right', () => {
+          this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+        }]
+      ]);
+    },
+    handleHotKey(event) {
+      handleEvent(event, this.hotkeyDownEvents);
+      // // esc
+      // if (event.keyCode === 27) {
+      //   // 默认返回上一页， 若为  全屏状态则退出全屏
+      //   if (
+      //     this.fullScreening &&
+      //     document.fullscreenElement &&
+      //     document.fullscreenElement.nodeName === 'VIDEO'
+      //   ) {
+      //     document.exitFullscreen();
+      //     this.setVideoConfig({ fullScreening: false });
+      //     document.body.removeChild(document.body.lastChild);
+      //   } else {
+      //     this.goBack();
+      //   }
+      // }
+      // // cmd/ctrl+p
+      // else if ((event.metaKey || event.ctrlKey) && event.keyCode === 80) {
+      //   this.pickColor();
+      // }
+      // // cmd/ctrl + ← 向前切换一个分组
+      // else if (
+      //   (event.metaKey || event.ctrlKey) &&
+      //   event.keyCode === 37 &&
+      //   this.groupNum > 1
+      // ) {
+      //   this.groupNum--;
+      //   this.changeGroup(this.groupNum, this.groupNum + 1);
+      // }
+      // // cmd/ctrl + → 向后切换一个分组
+      // else if (
+      //   (event.metaKey || event.ctrlKey) &&
+      //   event.keyCode === 39 &&
+      //   this.groupNum < this.maxGroupNum
+      // ) {
+      //   this.groupNum++;
+      //   this.changeGroup(this.groupNum, this.groupNum - 1);
+      // }
+      // // cmd/ctrl + b 触发逐帧对比 向前播放 (暂停时可用)
+      // else if (
+      //   this.videoPaused &&
+      //   (event.metaKey || event.ctrlKey) &&
+      //   event.keyCode === 66
+      // ) {
+      //   this.frameSteps(-1);
+      // }
+
+      // // cmd/ctrl + n 触发逐帧对比 向后播放 (暂停时可用)
+      // else if (
+      //   this.videoPaused &&
+      //   (event.metaKey || event.ctrlKey) &&
+      //   event.keyCode === 78
+      // ) {
+      //   this.frameSteps(1);
+      // }
+      // // 空格键触发 播放/暂停
+      // else if (event.key === ' ') {
+      //   this.changeStatus(
+      //     this.videoPaused
+      //       ? CONSTANTS.VIDEO_STATUS_START
+      //       : CONSTANTS.VIDEO_STATUS_PAUSE
+      //   );
+      // }
+      // // 向上overlay 的快捷键
+      // else if (event.key.toLowerCase() === 'w' || event.key === 'ArrowUp') {
+      //   event.stopPropagation();
+      //   this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+      // }
+      // // 向下overlay 的快捷键
+      // else if (event.key.toLowerCase() === 's' || event.key === 'ArrowDown') {
+      //   event.stopPropagation();
+      //   this.overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+      // }
+      // // 向左overlay 的快捷键
+      // else if (event.key.toLowerCase() === 'a' || event.key === 'ArrowLeft') {
+      //   event.stopPropagation();
+      //   this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+      // }
+      // // 向右overlay 的快捷键
+      // else if (event.key.toLowerCase() === 'd' || event.key === 'ArrowRight') {
+      //   event.stopPropagation();
+      //   this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+      // }
     },
     handleHotKeyUp(event) {
-      // 向上overlay 的快捷键
-      if (event.key.toLowerCase() === 'w' || event.key === 'ArrowUp') {
-        event.stopPropagation();
-        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
-      }
-      // 向下overlay 的快捷键
-      else if (event.key.toLowerCase() === 's' || event.key === 'ArrowDown') {
-        event.stopPropagation();
-        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
-      }
-      // 向左overlay 的快捷键
-      else if (event.key.toLowerCase() === 'a' || event.key === 'ArrowLeft') {
-        event.stopPropagation();
-        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
-      }
-      // 向右overlay 的快捷键
-      else if (event.key.toLowerCase() === 'd' || event.key === 'ArrowRight') {
-        event.stopPropagation();
-        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
-      }
+      handleEvent(event, this.hotkeyUpEvents);
+      // // 向上overlay 的快捷键
+      // if (event.key.toLowerCase() === 'w' || event.key === 'ArrowUp') {
+      //   event.stopPropagation();
+      //   this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+      // }
+      // // 向下overlay 的快捷键
+      // else if (event.key.toLowerCase() === 's' || event.key === 'ArrowDown') {
+      //   event.stopPropagation();
+      //   this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+      // }
+      // // 向左overlay 的快捷键
+      // else if (event.key.toLowerCase() === 'a' || event.key === 'ArrowLeft') {
+      //   event.stopPropagation();
+      //   this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+      // }
+      // // 向右overlay 的快捷键
+      // else if (event.key.toLowerCase() === 'd' || event.key === 'ArrowRight') {
+      //   event.stopPropagation();
+      //   this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+      // }
     },
     changeStatus(status) {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status);
@@ -704,35 +653,44 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
+
 .toolbar {
   height: 28px !important;
   position: relative;
   padding: 0 5px;
-  .gap + .gap {
+
+  .gap+.gap {
     margin-left: 10px;
   }
+
   .help-info {
     color: #409eff;
     line-height: 28px;
     margin-left: 5px;
   }
+
   .svg-container {
     font-size: 24px;
   }
+
   .left {
     position: relative;
+
     .router-back {
       .btn {
         cursor: pointer;
         margin-right: 10px;
         color: $labelColor;
+
         &:hover {
           color: #303133;
         }
       }
     }
+
     .clear-images {
       margin-right: 10px;
+
       &:hover {
         color: #e93b3b;
       }
@@ -742,14 +700,17 @@ export default {
   .group-number {
     margin-right: 10px;
   }
+
   .tip {
     position: relative;
     width: 0;
+
     .select {
       position: absolute;
       left: 0;
       width: 100px;
       transform: translateX(-50%);
+
       .msg {
         font-size: 12px;
         color: red;
@@ -759,14 +720,17 @@ export default {
 
   .middle {
     position: relative;
+
     .layout-selector {
       width: 80px;
       margin-left: 10px;
     }
+
     .el-button-group {
       .svg-container {
         margin-left: 0.3rem;
       }
+
       .progress-bar {
         margin-left: 20px;
       }

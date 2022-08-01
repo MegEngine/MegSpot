@@ -6,6 +6,8 @@ import { isExist } from '../utils/file';
 import { createPersistedState } from 'vuex-electron';
 import modules from './modules';
 
+import { DEFAULT_HOTKEYS } from '@/tools/hotkey';
+
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -24,11 +26,16 @@ const checkStore = function(pathList = [], removeFnName = '') {
   store.dispatch(removeFnName, removeList);
 };
 // 校验文件/文件夹存在性 移除不存在的  todo:改成单次不展示
-const { imageStore = {}, videoStore = {} } = store.state;
+const { imageStore = {}, videoStore = {}, preferenceStore } = store.state;
 const { imageFolders = [], imageList = [] } = imageStore;
 const { videoFolders = [], videoList = [] } = videoStore;
 checkStore(imageFolders, 'imageStore/removeImageFolders');
 checkStore(imageList, 'imageStore/removeImages');
 checkStore(videoFolders, 'videoStore/removeVideoFolders');
 checkStore(videoList, 'videoStore/removeVideos');
+if (!preferenceStore.preference && preferenceStore.preference.hotkeys.length === 0) {
+  store.dispatch('preferenceStore/setPreference', {
+    hotkeys: DEFAULT_HOTKEYS
+  });
+}
 export default store;

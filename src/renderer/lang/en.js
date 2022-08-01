@@ -6,6 +6,10 @@ export default {
     manual: 'manual',
     hotKey: 'hotKey',
     please: 'please',
+    reset: 'Reset',
+    edit: 'Edit',
+    save: 'Save',
+    cancel: 'Cancel',
     showVideoTip: 'show help videos'
   },
   nav: {
@@ -60,6 +64,24 @@ export default {
     invalidFolderTip: 'Folder does not exist,please input valid path',
     imageFolderList: 'Image Folder List',
     videoFolderList: 'Video Folder List'
+  },
+  hotkey: {
+    desc: 'description',
+    key: 'shortcut keys',
+    gotoCompare: 'Jump to the comparison page',
+    emptyAll: 'Empty all selected images or videos',
+    back: 'Go back to the file selection page',
+    gallery: 'Open/close image gallery',
+    previousGroup: 'Previous group',
+    nextGroup: 'Next group',
+    previousFrame: 'Previous Frame',
+    nextFrame: 'Next frame',
+    togglePlay: 'Play/Pause video',
+    top: 'Overlay contrast up',
+    left: 'Overlay contrast to the left',
+    right: 'Overlay contrast to the right',
+    bottom: 'Overlay down the contrast',
+    pickColor: 'Turn on/off the color picker'
   },
   dashboard: {
     entries: {
@@ -167,7 +189,7 @@ export default {
     defaultSortTip: 'sort files by name'
   },
   gallery: {
-    clear: 'Clear All',
+    clear: 'Clear',
     enableNameSort: 'Sort by name',
     enableNameSortTip: 'Whether to sort by name',
     smartSort: 'Smart Sort',

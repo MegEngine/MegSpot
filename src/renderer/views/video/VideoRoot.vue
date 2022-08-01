@@ -2,31 +2,12 @@
   <div class="home" flex="dir:top">
     <div class="tool" flex="main:justify cross:center">
       <div class="tool-items">
-        <el-button
-          @click="addFolder"
-          type="text"
-          class="tool-item add-folder"
-          title="add folder to root"
-          size="small"
-        >
+        <el-button @click="addFolder" type="text" class="tool-item add-folder" title="add folder to root" size="small">
           {{ $t('image.toolbar.addFolder') }}
         </el-button>
-        <SelectedBtn
-          :selectedList="videoList"
-          @update="setVideos"
-          @remove="removeVideos"
-          @click="emptyVideos"
-        />
-        <el-button
-          type="primary"
-          round
-          class="tool-item"
-          :disabled="!videoList.length"
-          @click="compare"
-          v-on:keyup.meta.enter="compare"
-          v-on:keydown.tab="compare"
-          :title="`${$t('common.hotKey')}：cmd/ctrl+enter`"
-        >
+        <SelectedBtn :selectedList="videoList" @update="setVideos" @remove="removeVideos" @click="emptyVideos" />
+        <el-button type="primary" round class="tool-item" :disabled="!videoList.length" @click="compare"
+          v-on:keyup.meta.enter="compare" v-on:keydown.tab="compare" :title="`${$t('common.hotKey')}：cmd/ctrl+enter`">
           {{ $t('general.compare') }}
         </el-button>
       </div>
@@ -34,26 +15,13 @@
     <div class="content" flex-box="1">
       <Split :style="{ height: splitHeight }" :gutterSize="4">
         <SplitArea :size="23" :maxSize="1000" :minSize="200">
-          <FileTree
-            ref="folderTree"
-            id="folderTree"
-            :currentPath="currentPath"
-            :openedFolders="videoFolders"
-            :checkedFiles="checkedFiles"
-            @close="onClose"
-            @select="onSelect"
-            @addFolder="addFolder"
-            :defaultExpand="expandData"
-            @addExpand="addExpandData"
-            @removeExpand="removeExpandData"
-          >
+          <FileTree ref="folderTree" id="folderTree" :currentPath="currentPath" :openedFolders="videoFolders"
+            :checkedFiles="checkedFiles" @close="onClose" @select="onSelect" @addFolder="addFolder"
+            :defaultExpand="expandData" @addExpand="addExpandData" @removeExpand="removeExpandData">
           </FileTree>
         </SplitArea>
         <SplitArea :size="77">
-          <VideoPreview
-            ref="videoPreview"
-            @addFolder="addFolder"
-          ></VideoPreview>
+          <VideoPreview ref="videoPreview" @addFolder="addFolder"></VideoPreview>
         </SplitArea>
       </Split>
     </div>
@@ -71,6 +39,7 @@ import { createNamespacedHelpers } from 'vuex';
 import SelectedBtn from '@/components/selected-btn';
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
 import addDragFolderListener from '@/utils/dragFolder.js';
+import { handleEvent } from '@/tools/hotkey';
 
 Vue.use(VueSplit);
 export default {
@@ -81,13 +50,15 @@ export default {
       isDraging: false,
       checkedFiles: [],
       dragFiles: [],
-      splitHeight: '200px'
+      splitHeight: '200px',
+      hotkeyEvents: undefined
     };
   },
   computed: {
     ...mapGetters(['videoList', 'videoFolders', 'expandData', 'currentPath'])
   },
   mounted() {
+    this.initHotkeyEvents();
     this.calcSplitHeight();
     window.addEventListener('resize', this.handleResize, true);
     addDragFolderListener(document.getElementById('folderTree'), false);
@@ -111,18 +82,21 @@ export default {
       'addExpandData',
       'removeExpandData'
     ]),
-    handleResize: throttle(50, function() {
+    handleResize: throttle(50, function () {
       this.calcSplitHeight();
     }),
+    initHotkeyEvents() {
+      this.hotkeyEvents = new Map([
+        ['gotoCompare', () => {
+          this.compare();
+        }],
+        ['emptyAll', () => {
+          this.emptyVideos();
+        }]
+      ]);
+    },
     handleHotKey(event) {
-      // cmd+enter
-      if ((event.metaKey || event.ctrlKey) && event.keyCode === 13) {
-        this.compare();
-      }
-      // cmd+delete
-      if ((event.metaKey || event.ctrlKey) && event.keyCode === 8) {
-        this.emptyVideos();
-      }
+      handleEvent(event, this.hotkeyEvents)
     },
     calcSplitHeight() {
       this.splitHeight = window.document.body.clientHeight - 56 - 40 + 'px';
@@ -183,6 +157,7 @@ export default {
 
 <style scoped lang="scss">
 @import '@/styles/variables.scss';
+
 .home {
   color: $labelColor;
   height: 100%;
@@ -191,10 +166,12 @@ export default {
   padding: 0px;
   box-sizing: border-box;
   position: relative;
+
   .tool {
     padding: 0 10px;
     border-bottom: 1px solid #eee;
-    .tool-item + .tool-item {
+
+    .tool-item+.tool-item {
       margin-left: 10px;
     }
   }

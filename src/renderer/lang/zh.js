@@ -6,6 +6,10 @@ export default {
     manual: '使用手册',
     hotKey: '快捷键',
     please: '请',
+    reset: '重置',
+    edit: '编辑',
+    save: '保存',
+    cancel: '取消',
     showVideoTip: '查看演示'
   },
   nav: {
@@ -59,6 +63,24 @@ export default {
     invalidFolderTip: '文件夹不存在，请输入有效路径',
     imageFolderList: '图片目录列表',
     videoFolderList: '视频目录列表'
+  },
+  hotkey: {
+    desc: '描述',
+    key: '快捷键',
+    gotoCompare: '跳转到对比页面',
+    emptyAll: '清空所有已选图像或视频',
+    back: '返回文件选择页面',
+    gallery: '打开/关闭画廊',
+    previousGroup: '前一组',
+    nextGroup: '下一组',
+    previousFrame: '前一帧',
+    nextFrame: '下一帧',
+    togglePlay: '播放/暂停',
+    top: '向上叠加对比',
+    left: '向左叠加对比',
+    right: '向右叠加对比',
+    bottom: '向下叠加对比',
+    pickColor: '打开/关闭取色器'
   },
   dashboard: {
     entries: {
