@@ -2,38 +2,23 @@
   <div class="preview" flex="dir:top">
     <div class="toolbar" flex="dir:top">
       <div flex="cross:center">
-        <file-path-input
-          ref="filePathInput_ref"
-          class="file-path-input"
-          flex-box="1"
-          :filePath.sync="videoCurrentPath"
-        >
+        <file-path-input ref="filePathInput_ref" class="file-path-input" flex-box="1" :filePath.sync="videoCurrentPath">
         </file-path-input>
-        <el-tooltip
-          v-if="videoFolders.includes(videoCurrentPath)"
-          :content="$t('image.toolbar.openFolderTip')"
-        >
+        <el-tooltip v-if="videoFolders.includes(videoCurrentPath)" :content="$t('image.toolbar.openFolderTip')">
           <el-button type="primary" @click="openFolder" class="addFolder">{{
-            $t('image.toolbar.openFolder')
+              $t('image.toolbar.openFolder')
           }}</el-button>
         </el-tooltip>
-        <el-button v-else type="primary" @click="addFolder" class="addFolder">{{
-          $t('image.toolbar.addFolder')
+        <el-button v-else-if="videoCurrentPath === ''" type="primary" @click="$emit('addFolder')" class="addFolder">{{
+            $t('image.toolbar.addFolder')
         }}</el-button>
-        <el-switch
-          class="show-all-switch"
-          v-model="showAll"
-          active-color="#1067d1"
-          :active-value="true"
-          :inactive-value="false"
-          :active-text="$t('general.showAll')"
-        >
+        <el-button v-else type="primary" @click="addFolder" class="addFolder">{{
+            $t('image.toolbar.addCurrentDirectory')
+        }}</el-button>
+        <el-switch class="show-all-switch" v-model="showAll" active-color="#1067d1" :active-value="true"
+          :inactive-value="false" :active-text="$t('general.showAll')">
         </el-switch>
-        <el-radio-group
-          v-model="showType"
-          size="mini"
-          class="show-type-container"
-        >
+        <el-radio-group v-model="showType" size="mini" class="show-type-container">
           <el-radio-button label="list">
             <svg-icon icon-class="file-table-list"></svg-icon>
           </el-radio-button>
@@ -42,55 +27,26 @@
           </el-radio-button>
         </el-radio-group>
       </div>
-      <SortToolBar
-        :currentPath="videoCurrentPath"
-        :allSelectd.sync="allSelectd"
-        :oneOrMoreSelected.sync="oneOrMoreSelected"
-        @change="handleSelectAll"
-        @getSortData="handleGetSortData"
-        @showDialog="handleShowDialog"
-      ></SortToolBar>
+      <SortToolBar :currentPath="videoCurrentPath" :allSelectd.sync="allSelectd"
+        :oneOrMoreSelected.sync="oneOrMoreSelected" @change="handleSelectAll" @getSortData="handleGetSortData"
+        @showDialog="handleShowDialog"></SortToolBar>
     </div>
     <div class="preview-content" flex-box="1">
-      <FileTable
-        v-show="showType === 'list'"
-        ref="fileTable"
-        :showAll="showAll"
-        :fileList="videoList"
-        :currentPath="videoCurrentPath"
-        :checkItem="checkItem"
-        :addVuexItem="addVideos"
-        :removeVuexItem="removeVideos"
-        :emptyVuexItems="emptyVideos"
-        :defaultSort="videoConfig.defaultSort"
-        @sort-change="handleSortChange"
-        @addFolder="$emit('addFolder')"
-      >
+      <FileTable v-show="showType === 'list'" ref="fileTable" :showAll="showAll" :fileList="videoList"
+        :currentPath="videoCurrentPath" :checkItem="checkItem" :addVuexItem="addVideos" :removeVuexItem="removeVideos"
+        :emptyVuexItems="emptyVideos" :defaultSort="videoConfig.defaultSort" @sort-change="handleSortChange"
+        @addFolder="$emit('addFolder')">
       </FileTable>
       <div class="thumbnail-content" v-show="showType === 'thumbnail'">
-        <Thumbnail
-          v-for="item in thumbnailList"
-          :key="item.path"
-          :file="item"
-          :fileList="videoList"
-          :addVuexItem="addVideos"
-          :removeVuexItem="removeVideos"
-        >
+        <Thumbnail v-for="item in thumbnailList" :key="item.path" :file="item" :fileList="videoList"
+          :addVuexItem="addVideos" :removeVuexItem="removeVideos">
           <template v-slot:default="slotProps">
-            <video
-              controls
-              style="object-fit:contain;width:200px;height:120px"
-              :src="slotProps.src"
-            ></video>
+            <video controls style="object-fit:contain;width:200px;height:120px" :src="slotProps.src"></video>
           </template>
         </Thumbnail>
       </div>
     </div>
-    <SortFileDialog
-      ref="sort_file_dialog"
-      :currentPath="videoCurrentPath"
-      @getSortData="handleGetSortData"
-    />
+    <SortFileDialog ref="sort_file_dialog" :currentPath="videoCurrentPath" @getSortData="handleGetSortData" />
   </div>
 </template>
 
@@ -217,23 +173,29 @@ export default {
   height: 100%;
   background-color: #f0f3f6;
   padding: 10px;
+
   .toolbar {
     .show-all-switch {
       margin-left: 18px;
     }
+
     .show-type-container {
       margin-left: 18px;
       display: inline-block;
     }
+
     .file-path-input {
       display: inline-block;
     }
+
     .addFolder {
       margin: 0 2px;
     }
   }
+
   .preview-content {
     height: 0;
+
     .thumbnail-content {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

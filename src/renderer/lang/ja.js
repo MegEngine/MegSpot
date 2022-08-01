@@ -103,6 +103,7 @@ export default {
     toolbar: {
       openFolder: 'フォルダを開く',
       addFolder: 'フォルダーを追加',
+      addCurrentDirectory: '現在のディレクトリを追加します',
       openFolderTip:
         'システムファイルリソースマネージャーのディレクトリを開きます',
       loadShareProject: 'スナップショットのロード',

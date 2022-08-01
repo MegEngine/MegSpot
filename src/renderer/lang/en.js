@@ -104,6 +104,7 @@ export default {
       openFolder: 'Open Folder',
       openFolderTip: 'Open the directory in the system file resource manager',
       addFolder: 'Add Folder',
+      addCurrentDirectory: 'Add Current Directory',
       loadShareProject: 'Load Snapshot',
       resetPosition: 'reset snapshot',
       resetPositionTip: 'Reset to snapshot original position',

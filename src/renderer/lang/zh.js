@@ -104,6 +104,7 @@ export default {
       openFolder: '打开文件夹',
       openFolderTip: '在系统文件资源管理器中打开该目录',
       addFolder: '添加文件夹',
+      addCurrentDirectory: '添加当前目录',
       loadShareProject: '加载快照',
       resetPosition: '重置快照',
       resetPositionTip: '快照重置为初始位置',
