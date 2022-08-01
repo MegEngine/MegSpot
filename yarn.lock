@@ -1120,6 +1120,14 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
+"@playwright/test@^1.24.2":
+  version "1.24.2"
+  resolved "https://registry.npmmirror.com/@playwright/test/-/test-1.24.2.tgz#283ea8cc497f9742037458659bf235f4776cf1f0"
+  integrity sha512-Q4X224pRHw4Dtkk5PoNJplZCokLNvVbXD9wDQEMrHcEuvWpJWEQDeJ9gEwkZ3iCWSFSWBshIX177B231XW4wOQ==
+  dependencies:
+    "@types/node" "*"
+    playwright-core "1.24.2"
+
 "@popperjs/core@^2.9.2":
   version "2.10.1"
   resolved "https://registry.nlark.com/@popperjs/core/download/@popperjs/core-2.10.1.tgz?cache=0&sync_timestamp=1630646793367&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40popperjs%2Fcore%2Fdownload%2F%40popperjs%2Fcore-2.10.1.tgz#728ecd95ab207aab8a9a4e421f0422db329232be"
@@ -1826,6 +1834,18 @@ asar@^3.0.3:
   version "3.1.0"
   resolved "https://registry.nlark.com/asar/download/asar-3.1.0.tgz#70b0509449fe3daccc63beb4d3c7d2e24d3c6473"
   integrity sha1-cLBQlEn+PazMY76008fS4k08ZHM=
+  dependencies:
+    chromium-pickle-js "^0.2.0"
+    commander "^5.0.0"
+    glob "^7.1.6"
+    minimatch "^3.0.4"
+  optionalDependencies:
+    "@types/glob" "^7.1.1"
+
+asar@^3.1.0:
+  version "3.2.0"
+  resolved "https://registry.npmmirror.com/asar/-/asar-3.2.0.tgz#e6edb5edd6f627ebef04db62f771c61bea9c1221"
+  integrity sha512-COdw2ZQvKdFGFxXwX3oYh2/sOsJWJegrdJCGxnN4MZ7IULgRBp9P6665aqj9z1v9VwP4oP1hRBojRDQ//IGgAg==
   dependencies:
     chromium-pickle-js "^0.2.0"
     commander "^5.0.0"
@@ -3863,6 +3883,13 @@ electron-osx-sign@^0.5.0:
     isbinaryfile "^3.0.2"
     minimist "^1.2.0"
     plist "^3.0.1"
+
+electron-playwright-helpers@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.npmmirror.com/electron-playwright-helpers/-/electron-playwright-helpers-1.2.0.tgz#a9d175bc767bb2868aeaa1440483e69e5c60858c"
+  integrity sha512-4xBbfsrmv+OWo9aWY+jGD6xGIbgcoaGvzsBHyWCotA3sRs0MhU8E/QdrC120kyiuEu2IY/lYSb/Uf5NefFfiwg==
+  dependencies:
+    asar "^3.1.0"
 
 electron-publish@22.11.7:
   version "22.11.7"
@@ -8065,6 +8092,18 @@ pkg-up@^3.0.1:
   integrity sha1-EA7CNcwVDk/UJRlBJZaihRKg3vU=
   dependencies:
     find-up "^3.0.0"
+
+playwright-core@1.24.2:
+  version "1.24.2"
+  resolved "https://registry.npmmirror.com/playwright-core/-/playwright-core-1.24.2.tgz#47bc5adf3dcfcc297a5a7a332449c9009987db26"
+  integrity sha512-zfAoDoPY/0sDLsgSgLZwWmSCevIg1ym7CppBwllguVBNiHeixZkc1AdMuYUPZC6AdEYc4CxWEyLMBTw2YcmRrA==
+
+playwright@^1.24.2:
+  version "1.24.2"
+  resolved "https://registry.npmmirror.com/playwright/-/playwright-1.24.2.tgz#51e60f128b386023e5ee83deca23453aaf73ba6d"
+  integrity sha512-iMWDLgaFRT+7dXsNeYwgl8nhLHsUrzFyaRVC+ftr++P1dVs70mPrFKBZrGp1fOKigHV9d1syC03IpPbqLKlPsg==
+  dependencies:
+    playwright-core "1.24.2"
 
 please-upgrade-node@^3.2.0:
   version "3.2.0"
