@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -43,8 +43,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1. 新增功能：支持创建图像快照，与他人一起分享精彩的对比瞬间；支持对比文件智能排序。\n2. 优化体验：优化部分界面及图标，更新提示信息。\n3. 修复bug: 如时间排序不正确、视频自动播放失效等问题。",
-      "releaseDate": "2022.07.14"
+      "releaseNotes": "1. 新增功能：支持自定义快捷键，新增一些常用功能对应的快捷键，如叠加对比、视频播放与暂停等。\n2. 优化体验：添加快照操作相关的提示信息。\n3. 修复bug: 如快照文件生成失败、视频叠加对比失败等问题。",
+      "releaseDate": "2022.08.05"
     },
     "directories": {
       "output": "build"
