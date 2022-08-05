@@ -89,13 +89,14 @@
                       <el-button icon="el-icon-close" circle @click="
                         clearKeys(index, generateRowId(rowIndex, index))
                       " style="margin-left: 10px"></el-button>
-                      <span v-if="
+                      <!-- TODO:检测重复；支持单独重置 -->
+                      <!-- <span v-if="
                         [...temporaryKeysArr[index]].sort().toString() !==
                         getOriginStr(row, index) &&
                         hotkeyStrArr.includes(
                           [...temporaryKeysArr[index]].sort().toString()
                         )
-                      ">已存在相同快捷键</span>
+                      ">已存在相同快捷键</span> -->
                     </el-tooltip>
                   </div>
                 </el-card>
@@ -173,7 +174,6 @@ const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore');
 import { i18nRender } from '@/lang';
 import {
   ATTRS_KEYS,
-  ATTRS_KEYS_VALUE,
   SPECIAL_KEYS,
   PRESET_KEYS_MAP,
   DEFAULT_HOTKEYS
@@ -215,9 +215,6 @@ export default {
   },
   computed: {
     ...mapGetters(['preference']),
-    metaKey() {
-      return process.platform === 'darwin' ? '⌘ Command' : 'Ctrl';
-    },
     hotkeys: {
       get() {
         return [...this.preference.hotkeys].sort((a, b) => a.index - b.index);
@@ -425,7 +422,7 @@ export default {
           return target[key];
         },
         set: (target, key, value) => {
-          console.log('set', target, key, value);
+          // console.log('set', target, key, value);
           target[key] = value;
           return true;
         }
@@ -437,10 +434,8 @@ export default {
             const id = this.generateRowId(rowIndex, i);
             const ele = document.getElementById(id);
             this.temporaryKeysEleMap.set(id, ele);
-            console.log('ele', id, ele);
             ele && ele.addEventListener('keydown', this.handleKeydown, true);
           }
-          console.log('temporaryKeysEleMap', this.temporaryKeysEleMap);
         });
       });
       this.$refs.xTable.setActiveRow(row);
@@ -450,7 +445,6 @@ export default {
     handleSaveHotkey(row) {
       this.closeRow(row);
       const { name, keysArr } = row;
-      console.log('clear actived', this.hotkeys);
       const temporaryKeysArr = JSON.parse(
         JSON.stringify(this.temporaryKeysArr)
       );

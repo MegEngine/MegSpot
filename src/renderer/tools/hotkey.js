@@ -1,4 +1,6 @@
+import console from 'console';
 import store from '../store';
+import { Message } from 'element-ui';
 
 const isDrawn = process.platform === 'darwin';
 
@@ -175,9 +177,13 @@ export function getPressedKeysStr(event) {
   return pressedKeys.sort().toString()
 }
 
+export function ensureHotkeysMapExists() {
+  store.dispatch('preferenceStore/ensureHotkeysMap') // 确保keysMap存在
+}
+
 export function handleEvent(event, callbackFnMap) {
-  const hotkeys = store.state.preferenceStore.preference.hotkeys;
-  const hotkeysMap = new Map(hotkeys.map(({ name, keysArr }) => keysArr.map(keys => [getArrStr(keys), name])).flat());
+  ensureHotkeysMapExists();
+  const hotkeysMap = store.state.preferenceStore.hotkeysMap;
   const pressedKeysStr = getPressedKeysStr(event);
   const hotkeyName = hotkeysMap.get(pressedKeysStr)
   const hotkeyEvent = callbackFnMap.get(hotkeyName)

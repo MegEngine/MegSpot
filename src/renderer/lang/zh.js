@@ -106,6 +106,8 @@ export default {
       addFolder: '添加文件夹',
       addCurrentDirectory: '添加当前目录',
       loadShareProject: '加载快照',
+      snapshotGenerating: '快照生成中',
+      snapshotGenerated: '快照已生成，请保存到本地',
       resetPosition: '重置快照',
       resetPositionTip: '快照重置为初始位置',
       export: '导出',

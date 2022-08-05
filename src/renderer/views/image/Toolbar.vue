@@ -24,7 +24,7 @@
         {{ $t('image.toolbar.resetPosition') }}
       </el-button>
       <el-button v-if="snapshotMode" type="text" size="mini" @click="exportImage"
-        v-tip.sure="$t('image.toolbar.exportTip')">
+        v-loading.fullscreen.lock="fullscreenLoading" v-tip.sure="$t('image.toolbar.exportTip')">
         <span class="svg-container" v-tip="$t('image.toolbar.exportTip')">
           <svg-icon icon-class="export" />
         </span>
@@ -169,6 +169,7 @@ export default {
   data() {
     return {
       GLOBAL_CONSTANTS,
+      fullscreenLoading: false,
       dialogVisible: false,
       traggerRGB: false,
       showSelectedMsg: false,
@@ -237,7 +238,6 @@ export default {
       })
       hotkeyDownEvents.set('top', () => {
         this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
-        console.log('top');
       })
       hotkeyDownEvents.set('left', () => {
         this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
@@ -267,7 +267,6 @@ export default {
 
       hotkeyUpEvents.set('top', () => {
         this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
-        console.log('top');
       })
       hotkeyUpEvents.set('left', () => {
         this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
@@ -364,8 +363,11 @@ export default {
     exportImage() {
       this.$bus.$emit(
         'imageCenter_exportImage',
-        null,
+        () => {
+          this.fullscreenLoading = true;
+        },
         ({ directoryPath, results }) => {
+          this.fullscreenLoading = false;
           results.every(result => result.status === 'fulfilled')
             ? this.$message.success(`导出成功,文件路径：${directoryPath}`)
             : this.$message.error('导出失败');

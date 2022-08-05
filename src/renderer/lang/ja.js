@@ -107,6 +107,8 @@ export default {
       openFolderTip:
         'システムファイルリソースマネージャーのディレクトリを開きます',
       loadShareProject: 'スナップショットのロード',
+      snapshotGenerating: 'スナップショットが生成されています',
+      snapshotGenerated: 'スナップショットが生成されました。ローカルに保存してください',
       resetPosition: 'リセット',
       resetPositionTip: 'スナップショットの元の位置にリセット',
       export: 'をエクスポート',

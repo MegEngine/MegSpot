@@ -4,6 +4,8 @@ import fse from 'fs-extra';
 import { saveAs } from 'file-saver';
 import { getFilePath } from '@/utils/file';
 import { isImage } from '@/components/file-tree/lib/util';
+import { Message } from 'element-ui';
+import { i18nRender } from '@/lang';
 
 export const SHARE_FILE_NAME = '.MegSpotShare.ini';
 export const SHARE_ZIP_EXT = 'mgt';
@@ -13,7 +15,7 @@ export const TEMP_PATH = '/tmp/megspot';
 export class SnapshotHelper {
   zipInstance;
   validator;
-  constructor() {}
+  constructor() { }
   // 保存为MegSpot快照文件
   async save(config, files) {
     if (!this.zipInstance) {
@@ -26,7 +28,15 @@ export class SnapshotHelper {
     });
     this.zipInstance.generateAsync({ type: 'blob' }).then(content => {
       // console.log(content, content.type);
-      saveAs(content, SHARE_ZIP_NAME);
+      setTimeout(() => {
+        Message.closeAll();
+        Message({
+          type: 'success',
+          message: i18nRender(`image.toolbar.snapshotGenerated`),
+          duration: 3000
+        })
+        saveAs(content, SHARE_ZIP_NAME);
+      }, 300);
     });
   }
   // 读取MegSpot工程文件[,并解压]
@@ -41,6 +51,12 @@ export class SnapshotHelper {
       console.error('invalid path', path);
       return false;
     }
+    const msg = Message({
+      showClose: true,
+      message: 'Loading...',
+      type: 'info',
+      duration: 0
+    })
     const files = await this.validate(path);
     if (!files) {
       console.error('invalid MegSpot project file!', files);
@@ -48,9 +64,12 @@ export class SnapshotHelper {
     }
     try {
       await fse.ensureDir(TEMP_PATH);
-      return await this.decompress(path, files, 'binary');
+      const res = await this.decompress(path, files, 'binary');
+      msg.close()
+      return res
     } catch (err) {
       console.error(err);
+      msg.close()
       return false;
     }
   }

@@ -106,6 +106,8 @@ export default {
       addFolder: 'Add Folder',
       addCurrentDirectory: 'Add Current Directory',
       loadShareProject: 'Load Snapshot',
+      snapshotGenerating: 'snapshot is generating',
+      snapshotGenerated: 'The snapshot has been generated, please save it locally',
       resetPosition: 'reset snapshot',
       resetPositionTip: 'Reset to snapshot original position',
       export: 'Export',
