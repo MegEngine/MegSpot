@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 var sizeof = require('image-size');
-const { dialog } = require('electron').remote;
+const { dialog } = require('@electron/remote');
 import { SHARE_ZIP_EXT } from '@/tools/compress';
 
 export const trimSep = pathStr => {

@@ -18,6 +18,10 @@ let mainConfig = {
   externals: [...Object.keys(dependencies || {})],
   module: {
     rules: [
+            {
+        test: /\.js$/,
+        loader: 'esbuild-loader'
+      },
       {
         test: /\.ts$/,
         use: [

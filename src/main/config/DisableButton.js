@@ -1,5 +1,5 @@
 import { globalShortcut } from 'electron'
-import config from '@config'
+import config from '@config/index'
 
 export default {
   Disablef12 () {

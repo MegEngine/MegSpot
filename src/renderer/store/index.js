@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import { isExist } from '../utils/file';
 
 // 注释这个的原因是因为会导致vuex操作失败
-import { createPersistedState } from 'vuex-electron';
+import PersistedState from 'vuex-electron-store'
 import modules from './modules';
 
 import { DEFAULT_HOTKEYS } from '@/tools/hotkey';
@@ -11,12 +11,12 @@ import { DEFAULT_HOTKEYS } from '@/tools/hotkey';
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
-  modules,
+  modules, 
   // 如果使用插件 vuex 无法使用console.log debugger 进行调试
-  plugins: [createPersistedState()],
+  plugins: [PersistedState.create()], 
   strict: process.env.NODE_ENV !== 'production'
 });
-const checkStore = function(pathList = [], removeFnName = '') {
+const checkStore = function (pathList = [], removeFnName = '') {
   let removeList = [];
   pathList.forEach(item => {
     if (!item || !isExist(item)) {

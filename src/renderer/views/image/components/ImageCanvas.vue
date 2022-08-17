@@ -354,7 +354,7 @@ export default {
         offCtx.drawImage(this.image, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
         initPosition && this.reDraw(true);
-        // console.log('image', this.image, this.image.width);
+        console.log('image', this.image, this.image.width);
         if (this.image && this.image.width) {
           this.currentHist = this.$refs['hist-container'].generateHist(
             cv.imread(this.image)

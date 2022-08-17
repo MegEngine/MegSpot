@@ -41,7 +41,7 @@
 <script>
 import fse from 'fs-extra';
 import getFileName from '@/filter/get-file-name';
-const { dialog } = require('electron').remote;
+const { dialog } = require('@electron/remote');
 import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants';
 
 export default {

@@ -11,7 +11,7 @@
 </template>
 
 <script>
-const { dialog } = require('electron').remote;
+const { dialog } = require('@electron/remote');
 export default {
   name: 'show-path',
   props: ['path'],
