@@ -646,7 +646,7 @@ export default {
     },
     // 初始化bitMap， 重新生成直方图hist
     async initImage() {
-      if (this.paused) {
+      if (this.paused && this.video.videoWidth) {
         let offsreen = new OffscreenCanvas(
           this.video.videoWidth,
           this.video.videoHeight
@@ -684,13 +684,12 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           this.video = document.createElement('video');
-          this.video.addEventListener('loadeddata', () => {
+          this.video.addEventListener('loadeddata',async () => {
             this.$emit('loaded');
             this.duration = isNaN(this.video.duration)
               ? 60
               : Number(Number(this.video.duration).toFixed(5));
             this.handleVideoPaused();
-            this.initImage();
             if (
               this.imagePosition == undefined ||
               isNaN(this.imagePosition?.height)
@@ -701,6 +700,8 @@ export default {
               );
             }
             this.doZoomEnd();
+            await this.initImage();
+            this.drawImage();
             resolve();
           });
           this.video.addEventListener('timeupdate', () => {

@@ -82,7 +82,7 @@ Copyright JS Foundation and other contributors
 36. sass
 Copyright (c) 2016, Google Inc.
 
-37. sass-loader,css-loader,node-loader,style-loader,terser-webpack-plugin,thread-loader,url-loader
+37. sass-loader,css-loader,node-loader,style-loader,terser-webpack-plugin,url-loader
 Copyright JS Foundation and other contributorsss
 
 38. lodash
@@ -120,6 +120,9 @@ Copyright (c) 2017 Stas Kurilov (kisenka)
 
 49. webpack-merge
 Copyright (c) 2015 Juho Vepsalainen
+
+50. esbuild-loader
+Copyright (c) Hiroki Osame <hiroki.osame@gmail.com>
 
 Software Licensed under the Apache License Version 2.0:
 --------------------------------------------------------------------

@@ -105,16 +105,10 @@ let rendererConfig = {
       },
       {
         test: /\.js$/,
-        use: [
-          'thread-loader',
-          {
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-            },
-          },
-        ],
-        exclude: /node_modules/,
+        loader: 'esbuild-loader',
+        options: {
+          target: 'es2015'
+        }
       },
       {
         test: /\.node$/,
@@ -151,7 +145,7 @@ let rendererConfig = {
         },
       },
       {
-        test: /\.(mp4|webm|mkv|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           esModule: false,

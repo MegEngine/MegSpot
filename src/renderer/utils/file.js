@@ -183,7 +183,7 @@ export const arraySortByName = (a, b) => {
   const [nameA, extensionA] = extractNameAndExtension(a);
   const [nameB, extensionB] = extractNameAndExtension(b);
 
-  let result = (result = collator.compare(nameA, nameB));
+  let result = collator.compare(nameA, nameB);
 
   if (collatorIsNumeric && result === 0 && nameA !== nameB) {
     return nameA < nameB ? -1 : 1;
