@@ -145,6 +145,15 @@ export default {
     rotate: '旋转',
     generateGIF: '生成gif'
   },
+  imageSetting: {
+    title: '图像设置',
+    defaultShowHistogram: '默认显示直方图',
+    showImageName: '显示图片名称',
+    backgroundMode: '背景模式',
+    scaleOpt: '缩放选项',
+    showScale: '显示缩放比例',
+    showMousePos: '显示光标位置'
+  },
   imageDragDropCompare: {
     hideLine: '隐藏比较线',
     displayLine: '显示比较线',

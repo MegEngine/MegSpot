@@ -48,14 +48,14 @@ function onAppReady() {
   initWindow();
   DisableButton.Disablef12();
   if (process.env.NODE_ENV === 'development') {
-    // const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor"); // Vue2 Extension
-    // session.defaultSession.loadExtension(VUEJS_DEVTOOLS, {
-    //   allowFileAccess: true
-    // }).then(() => {
-    //   console.log('已安装: vue-devtools')
-    // }).catch((err) => {
-    //   console.error('拓展安装失败', err)
-    // });
+    const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor"); // Vue2 Extension
+    session.defaultSession.loadExtension(VUEJS_DEVTOOLS, {
+      allowFileAccess: true
+    }).then(() => {
+      console.log('已安装: vue-devtools')
+    }).catch((err) => {
+      console.error('拓展安装失败', err)
+    });
     // electronDevtoolsInstaller(VUEJS_DEVTOOLS)
     //   .then(name => console.log(`installed: ${name}`))
     //   .catch(err => console.log('Unable to install `vue-devtools`: \n', err));

@@ -147,6 +147,15 @@ export default {
     rotate: '回転',
     generateGIF: 'gifを生成する'
   },
+  imageSetting: {
+    title: '画像設定パネル',
+    defaultShowHistogram: 'デフォルトの表示ヒストグラム',
+    showImageName: 'イメージ名を表示',
+    backgroundMode: 'バックグラウンド モード',
+    scaleOpt: '尺度オプション',
+    showScale: 'スケールのヒントを表示',
+    showMousePos: 'マウスの位置を表示'
+  },
   imageDragDropCompare: {
     hideLine: '比較ラインを隠す',
     displayLine: '比較ライン表示',

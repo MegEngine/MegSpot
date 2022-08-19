@@ -122,6 +122,7 @@
       >
         <div class="canvas-item" @contextmenu.prevent>
           <ScaleEditor
+            v-if="preference.showScale"
             class="scale-editor"
             :scale="imgScale"
             :scaleEditorVisible.sync="scaleEditorVisible"
@@ -131,6 +132,13 @@
           />
           <canvas ref="canvas" :width="_width" :height="_height"> </canvas>
           <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
+          <div
+            v-if="preference.showMousePos"
+            class="mouse-position"
+            v-show="showPosition && mousePosInfo.x !== ''"
+          >
+            <span>x={{ mousePosInfo.x }},y={{ mousePosInfo.y }}</span>
+          </div>
         </div>
       </OperationContainer>
     </div>
@@ -285,6 +293,11 @@ export default {
         G: 0,
         B: 0,
         A: 0
+      },
+      showPosition: true,
+      mousePosInfo: {
+        x: '',
+        y: ''
       }
     };
   },
@@ -684,7 +697,7 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           this.video = document.createElement('video');
-          this.video.addEventListener('loadeddata',async () => {
+          this.video.addEventListener('loadeddata', async () => {
             this.$emit('loaded');
             this.duration = isNaN(this.video.duration)
               ? 60
@@ -757,12 +770,6 @@ export default {
       this.initCanvas();
       await this.initImage();
       this.drawImage();
-      // this.video.src = getImageUrlSyncNoCache(this.path);
-      // // 视频是否静音
-      // this.video.muted = this.muted;
-      // // 视频播放速度
-      // this.video.defaultPlaybackRate = this.speed;
-      // this.video.playbackRate = this.speed;
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4;
@@ -851,8 +858,7 @@ export default {
         data: { mousePos }
       });
     }),
-    async doHandleMove(e) {
-      if (!this.traggerRGB) return;
+    doHandleMove(e) {
       let mousePos = undefined;
       if (!e?.mousePos) {
         mousePos = this.mousePos;
@@ -860,13 +866,21 @@ export default {
         mousePos = e.mousePos;
         this.mousePos = mousePos;
       }
+      this.preference.showMousePos && this.changeMousePosInfo(mousePos);
+      this.preference.showScale && this.changeRGBA(mousePos);
+      // console.log(`${this.path-changeMousePosInfo`, mousePos, {
+      //   ...this.mousePosInfo
+      // });
+    },
+    changeRGBA(mousePos) {
+      if (!this.traggerRGB) return;
       const { x, y } = mousePos;
       const feedback = this.$refs.feedback;
       feedback.style.left = x - this.radius + 'px';
       feedback.style.top = y - this.radius + 'px';
       feedback.style.width = this.radius * 2 + 'px';
       feedback.style.height = this.radius * 2 + 'px';
-      await Promise.resolve().then(() => {
+      Promise.resolve().then(() => {
         const data = this.cs.getImageData(x, y, this.radius, this.radius).data;
         const count = data.length / 4;
         let r = 0,
@@ -886,6 +900,34 @@ export default {
           A: parseInt(a / count)
         };
       });
+    },
+    changeMousePosInfo(mousePos) {
+      if (!this.imagePosition?.x || !this.imagePosition?.width) {
+        this.mousePosInfo = {
+          x: '',
+          y: ''
+        };
+        return;
+      }
+      const { x, y } = mousePos;
+      const { x: imageX, y: imageY, width, height } = this.imagePosition;
+      const isOutside =
+        x < imageX || y < imageY || x > imageX + width || y > imageY + height;
+      const originWidth = this.video.videoWidth;
+      const originHeight = this.video.videoHeight;
+      if (!isOutside && originWidth && originHeight) {
+        const posX = ((x - imageX) * originWidth) / width;
+        const posY = ((y - imageY) * originHeight) / height;
+        this.mousePosInfo = {
+          x: Number(posX).toFixed(2),
+          y: Number(posY).toFixed(2)
+        };
+      } else {
+        this.mousePosInfo = {
+          x: '',
+          y: ''
+        };
+      }
     },
     // 外部直接调用
     setCoverStatus({ snapShot, hist }, status) {
@@ -1236,6 +1278,13 @@ export default {
       #feedback {
         position: absolute;
         border: 1px solid red;
+      }
+
+      .mouse-position {
+        position: absolute;
+        bottom: 4px;
+        right: 5px;
+        color: rgba(0, 0, 0, 0.6);
       }
     }
   }

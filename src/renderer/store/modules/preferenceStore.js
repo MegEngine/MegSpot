@@ -19,6 +19,8 @@ const preferenceStore = {
       defaultFileListShowType: 'list',
       // 视频控制条位置 fixed(固定在toolbar) / float (悬浮球)
       videoProcessBarStyle: 'fixed',
+      showScale: true,
+      showMousePos: true,
       hotkeys: []
     },
     lastRouterPath: '/dashboard',

@@ -9,7 +9,7 @@
       @click.stop
     >
       <div class="header">
-        <div class="title">Image Setting Panel</div>
+        <div class="title">{{ $t('imageSetting.title') }}</div>
         <el-button
           type="text"
           class="close-btn"
@@ -21,12 +21,20 @@
       </div>
       <div flex="dir:top" class="setting-group">
         <div flex="main:justify" class="setting-item">
-          <span>default show histogram：</span>
+          <span>{{ $t('imageSetting.defaultShowHistogram') }}：</span>
           <el-switch v-model="defaultShowHist"></el-switch>
         </div>
         <div flex="main:justify" class="setting-item">
-          <span>show image name：</span>
+          <span>{{ $t('imageSetting.showImageName') }}：</span>
           <el-switch v-model="showTitle"></el-switch>
+        </div>
+        <div flex="main:justify" class="setting-item">
+          <span>{{ $t('imageSetting.showScale') }}：</span>
+          <el-switch v-model="showScale"></el-switch>
+        </div>
+        <div flex="main:justify" class="setting-item">
+          <span>{{ $t('imageSetting.showMousePos') }}：</span>
+          <el-switch v-model="showMousePos"></el-switch>
         </div>
         <div
           v-if="$route.path.includes('video')"
@@ -45,7 +53,7 @@
           <el-switch v-model="videoMuted"></el-switch>
         </div>
         <div flex="main:justify" class="setting-item">
-          <span>background mode：</span>
+          <span>{{ $t('imageSetting.backgroundMode') }}：</span>
           <el-select
             v-model="mode"
             placeholder="please select background color"
@@ -68,7 +76,7 @@
             </div>
           </el-select>
         </div>
-        <div
+        <!-- <div
           v-if="$route.path.includes('video')"
           flex="main:justify"
           class="setting-item"
@@ -78,9 +86,9 @@
             <el-option :label="$t('general.fixed')" value="fixed"> </el-option>
             <el-option :label="$t('general.float')" value="float"> </el-option>
           </el-select>
-        </div>
+        </div> -->
         <div flex="main:justify" class="setting-item">
-          <span>scale options：</span>
+          <span>{{ $t('imageSetting.scaleOpt') }}：</span>
           <el-select
             v-model="scaleOptions"
             multiple
@@ -277,6 +285,22 @@ export default {
       },
       set(newVal) {
         this.setPreference({ showTitle: newVal });
+      }
+    },
+    showMousePos: {
+      get() {
+        return this.preference.showMousePos; // true
+      },
+      set(newVal) {
+        this.setPreference({ showMousePos: newVal });
+      }
+    },
+    showScale: {
+      get() {
+        return this.preference.showScale; // true
+      },
+      set(newVal) {
+        this.setPreference({ showScale: newVal });
       }
     },
     backgroundStyle: {
