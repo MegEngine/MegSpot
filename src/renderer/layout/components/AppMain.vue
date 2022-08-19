@@ -11,7 +11,7 @@
 <script>
 import path from 'path';
 var electron = require('electron');
-var userData = electron.remote.app.getPath('userData');
+var userData = require('@electron/remote').app.getPath('userData');
 console.log('userData', userData);
 import { createNamespacedHelpers } from 'vuex';
 const { mapGetters } = createNamespacedHelpers('preferenceStore');

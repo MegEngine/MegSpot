@@ -28,7 +28,7 @@
 </template>
 
 <script>
-const { dialog } = require('electron').remote;
+const { dialog } = require('@electron/remote');
 import ManageHistory from '@/components/manage-history';
 export default {
   name: 'file-input',

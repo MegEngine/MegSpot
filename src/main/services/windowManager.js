@@ -1,7 +1,8 @@
 import { BrowserWindow, Menu, ipcMain } from 'electron';
 const path = require('path');
 import menuconfig from '../config/menu';
-import config from '@config';
+import config from '@config/index';
+import { platform } from "os"
 import setIpc from './ipcMain';
 import { winURL, loadingURL } from '../config/StaticPath';
 import updateHandle from './autoUpdate';
@@ -24,11 +25,13 @@ function createMainWindow() {
     width: 1700,
     show: false,
     frame: config.IsUseSysTitle,
+    titleBarStyle: platform().includes('win32') ? 'default' : 'hidden',
     icon: iconPath, // sets window icon
     webPreferences: {
-      enableRemoteModule: true,
+      experimentalFeatures: true,
       nodeIntegration: true,
       webSecurity: false,
+      contextIsolation: false,
       // 如果是开发模式可以使用devTools
       devTools: true,
       // devTools: true,
@@ -50,7 +53,7 @@ function createMainWindow() {
         {
           label: 'Quit',
           accelerator: 'Command+Q',
-          click: function() {
+          click: function () {
             mainWindow.close();
           }
         }
@@ -60,6 +63,9 @@ function createMainWindow() {
   const menu = Menu.buildFromTemplate(menuconfig);
   Menu.setApplicationMenu(menu);
   mainWindow.loadURL(winURL);
+
+  require('@electron/remote/main').enable(mainWindow.webContents)
+
   setIpc.Mainfunc(mainWindow, config.IsUseSysTitle);
   ipcMain.on('get_start_cmd_arg', event => {
     event.returnValue = cmdArg;
@@ -85,13 +91,16 @@ function loadingWindow() {
     width: 400,
     height: 600,
     frame: false,
+
     backgroundColor: '#222',
     skipTaskbar: true,
     transparent: true,
     resizable: true,
     center: true,
     maximizable: true,
-    webPreferences: { experimentalFeatures: true }
+    webPreferences: {
+      experimentalFeatures: true
+    }
   });
 
   loadWindow.loadURL(loadingURL);

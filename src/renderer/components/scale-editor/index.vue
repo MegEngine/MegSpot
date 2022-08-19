@@ -94,8 +94,8 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 .scale-editor {
   position: absolute;
-  bottom: 2px;
-  left: 2px;
+  bottom: 4px;
+  left: 4px;
   ::v-deep {
     .el-input-number {
       width: 100px;

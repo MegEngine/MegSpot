@@ -48,7 +48,7 @@
 
 <script>
 import store from '@/store';
-const { dialog } = require('electron').remote;
+const { dialog } = require('@electron/remote');
 import FileTree from '@/components/file-tree/FileTree.vue';
 import SelectedBtn from '@/components/selected-btn';
 import ShowPath from '@/components/show-path';

@@ -19,17 +19,18 @@ let mainConfig = {
   module: {
     rules: [
       {
+        test: /\.js$/,
+        loader: 'esbuild-loader',
+        options: {
+          target: 'es2015'
+        }
+      },
+      {
         test: /\.ts$/,
-        use: [
-          'thread-loader',
-          {
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true
-            }
-          },
-          'ts-loader'
-        ]
+        loader: 'esbuild-loader',
+        options: {
+          target: 'es2015'
+        }
       },
       {
         test: /\.node$/,

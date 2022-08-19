@@ -2,11 +2,13 @@
 import path from 'path';
 import { cmdArg } from './services/cmdParse';
 const { app, protocol } = require('electron');
+import PersistedState from 'vuex-electron-store'
 import initWindow from './services/windowManager';
 import DisableButton from './config/DisableButton';
-import electronDevtoolsInstaller, {
-  VUEJS_DEVTOOLS
-} from 'electron-devtools-installer';
+const { session } = require("electron");
+// import electronDevtoolsInstaller, {
+//   VUEJS_DEVTOOLS
+// } from 'electron-devtools-installer';
 import { NO_CACHE_FILE_PROTOCOL } from '@/constants';
 
 protocol.registerSchemesAsPrivileged([
@@ -38,16 +40,27 @@ advise:
   `);
   app.exit();
 }
+app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport');  // 启用H.265解码
+require('@electron/remote/main').initialize() // init @electron/remote
+PersistedState.initRenderer() // init vuex-electron-store
 console.log('cmdArg', cmdArg);
 function onAppReady() {
   initWindow();
   DisableButton.Disablef12();
   if (process.env.NODE_ENV === 'development') {
-    electronDevtoolsInstaller(VUEJS_DEVTOOLS)
-      .then(name => console.log(`installed: ${name}`))
-      .catch(err => console.log('Unable to install `vue-devtools`: \n', err));
+    const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor"); // Vue2 Extension
+    session.defaultSession.loadExtension(VUEJS_DEVTOOLS, {
+      allowFileAccess: true
+    }).then(() => {
+      console.log('已安装: vue-devtools')
+    }).catch((err) => {
+      console.error('拓展安装失败', err)
+    });
+    // electronDevtoolsInstaller(VUEJS_DEVTOOLS)
+    //   .then(name => console.log(`installed: ${name}`))
+    //   .catch(err => console.log('Unable to install `vue-devtools`: \n', err));
   }
-  protocol.registerFileProtocol(
+  const registerSucceed = protocol.registerFileProtocol(
     NO_CACHE_FILE_PROTOCOL,
     (request, callback) => {
       const url = decodeURI(request.url).substr(
@@ -59,12 +72,9 @@ function onAppReady() {
           'cache-control': 'no-store'
         }
       });
-    },
-    error => {
-      if (error) console.error('Failed to register protocol');
     }
   );
-
+  if (!registerSucceed) console.error('Failed to register protocol')
   protocol.interceptFileProtocol('file', (request, callback) => {
     callback(request);
   });

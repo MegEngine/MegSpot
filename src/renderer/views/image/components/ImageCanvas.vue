@@ -38,6 +38,7 @@
       >
         <div class="canvas-item" @contextmenu.prevent>
           <ScaleEditor
+            v-if="preference.showScale"
             class="scale-editor"
             :scale="imgScale"
             :scaleEditorVisible.sync="scaleEditorVisible"
@@ -47,6 +48,13 @@
           />
           <canvas ref="canvas" :width="_width" :height="_height"> </canvas>
           <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
+          <div
+            v-if="preference.showMousePos"
+            class="mouse-position"
+            v-show="showPosition && mousePosInfo.x !== ''"
+          >
+            <span>x={{ mousePosInfo.x }},y={{ mousePosInfo.y }}</span>
+          </div>
         </div>
       </OperationContainer>
     </div>
@@ -175,6 +183,11 @@ export default {
         G: 0,
         B: 0,
         A: 0
+      },
+      showPosition: true,
+      mousePosInfo: {
+        x: '',
+        y: ''
       }
     };
   },
@@ -354,7 +367,7 @@ export default {
         offCtx.drawImage(this.image, 0, 0);
         this.bitMap = await offsreen.transferToImageBitmap();
         initPosition && this.reDraw(true);
-        // console.log('image', this.image, this.image.width);
+        console.log('image', this.image, this.image.width);
         if (this.image && this.image.width) {
           this.currentHist = this.$refs['hist-container'].generateHist(
             cv.imread(this.image)
@@ -451,6 +464,13 @@ export default {
       });
     }),
     doHandleMove({ mousePos }) {
+      this.preference.showMousePos && this.changeMousePosInfo(mousePos);
+      this.preference.showScale && this.changeRGBA(mousePos);
+      // console.log(`${this.getName()}-changeMousePosInfo`, mousePos, {
+      //   ...this.mousePosInfo
+      // });
+    },
+    changeRGBA(mousePos) {
       if (!this.traggerRGB) return;
       const { x, y } = mousePos;
       const feedback = this.$refs.feedback;
@@ -478,6 +498,34 @@ export default {
           A: parseInt(a / count)
         };
       });
+    },
+    changeMousePosInfo(mousePos) {
+      if (!this.imagePosition?.x || !this.imagePosition?.width) {
+        this.mousePosInfo = {
+          x: '',
+          y: ''
+        };
+        return;
+      }
+      const { x, y } = mousePos;
+      const { x: imageX, y: imageY, width, height } = this.imagePosition;
+      const isOutside =
+        x < imageX || y < imageY || x > imageX + width || y > imageY + height;
+      const originWidth = this.image.naturalWidth;
+      const originHeight = this.image.naturalHeight;
+      if (!isOutside && originWidth && originHeight) {
+        const posX = ((x - imageX) * originWidth) / width;
+        const posY = ((y - imageY) * originHeight) / height;
+        this.mousePosInfo = {
+          x: Number(posX).toFixed(2),
+          y: Number(posY).toFixed(2)
+        };
+      } else {
+        this.mousePosInfo = {
+          x: '',
+          y: ''
+        };
+      }
     },
     // 外部直接调用
     setCoverStatus({ snapShot, hist }, status) {
@@ -831,6 +879,13 @@ export default {
       #feedback {
         position: absolute;
         border: 1px solid red;
+      }
+
+      .mouse-position {
+        position: absolute;
+        bottom: 4px;
+        right: 5px;
+        color: rgba(0, 0, 0, 0.6);
       }
     }
   }

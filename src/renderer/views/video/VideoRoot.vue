@@ -28,7 +28,7 @@
   </div>
 </template>
 <script>
-const { dialog } = require('electron').remote;
+const { dialog } = require('@electron/remote');
 import Vue from 'vue';
 import FileTree from '@/components/file-tree/FileTree.vue';
 import ShowPath from '@/components/show-path';

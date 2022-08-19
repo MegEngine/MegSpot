@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "1.4.1",
+  "version": "2.0.1",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -43,8 +43,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1. 新增功能：支持自定义快捷键，新增一些常用功能对应的快捷键，如叠加对比、视频播放与暂停等。\n2. 优化体验：添加快照操作相关的提示信息。\n3. 修复bug: 如快照文件生成失败、视频叠加对比失败等问题。",
-      "releaseDate": "2022.08.05"
+      "releaseNotes": "1. 新增功能：支持hevc视频硬解码(需系统GPU支持)等; 支持显示光标所在图像坐标位置； \n2. 优化体验: 图像设置面板所有选项完成翻译；支持控制显示/隐藏 缩放提示和光标位置提示；\n3. 修复bug: 如视频切换组时未及时刷新等。",
+      "releaseDate": "2022.08.19"
     },
     "directories": {
       "output": "build"
@@ -92,12 +92,13 @@
   },
   "dependencies": {
     "@dhdbstjr98/gif.js": "^1.0.2",
+    "@electron/remote": "^2.0.8",
     "@popperjs/core": "^2.9.2",
     "axios": "^0.21.1",
     "chokidar": "^3.5.2",
     "dayjs": "^1.10.4",
     "electron-log": "^4.3.4",
-    "electron-store": "4.0.0",
+    "electron-store": "^8.1.0",
     "electron-updater": "^4.3.5",
     "element-ui": "^2.15.0",
     "ex-utils": "^0.0.4",
@@ -117,7 +118,7 @@
     "vuedraggable": "^2.24.3",
     "vuescroll": "^4.17.3",
     "vuex": "^3.6.0",
-    "vuex-electron": "^1.0.3",
+    "vuex-electron-store": "^1.4.26",
     "vxe-table": "^3.4.5",
     "xe-utils": "^3.4.0"
   },
@@ -158,11 +159,12 @@
     "css-loader": "^5.0.1",
     "del": "^6.0.0",
     "dmg-builder": "^22.14.5",
-    "electron": "^11.2.1",
-    "electron-builder": "^22.10.5",
-    "electron-devtools-installer": "^3.1.1",
+    "electron": "^20.0.2",
+    "electron-builder": "^23.3.3",
+    "electron-devtools-vendor": "^1.1.0",
     "electron-playwright-helpers": "^1.2.0",
     "electron-rebuild": "^2.3.5",
+    "esbuild-loader": "^2.19.0",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-friendly-formatter": "^4.0.1",
@@ -188,7 +190,6 @@
     "style-loader": "^2.0.0",
     "svg-sprite-loader": "^5.2.1",
     "terser-webpack-plugin": "^4.2.3",
-    "thread-loader": "^3.0.1",
     "url-loader": "^4.1.1",
     "vue-html-loader": "^1.2.4",
     "vue-loader": "^15.9.6",

@@ -105,16 +105,10 @@ let rendererConfig = {
       },
       {
         test: /\.js$/,
-        use: [
-          'thread-loader',
-          {
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-            },
-          },
-        ],
-        exclude: /node_modules/,
+        loader: 'esbuild-loader',
+        options: {
+          target: 'es2015'
+        }
       },
       {
         test: /\.node$/,

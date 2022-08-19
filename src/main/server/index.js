@@ -1,7 +1,7 @@
 /* eslint-disable prefer-promise-reject-errors */
 import app from './server'
 import http from 'http'
-import config from '@config'
+import config from '@config/index'
 const port = config.BuiltInServerPort
 var server = null
 app.set('port', port)

@@ -253,6 +253,7 @@ export default {
             }
           )
           .on('all', async (event, path) => {
+            // console.log('FileTree watcher:', event, path);
             if (path !== this.sortFilePath) {
               this.treeData = await this.loadMultiDir(this.openedFolders);
             }

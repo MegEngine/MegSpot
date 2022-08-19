@@ -267,6 +267,7 @@ export default {
               }
             })
             .on('all', async (event, path) => {
+              // console.log('FileTable watcher:', event, path);
               if (path === this.sortFilePath) {
                 const exist = await fse.pathExists(path);
                 if (exist) {

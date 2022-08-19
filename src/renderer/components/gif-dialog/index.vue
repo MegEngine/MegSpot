@@ -102,7 +102,7 @@
 </template>
 
 <script>
-const { dialog } = require('electron').remote;
+const { dialog } = require('@electron/remote');
 const fs = require('fs');
 import getFileName from '@/filter/get-file-name';
 import GIF from '@dhdbstjr98/gif.js/dist/gif';

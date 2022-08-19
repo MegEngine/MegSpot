@@ -159,7 +159,7 @@
 </template>
 
 <script>
-const { dialog } = require('electron').remote;
+const { dialog } = require('@electron/remote');
 const { shell, ipcRenderer } = require('electron');
 import fse from 'fs-extra';
 import _ from 'lodash';

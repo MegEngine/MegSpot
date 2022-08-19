@@ -146,6 +146,15 @@ export default {
     rotate: 'rotate',
     generateGIF: 'generate GIF'
   },
+  imageSetting: {
+    title: 'image setting Panel',
+    defaultShowHistogram: 'default show histogram',
+    showImageName: 'show image name',
+    backgroundMode: 'background mode',
+    scaleOpt: 'scale options',
+    showScale: 'show scale tip',
+    showMousePos: 'show mouse position'
+  },
   imageDragDropCompare: {
     hideLine: 'hide comparison line',
     displayLine: 'display comparison line',
