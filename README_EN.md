@@ -11,10 +11,11 @@ English | [中文](README.md)
 ## Feature
 
 - Support superimposed comparison, drag-and-drop comparison, and GIF result presentation.
-- Support pixel-level image viewing, image histogram, RGBA viewing.
+- Support pixel-level image viewing, image histogram, RGB color information, coordinate information viewing.
 - Support to adjust the brightness, contrast, saturation, gray level and other indicators for preview.
 - Support video comparison, and inherit all image comparison functions.
 - Mac, Linux, Window cross-platform support & automatic update support.
+- **HEVC/H.265 video hard decoding support**.
 - Support the comparison of any screen of multiple videos.
 - Support terminal command.
 - Support multiple languages: Chinese, English, Japanese.
