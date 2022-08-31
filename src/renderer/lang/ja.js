@@ -1,8 +1,7 @@
 export default {
   common: {
     supportTypes: '対応ファイルタイプ:',
-    desc:
-      'MegSpotは、画像比較、ビデオ比較、画像カスタマイズ処理などの便利な機能をユーザーに提供するように設計されたクロスプラットフォームのネイティブアプリケーションです。 \r\nqqグループ（782365536）に参加して、詳細を確認し、最新情報を入手してください。',
+    desc: 'MegSpotは、画像比較、ビデオ比較、画像カスタマイズ処理などの便利な機能をユーザーに提供するように設計されたクロスプラットフォームのネイティブアプリケーションです。 \r\nqqグループ（782365536）に参加して、詳細を確認し、最新情報を入手してください。',
     manual: 'マニュアル',
     hotKey: 'ホットキー',
     please: 'お願いします',
@@ -104,8 +103,7 @@ export default {
       openFolder: 'フォルダを開く',
       addFolder: 'フォルダーを追加',
       addCurrentDirectory: '現在のディレクトリを追加します',
-      openFolderTip:
-        'システムファイルリソースマネージャーのディレクトリを開きます',
+      openFolderTip: 'システムファイルリソースマネージャーのディレクトリを開きます',
       loadShareProject: 'スナップショットのロード',
       snapshotGenerating: 'スナップショットが生成されています',
       snapshotGenerated: 'スナップショットが生成されました。ローカルに保存してください',
@@ -159,8 +157,7 @@ export default {
   imageDragDropCompare: {
     hideLine: '比較ラインを隠す',
     displayLine: '比較ライン表示',
-    tip:
-      'デフォルトでは、選択された画像の最初の2つが比較されます。 変更する場合は、選択を開いて切り替えてください。'
+    tip: 'デフォルトでは、選択された画像の最初の2つが比較されます。 変更する場合は、選択を開いて切り替えてください。'
   },
   generateGIF: {
     title: '比較働画GIFを生成',
@@ -193,8 +190,7 @@ export default {
     afterAddFolder: '并从左侧目录树选择文件夹',
     edit: '次に、左側のディレクトリツリーからフォルダを選択します',
     generate: '生成',
-    generateTip:
-      'クリックして、現在のディレクトリに.MegSpotSort.iniソート構成ファイルを生成します',
+    generateTip: 'クリックして、現在のディレクトリに.MegSpotSort.iniソート構成ファイルを生成します',
     sortFile: 'ファイルを並べ替える',
     useTableFileList: '現在のテーブル並べ替えリストを適用する',
     clearSortList: 'ソート済みリストをクリア',
@@ -206,7 +202,6 @@ export default {
     enableNameSort: '名前順',
     enableNameSortTip: '名前で並べ替えるかどうか',
     smartSort: 'スマートソーティング',
-    smartSortTip:
-      '異なるフォルダにある同じ名前のファイルは、簡単に比較できるように一緒に並べ替えられます'
+    smartSortTip: '異なるフォルダにある同じ名前のファイルは、簡単に比較できるように一緒に並べ替えられます'
   }
-};
+}

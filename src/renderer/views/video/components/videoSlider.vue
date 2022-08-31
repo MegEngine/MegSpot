@@ -18,9 +18,7 @@
       @input="handleChange"
       :style="processStyle"
     ></el-slider>
-    <span v-show="show && showTime && labelVisible" class="label">{{
-      currentTime.toFixed(1)
-    }}</span>
+    <span v-show="show && showTime && labelVisible" class="label">{{ currentTime.toFixed(1) }}</span>
   </div>
 </template>
 
@@ -100,46 +98,40 @@ export default {
         labelStyle: void 0,
         labelActiveStyle: void 0
       }
-    };
+    }
   },
   computed: {
     currentTime: {
       get() {
-        return this.time;
+        return this.time
       },
       set() {
-        this.$emit('update:time', this.value);
+        this.$emit('update:time', this.value)
       }
     },
     processStyle() {
       return {
         marginLeft: '5px',
         minWidth: `${this._width}px`
-      };
+      }
     }
   },
   methods: {
     handleChange(value) {
       // this.$emit('change', value);
       // console.log('change', value);
-      this.$emit('update:time', value);
+      this.$emit('update:time', value)
     },
     formatter(seconds) {
-      var hours = Math.floor(seconds / 3600);
-      seconds = seconds - hours * 3600;
-      var minutes = Math.floor(seconds / 60);
-      seconds = Math.floor(seconds - minutes * 60);
+      var hours = Math.floor(seconds / 3600)
+      seconds = seconds - hours * 3600
+      var minutes = Math.floor(seconds / 60)
+      seconds = Math.floor(seconds - minutes * 60)
 
-      return (
-        hours +
-        ':' +
-        ('0' + minutes).slice(-2) +
-        ':' +
-        ('0' + seconds).slice(-2)
-      );
+      return hours + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2)
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,8 +1,6 @@
 <template>
   <div>
-    <slot :images="images"
-          :options="options">
-    </slot>
+    <slot :images="images" :options="options"></slot>
   </div>
 </template>
 <script>
@@ -20,11 +18,9 @@ export default {
     }
   },
   data() {
-    return {
-    }
+    return {}
   },
-  computed: {
-  },
+  computed: {},
   methods: {
     createViewer() {
       this.$viewer && this.$viewer.destroy()
@@ -40,7 +36,7 @@ export default {
       })
     },
     trigger: {
-      handler: function() {
+      handler: function () {
         this.$nextTick(() => {
           this.createViewer()
         })
@@ -48,7 +44,7 @@ export default {
       deep: true
     },
     options: {
-      handler: function() {
+      handler: function () {
         this.$nextTick(() => {
           this.createViewer()
         })
@@ -68,5 +64,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@import "~viewerjs/dist/viewer.css";
+@import '~viewerjs/dist/viewer.css';
 </style>

@@ -1,5 +1,5 @@
-import parseArgs from 'minimist';
-console.log('process.argv', process.argv);
+import parseArgs from 'minimist'
+console.log('process.argv', process.argv)
 const cmdArg = parseArgs(process.argv.slice(1), {
   alias: {
     h: ['help'],
@@ -7,5 +7,5 @@ const cmdArg = parseArgs(process.argv.slice(1), {
     v: ['video'],
     c: ['clear']
   }
-});
-export { cmdArg };
+})
+export { cmdArg }

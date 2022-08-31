@@ -17,31 +17,28 @@ export default {
       ctxTop: 0,
       ctxLeft: 0,
       ctxVisible: false,
-      bodyClickListener: createBodyClickListener(
-        (e) => {
-          const isOpen = !!this.ctxVisible
-          const outsideClick = isOpen && !this.$el.contains(e.target)
+      bodyClickListener: createBodyClickListener((e) => {
+        const isOpen = !!this.ctxVisible
+        const outsideClick = isOpen && !this.$el.contains(e.target)
 
-          if (outsideClick) {
-            if (e.which !== 1) {
-              e.preventDefault()
-              e.stopPropagation()
-              return false
-            } else {
-              this.ctxVisible = false
-              this.$emit('ctx-cancel', this.locals)
-              e.stopPropagation()
-            }
+        if (outsideClick) {
+          if (e.which !== 1) {
+            e.preventDefault()
+            e.stopPropagation()
+            return false
           } else {
             this.ctxVisible = false
-            this.$emit('ctx-close', this.locals)
+            this.$emit('ctx-cancel', this.locals)
+            e.stopPropagation()
           }
+        } else {
+          this.ctxVisible = false
+          this.$emit('ctx-close', this.locals)
         }
-      )
+      })
     }
   },
   methods: {
-
     /*
      * this function handles some cross-browser compat issues
      * thanks to https://github.com/callmenick/Custom-Context-Menu
@@ -78,7 +75,7 @@ export default {
     open(e, data) {
       if (this.ctxVisible) this.ctxVisible = false
       this.ctxVisible = true
-      this.$emit('ctx-open', this.locals = data || {})
+      this.$emit('ctx-open', (this.locals = data || {}))
       this.setPositionFromEvent(e)
       this.$el.setAttribute('tab-index', -1)
       this.bodyClickListener.start()
@@ -98,9 +95,9 @@ export default {
   computed: {
     ctxStyle() {
       return {
-        'display': this.ctxVisible ? 'block' : 'none',
-        'top': (this.ctxTop || 0) + 'px',
-        'left': (this.ctxLeft || 0) + 'px'
+        display: this.ctxVisible ? 'block' : 'none',
+        top: (this.ctxTop || 0) + 'px',
+        left: (this.ctxLeft || 0) + 'px'
       }
     }
   }

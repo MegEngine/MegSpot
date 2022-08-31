@@ -1,8 +1,7 @@
 export default {
   common: {
     supportTypes: 'Support file types:',
-    desc:
-      'MegSpot is a cross-platform native application designed to provide users with convenient functions such as picture comparison, video comparison. \r\nYou can enter the QQ group(782365536) to learn more and get the latest information.',
+    desc: 'MegSpot is a cross-platform native application designed to provide users with convenient functions such as picture comparison, video comparison. \r\nYou can enter the QQ group(782365536) to learn more and get the latest information.',
     manual: 'manual',
     hotKey: 'hotKey',
     please: 'please',
@@ -123,8 +122,7 @@ export default {
   imageCenter: {
     bilinearInterpolation: 'bilinar',
     shortSelectedMsg: 'selected',
-    selectedMsg:
-      'The picture has been selected and can be operated individually',
+    selectedMsg: 'The picture has been selected and can be operated individually',
     colorPicker: 'color picker',
     region: 'size of color picker',
     nearestInterpolation: 'nearest',
@@ -158,8 +156,7 @@ export default {
   imageDragDropCompare: {
     hideLine: 'hide comparison line',
     displayLine: 'display comparison line',
-    tip:
-      'By default, the first two pictures that have been selected are compared. If you need to modify, please open the selected to switch.'
+    tip: 'By default, the first two pictures that have been selected are compared. If you need to modify, please open the selected to switch.'
   },
   generateGIF: {
     title: 'title',
@@ -192,8 +189,7 @@ export default {
     afterAddFolder: 'and select one',
     edit: 'Custom file sorting configuration',
     generate: 'Generate',
-    generateTip:
-      'Click to generate the .MegSpotSort.ini sorting configuration file in the current directory',
+    generateTip: 'Click to generate the .MegSpotSort.ini sorting configuration file in the current directory',
     sortFile: ' Sorting File',
     useTableFileList: 'Apply current table sorting list',
     clearSortList: 'Clear SortList',
@@ -205,7 +201,6 @@ export default {
     enableNameSort: 'Sort by name',
     enableNameSortTip: 'Whether to sort by name',
     smartSort: 'Smart Sort',
-    smartSortTip:
-      'files with the same name in different folders are sorted together for easy comparison'
+    smartSortTip: 'files with the same name in different folders are sorted together for easy comparison'
   }
-};
+}

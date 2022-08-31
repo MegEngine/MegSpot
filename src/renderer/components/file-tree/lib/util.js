@@ -6,9 +6,9 @@
  */
 export const isInArray = (a, k, v) => {
   return a.some((i) => {
-    return i[k] === v;
-  });
-};
+    return i[k] === v
+  })
+}
 
 /**
  * @function 根据指定长度对文本进行截断。文本字符串原始长度小于指定长度时，返回原始字符串；文本字符串长度大于指定长度时，尾部补省略符
@@ -17,29 +17,22 @@ export const isInArray = (a, k, v) => {
  * @param {String} ellipsis 省略符号
  */
 export const truncateText = (str, len, ellipsis = '...') => {
-  if (
-    !(
-      typeof str === 'string' &&
-      typeof len === 'number' &&
-      typeof ellipsis === 'string' &&
-      len > ellipsis.length
-    )
-  ) {
-    throw new Error('Invalid params.');
+  if (!(typeof str === 'string' && typeof len === 'number' && typeof ellipsis === 'string' && len > ellipsis.length)) {
+    throw new Error('Invalid params.')
   }
   if (str.length <= len) {
-    return str;
+    return str
   } else {
-    const contentLen = len - ellipsis.length;
-    const content = str.slice(0, contentLen);
-    return content + ellipsis;
-  }s
-};
+    const contentLen = len - ellipsis.length
+    const content = str.slice(0, contentLen)
+    return content + ellipsis
+  }
+  s
+}
 
 export const isImage = (src) =>
   /\.(jpe?g|ico|pcx|svg|bmp|tif|png|raw|tga)(\?.*)?$/.test(src) ||
-  /\.(JPE?G|ICO|PCX|SVG|BMP|TIF|PNG|RAW|TGA)(\?.*)?$/.test(src);
-  
+  /\.(JPE?G|ICO|PCX|SVG|BMP|TIF|PNG|RAW|TGA)(\?.*)?$/.test(src)
+
 export const isVideo = (src) =>
-  /(.*)\.(mp4|mov|mkv|rmvb|avi|ts)$/.test(src) ||
-  /(.*)\.(MP4|MOV|MKV|RMVB|AVI|TS)$/.test(src);
+  /(.*)\.(mp4|mov|mkv|rmvb|avi|ts)$/.test(src) || /(.*)\.(MP4|MOV|MKV|RMVB|AVI|TS)$/.test(src)

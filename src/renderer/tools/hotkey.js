@@ -1,8 +1,8 @@
-import console from 'console';
-import store from '../store';
-import { Message } from 'element-ui';
+import console from 'console'
+import store from '../store'
+import { Message } from 'element-ui'
 
-const isDrawn = process.platform === 'darwin';
+const isDrawn = process.platform === 'darwin'
 
 export const ATTRS_KEYS = [
   {
@@ -20,9 +20,9 @@ export const ATTRS_KEYS = [
     key: isDrawn ? 'Option' : 'Alt',
     label: isDrawn ? '⌥ Option' : 'Alt'
   }
-];
+]
 
-export const ATTRS_KEYS_VALUE = ['Control', 'Meta', 'Option', 'Alt'];
+export const ATTRS_KEYS_VALUE = ['Control', 'Meta', 'Option', 'Alt']
 
 export const SPECIAL_KEYS = [
   ...ATTRS_KEYS,
@@ -58,15 +58,13 @@ export const SPECIAL_KEYS = [
     key: 'ArrowDown',
     label: '↓'
   }
-];
+]
 
-export const PRESET_KEYS = [...SPECIAL_KEYS];
+export const PRESET_KEYS = [...SPECIAL_KEYS]
 
-export const PRESET_KEYS_MAP = new Map(
-  PRESET_KEYS.map(item => [item.key, item])
-);
+export const PRESET_KEYS_MAP = new Map(PRESET_KEYS.map((item) => [item.key, item]))
 
-const ctrlOrCommand = isDrawn ? 'Meta' : 'Control';
+const ctrlOrCommand = isDrawn ? 'Meta' : 'Control'
 
 export const DEFAULT_HOTKEYS = [
   {
@@ -155,24 +153,18 @@ export const DEFAULT_HOTKEYS = [
     desc: 'pick color in image',
     keysArr: [[ctrlOrCommand, 'p']]
   }
-];
-
+]
 
 export function getArrStr(arr) {
-  return JSON.parse(JSON.stringify(arr))
-    .sort()
-    .toString();
+  return JSON.parse(JSON.stringify(arr)).sort().toString()
 }
 
 export function getPressedKeysStr(event) {
-  const attrsKeys = ATTRS_KEYS.map(item => item.name);
-  const attrsKeyIndex = attrsKeys.findIndex(key => event[key]);
-  const pressedKeys = [event.key];
+  const attrsKeys = ATTRS_KEYS.map((item) => item.name)
+  const attrsKeyIndex = attrsKeys.findIndex((key) => event[key])
+  const pressedKeys = [event.key]
   if (attrsKeyIndex > -1) {
-    pressedKeys.push(
-      ATTRS_KEYS.find(keyConf => keyConf.name === attrsKeys[attrsKeyIndex])
-        .key
-    );
+    pressedKeys.push(ATTRS_KEYS.find((keyConf) => keyConf.name === attrsKeys[attrsKeyIndex]).key)
   }
   return pressedKeys.sort().toString()
 }
@@ -182,12 +174,12 @@ export function ensureHotkeysMapExists() {
 }
 
 export function handleEvent(event, callbackFnMap) {
-  ensureHotkeysMapExists();
-  const hotkeysMap = store.state.preferenceStore.hotkeysMap;
-  const pressedKeysStr = getPressedKeysStr(event);
+  ensureHotkeysMapExists()
+  const hotkeysMap = store.state.preferenceStore.hotkeysMap
+  const pressedKeysStr = getPressedKeysStr(event)
   const hotkeyName = hotkeysMap.get(pressedKeysStr)
   const hotkeyEvent = callbackFnMap.get(hotkeyName)
   if (hotkeyName && hotkeyEvent) {
-    hotkeyEvent();
+    hotkeyEvent()
   }
 }

@@ -1,6 +1,6 @@
-import Layout from '@/layout';
-const Notfound = () => import('@/views/404');
-import store from '../store';
+import Layout from '@/layout'
+const Notfound = () => import('@/views/404')
+import store from '../store'
 
 export default [
   { path: '*', component: Notfound },
@@ -58,4 +58,4 @@ export default [
       }
     ]
   }
-];
+]

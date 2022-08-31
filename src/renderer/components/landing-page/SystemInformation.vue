@@ -22,12 +22,12 @@ export default {
         ['Node版本:', process.versions.node || '浏览器环境'],
         ['所运行的系统:', require('os').platform() + require('os').arch()]
       ]
-    };
+    }
   },
   mounted() {
-    console.log(this.$route);
+    console.log(this.$route)
   }
-};
+}
 </script>
 
 <style scoped>

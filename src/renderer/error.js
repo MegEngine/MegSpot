@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-Vue.config.errorHandler = function(err, vm, info) {
+Vue.config.errorHandler = function (err, vm, info) {
   Vue.nextTick(() => {
     if (process.env.NODE_ENV === 'development') {
       console.group('%c >>>>>> 错误信息 >>>>>>', 'color:red')

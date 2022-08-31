@@ -28,9 +28,7 @@ class Timer {
    */
   interval(interval, callback) {
     this.timeout(interval).then(() => {
-      typeof callback === 'function' &&
-        callback() !== false &&
-        this.interval(interval, callback)
+      typeof callback === 'function' && callback() !== false && this.interval(interval, callback)
     })
     return { then: (c) => (callback = c) }
   }

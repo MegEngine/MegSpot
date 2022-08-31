@@ -1,5 +1,5 @@
 <template>
-  <div style="background:#f0f2f5;margin-top: -20px;">
+  <div style="background: #f0f2f5; margin-top: -20px">
     <div class="wscn-http404">
       <div class="bullshit">
         <div class="bullshit__oops">OOPS!</div>
@@ -11,11 +11,9 @@
 </template>
 
 <script>
-
 export default {
   data() {
-    return {
-    }
+    return {}
   }
 }
 </script>
@@ -208,5 +206,4 @@ export default {
     }
   }
 }
-
 </style>

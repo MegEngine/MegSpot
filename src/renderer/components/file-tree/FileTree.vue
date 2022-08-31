@@ -20,14 +20,11 @@
           </span>
         </el-tooltip>
         <div class="folder-head-search" flex-box="1">
-          <search-input
-            v-model="searchValue"
-            placeholder="filter file name according to input"
-          ></search-input>
+          <search-input v-model="searchValue" placeholder="filter file name according to input"></search-input>
         </div>
       </div>
-      <span class="loading" v-if="showloading"
-        ><i class="el-icon-loading"></i>
+      <span class="loading" v-if="showloading">
+        <i class="el-icon-loading"></i>
         {{ $t('image.folder.loadingText') }}
       </span>
       <el-tree
@@ -58,10 +55,7 @@
           <span flex="main:justify cross:center">
             <span class="folder-item-left" flex="cross:center">
               <span class="folder-item-icon" flex-box="1">
-                <svg-icon
-                  v-if="!data.isLeaf"
-                  icon-class="folder-open-fill"
-                ></svg-icon>
+                <svg-icon v-if="!data.isLeaf" icon-class="folder-open-fill"></svg-icon>
                 <svg-icon v-else icon-class="folder-fill"></svg-icon>
               </span>
               <el-tooltip
@@ -72,9 +66,7 @@
                 :disabled="isDraging"
                 popper-class="folder-tooltip"
               >
-                <span class="folder-item-label">{{
-                  truncateName(data.label)
-                }}</span>
+                <span class="folder-item-label">{{ truncateName(data.label) }}</span>
               </el-tooltip>
             </span>
             <span class="folder-item-right" flex="cross:center">
@@ -121,13 +113,13 @@
 </template>
 
 <script>
-import SearchInput from '@/components/search-input';
-import ContextMenu from '@/components/context-menu';
-import { generateFileInfo, listDir } from './lib/file.js';
-import { defaultIcon } from './lib/consts.js';
-import { DELIMITER, SORTING_FILE_NAME } from '@/constants';
-import { throttle } from '@/utils';
-import chokidar from 'chokidar';
+import SearchInput from '@/components/search-input'
+import ContextMenu from '@/components/context-menu'
+import { generateFileInfo, listDir } from './lib/file.js'
+import { defaultIcon } from './lib/consts.js'
+import { DELIMITER, SORTING_FILE_NAME } from '@/constants'
+import { throttle } from '@/utils'
+import chokidar from 'chokidar'
 
 export default {
   name: 'FileTree',
@@ -158,7 +150,7 @@ export default {
       searchValue: '',
       showloading: false,
       treeOffsetTop: 0
-    };
+    }
   },
   props: {
     openedFolders: {
@@ -186,7 +178,7 @@ export default {
           '.png': { name: 'iconfile-image-fill', color: '#E6880E' },
           '.jpg': { name: 'iconfile-image-fill', color: '#E6880E' },
           '.md': { name: 'iconfile-markdown-fill', color: '#844DEA' }
-        };
+        }
       }
     },
     enableReload: {
@@ -222,24 +214,24 @@ export default {
   computed: {
     fileIcons() {
       if (this.icons && Object.keys(this.icons).length > 0) {
-        return { ...defaultIcon, ...this.icons };
+        return { ...defaultIcon, ...this.icons }
       } else {
-        return defaultIcon;
+        return defaultIcon
       }
     },
     sortFilePath() {
-      return this.currentPath + DELIMITER + SORTING_FILE_NAME;
+      return this.currentPath + DELIMITER + SORTING_FILE_NAME
     }
   },
   watch: {
     treeData(newVal, oldVal) {
       if (oldVal) {
-        this.watcher && this.watcher.close();
+        this.watcher && this.watcher.close()
       }
       if (newVal) {
         this.watcher = chokidar
           .watch(
-            newVal.map(item => item.path),
+            newVal.map((item) => item.path),
             {
               // 持续监听
               persistent: true,
@@ -255,133 +247,131 @@ export default {
           .on('all', async (event, path) => {
             // console.log('FileTree watcher:', event, path);
             if (path !== this.sortFilePath) {
-              this.treeData = await this.loadMultiDir(this.openedFolders);
+              this.treeData = await this.loadMultiDir(this.openedFolders)
             }
-          });
+          })
       }
     },
     openedFolders: {
-      handler: async function(newVal, oldVal) {
-        this.treeData = await this.loadMultiDir(this.openedFolders);
+      handler: async function (newVal, oldVal) {
+        this.treeData = await this.loadMultiDir(this.openedFolders)
       },
       immediate: true
     },
     currentKey(id) {
       // Tree 内部使用了 Node 类型的对象来包装用户传入的数据，用来保存目前节点的状态。可以用 $refs 获取 Tree 实例
       if (id.toString()) {
-        this.$refs.elTree.setCurrentKey(id);
+        this.$refs.elTree.setCurrentKey(id)
       } else {
-        this.$refs.elTree.setCurrentKey(null);
+        this.$refs.elTree.setCurrentKey(null)
       }
     },
     searchValue(v) {
       if (this.$refs && this.$refs.elTree) {
-        this.$refs.elTree.filter(v);
+        this.$refs.elTree.filter(v)
       }
     }
   },
   created() {
     this.dblclick = throttle(200, (...args) => {
-      this.$emit('dblclick', ...args);
-    });
+      this.$emit('dblclick', ...args)
+    })
     this.closeFolder = throttle(200, (...args) => {
-      this.$emit('close', ...args);
-      this.$emit('removeExpand', args[0].path);
-    });
+      this.$emit('close', ...args)
+      this.$emit('removeExpand', args[0].path)
+    })
   },
   beforeDestroy() {
-    this.dblclick = null;
-    this.closeFolder = null;
-    this.watcher && this.watcher.close();
-    this.watcher = null;
+    this.dblclick = null
+    this.closeFolder = null
+    this.watcher && this.watcher.close()
+    this.watcher = null
   },
   methods: {
     async loadNode(node, resolve) {
       // 过滤根节点 由于el-tree在不同的地方使用id是逐个增加的 所以不能通过 node.id === 0 判断是否为根
-      if (node.data === undefined || node.data.path === undefined) return;
+      if (node.data === undefined || node.data.path === undefined) return
       const nodeData = await listDir(node.data.path, this.fileIcons, {
         include: this.includes,
         onlyDir: this.onlyDir
-      });
+      })
 
       // 取消递归第二层目录，直接返回包装过后的一层目录文件信息
       // const result = await this.loadMultiDir(nodeData.children);
       // resolve(result);
-      resolve(nodeData.children.map(generateFileInfo));
+      resolve(nodeData.children.map(generateFileInfo))
     },
     async handleRefresh(node, data) {
-      node.loaded = false;
-      node.expand();
+      node.loaded = false
+      node.expand()
     },
     async loadMultiDir(dirs) {
-      const result = [];
+      const result = []
       for (let i = 0; i < dirs.length; i++) {
         try {
-          const f = dirs[i];
+          const f = dirs[i]
           const res = await listDir(f, this.fileIcons, {
             include: this.includes,
             onlyDir: this.onlyDir
-          }).catch(err => {
-            throw err;
-          });
+          }).catch((err) => {
+            throw err
+          })
           // 多目录展开时 避免加载过多 引起错误
-          delete res.children;
-          result.push(res);
+          delete res.children
+          result.push(res)
         } catch (e) {
-          console.error('读取文件内容异常. path:' + f);
-          console.error(e);
+          console.error('读取文件内容异常. path:' + f)
+          console.error(e)
         }
       }
-      return result;
+      return result
     },
     onMousEenter(node, data) {
-      data.hovering = true;
+      data.hovering = true
     },
     onMouseleave(node, data) {
-      data.hovering = false;
+      data.hovering = false
     },
     onClick(data, node, e) {
-      this.treeOffsetTop = e.$el.offsetTop;
+      this.treeOffsetTop = e.$el.offsetTop
       if (!node.checked) {
-        this.$emit('select', data);
+        this.$emit('select', data)
       }
     },
     onCloseFolder(node, data) {
-      this.closeFolder(data);
+      this.closeFolder(data)
     },
     async onRefreshAllFolder() {
-      this.treeData = await this.loadMultiDir(this.openedFolders);
+      this.treeData = await this.loadMultiDir(this.openedFolders)
     },
     truncateName(src) {
       // 使用css方式解决
-      return src;
+      return src
       // return truncateText(src, 32)
     },
     filterNode(value, data) {
-      if (!value) return true;
-      return (
-        data.label.toLocaleLowerCase().indexOf(value.toLocaleLowerCase()) !== -1
-      );
+      if (!value) return true
+      return data.label.toLocaleLowerCase().indexOf(value.toLocaleLowerCase()) !== -1
     }
   },
   async mounted() {
     if (this.openedFolders.length) {
-      await this.onRefreshAllFolder();
+      await this.onRefreshAllFolder()
     }
   },
   deactivated() {
-    window.sessionStorage.setItem('treeOffsetTop', this.treeOffsetTop);
+    window.sessionStorage.setItem('treeOffsetTop', this.treeOffsetTop)
   },
   activated() {
-    this.treeOffsetTop = window.sessionStorage.getItem('treeOffsetTop');
+    this.treeOffsetTop = window.sessionStorage.getItem('treeOffsetTop')
     this.$refs.vuescroll.scrollTo(
       {
         y: this.treeOffsetTop
       },
       0
-    );
+    )
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

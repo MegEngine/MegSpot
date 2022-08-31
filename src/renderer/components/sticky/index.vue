@@ -35,11 +35,11 @@ export default {
     // 通过position来设置初始定位
     position: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           right: '20px',
           bottom: '100px'
-        };
+        }
       }
     },
     backgroundColor: {
@@ -49,7 +49,7 @@ export default {
     disableDragFn: {
       type: Function,
       default: () => {
-        return false;
+        return false
       }
     }
   },
@@ -63,107 +63,97 @@ export default {
       dY: 500, //  初始定位
       lastMoveIndex: 0, //  拖拽计数
       curMoveIndex: 0 //  历史计数
-    };
+    }
   },
   mounted() {
     this.$nextTick(() => {
-      this.parentContainer = this.$parent.$refs[this.parentContainerName];
-      this.parentContainer.addEventListener('mouseup', this.handleMouseUp);
-      this.parentContainer.addEventListener('mousemove', this.handleMouseMove);
-    });
+      this.parentContainer = this.$parent.$refs[this.parentContainerName]
+      this.parentContainer.addEventListener('mouseup', this.handleMouseUp)
+      this.parentContainer.addEventListener('mousemove', this.handleMouseMove)
+    })
   },
   beforeDestroy() {
-    this.parentContainer.removeEventListener('mouseup', this.handleMouseUp);
-    this.parentContainer.removeEventListener('mousemove', this.handleMouseMove);
+    this.parentContainer.removeEventListener('mouseup', this.handleMouseUp)
+    this.parentContainer.removeEventListener('mousemove', this.handleMouseMove)
   },
   methods: {
     handleClick() {
-      this.innerOpen = false;
+      this.innerOpen = false
     },
     //  鼠标按下
     handleMouseDown(event) {
       //  如果进度条为拖动状态，则不做响应
-      if (
-        (this.contentDragDisabled && this.innerOpen) ||
-        this.disableDragFn(event)
-      ) {
-        this.mouseDownState = false;
-        return;
+      if ((this.contentDragDisabled && this.innerOpen) || this.disableDragFn(event)) {
+        this.mouseDownState = false
+        return
       }
       /* 此处判断  pc 或 移动端 得到 event 事件 */
-      var touch;
+      var touch
       if (event.touches) {
-        touch = event.touches[0];
+        touch = event.touches[0]
       } else {
-        touch = event;
+        touch = event
       }
       // 鼠标点击 面向页面 的 x坐标 y坐标
-      let { clientX, clientY } = touch;
+      let { clientX, clientY } = touch
       // 鼠标x坐标 - 拖拽按钮x坐标  得到鼠标 距离 拖拽按钮 的间距
-      this.iX = clientX - this.$refs.actionMgr.offsetLeft;
+      this.iX = clientX - this.$refs.actionMgr.offsetLeft
       // 鼠标y坐标 - 拖拽按钮y坐标  得到鼠标 距离 拖拽按钮 的间距
-      this.iY = clientY - this.$refs.actionMgr.offsetTop;
+      this.iY = clientY - this.$refs.actionMgr.offsetTop
       // 设置当前 状态为 鼠标按下
-      this.mouseDownState = true;
+      this.mouseDownState = true
     },
     //  鼠标拖拽
     handleMouseMove(event) {
       if (this.contentDragDisabled && this.innerOpen) {
-        this.mouseDownState = false;
-        return;
+        this.mouseDownState = false
+        return
       }
       //鼠标按下 切移动中
       if (this.mouseDownState) {
         /* 此处判断  pc 或 移动端 得到 event 事件 */
-        var touch;
+        var touch
         if (event.touches) {
-          touch = event.touches[0];
+          touch = event.touches[0]
         } else {
-          touch = event;
+          touch = event
         }
         // 鼠标移动时 面向页面 的 x坐标 y坐标
-        let { clientX, clientY } = touch;
+        let { clientX, clientY } = touch
         //当前页面全局容器 dom 元素  获取容器 宽高
-        let {
-          clientHeight: pageDivY,
-          clientWidth: pageDivX
-        } = this.parentContainer;
+        let { clientHeight: pageDivY, clientWidth: pageDivX } = this.parentContainer
         /* 鼠标坐标 - 鼠标与拖拽按钮的 间距坐标  得到 拖拽按钮的 左上角 x轴y轴坐标 */
-        let [x, y] = [clientX - this.iX, clientY - this.iY];
+        let [x, y] = [clientX - this.iX, clientY - this.iY]
 
         //拖拽按钮 dom 元素  获取 宽高 style 对象
-        let {
-          clientHeight: actionMgrY,
-          clientWidth: actionMgrX,
-          style: actionMgrStyle
-        } = this.$refs.actionMgr;
+        let { clientHeight: actionMgrY, clientWidth: actionMgrX, style: actionMgrStyle } = this.$refs.actionMgr
         /* 此处判断 拖拽按钮 如果超出 屏幕宽高 或者 小于
          * 设置 屏幕最大 x=全局容器x y=全局容器y 否则 设置 为 x=0 y=0
          */
-        if (x > pageDivX - actionMgrX) x = pageDivX - actionMgrX;
-        else if (x < 0) x = 0;
-        if (y > pageDivY - actionMgrY) y = pageDivY - actionMgrY;
-        else if (y < 0) y = 0;
-        this.dX = x;
-        this.dY = y;
+        if (x > pageDivX - actionMgrX) x = pageDivX - actionMgrX
+        else if (x < 0) x = 0
+        if (y > pageDivY - actionMgrY) y = pageDivY - actionMgrY
+        else if (y < 0) y = 0
+        this.dX = x
+        this.dY = y
         // 计算后坐标  设置 按钮位置
-        actionMgrStyle.left = `${x}px`;
-        actionMgrStyle.top = `${y}px`;
-        actionMgrStyle.bottom = 'auto';
-        actionMgrStyle.right = 'auto';
+        actionMgrStyle.left = `${x}px`
+        actionMgrStyle.top = `${y}px`
+        actionMgrStyle.bottom = 'auto'
+        actionMgrStyle.right = 'auto'
         //  move Index
-        this.lastMoveIndex++;
+        this.lastMoveIndex++
         //  当按下键滑动时， 阻止屏幕滑动事件
-        event.preventDefault();
+        event.preventDefault()
       }
     },
     // 鼠标抬起
     handleMouseUp() {
       if (this.contentDragDisabled && this.innerOpen) {
-        this.mouseDownState = false;
-        return;
+        this.mouseDownState = false
+        return
       }
-      this.mouseDownState = false;
+      this.mouseDownState = false
     },
     // 单击事件
     handleBtnClick() {
@@ -171,58 +161,54 @@ export default {
       //  如果上一次down事件到下一次click事件中经历10次以下move，则视为纯点击事件
       if (this.lastMoveIndex - this.curMoveIndex <= 10) {
         //  点击事件
-        this.innerOpen = !this.innerOpen;
+        this.innerOpen = !this.innerOpen
         if (this.innerOpen) {
-          let {
-            clientHeight: windowHeight,
-            clientWidth: windowWidth
-          } = document.documentElement;
+          let { clientHeight: windowHeight, clientWidth: windowWidth } = document.documentElement
 
           //  拖拽按钮 dom 元素  获取 宽高 style 对象
-          let { style: actionMgrStyle } = this.$refs.actionMgr;
+          let { style: actionMgrStyle } = this.$refs.actionMgr
           // 计算后坐标  设置 按钮位置
-          this.innerOpen &&
-            this.calcPosition(actionMgrStyle, windowWidth, windowHeight);
+          this.innerOpen && this.calcPosition(actionMgrStyle, windowWidth, windowHeight)
         }
       }
-      this.curMoveIndex = this.lastMoveIndex;
+      this.curMoveIndex = this.lastMoveIndex
     },
     calcPosition(actionMgrStyle, windowWidth, windowHeight) {
       if (this.dY > 0 && this.dY < windowHeight - 50) {
         //  不在顶部 且 不在底部
         if (this.dX <= windowWidth / 2) {
           //  left 小于等于屏幕一半
-          actionMgrStyle.left = 0;
-          actionMgrStyle.right = 'auto';
+          actionMgrStyle.left = 0
+          actionMgrStyle.right = 'auto'
         } else {
           //  left 大于屏幕一半
-          actionMgrStyle.left = 'auto';
-          actionMgrStyle.right = 0;
+          actionMgrStyle.left = 'auto'
+          actionMgrStyle.right = 0
         }
         if (this.dY >= windowHeight / 2) {
           //  宽度大于1/2时，是将top改为auto，调整bottom
-          actionMgrStyle.top = 'auto';
-          actionMgrStyle.bottom = windowHeight - this.dY - 50 + 'px';
+          actionMgrStyle.top = 'auto'
+          actionMgrStyle.bottom = windowHeight - this.dY - 50 + 'px'
         }
       } else {
         if (this.dY === 0) {
           //  在顶部
-          actionMgrStyle.top = 0;
-          actionMgrStyle.bottom = 'auto';
+          actionMgrStyle.top = 0
+          actionMgrStyle.bottom = 'auto'
         } else if (this.dY === windowHeight - 50) {
-          actionMgrStyle.bottom = 0;
-          actionMgrStyle.top = 'auto';
+          actionMgrStyle.bottom = 0
+          actionMgrStyle.top = 'auto'
         }
         if (this.dX >= windowWidth / 2) {
           //  右侧是将left改为auto，调整right
-          actionMgrStyle.left = 'auto';
-          actionMgrStyle.right = windowWidth - this.dX - 50 + 'px';
+          actionMgrStyle.left = 'auto'
+          actionMgrStyle.right = windowWidth - this.dX - 50 + 'px'
         }
       }
-      return actionMgrStyle;
+      return actionMgrStyle
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

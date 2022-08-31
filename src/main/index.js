@@ -1,22 +1,22 @@
-'use strict';
-import path from 'path';
-import { cmdArg } from './services/cmdParse';
-const { app, protocol } = require('electron');
+'use strict'
+import path from 'path'
+import { cmdArg } from './services/cmdParse'
+const { app, protocol } = require('electron')
 import PersistedState from 'vuex-electron-store'
-import initWindow from './services/windowManager';
-import DisableButton from './config/DisableButton';
-const { session } = require("electron");
+import initWindow from './services/windowManager'
+import DisableButton from './config/DisableButton'
+const { session } = require('electron')
 // import electronDevtoolsInstaller, {
 //   VUEJS_DEVTOOLS
 // } from 'electron-devtools-installer';
-import { NO_CACHE_FILE_PROTOCOL } from '@/constants';
+import { NO_CACHE_FILE_PROTOCOL } from '@/constants'
 
 protocol.registerSchemesAsPrivileged([
   {
     scheme: NO_CACHE_FILE_PROTOCOL,
     privileges: { bypassCSP: true }
   }
-]);
+])
 // app.disableHardwareAcceleration(); // 禁用gpu加速  解决图片拖动卡顿问题
 if (cmdArg.h) {
   console.log(`
@@ -37,66 +37,62 @@ Options:
 advise:
   由于MegSpot支持自动更新导致  MegSpot-x.x.x.AppImage的文件名称会不断变化，建议创建个硬链接指向AppImage
   命令：sudo ln ./MegSpot-x.x.x.AppImage /usr/bin/MegSpot
-  `);
-  app.exit();
+  `)
+  app.exit()
 }
-app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport');  // 启用H.265解码
+app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport') // 启用H.265解码
 require('@electron/remote/main').initialize() // init @electron/remote
 PersistedState.initRenderer() // init vuex-electron-store
-console.log('cmdArg', cmdArg);
+console.log('cmdArg', cmdArg)
 function onAppReady() {
-  initWindow();
-  DisableButton.Disablef12();
+  initWindow()
+  DisableButton.Disablef12()
   if (process.env.NODE_ENV === 'development') {
-    const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor"); // Vue2 Extension
-    session.defaultSession.loadExtension(VUEJS_DEVTOOLS, {
-      allowFileAccess: true
-    }).then(() => {
-      console.log('已安装: vue-devtools')
-    }).catch((err) => {
-      console.error('拓展安装失败', err)
-    });
+    const { VUEJS_DEVTOOLS } = require('electron-devtools-vendor') // Vue2 Extension
+    session.defaultSession
+      .loadExtension(VUEJS_DEVTOOLS, {
+        allowFileAccess: true
+      })
+      .then(() => {
+        console.log('已安装: vue-devtools')
+      })
+      .catch((err) => {
+        console.error('拓展安装失败', err)
+      })
     // electronDevtoolsInstaller(VUEJS_DEVTOOLS)
     //   .then(name => console.log(`installed: ${name}`))
     //   .catch(err => console.log('Unable to install `vue-devtools`: \n', err));
   }
-  const registerSucceed = protocol.registerFileProtocol(
-    NO_CACHE_FILE_PROTOCOL,
-    (request, callback) => {
-      const url = decodeURI(request.url).substr(
-        `${NO_CACHE_FILE_PROTOCOL}://`.length
-      );
-      callback({
-        path: url,
-        headers: {
-          'cache-control': 'no-store'
-        }
-      });
-    }
-  );
+  const registerSucceed = protocol.registerFileProtocol(NO_CACHE_FILE_PROTOCOL, (request, callback) => {
+    const url = decodeURI(request.url).substr(`${NO_CACHE_FILE_PROTOCOL}://`.length)
+    callback({
+      path: url,
+      headers: {
+        'cache-control': 'no-store'
+      }
+    })
+  })
   if (!registerSucceed) console.error('Failed to register protocol')
   protocol.interceptFileProtocol('file', (request, callback) => {
-    callback(request);
-  });
+    callback(request)
+  })
 }
 // 禁止缓存
-app.isReady() ? onAppReady() : app.on('ready', onAppReady);
+app.isReady() ? onAppReady() : app.on('ready', onAppReady)
 // 解决9.x跨域异常问题
-app.commandLine.appendArgument('no-sandbox');
+app.commandLine.appendArgument('no-sandbox')
 
 app.on('window-all-closed', () => {
   // 所有平台均为所有窗口关闭就退出软件
-  app.quit();
-});
+  app.quit()
+})
 app.on('browser-window-created', () => {
   // console.log('window-created');
-});
-const MEGSPOT = 'megspot';
+})
+const MEGSPOT = 'megspot'
 if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
   // 设置electron.exe 和 app的路径
-  app.setAsDefaultProtocolClient(MEGSPOT, process.execPath, [
-    path.resolve(process.argv[1])
-  ]);
+  app.setAsDefaultProtocolClient(MEGSPOT, process.execPath, [path.resolve(process.argv[1])])
 } else {
-  app.setAsDefaultProtocolClient(MEGSPOT);
+  app.setAsDefaultProtocolClient(MEGSPOT)
 }

@@ -1,14 +1,11 @@
-let crypto;
+let crypto
 try {
-  crypto = require('crypto');
+  crypto = require('crypto')
 } catch (err) {
-  console.log('crypto support is disabled!');
+  console.log('crypto support is disabled!')
 }
 
-export const encrypt = str => {
-  let hash = crypto
-    .createHash('sha256')
-    .update(str)
-    .digest('hex');
-  return hash;
-};
+export const encrypt = (str) => {
+  let hash = crypto.createHash('sha256').update(str).digest('hex')
+  return hash
+}

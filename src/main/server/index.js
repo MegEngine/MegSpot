@@ -6,7 +6,7 @@ const port = config.BuiltInServerPort
 var server = null
 app.set('port', port)
 export default {
-  StatrServer () {
+  StatrServer() {
     return new Promise((resolve, reject) => {
       server = http.createServer(app)
       server.listen(port)
@@ -27,7 +27,7 @@ export default {
       })
     })
   },
-  StopServer () {
+  StopServer() {
     return new Promise((resolve, reject) => {
       console.log(server)
       if (server) {

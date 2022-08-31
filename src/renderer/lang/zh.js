@@ -1,8 +1,7 @@
 export default {
   common: {
     supportTypes: '支持多种文件类型:',
-    desc:
-      'MegSpot是一款跨平台的本地应用，旨在为用户提供本地图片对比、视频对比、图片定制处理等便捷功能。\r\n可进入QQ交流群(782365536)了解详情、获取最新资讯。',
+    desc: 'MegSpot是一款跨平台的本地应用，旨在为用户提供本地图片对比、视频对比、图片定制处理等便捷功能。\r\n可进入QQ交流群(782365536)了解详情、获取最新资讯。',
     manual: '使用手册',
     hotKey: '快捷键',
     please: '请',
@@ -86,8 +85,7 @@ export default {
     entries: {
       image: {
         title: '图片对比',
-        desc:
-          '图片查看对比器，可查看本地图片，支持缩放、移动、叠加显示等多种交互'
+        desc: '图片查看对比器，可查看本地图片，支持缩放、移动、叠加显示等多种交互'
       },
       video: {
         title: '视频对比',
@@ -140,8 +138,7 @@ export default {
     adaptive: '自适应',
     align: '对齐(大小不变)',
     align2: '对齐(大小相同)',
-    helpText:
-      '双击图片可激活目标容器实现单独缩放旋转等操作，单击图片描述信息可编辑',
+    helpText: '双击图片可激活目标容器实现单独缩放旋转等操作，单击图片描述信息可编辑',
     rotate: '旋转',
     generateGIF: '生成gif'
   },
@@ -181,8 +178,7 @@ export default {
     fullscreen: '全屏\nESC退出全屏',
     dynamicPickColor: '取色器动态监听',
     minRenderInterval: '视频渲染最小间隔',
-    processTip:
-      '左键点击可 显示/隐藏 视频进度条，右键点击可 显示/隐藏 视频进度的精确控制组件'
+    processTip: '左键点击可 显示/隐藏 视频进度条，右键点击可 显示/隐藏 视频进度的精确控制组件'
   },
   sortFile: {
     apply: '应用',
@@ -204,4 +200,4 @@ export default {
     smartSort: '智能排序',
     smartSortTip: '不同文件夹下的同名文件排序在一起，便于对比'
   }
-};
+}

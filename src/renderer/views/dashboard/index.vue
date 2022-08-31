@@ -1,10 +1,5 @@
 <template>
-  <div
-    ref="container"
-    id="container"
-    flex="dir:top box:first"
-    class="dashboard-container"
-  >
+  <div ref="container" id="container" flex="dir:top box:first" class="dashboard-container">
     <div flex="dir:left main:center box:mean" class="entry">
       <entry-card
         v-for="item in tools"
@@ -14,23 +9,18 @@
         :icon="item.icon"
         :route="item.route"
         class="entry-item"
-      >
-      </entry-card>
+      ></entry-card>
     </div>
     <div class="help">
-      <HelpVideo
-        :videoSource="videoSource"
-        :_width="size.width"
-        :_height="size.height"
-      ></HelpVideo>
+      <HelpVideo :videoSource="videoSource" :_width="size.width" :_height="size.height"></HelpVideo>
     </div>
   </div>
 </template>
 
 <script>
-import EntryCard from './EntryCard';
-import HelpVideo from './HelpVideo';
-import { throttle } from '@/utils';
+import EntryCard from './EntryCard'
+import HelpVideo from './HelpVideo'
+import { throttle } from '@/utils'
 
 export default {
   name: 'dashboard',
@@ -61,40 +51,37 @@ export default {
           route: '/video/index'
         }
       ]
-    };
+    }
   },
   mounted() {
     this.videoSource = [
       {
-        url:
-          'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/image-compare.mp4',
+        url: 'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/image-compare.mp4',
         title: '图像对比使用介绍'
       },
       {
-        url:
-          'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/video-compare.mp4',
+        url: 'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/video-compare.mp4',
         title: '视频对比使用介绍'
       },
       {
-        url:
-          'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/drag-compare.mp4',
+        url: 'https://github.com/MegEngine/MegSpot/releases/download/v1.0.1/drag-compare.mp4',
         title: '拖拽对比使用介绍'
       }
-    ];
-    window.addEventListener('resize', this.handleResize, true);
+    ]
+    window.addEventListener('resize', this.handleResize, true)
   },
   methods: {
-    handleResize: throttle(50, function() {
+    handleResize: throttle(50, function () {
       // this.$nextTick(() => {
-      const container = this.$refs.container;
+      const container = this.$refs.container
       this.size = {
         width: (container && ((container.offsetHeight - 240) * 5) / 3) ?? 500,
         height: (container && container.offsetHeight - 240) ?? 300
-      };
+      }
       // });
     })
   }
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>

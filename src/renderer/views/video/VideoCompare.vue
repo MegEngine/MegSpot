@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import Toolbar from './Toolbar';
-import Content from './Content';
+import Toolbar from './Toolbar'
+import Content from './Content'
 
 export default {
   name: 'video-compare',
@@ -15,7 +15,7 @@ export default {
     Toolbar,
     Content
   }
-};
+}
 </script>
 <style lang="scss" scoped>
 .video-center {

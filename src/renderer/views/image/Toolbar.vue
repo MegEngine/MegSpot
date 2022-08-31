@@ -3,28 +3,53 @@
     <div class="left" flex="cross:center">
       <div class="router-back">
         <!-- v-tip.sure="`${$t('common.hotKey')}：esc`" -->
-        <span @click="goBack" class="btn"><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span>
+        <span @click="goBack" class="btn">
+          <i class="el-icon-d-arrow-left"></i>
+          {{ $t('nav.back') }}
+        </span>
       </div>
-      <SelectedBtn v-if="!snapshotMode" :selectedList="imageList" :focusListIndex="
-        new Array(groupCount).fill(0).map((_, index) => index + startIndex)
-      " @update="setImages" @remove="removeImages" @click="emptyImages">
-      </SelectedBtn>
-      <el-input-number v-if="!snapshotMode" v-model="groupNum" @change="changeGroup" size="mini" :step="1" :min="1"
-        :max="maxGroupNum" v-tip="$t('general.groupNum')" label="groupNum" class="group-number"></el-input-number>
+      <SelectedBtn
+        v-if="!snapshotMode"
+        :selectedList="imageList"
+        :focusListIndex="new Array(groupCount).fill(0).map((_, index) => index + startIndex)"
+        @update="setImages"
+        @remove="removeImages"
+        @click="emptyImages"
+      ></SelectedBtn>
+      <el-input-number
+        v-if="!snapshotMode"
+        v-model="groupNum"
+        @change="changeGroup"
+        size="mini"
+        :step="1"
+        :min="1"
+        :max="maxGroupNum"
+        v-tip="$t('general.groupNum')"
+        label="groupNum"
+        class="group-number"
+      ></el-input-number>
       <el-radio-group v-model="smooth" class="gap" size="mini">
-        <el-radio-button :label="false">{{
-            $t('imageCenter.nearestInterpolation')
-        }}</el-radio-button>
-        <el-radio-button :label="true">{{
-            $t('imageCenter.bilinearInterpolation')
-        }}</el-radio-button>
+        <el-radio-button :label="false">{{ $t('imageCenter.nearestInterpolation') }}</el-radio-button>
+        <el-radio-button :label="true">{{ $t('imageCenter.bilinearInterpolation') }}</el-radio-button>
       </el-radio-group>
-      <el-button v-if="snapshotMode" type="text" size="mini" @click="resetSnapshotPos"
-        v-tip="$t('image.toolbar.resetPositionTip')" style="margin-left: 10px;">
+      <el-button
+        v-if="snapshotMode"
+        type="text"
+        size="mini"
+        @click="resetSnapshotPos"
+        v-tip="$t('image.toolbar.resetPositionTip')"
+        style="margin-left: 10px"
+      >
         {{ $t('image.toolbar.resetPosition') }}
       </el-button>
-      <el-button v-if="snapshotMode" type="text" size="mini" @click="exportImage"
-        v-loading.fullscreen.lock="fullscreenLoading" v-tip.sure="$t('image.toolbar.exportTip')">
+      <el-button
+        v-if="snapshotMode"
+        type="text"
+        size="mini"
+        @click="exportImage"
+        v-loading.fullscreen.lock="fullscreenLoading"
+        v-tip.sure="$t('image.toolbar.exportTip')"
+      >
         <span class="svg-container" v-tip="$t('image.toolbar.exportTip')">
           <svg-icon icon-class="export" />
         </span>
@@ -37,28 +62,48 @@
     </div>
     <div class="middle">
       <el-button-group class="gap">
-        <el-button type="text" size="mini" @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)" v-tip="$t('imageCenter.overlayLeft')">
+        <el-button
+          type="text"
+          size="mini"
+          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
+          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
+          v-tip="$t('imageCenter.overlayLeft')"
+        >
           <span class="svg-container">
             <svg-icon icon-class="direction-left" />
           </span>
         </el-button>
-        <el-button type="text" size="mini" @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)" v-tip="$t('imageCenter.overlayRight')">
+        <el-button
+          type="text"
+          size="mini"
+          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
+          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
+          v-tip="$t('imageCenter.overlayRight')"
+        >
           <span class="svg-container">
-            <svg-icon icon-class="direction-left" class="svg-container" style="transform:rotate(180deg);" />
+            <svg-icon icon-class="direction-left" class="svg-container" style="transform: rotate(180deg)" />
           </span>
         </el-button>
-        <el-button type="text" size="mini" @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)" v-tip="$t('imageCenter.overlayBottom')">
+        <el-button
+          type="text"
+          size="mini"
+          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
+          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
+          v-tip="$t('imageCenter.overlayBottom')"
+        >
           <span class="svg-container">
-            <svg-icon icon-class="direction-left" style="transform:rotate(-90deg);" />
+            <svg-icon icon-class="direction-left" style="transform: rotate(-90deg)" />
           </span>
         </el-button>
-        <el-button type="text" size="mini" @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
-          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)" v-tip="$t('imageCenter.overlayTop')">
+        <el-button
+          type="text"
+          size="mini"
+          @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
+          @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
+          v-tip="$t('imageCenter.overlayTop')"
+        >
           <span class="svg-container">
-            <svg-icon icon-class="direction-left" style="transform:rotate(90deg);" />
+            <svg-icon icon-class="direction-left" style="transform: rotate(90deg)" />
           </span>
         </el-button>
         <el-button type="text" size="mini" v-tip.sure="`choose images to generate GIF`" @click="$refs.gifDialog.show()">
@@ -77,12 +122,12 @@
     <div class="right">
       <div class="tool-btns">
         <el-button-group class="gap">
-          <el-button type="text" @click="pickColor" size="mini" v-tip="
-            $t('imageCenter.colorPicker') +
-            ' ' +
-            $t('common.hotKey') +
-            ':cmd/ctrl+p'
-          ">
+          <el-button
+            type="text"
+            @click="pickColor"
+            size="mini"
+            v-tip="$t('imageCenter.colorPicker') + ' ' + $t('common.hotKey') + ':cmd/ctrl+p'"
+          >
             <span class="svg-container" style="font-size: 20px">
               <svg-icon icon-class="pick-color" :clicked="traggerRGB" />
             </span>
@@ -129,18 +174,28 @@
             </span>
           </el-button>
         </el-button-group>
-        <el-select v-if="!snapshotMode" v-model="layout" placeholder="layout" class="layout-selector" size="mini"
-          v-tip.left="$t('general.layout')">
-          <el-option v-for="item in [
-            GLOBAL_CONSTANTS.LAYOUT_2X2,
-            GLOBAL_CONSTANTS.LAYOUT_2X1,
-            GLOBAL_CONSTANTS.LAYOUT_3X1,
-            GLOBAL_CONSTANTS.LAYOUT_3X2,
-            GLOBAL_CONSTANTS.LAYOUT_4X1,
-            GLOBAL_CONSTANTS.LAYOUT_1X1
-          ]" :disabled="imageList.length < parseInt(item[0]) * parseInt(item[2])" :key="item" :label="item"
-            :value="item">
-          </el-option>
+        <el-select
+          v-if="!snapshotMode"
+          v-model="layout"
+          placeholder="layout"
+          class="layout-selector"
+          size="mini"
+          v-tip.left="$t('general.layout')"
+        >
+          <el-option
+            v-for="item in [
+              GLOBAL_CONSTANTS.LAYOUT_2X2,
+              GLOBAL_CONSTANTS.LAYOUT_2X1,
+              GLOBAL_CONSTANTS.LAYOUT_3X1,
+              GLOBAL_CONSTANTS.LAYOUT_3X2,
+              GLOBAL_CONSTANTS.LAYOUT_4X1,
+              GLOBAL_CONSTANTS.LAYOUT_1X1
+            ]"
+            :disabled="imageList.length < parseInt(item[0]) * parseInt(item[2])"
+            :key="item"
+            :label="item"
+            :value="item"
+          ></el-option>
         </el-select>
         <el-button-group class="gap">
           <ImageSetting></ImageSetting>
@@ -150,13 +205,13 @@
   </div>
 </template>
 <script>
-import * as GLOBAL_CONSTANTS from '@/constants';
-import SelectedBtn from '@/components/selected-btn';
-import { createNamespacedHelpers } from 'vuex';
-import GifDialog from '@/components/gif-dialog';
-import ImageSetting from '@/components/image-setting';
-const { mapGetters, mapActions } = createNamespacedHelpers('imageStore');
-import { handleEvent } from '@/tools/hotkey';
+import * as GLOBAL_CONSTANTS from '@/constants'
+import SelectedBtn from '@/components/selected-btn'
+import { createNamespacedHelpers } from 'vuex'
+import GifDialog from '@/components/gif-dialog'
+import ImageSetting from '@/components/image-setting'
+const { mapGetters, mapActions } = createNamespacedHelpers('imageStore')
+import { handleEvent } from '@/tools/hotkey'
 
 export default {
   components: { SelectedBtn, GifDialog, ImageSetting },
@@ -178,218 +233,196 @@ export default {
       offset: 0,
       hotkeyDownEvents: undefined,
       hotkeyUpEvents: undefined
-    };
+    }
   },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
     maxGroupNum() {
-      return Math.ceil(
-        this.imageList.length / (this.layout[0] * this.layout[2])
-      );
+      return Math.ceil(this.imageList.length / (this.layout[0] * this.layout[2]))
     },
     // 每组图片数量
     groupCount() {
       const str = this.imageConfig.layout,
-        len = str.length;
-      return str[len - 3] * str[len - 1];
+        len = str.length
+      return str[len - 3] * str[len - 1]
     },
     smooth: {
       get() {
-        return this.imageConfig.smooth;
+        return this.imageConfig.smooth
       },
       set(newVal) {
-        this.setImageConfig({ smooth: newVal });
+        this.setImageConfig({ smooth: newVal })
       }
     },
     layout: {
       get() {
-        return this.imageConfig.layout;
+        return this.imageConfig.layout
       },
       set(val) {
-        const preNum = this.groupCount * (this.groupNum - 1);
-        this.setImageConfig({ layout: val });
-        const afterNum = this.groupCount * (this.groupNum - 1);
-        this.offset = preNum - afterNum;
-        this.startIndex = Math.max(
-          0,
-          (this.groupNum - 1) * this.groupCount + this.offset
-        );
-        this.$bus.$emit('changeGroup', this.startIndex);
-        this.groupNum = Math.floor(this.startIndex / this.groupCount);
+        const preNum = this.groupCount * (this.groupNum - 1)
+        this.setImageConfig({ layout: val })
+        const afterNum = this.groupCount * (this.groupNum - 1)
+        this.offset = preNum - afterNum
+        this.startIndex = Math.max(0, (this.groupNum - 1) * this.groupCount + this.offset)
+        this.$bus.$emit('changeGroup', this.startIndex)
+        this.groupNum = Math.floor(this.startIndex / this.groupCount)
       }
     }
   },
   methods: {
-    ...mapActions([
-      'emptyImages',
-      'removeImages',
-      'setImageConfig',
-      'setImages'
-    ]),
+    ...mapActions(['emptyImages', 'removeImages', 'setImageConfig', 'setImages']),
     initHotkeyEvents() {
-      const hotkeyDownEvents = new Map();
-      const hotkeyUpEvents = new Map();
+      const hotkeyDownEvents = new Map()
+      const hotkeyUpEvents = new Map()
 
       hotkeyDownEvents.set('back', () => {
-        this.goBack();
+        this.goBack()
       })
       hotkeyDownEvents.set('pickColor', () => {
-        this.pickColor();
+        this.pickColor()
       })
       hotkeyDownEvents.set('top', () => {
-        this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+        this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)
       })
       hotkeyDownEvents.set('left', () => {
-        this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+        this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)
       })
       hotkeyDownEvents.set('bottom', () => {
-        this.overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+        this.overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)
       })
       hotkeyDownEvents.set('right', () => {
-        this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+        this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)
       })
       hotkeyDownEvents.set('previousGroup', () => {
-        if (
-          this.groupNum > 1
-        ) {
-          this.groupNum--;
-          this.changeGroup(this.groupNum, this.groupNum + 1);
+        if (this.groupNum > 1) {
+          this.groupNum--
+          this.changeGroup(this.groupNum, this.groupNum + 1)
         }
       })
       hotkeyDownEvents.set('nextGroup', () => {
-        if (
-          this.groupNum < this.maxGroupNum
-        ) {
-          this.groupNum++;
-          this.changeGroup(this.groupNum, this.groupNum - 1);
+        if (this.groupNum < this.maxGroupNum) {
+          this.groupNum++
+          this.changeGroup(this.groupNum, this.groupNum - 1)
         }
       })
 
       hotkeyUpEvents.set('top', () => {
-        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)
       })
       hotkeyUpEvents.set('left', () => {
-        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)
       })
       hotkeyUpEvents.set('bottom', () => {
-        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)
       })
       hotkeyUpEvents.set('right', () => {
-        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+        this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)
       })
 
-      this.hotkeyDownEvents = hotkeyDownEvents;
-      this.hotkeyUpEvents = hotkeyUpEvents;
+      this.hotkeyDownEvents = hotkeyDownEvents
+      this.hotkeyUpEvents = hotkeyUpEvents
     },
     handleHotKey(event) {
-      handleEvent(event, this.hotkeyDownEvents);
+      handleEvent(event, this.hotkeyDownEvents)
     },
     handleHotKeyUp(event) {
-      handleEvent(event, this.hotkeyUpEvents);
+      handleEvent(event, this.hotkeyUpEvents)
     },
     changeGroup(groupNum, oldGroupNum) {
-      this.startIndex = Math.max(
-        0,
-        this.startIndex - this.groupCount * (oldGroupNum - groupNum)
-      );
-      this.$refs.gifDialog.clear(); // 清空gifDialog上次所选
-      this.$bus.$emit('changeGroup', this.startIndex);
+      this.startIndex = Math.max(0, this.startIndex - this.groupCount * (oldGroupNum - groupNum))
+      this.$refs.gifDialog.clear() // 清空gifDialog上次所选
+      this.$bus.$emit('changeGroup', this.startIndex)
     },
     changeGroup(groupNum) {
-      this.startIndex = Math.max(
-        0,
-        (groupNum - 1) * this.groupCount + this.offset
-      );
-      this.$bus.$emit('changeGroup', this.startIndex);
+      this.startIndex = Math.max(0, (groupNum - 1) * this.groupCount + this.offset)
+      this.$bus.$emit('changeGroup', this.startIndex)
     },
     handleSelect(data) {
-      this.showSelectedMsg = !!data;
+      this.showSelectedMsg = !!data
     },
     handleReset() {
-      this.imgScale = 1;
+      this.imgScale = 1
     },
     goBack() {
       if (window.history.length > 1) {
-        this.$router.back();
+        this.$router.back()
       } else {
         // 如果强制reload导致没有历史路由 唯一的历史就是当前页面 则回到默认的历史页面
-        this.$router.push('/image/index');
+        this.$router.push('/image/index')
       }
     },
     resetCanvas(data) {
-      this.$bus.$emit('imageCenter_resetCanvas', { name: 'reset', data });
+      this.$bus.$emit('imageCenter_resetCanvas', { name: 'reset', data })
     },
     overlay(direction) {
       this.$bus.$emit('setOverLay', {
         direction,
         status: true
-      });
+      })
     },
     cancelOverlay(direction) {
       this.$bus.$emit('setOverLay', {
         direction,
         status: false
-      });
+      })
     },
     handleShare() {
-      this.$bus.$emit('share');
+      this.$bus.$emit('share')
     },
     pickColor() {
-      this.traggerRGB = !this.traggerRGB;
+      this.traggerRGB = !this.traggerRGB
       this.$bus.$emit('image_broadcast', {
         name: 'pickColor',
         data: { status: this.traggerRGB }
-      });
+      })
     },
     rotate(data) {
-      this.$bus.$emit('imageCenter_rotate', { name: 'rotate', data });
+      this.$bus.$emit('imageCenter_rotate', { name: 'rotate', data })
     },
     reverse(data) {
-      this.$bus.$emit('imageCenter_reverse', { name: 'reverse', data });
+      this.$bus.$emit('imageCenter_reverse', { name: 'reverse', data })
     },
     async align(beSameSize) {
-      const data = await new Promise(resolve => {
-        this.$bus.$emit(
-          'imageCenter_getSelectedPosition',
-          { name: 'getSelectedPosition', data: beSameSize },
-          res => resolve(res)
-        );
-      });
+      const data = await new Promise((resolve) => {
+        this.$bus.$emit('imageCenter_getSelectedPosition', { name: 'getSelectedPosition', data: beSameSize }, (res) =>
+          resolve(res)
+        )
+      })
       this.$bus.$emit('imageCenter_align', {
         name: 'align',
         data: { beSameSize, ...data }
-      });
+      })
     },
     exportImage() {
       this.$bus.$emit(
         'imageCenter_exportImage',
         () => {
-          this.fullscreenLoading = true;
+          this.fullscreenLoading = true
         },
         ({ directoryPath, results }) => {
-          this.fullscreenLoading = false;
-          results.every(result => result.status === 'fulfilled')
+          this.fullscreenLoading = false
+          results.every((result) => result.status === 'fulfilled')
             ? this.$message.success(`导出成功,文件路径：${directoryPath}`)
-            : this.$message.error('导出失败');
+            : this.$message.error('导出失败')
         }
-      );
+      )
     },
     resetSnapshotPos() {
-      this.$bus.$emit('imageCenter_resetSnapshotPos');
+      this.$bus.$emit('imageCenter_resetSnapshotPos')
     }
   },
   mounted() {
-    this.initHotkeyEvents();
-    window.addEventListener('keydown', this.handleHotKey, true);
-    window.addEventListener('keyup', this.handleHotKeyUp, true);
-    this.$bus.$on('image_handleSelect', this.handleSelect);
+    this.initHotkeyEvents()
+    window.addEventListener('keydown', this.handleHotKey, true)
+    window.addEventListener('keyup', this.handleHotKeyUp, true)
+    this.$bus.$on('image_handleSelect', this.handleSelect)
   },
   beforeDestroy() {
-    window.removeEventListener('keydown', this.handleHotKey, true);
-    window.removeEventListener('keyup', this.handleHotKeyUp, true);
-    this.$bus.$off('image_handleSelect', this.handleSelect);
+    window.removeEventListener('keydown', this.handleHotKey, true)
+    window.removeEventListener('keyup', this.handleHotKeyUp, true)
+    this.$bus.$off('image_handleSelect', this.handleSelect)
   }
-};
+}
 </script>
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
@@ -399,7 +432,7 @@ export default {
   position: relative;
   padding: 0 5px;
 
-  .gap+.gap {
+  .gap + .gap {
     margin-left: 10px;
   }
 

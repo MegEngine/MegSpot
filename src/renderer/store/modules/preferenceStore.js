@@ -1,5 +1,5 @@
-import { getArrStr } from '@/tools/hotkey';
-import {getType} from '@/utils'
+import { getArrStr } from '@/tools/hotkey'
+import { getType } from '@/utils'
 
 const preferenceStore = {
   namespaced: true,
@@ -27,44 +27,48 @@ const preferenceStore = {
     hotkeysMap: null
   },
   getters: {
-    preference: state => state.preference,
-    lastRouterPath: state => state.lastRouterPath,
-    hotkeysMap: state => state.hotkeysMap
+    preference: (state) => state.preference,
+    lastRouterPath: (state) => state.lastRouterPath,
+    hotkeysMap: (state) => state.hotkeysMap
   },
   mutations: {
     SET_PREFERENCE: (state, newPreOb) => {
-      const newPreference = Object.assign({}, state.preference, newPreOb);
-      state.preference = newPreference;
+      const newPreference = Object.assign({}, state.preference, newPreOb)
+      state.preference = newPreference
       if (newPreOb.hotkeys?.length) {
         console.log('generate keysMap')
-        state.hotkeysMap = new Map(newPreOb.hotkeys.map(({ name, keysArr }) => keysArr.map(keys => [getArrStr(keys), name])).flat());
+        state.hotkeysMap = new Map(
+          newPreOb.hotkeys.map(({ name, keysArr }) => keysArr.map((keys) => [getArrStr(keys), name])).flat()
+        )
       }
     },
     SET_LAST_ROUTER_PATH: (state, routerPath) => {
-      state.lastRouterPath = routerPath;
+      state.lastRouterPath = routerPath
     },
     ENSURE_HOTKEYS_MAP: (state) => {
       if (getType(state.hotkeysMap) !== 'Map' || state.hotkeysMap.size === 0) {
         console.log('(ensure)generate keysMap')
-        state.hotkeysMap = new Map(state.preference.hotkeys.map(({ name, keysArr }) => keysArr.map(keys => [getArrStr(keys), name])).flat());
+        state.hotkeysMap = new Map(
+          state.preference.hotkeys.map(({ name, keysArr }) => keysArr.map((keys) => [getArrStr(keys), name])).flat()
+        )
       }
     },
     CLEAR_HOTKEYS_MAP: (state) => {
-      state.hotkeysMap = null;
-      console.log('clear map', state.hotkeysMap);
+      state.hotkeysMap = null
+      console.log('clear map', state.hotkeysMap)
     }
   },
   actions: {
     setPreference({ commit }, newPreOb) {
-      commit('SET_PREFERENCE', newPreOb);
+      commit('SET_PREFERENCE', newPreOb)
     },
     setLastRouterPath({ commit }, routerPath) {
-      commit('SET_LAST_ROUTER_PATH', routerPath);
+      commit('SET_LAST_ROUTER_PATH', routerPath)
     },
     ensureHotkeysMap({ commit }) {
       commit('ENSURE_HOTKEYS_MAP')
     }
   }
-};
+}
 
-export default preferenceStore;
+export default preferenceStore

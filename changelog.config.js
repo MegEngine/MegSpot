@@ -52,4 +52,4 @@ module.exports = {
       value: 'release'
     }
   }
-};
+}

@@ -1,19 +1,9 @@
 <template>
   <div class="file-input">
-    <el-tooltip
-      :content="filePath"
-      placement="top"
-      effect="light"
-      :open-delay="800"
-    >
+    <el-tooltip :content="filePath" placement="top" effect="light" :open-delay="800">
       <span class="viewer-name">{{ filePath | getFileName }}</span>
     </el-tooltip>
-    <el-button
-      size="mini"
-      type="text"
-      class="el-icon-circle-plus"
-      @click="getFile"
-    ></el-button>
+    <el-button size="mini" type="text" class="el-icon-circle-plus" @click="getFile"></el-button>
     <ManageHistory
       v-model="fileHistory"
       :selected="filePath"
@@ -28,8 +18,8 @@
 </template>
 
 <script>
-const { dialog } = require('@electron/remote');
-import ManageHistory from '@/components/manage-history';
+const { dialog } = require('@electron/remote')
+import ManageHistory from '@/components/manage-history'
 export default {
   name: 'file-input',
   components: { ManageHistory },
@@ -55,14 +45,12 @@ export default {
     }
   },
   data() {
-    return {};
+    return {}
   },
   mounted() {},
   methods: {
     getFile() {
-      const filters = this.ext
-        ? [{ name: 'filter', extensions: this.ext }]
-        : [];
+      const filters = this.ext ? [{ name: 'filter', extensions: this.ext }] : []
       dialog
         .showOpenDialog({
           title: 'add file',
@@ -71,18 +59,18 @@ export default {
         })
         .then(({ canceled, filePaths }) => {
           if (canceled || !filePaths || !(filePaths.length > 0)) {
-            return;
+            return
           }
-          const filePath = filePaths[0];
-          this.$emit('update', filePath);
-          this.$emit('addHistory', filePath);
-        });
+          const filePath = filePaths[0]
+          this.$emit('update', filePath)
+          this.$emit('addHistory', filePath)
+        })
     },
     selectHistoryItem(item) {
-      this.$emit('update', item);
+      this.$emit('update', item)
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

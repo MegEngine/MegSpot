@@ -14,9 +14,7 @@
       @blur="onBlur"
       ref="searchInput"
     >
-      <template v-for="item in slots" :slot="item"
-        ><slot :name="item"></slot
-      ></template>
+      <template v-for="item in slots" :slot="item"><slot :name="item"></slot></template>
     </el-input>
   </div>
 </template>
@@ -32,33 +30,33 @@ export default {
   data() {
     return {
       slots: ['prefix', 'suffix', 'prepend', 'append']
-    };
+    }
   },
   methods: {
     onInput(value) {
-      this.$emit('input', value);
+      this.$emit('input', value)
     },
     onChange(value) {
-      this.$emit('change', value);
+      this.$emit('change', value)
     },
     onFocus(event) {
-      this.$emit('focus', event);
+      this.$emit('focus', event)
     },
     onBlur(event) {
-      this.$emit('blur', event);
+      this.$emit('blur', event)
     },
     focus() {
       if (this.$refs && this.$refs.searchInput) {
-        this.$refs.searchInput.focus();
+        this.$refs.searchInput.focus()
       }
     },
     blur() {
       if (this.$refs && this.$refs.searchInput) {
-        this.$refs.searchInput.blur();
+        this.$refs.searchInput.blur()
       }
     }
   }
-};
+}
 </script>
 
 <style scoped></style>

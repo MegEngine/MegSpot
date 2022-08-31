@@ -10,12 +10,7 @@
     >
       <div class="header">
         <div class="title">{{ $t('imageSetting.title') }}</div>
-        <el-button
-          type="text"
-          class="close-btn"
-          @click="visible = false"
-          v-tip="'close'"
-        >
+        <el-button type="text" class="close-btn" @click="visible = false" v-tip="'close'">
           <svg-icon icon-class="close" class="icon"></svg-icon>
         </el-button>
       </div>
@@ -36,19 +31,11 @@
           <span>{{ $t('imageSetting.showMousePos') }}：</span>
           <el-switch v-model="showMousePos"></el-switch>
         </div>
-        <div
-          v-if="$route.path.includes('video')"
-          flex="main:justify"
-          class="setting-item"
-        >
+        <div v-if="$route.path.includes('video')" flex="main:justify" class="setting-item">
           <span>{{ $t('video.dynamicPickColor') }}:</span>
           <el-switch v-model="dynamicPickColor"></el-switch>
         </div>
-        <div
-          v-if="$route.path.includes('video')"
-          flex="main:justify"
-          class="setting-item"
-        >
+        <div v-if="$route.path.includes('video')" flex="main:justify" class="setting-item">
           <span>{{ $t('video.muted') }}:</span>
           <el-switch v-model="videoMuted"></el-switch>
         </div>
@@ -57,7 +44,7 @@
           <el-select
             v-model="mode"
             placeholder="please select background color"
-            style="width: 100px;"
+            style="width: 100px"
             @change="handleModeChange"
           >
             <div>
@@ -66,7 +53,7 @@
                 :key="index"
                 :label="item.mode"
                 :value="item.mode"
-                style="padding: 0 10px 0 5px;"
+                style="padding: 0 10px 0 5px"
               >
                 <div flex="main:justify cross:center">
                   <div :style="baseStyle + item.style"></div>
@@ -102,15 +89,10 @@
               :key="index"
               :label="item"
               :value="item"
-            >
-            </el-option>
+            ></el-option>
           </el-select>
         </div>
-        <div
-          v-if="$route.path.includes('video')"
-          flex="main:justify"
-          class="setting-item"
-        >
+        <div v-if="$route.path.includes('video')" flex="main:justify" class="setting-item">
           <span>{{ $t('imageCenter.frameStep') }}(s):</span>
           <el-input-number
             v-model="frameCompareInterval"
@@ -120,11 +102,7 @@
             controls-position="right"
           ></el-input-number>
         </div>
-        <div
-          v-if="$route.path.includes('video')"
-          flex="main:justify"
-          class="setting-item"
-        >
+        <div v-if="$route.path.includes('video')" flex="main:justify" class="setting-item">
           <span>{{ $t('video.minRenderInterval') }}(s):</span>
           <el-input-number
             v-model="renderInterval"
@@ -146,23 +124,16 @@
         </div>
       </div>
       <el-button slot="reference" type="text" @click="visible = !visible">
-        <svg-icon
-          :clicked="visible"
-          icon-class="settings"
-          style="font-size: 22px;"
-        ></svg-icon>
+        <svg-icon :clicked="visible" icon-class="settings" style="font-size: 22px"></svg-icon>
       </el-button>
     </el-popover>
   </div>
 </template>
 
 <script>
-import { createNamespacedHelpers } from 'vuex';
-const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore');
-const {
-  mapGetters: videoMapGetters,
-  mapActions: videoMapActions
-} = createNamespacedHelpers('videoStore');
+import { createNamespacedHelpers } from 'vuex'
+const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore')
+const { mapGetters: videoMapGetters, mapActions: videoMapActions } = createNamespacedHelpers('videoStore')
 
 export default {
   name: 'ImageSetting',
@@ -170,8 +141,7 @@ export default {
     return {
       visible: false,
       radius: 10,
-      baseStyle:
-        'display: inline-block; margin-right: 5px; width: 24px; height: 24px; border:solid gray 2px;',
+      baseStyle: 'display: inline-block; margin-right: 5px; width: 24px; height: 24px; border:solid gray 2px;',
       predefineColors: ['#e3e7e900', '#2f2f2f', '#fafafa'],
       colorOptions: [
         {
@@ -191,17 +161,17 @@ export default {
           style: 'background: #fafafa;'
         }
       ]
-    };
+    }
   },
   methods: {
     ...mapActions(['setPreference']),
     ...videoMapActions(['setVideoConfig']),
     handleRadiusChange(newVal, oldVal) {
-      this.$bus.$emit('radius', newVal);
+      this.$bus.$emit('radius', newVal)
     },
     handleModeChange(curMode) {
-      const bg = this.colorOptions.find(item => item.mode === curMode);
-      this.setPreference({ background: bg });
+      const bg = this.colorOptions.find((item) => item.mode === curMode)
+      this.setPreference({ background: bg })
     }
   },
   computed: {
@@ -209,127 +179,123 @@ export default {
     ...videoMapGetters(['videoConfig']),
     scaleOptions: {
       get() {
-        return [...this.preference.scaleOptions].sort((a, b) => a - b);
+        return [...this.preference.scaleOptions].sort((a, b) => a - b)
       },
       set(newVal) {
         this.setPreference({
-          scaleOptions: [
-            ...new Set(
-              newVal.filter(item => !isNaN(item)).map(item => Number(item))
-            )
-          ]
-        });
+          scaleOptions: [...new Set(newVal.filter((item) => !isNaN(item)).map((item) => Number(item)))]
+        })
       }
     },
     videoProcessBarStyle: {
       get() {
-        return this.preference.videoProcessBarStyle;
+        return this.preference.videoProcessBarStyle
       },
       set(arg) {
         this.setPreference({
           videoProcessBarStyle: arg
-        });
+        })
       }
     },
     dynamicPickColor: {
       get() {
-        return this.videoConfig.dynamicPickColor;
+        return this.videoConfig.dynamicPickColor
       },
       set(arg) {
         this.setVideoConfig({
           dynamicPickColor: arg
-        });
+        })
       }
     },
     videoMuted: {
       get() {
-        return this.videoConfig.muted;
+        return this.videoConfig.muted
       },
       set(arg) {
         this.setVideoConfig({
           muted: arg
-        });
+        })
       }
     },
     frameCompareInterval: {
       get() {
-        return this.videoConfig.interval;
+        return this.videoConfig.interval
       },
       set(arg) {
         this.setVideoConfig({
           interval: arg
-        });
+        })
       }
     },
     renderInterval: {
       get() {
-        return this.videoConfig.minRenderInterval;
+        return this.videoConfig.minRenderInterval
       },
       set(arg) {
         this.setVideoConfig({
           minRenderInterval: arg
-        });
+        })
       }
     },
     defaultShowHist: {
       get() {
-        return this.preference.defaultShowHist; // false
+        return this.preference.defaultShowHist // false
       },
       set(newVal) {
-        this.setPreference({ defaultShowHist: newVal });
+        this.setPreference({ defaultShowHist: newVal })
       }
     },
     showTitle: {
       get() {
-        return this.preference.showTitle; // true
+        return this.preference.showTitle // true
       },
       set(newVal) {
-        this.setPreference({ showTitle: newVal });
+        this.setPreference({ showTitle: newVal })
       }
     },
     showMousePos: {
       get() {
-        return this.preference.showMousePos; // true
+        return this.preference.showMousePos // true
       },
       set(newVal) {
-        this.setPreference({ showMousePos: newVal });
+        this.setPreference({ showMousePos: newVal })
       }
     },
     showScale: {
       get() {
-        return this.preference.showScale; // true
+        return this.preference.showScale // true
       },
       set(newVal) {
-        this.setPreference({ showScale: newVal });
+        this.setPreference({ showScale: newVal })
       }
     },
     backgroundStyle: {
       get() {
-        return this.preference.background.style; // mix
+        return this.preference.background.style // mix
       },
       set(newVal) {
-        this.setPreference({ backgroundStyle: newVal });
+        this.setPreference({ backgroundStyle: newVal })
       }
     },
     mode: {
       get() {
-        return this.preference.background.mode; // mix
+        return this.preference.background.mode // mix
       },
       set(newVal) {
-        this.setPreference({ mode: newVal });
+        this.setPreference({ mode: newVal })
       }
     },
     radiusData: {
       get() {
-        return this.radius;
+        return this.radius
       },
       set(newVal) {
-        console.log('radius', radius);
-        this.$bus.$emit('radius', newVal);
+        console.log('radius', radius)
+        this.$bus.$emit('radius', newVal)
       }
     }
   }
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss">

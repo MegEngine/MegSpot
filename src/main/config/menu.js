@@ -1,8 +1,8 @@
 // 这里是定义菜单的地方，详情请查看 https://electronjs.org/docs/api/menu
-const { dialog, shell } = require('electron');
-const os = require('os');
-const { version, homepage } = require('../../../package.json');
-import { mainWindow } from '../services/windowManager';
+const { dialog, shell } = require('electron')
+const os = require('os')
+const { version, homepage } = require('../../../package.json')
+import { mainWindow } from '../services/windowManager'
 const menu = [
   {
     label: 'view',
@@ -14,8 +14,8 @@ const menu = [
       {
         label: 'Preference',
         accelerator: 'CmdOrCtrl+,',
-        click: function() {
-          mainWindow.webContents.send('aboutDialog');
+        click: function () {
+          mainWindow.webContents.send('aboutDialog')
         }
       },
       { role: 'undo' },
@@ -44,13 +44,13 @@ const menu = [
     submenu: [
       {
         label: 'about',
-        click: function() {
-          info();
+        click: function () {
+          info()
         }
       }
     ]
   }
-];
+]
 
 function info() {
   dialog
@@ -66,17 +66,17 @@ function info() {
     })
     .then(({ response, checkboxChecked }) => {
       if (response === 0) {
-        shell.openExternal(homepage);
+        shell.openExternal(homepage)
       }
     })
-    .catch(err => {
-      console.error(err);
+    .catch((err) => {
+      console.error(err)
       dialog.showMessageBox({
         title: 'Error',
         type: 'error',
         message: 'MegSpot',
         detail: err.toString()
-      });
-    });
+      })
+    })
 }
-export default menu;
+export default menu

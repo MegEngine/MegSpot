@@ -1,24 +1,24 @@
-import path from 'path';
-import { DEF } from './consts.js';
-import { readDir, getExtname, isDirectory, isFile } from '@/utils/file';
+import path from 'path'
+import { DEF } from './consts.js'
+import { readDir, getExtname, isDirectory, isFile } from '@/utils/file'
 
 // 不去进一步解析的文件夹  node_modules->黑洞
-const folderBlackList = ['node_modules'];
+const folderBlackList = ['node_modules']
 
 const getId = () => {
-  return new Date().getTime();
-};
+  return new Date().getTime()
+}
 
 const getFileIcon = (fileIcons, filePath) => {
-  const ext = getExtname(filePath);
+  const ext = getExtname(filePath)
   if (fileIcons[ext] && fileIcons[ext].name && fileIcons[ext].color) {
-    return fileIcons[ext];
+    return fileIcons[ext]
   } else {
-    return fileIcons['*'];
+    return fileIcons['*']
   }
-};
+}
 
-const generateFileInfo = dir => {
+const generateFileInfo = (dir) => {
   return {
     id: getId(),
     label: path.basename(dir),
@@ -26,8 +26,8 @@ const generateFileInfo = dir => {
     type: DEF.TYPE_DIRECTORY,
     hovering: false,
     children: []
-  };
-};
+  }
+}
 
 /**
  * @function 递归地遍历文件目录，返回所有文件清单
@@ -39,18 +39,13 @@ const generateFileInfo = dir => {
  */
 const listDir = async (dir, fileIcons, options = {}) => {
   if (!(options && typeof options === 'object')) {
-    throw new Error('Invalid options');
+    throw new Error('Invalid options')
   }
-  if (!isDirectory(dir)) throw new Error(`Invalid directory: ${dir}`);
+  if (!isDirectory(dir)) throw new Error(`Invalid directory: ${dir}`)
 
-  const include =
-    Array.isArray(options.include) && options.include.length > 0
-      ? options.include
-      : null;
-  const hiddenFiles =
-    typeof options.hiddenFiles === 'boolean' ? options.hiddenFiles : true;
-  const onlyDir =
-    typeof options.onlyDir === 'boolean' ? options.onlyDir : false;
+  const include = Array.isArray(options.include) && options.include.length > 0 ? options.include : null
+  const hiddenFiles = typeof options.hiddenFiles === 'boolean' ? options.hiddenFiles : true
+  const onlyDir = typeof options.onlyDir === 'boolean' ? options.onlyDir : false
   const dirData = {
     id: getId(),
     label: options.name || path.basename(dir),
@@ -58,41 +53,41 @@ const listDir = async (dir, fileIcons, options = {}) => {
     type: DEF.TYPE_DIRECTORY,
     hovering: false,
     children: []
-  };
+  }
 
-  let files = await readDir(dir).catch(err => {
-    throw err;
-  });
+  let files = await readDir(dir).catch((err) => {
+    throw err
+  })
   if (hiddenFiles) {
-    files = files.filter(item => !item.startsWith('.'));
+    files = files.filter((item) => !item.startsWith('.'))
   }
 
   for (let i = 0; i < files.length; i++) {
-    const filename = files[i];
-    const filePath = path.resolve(dir, filename);
+    const filename = files[i]
+    const filePath = path.resolve(dir, filename)
     if (isDirectory(filePath)) {
       if (!folderBlackList.includes(filename)) {
-        dirData.children.push(filePath);
+        dirData.children.push(filePath)
       }
     } else if (!onlyDir && isFile(filePath)) {
-      if (include && !include.includes(getExtname(filePath))) continue;
-      dirData.children = dirData.children || [];
+      if (include && !include.includes(getExtname(filePath))) continue
+      dirData.children = dirData.children || []
       dirData.children.push({
         id: getId(),
         label: filename,
         path: filePath,
         type: DEF.TYPE_FILE,
         icon: getFileIcon(fileIcons, filePath)
-      });
+      })
     }
   }
   if (!dirData.children.length) {
-    dirData.isLeaf = true;
+    dirData.isLeaf = true
   }
   dirData.children.sort((a, b) => {
-    return a.type - b.type;
-  });
-  return dirData;
-};
+    return a.type - b.type
+  })
+  return dirData
+}
 
-export { generateFileInfo, listDir };
+export { generateFileInfo, listDir }

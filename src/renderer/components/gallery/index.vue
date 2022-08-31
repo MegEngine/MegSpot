@@ -5,44 +5,25 @@
       size="mini"
       @click="showModal"
       :disabled="!sortList.length"
-      v-tip.sure="
-        'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'
-      "
+      v-tip.sure="'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'"
     >
       {{ $t('general.selected') }}
     </el-button>
     <div class="modal" @click="handleWrapperClick">
       <Split :gutterSize="4">
-        <SplitArea
-          :size="size"
-          :minSize="minSize"
-          :style="{ minWidth: minSize + 'px', maxWidth: maxSize + 'px' }"
-        >
+        <SplitArea :size="size" :minSize="minSize" :style="{ minWidth: minSize + 'px', maxWidth: maxSize + 'px' }">
           <div class="container" @animationend="disappearModal" @click.stop>
             <div class="toolbar" flex="cross:center">
-              <el-tooltip
-                :content="$t('gallery.smartSortTip')"
-                placement="right-start"
-              >
-                <el-button type="primary" class="btn" @click="smartSort">{{
-                  $t('gallery.smartSort')
-                }}</el-button>
+              <el-tooltip :content="$t('gallery.smartSortTip')" placement="right-start">
+                <el-button type="primary" class="btn" @click="smartSort">{{ $t('gallery.smartSort') }}</el-button>
               </el-tooltip>
-              <el-tooltip
-                :content="$t('gallery.enableNameSortTip')"
-                placement="right-start"
-              >
-                <el-checkbox v-model="enableNameSort" class="btn">{{
-                  $t('gallery.enableNameSort')
-                }}</el-checkbox>
+              <el-tooltip :content="$t('gallery.enableNameSortTip')" placement="right-start">
+                <el-checkbox v-model="enableNameSort" class="btn">{{ $t('gallery.enableNameSort') }}</el-checkbox>
               </el-tooltip>
               <div>
-                <el-tooltip
-                  :content="$t('gallery.clear')"
-                  placement="right-start"
-                >
+                <el-tooltip :content="$t('gallery.clear')" placement="right-start">
                   <span @click="handleClearAll" class="clear-btn">
-                    <svg-icon icon-class="bin" style="color:red" />
+                    <svg-icon icon-class="bin" style="color: red" />
                   </span>
                 </el-tooltip>
               </div>
@@ -56,46 +37,25 @@
                 class="sortList"
               >
                 <transition-group id="drag" type="transition" name="flip-list">
-                  <div
-                    v-for="(item, index) in sortList"
-                    :key="item"
-                    class="dragItem"
-                    @click="handleClick(item)"
-                  >
+                  <div v-for="(item, index) in sortList" :key="item" class="dragItem" @click="handleClick(item)">
                     <div
                       :class="[
-                        (focusListIndex.length &&
-                          focusListIndex.includes(index)) ||
-                        focusList.includes(item)
+                        (focusListIndex.length && focusListIndex.includes(index)) || focusList.includes(item)
                           ? 'focus-item'
                           : ''
                       ]"
                     >
                       <div>
-                        <span
-                          @click.stop="$emit('remove', item)"
-                          class="close-button"
-                          :title="$t('general.delete')"
-                        >
+                        <span @click.stop="$emit('remove', item)" class="close-button" :title="$t('general.delete')">
                           <svg-icon icon-class="bin" />
                         </span>
                       </div>
                       <div class="content" flex="main:center cross:center">
-                        <img
-                          name="dragItem"
-                          :src="getImageUrlSync(item)"
-                          v-if="isImage(item)"
-                        />
-                        <video
-                          name="dragItem"
-                          :src="getImageUrlSync(item)"
-                          v-if="isVideo(item)"
-                        />
+                        <img name="dragItem" :src="getImageUrlSync(item)" v-if="isImage(item)" />
+                        <video name="dragItem" :src="getImageUrlSync(item)" v-if="isVideo(item)" />
                       </div>
                       <div class="name" v-tip="item">
-                        <span
-                          v-html="$options.filters.getFileName(item)"
-                        ></span>
+                        <span v-html="$options.filters.getFileName(item)"></span>
                       </div>
                     </div>
                   </div>
@@ -113,11 +73,11 @@
 </template>
 
 <script>
-import { getImageUrlSync } from '@/utils/image';
-import { isImage, isVideo } from '@/components/file-tree/lib/util';
-import draggable from 'vuedraggable';
-import { arraySortByName } from '@/utils/file';
-import { DELIMITER } from '@/constants';
+import { getImageUrlSync } from '@/utils/image'
+import { isImage, isVideo } from '@/components/file-tree/lib/util'
+import draggable from 'vuedraggable'
+import { arraySortByName } from '@/utils/file'
+import { DELIMITER } from '@/constants'
 
 export default {
   name: 'gallery',
@@ -166,51 +126,47 @@ export default {
         }
       },
       drag: false
-    };
+    }
   },
   computed: {
     maxColumnLength() {
-      return Math.floor(document.body.clientWidth / this.itemSize.width);
+      return Math.floor(document.body.clientWidth / this.itemSize.width)
     },
     columnItemNum() {
-      return Math.max(
-        1,
-        Math.floor(document.body.clientHeight / this.itemSize.height)
-      );
+      return Math.max(1, Math.floor(document.body.clientHeight / this.itemSize.height))
     },
     minSize() {
-      return this.itemSize.width + 24;
+      return this.itemSize.width + 24
     },
     maxSize() {
       return Math.min(
-        Math.ceil(this.selectedList.length / this.columnItemNum) *
-          this.itemSize.width,
+        Math.ceil(this.selectedList.length / this.columnItemNum) * this.itemSize.width,
         (document.body.clientWidth * 4) / 5
-      );
+      )
     },
     sortList: {
       get() {
-        return this.selectedList;
+        return this.selectedList
       },
       set(newVal) {
-        this.$emit('update', newVal);
+        this.$emit('update', newVal)
       }
     }
   },
   watch: {},
   mounted() {
-    window.addEventListener('keydown', this.handleHotKey, true);
-    this.modalItem = document.getElementsByClassName('modal')[0];
-    this.dragList = document.getElementsByClassName('container')[0];
+    window.addEventListener('keydown', this.handleHotKey, true)
+    this.modalItem = document.getElementsByClassName('modal')[0]
+    this.dragList = document.getElementsByClassName('container')[0]
   },
   activated() {
-    window.addEventListener('keydown', this.handleHotKey, true);
+    window.addEventListener('keydown', this.handleHotKey, true)
   },
   deactivated() {
-    window.removeEventListener('keydown', this.handleHotKey, true);
+    window.removeEventListener('keydown', this.handleHotKey, true)
   },
   beforeDestroy() {
-    window.removeEventListener('keydown', this.handleHotKey, true);
+    window.removeEventListener('keydown', this.handleHotKey, true)
   },
   methods: {
     isImage,
@@ -219,76 +175,73 @@ export default {
     handleHotKey(event) {
       if ((event.metaKey || event.ctrlKey) && event.keyCode === 70) {
         if (this.visible) {
-          this.hideModal();
+          this.hideModal()
         } else {
-          this.showModal();
+          this.showModal()
         }
       }
     },
     handleWrapperClick() {
-      if (!this.closeOnClickModal) return;
-      this.hideModal();
+      if (!this.closeOnClickModal) return
+      this.hideModal()
     },
     showModal() {
-      this.modalItem.style.display = 'inline';
-      this.modalItem.classList.remove('disappearModal');
-      this.modalItem.classList.add('appearModal');
-      this.dragList.classList.remove('disappearDragList');
-      this.dragList.classList.add('appearDragList');
-      this.visible = true;
+      this.modalItem.style.display = 'inline'
+      this.modalItem.classList.remove('disappearModal')
+      this.modalItem.classList.add('appearModal')
+      this.dragList.classList.remove('disappearDragList')
+      this.dragList.classList.add('appearDragList')
+      this.visible = true
     },
     hideModal(e) {
-      this.modalItem.classList.remove('appearModal');
-      this.modalItem.classList.add('disappearModal');
-      this.dragList.classList.remove('appearDragList');
-      this.dragList.classList.add('disappearDragList');
-      this.visible = false;
+      this.modalItem.classList.remove('appearModal')
+      this.modalItem.classList.add('disappearModal')
+      this.dragList.classList.remove('appearDragList')
+      this.dragList.classList.add('disappearDragList')
+      this.visible = false
     },
     disappearModal() {
       if (this.visible === false) {
-        this.modalItem.style.display = 'none';
+        this.modalItem.style.display = 'none'
       }
     },
     handleClick(path) {
-      this.$emit('click', path);
+      this.$emit('click', path)
     },
     handleClearAll() {
-      this.sortList = [];
-      this.hideModal();
+      this.sortList = []
+      this.hideModal()
     },
     smartSort() {
-      if (!this.sortList.length) return;
-      const getName = filePath =>
-        this.$options.filters.getFileName(filePath, false);
-      const nameMap = new Map();
-      let iterator = nameMap;
-      const multiple = [];
-      const single = [];
-      this.sortList.forEach(path => {
-        const name = getName(path);
+      if (!this.sortList.length) return
+      const getName = (filePath) => this.$options.filters.getFileName(filePath, false)
+      const nameMap = new Map()
+      let iterator = nameMap
+      const multiple = []
+      const single = []
+      this.sortList.forEach((path) => {
+        const name = getName(path)
         if (nameMap.has(name)) {
-          nameMap.get(name).push(path);
+          nameMap.get(name).push(path)
         } else {
-          nameMap.set(name, [path]);
+          nameMap.set(name, [path])
         }
-      });
+      })
       if (this.enableNameSort) {
-        iterator = Array.from(nameMap.entries()).sort(([nameA], [nameB]) =>
-          arraySortByName(nameA, nameB)
-        );
+        iterator = Array.from(nameMap.entries()).sort(([nameA], [nameB]) => arraySortByName(nameA, nameB))
       }
       for (const [name, pathArr] of iterator) {
         if (pathArr.length === 1) {
-          single.push(pathArr[0]);
+          single.push(pathArr[0])
         } else {
-          multiple.push(...pathArr);
+          multiple.push(...pathArr)
         }
       }
-      this.sortList = [...multiple, ...single];
+      this.sortList = [...multiple, ...single]
       // console.log('smartSort', this.sortList);
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

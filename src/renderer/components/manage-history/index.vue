@@ -11,28 +11,14 @@
       :close-on-press-escape="false"
     >
       <div class="content">
-        <div style="text-align:right">
-          <el-button
-            type="text"
-            size="small"
-            :disabled="!historyData.length"
-            @click="handleClear"
-          >
+        <div style="text-align: right">
+          <el-button type="text" size="small" :disabled="!historyData.length" @click="handleClear">
             {{ $t('general.clearAll') }}
           </el-button>
         </div>
-        <div
-          v-for="item in historyData"
-          class="drag-item"
-          :key="item"
-          @click="$emit('select', item)"
-        >
+        <div v-for="item in historyData" class="drag-item" :key="item" @click="$emit('select', item)">
           <span :class="{ highlight: item === selected }">{{ item }}</span>
-          <i
-            style="float:right"
-            class="el-icon-close"
-            @click="handleRemove"
-          ></i>
+          <i style="float: right" class="el-icon-close" @click="handleRemove"></i>
         </div>
       </div>
     </el-dialog>
@@ -44,46 +30,46 @@ export default {
   components: {},
   model: {
     prop: 'historyData',
-    event: 'update',
+    event: 'update'
   },
   props: {
     historyData: {
       type: Array,
       required: true,
-      default: () => [],
+      default: () => []
     },
     selected: {
       type: String,
       required: false,
-      default: '',
+      default: ''
     },
     disabled: {
       type: Boolean,
       required: false,
-      default: false,
-    },
+      default: false
+    }
   },
   data() {
     return {
-      visible: false,
-    };
+      visible: false
+    }
   },
   computed: {},
   methods: {
     // 提供给外部直接调用。
     show() {
-      !this.disabled && (this.visible = true);
+      !this.disabled && (this.visible = true)
     },
     handleClear() {
-      this.$emit('update', []);
+      this.$emit('update', [])
     },
     handleRemove(item) {
-      const tmp = [...this.historyData];
-      tmp.splice(this.historyData.indexOf(item), 1);
-      this.$emit('update', tmp);
-    },
-  },
-};
+      const tmp = [...this.historyData]
+      tmp.splice(this.historyData.indexOf(item), 1)
+      this.$emit('update', tmp)
+    }
+  }
+}
 </script>
 <style scoped lang="scss">
 @import '@/styles/variables.scss';

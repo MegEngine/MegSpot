@@ -3,7 +3,7 @@
     <div class="nav-container" flex="main:justify cross:center" flex-box="1">
       <img
         src="../../assets/images/big_logo_white.png"
-        style="cursor: pointer;padding-top: 5px; height:40px"
+        style="cursor: pointer; padding-top: 5px; height: 40px"
         @click="jumpToDashboard"
       />
       <div class="left-menu">
@@ -16,8 +16,8 @@
       </div>
       <div class="right-menu">
         <i @click="$refs.aboutDialog.show()">
-          <svg-icon icon-class="system-settings"></svg-icon
-        ></i>
+          <svg-icon icon-class="system-settings"></svg-icon>
+        </i>
         <!-- 先隐藏自动更新主动触发按钮  <i
           <svg-icon icon-class="update"></svg-icon> -->
       </div>
@@ -27,36 +27,36 @@
   </el-header>
 </template>
 <script>
-import AboutDialog from './AboutDialog';
-import UpdateDialog from './UpdateDialog';
+import AboutDialog from './AboutDialog'
+import UpdateDialog from './UpdateDialog'
 export default {
   name: 'AppHeader',
   components: { AboutDialog, UpdateDialog },
   data() {
     return {
       subNav: ''
-    };
+    }
   },
   watch: {
     '$route.name': {
       immediate: true,
-      handler: function(name) {
+      handler: function (name) {
         switch (name) {
           case 'dashboard':
-            this.subNav = '';
-            break;
+            this.subNav = ''
+            break
           case 'image-root':
           case 'image-compare':
           case 'image-drag-drop-compare':
           case 'image-browser':
-            this.subNav = this.$t('dashboard.entries.image.title');
-            break;
+            this.subNav = this.$t('dashboard.entries.image.title')
+            break
           case 'video-root':
           case 'video-compare':
-            this.subNav = this.$t('dashboard.entries.video.title');
-            break;
+            this.subNav = this.$t('dashboard.entries.video.title')
+            break
           default:
-            console.error('未知的路由名称请修改AppHeader.vue:' + name);
+            console.error('未知的路由名称请修改AppHeader.vue:' + name)
         }
       }
     }
@@ -65,10 +65,10 @@ export default {
     jumpToDashboard() {
       this.$router.push({
         path: '/dashboard'
-      });
+      })
     }
   }
-};
+}
 </script>
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';

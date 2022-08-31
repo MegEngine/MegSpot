@@ -1,11 +1,6 @@
-
 export function on(element, event, handler) {
   if (element && event && handler) {
-    if (
-      typeof element.addEventListener === 'function' &&
-      typeof handler === 'function' &&
-      typeof event === 'string'
-    ) {
+    if (typeof element.addEventListener === 'function' && typeof handler === 'function' && typeof event === 'string') {
       element.addEventListener(event, handler, false)
     }
   }
@@ -37,21 +32,12 @@ export function click(element) {
 
 export const isInViewport = (offsetTop, container) => {
   return new Promise((resolve, reject) => {
-    if (
-      !(
-        typeof offsetTop === 'number' &&
-        container &&
-        typeof container.scrollTop === 'number'
-      )
-    ) {
+    if (!(typeof offsetTop === 'number' && container && typeof container.scrollTop === 'number')) {
       return reject(new Error('Invalid params'))
     }
     // The purpose of this delay is to prevent scrolling too fast
     setTimeout(() => {
-      resolve(
-        offsetTop >= container.scrollTop &&
-          offsetTop <= container.scrollTop + container.offsetHeight
-      )
+      resolve(offsetTop >= container.scrollTop && offsetTop <= container.scrollTop + container.offsetHeight)
     }, 100)
   })
 }

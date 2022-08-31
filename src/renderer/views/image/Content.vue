@@ -1,12 +1,6 @@
 <template>
   <div>
-    <div
-      v-if="snapshotMode"
-      id="image-container"
-      ref="container"
-      class="canvas-container"
-      :style="containerStyle"
-    >
+    <div v-if="snapshotMode" id="image-container" ref="container" class="canvas-container" :style="containerStyle">
       <div v-for="(snapInfo, index) in files" :key="index">
         <ImageCanvas
           ref="image_canvas"
@@ -17,20 +11,9 @@
         ></ImageCanvas>
       </div>
     </div>
-    <div
-      v-else
-      id="image-container"
-      ref="container"
-      class="canvas-container"
-      :style="containerStyle"
-    >
+    <div v-else id="image-container" ref="container" class="canvas-container" :style="containerStyle">
       <div v-for="(imgs, index) in imageGroupList" :key="index">
-        <ImageCanvas
-          ref="image_canvas"
-          :path="imgs"
-          :_width="canvasWidth"
-          :_height="canvasHeight"
-        ></ImageCanvas>
+        <ImageCanvas ref="image_canvas" :path="imgs" :_width="canvasWidth" :_height="canvasHeight"></ImageCanvas>
       </div>
     </div>
   </div>
@@ -46,11 +29,8 @@ import { SnapshotHelper } from '@/tools/compress'
 import * as GLOBAL_CONSTANTS from '@/constants'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore')
-const {
-  mapGetters: snapMapGetters,
-  mapActions: snapMapActions
-} = createNamespacedHelpers('imageSnapshotStore')
-import { i18nRender } from '@/lang';
+const { mapGetters: snapMapGetters, mapActions: snapMapActions } = createNamespacedHelpers('imageSnapshotStore')
+import { i18nRender } from '@/lang'
 
 export default {
   components: { ImageCanvas },
@@ -150,17 +130,12 @@ export default {
     // 当前组的图片列表
     imageGroupList() {
       return this.imageList.length
-        ? this.imageList.slice(
-            this.groupStartIndex,
-            this.groupStartIndex + this.groupCount
-          )
+        ? this.imageList.slice(this.groupStartIndex, this.groupStartIndex + this.groupCount)
         : []
     },
     containerStyle() {
       switch (
-        (this.snapshotMode
-          ? this.snapshotConfig?.config?.imageStore?.imageConfig?.layout
-          : this.imageConfig.layout) ??
+        (this.snapshotMode ? this.snapshotConfig?.config?.imageStore?.imageConfig?.layout : this.imageConfig.layout) ??
         this.imageConfig.layout
       ) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
@@ -319,14 +294,9 @@ export default {
       if (!snapshotMode) {
         try {
           let depth = 2
-          while (
-            _.unionBy(shareProject.canvas, 'name').length < shareProject.canvas.length
-          ) {
+          while (_.unionBy(shareProject.canvas, 'name').length < shareProject.canvas.length) {
             shareProject.canvas.forEach((canvas) => {
-              canvas.name = canvas.path
-                .split(GLOBAL_CONSTANTS.DELIMITER)
-                .slice(-depth)
-                .join('-')
+              canvas.name = canvas.path.split(GLOBAL_CONSTANTS.DELIMITER).slice(-depth).join('-')
             })
             depth++
           }
@@ -372,14 +342,9 @@ export default {
       }
     },
     calcHeight() {
-      const toolbarInfo = document
-        .getElementsByClassName('toolbar')[0]
-        .getBoundingClientRect()
-      const headerInfo = document
-        .getElementsByClassName('header')[0]
-        .getBoundingClientRect()
-      const containerHeight =
-        document.body.clientHeight - toolbarInfo.height - headerInfo.height
+      const toolbarInfo = document.getElementsByClassName('toolbar')[0].getBoundingClientRect()
+      const headerInfo = document.getElementsByClassName('header')[0].getBoundingClientRect()
+      const containerHeight = document.body.clientHeight - toolbarInfo.height - headerInfo.height
       switch (this.imageConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
@@ -425,11 +390,7 @@ export default {
       const canvasViews = this.$refs['image_canvas']
       let snapShotArr = []
       let coveredArr = []
-      if (
-        [GLOBAL_CONSTANTS.DIRECTION_LEFT, GLOBAL_CONSTANTS.DIRECTION_RIGHT].includes(
-          direction
-        )
-      ) {
+      if ([GLOBAL_CONSTANTS.DIRECTION_LEFT, GLOBAL_CONSTANTS.DIRECTION_RIGHT].includes(direction)) {
         //左右对比,取整行进行比较
         if (columnLen === 3) {
           //不满一行则补全
@@ -475,37 +436,17 @@ export default {
           const compareLine = Math.floor(canvasViews.length / 4)
           for (let i = 0; i < compareLine; i++) {
             if (direction === GLOBAL_CONSTANTS.DIRECTION_LEFT) {
-              snapShotArr.push(
-                canvasViews[i * 4 + 1],
-                canvasViews[i * 4 + 2],
-                canvasViews[i * 4 + 3]
-              )
-              coveredArr.push(
-                canvasViews[i * 4],
-                canvasViews[i * 4 + 1],
-                canvasViews[i * 4 + 2]
-              )
+              snapShotArr.push(canvasViews[i * 4 + 1], canvasViews[i * 4 + 2], canvasViews[i * 4 + 3])
+              coveredArr.push(canvasViews[i * 4], canvasViews[i * 4 + 1], canvasViews[i * 4 + 2])
             } else if (direction === GLOBAL_CONSTANTS.DIRECTION_RIGHT) {
-              snapShotArr.push(
-                canvasViews[i * 4 + 2],
-                canvasViews[i * 4 + 1],
-                canvasViews[i * 4]
-              )
-              coveredArr.push(
-                canvasViews[i * 4 + 3],
-                canvasViews[i * 4 + 2],
-                canvasViews[i * 4 + 1]
-              )
+              snapShotArr.push(canvasViews[i * 4 + 2], canvasViews[i * 4 + 1], canvasViews[i * 4])
+              coveredArr.push(canvasViews[i * 4 + 3], canvasViews[i * 4 + 2], canvasViews[i * 4 + 1])
             }
           }
         }
       }
 
-      if (
-        [GLOBAL_CONSTANTS.DIRECTION_BOTTOM, GLOBAL_CONSTANTS.DIRECTION_TOP].includes(
-          direction
-        )
-      ) {
+      if ([GLOBAL_CONSTANTS.DIRECTION_BOTTOM, GLOBAL_CONSTANTS.DIRECTION_TOP].includes(direction)) {
         //上下对比，取偶数行进行比较
         var lineLen = Math.ceil(canvasViews.length / columnLen)
         if (lineLen % 2 === 1) {
@@ -544,18 +485,10 @@ export default {
     },
     getColumnLine() {
       //获取列数
-      if (
-        [GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(
-          this.imageConfig.layout
-        )
-      ) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(this.imageConfig.layout)) {
         return 3
       }
-      if (
-        [GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(
-          this.imageConfig.layout
-        )
-      ) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(this.imageConfig.layout)) {
         return 2
       }
       if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.imageConfig.layout)) {

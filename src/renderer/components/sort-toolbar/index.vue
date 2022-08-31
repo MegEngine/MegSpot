@@ -1,25 +1,12 @@
 <template>
   <div class="sort-toolbar-container">
-    <el-tooltip
-      :content="$t(this.allSelectd ? 'general.clearAll' : 'general.selectAll')"
-      :open-delay="300"
-    >
-      <vxe-checkbox
-        :value="allSelectd"
-        :indeterminate="oneOrMoreSelected"
-        @change="handleSelectAll"
-      ></vxe-checkbox>
+    <el-tooltip :content="$t(this.allSelectd ? 'general.clearAll' : 'general.selectAll')" :open-delay="300">
+      <vxe-checkbox :value="allSelectd" :indeterminate="oneOrMoreSelected" @change="handleSelectAll"></vxe-checkbox>
     </el-tooltip>
-    <el-button
-      v-show="generateVisible"
-      v-tip="'Generate Sorting File'"
-      @click="generateSortFile"
-    >
+    <el-button v-show="generateVisible" v-tip="'Generate Sorting File'" @click="generateSortFile">
       {{ $t('sortFile.generate') }}
     </el-button>
-    <span v-show="generateVisible" class="tip">{{
-      $t('sortFile.generateTip')
-    }}</span>
+    <span v-show="generateVisible" class="tip">{{ $t('sortFile.generateTip') }}</span>
     <!-- <el-button
       v-show="!generateVisible"
       :disabled="btnDisabled"
@@ -28,21 +15,17 @@
     >
       {{ $t('sortFile.apply') }}
     </el-button> -->
-    <el-button
-      v-show="!generateVisible"
-      v-tip="'Edit Sorting File'"
-      @click="editSortFile"
-    >
+    <el-button v-show="!generateVisible" v-tip="'Edit Sorting File'" @click="editSortFile">
       {{ $t('sortFile.edit') }}
     </el-button>
   </div>
 </template>
 
 <script>
-import fse from 'fs-extra';
-import getFileName from '@/filter/get-file-name';
-const { dialog } = require('@electron/remote');
-import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants';
+import fse from 'fs-extra'
+import getFileName from '@/filter/get-file-name'
+const { dialog } = require('@electron/remote')
+import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants'
 
 export default {
   components: {},
@@ -66,17 +49,17 @@ export default {
   data() {
     return {
       generateVisible: false
-    };
+    }
   },
   created() {},
   mounted() {},
   beforeDestroy() {
-    this.wacther && this.wacther.close();
-    this.wacther = null;
+    this.wacther && this.wacther.close()
+    this.wacther = null
   },
   methods: {
     handleSelectAll(...rest) {
-      this.$emit('change', ...rest);
+      this.$emit('change', ...rest)
     },
     saveFile(file) {
       dialog
@@ -85,71 +68,69 @@ export default {
           defaultPath: this.currentPath,
           filters: [{ name: 'Custom File Type', extensions: ['gif'] }]
         })
-        .then(result => {
-          fse.writeFileSync(result.filePath, dataBuffer);
-          this.$message.success('success');
-        });
+        .then((result) => {
+          fse.writeFileSync(result.filePath, dataBuffer)
+          this.$message.success('success')
+        })
     },
     async applySortFile() {
-      this.$bus.$emit('applySortFile');
+      this.$bus.$emit('applySortFile')
     },
     editSortFile() {
-      this.$emit('showDialog');
+      this.$emit('showDialog')
     },
     async generateSortFile() {
-      const path = this.sortFilePath;
-      let exist = await fse.pathExists(path);
-      let cancel = false;
+      const path = this.sortFilePath
+      let exist = await fse.pathExists(path)
+      let cancel = false
       if (exist) {
         this.$confirm('排序文件已存在，是否覆盖', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).catch(() => {
-          cancel = true;
+          cancel = true
           this.$message({
             type: 'info',
             message: '已取消覆盖'
-          });
-        });
+          })
+        })
       }
-      if (cancel) return;
+      if (cancel) return
       // 获取当前表格排序列表数据
-      const data = await new Promise(resolve =>
-        this.$emit('getSortData', null, data =>
-          resolve(data.map(item => getFileName(item.path, false)).join(EOF))
-        )
-      );
+      const data = await new Promise((resolve) =>
+        this.$emit('getSortData', null, (data) => resolve(data.map((item) => getFileName(item.path, false)).join(EOF)))
+      )
       // 写入文件
       try {
-        await fse.outputFile(path, data);
+        await fse.outputFile(path, data)
         this.$message({
           type: 'success',
           message: `The sorting file is successfully generated !<br /> and its path is <a style="color: blue;">${path}</a>`,
           dangerouslyUseHTMLString: true
-        });
-        this.generateVisible = false;
-        const _data = await fse.readFile(path, 'utf8');
+        })
+        this.generateVisible = false
+        const _data = await fse.readFile(path, 'utf8')
       } catch (err) {
-        console.error(err);
-        this.$message.error(err);
+        console.error(err)
+        this.$message.error(err)
       }
     },
     async confirmBtnVisible() {
-      const exists = await fse.pathExists(this.sortFilePath);
-      this.generateVisible = !exists;
+      const exists = await fse.pathExists(this.sortFilePath)
+      this.generateVisible = !exists
       // 更改dialog中的排序列表
       if (exists) {
-        this.$bus.$emit('fileChanged');
+        this.$bus.$emit('fileChanged')
       }
     }
   },
   computed: {
     sortFilePath() {
-      return this.currentPath + DELIMITER + SORTING_FILE_NAME;
+      return this.currentPath + DELIMITER + SORTING_FILE_NAME
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

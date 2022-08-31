@@ -1,11 +1,11 @@
-import { encrypt } from './encrypt';
-import { createPopper } from '@popperjs/core';
-import './tooltipBase.css';
+import { encrypt } from './encrypt'
+import { createPopper } from '@popperjs/core'
+import './tooltipBase.css'
 
 // tipArea用来统一存放 tooltip
-let tipArea = document.createElement('div');
-tipArea.setAttribute('id', 'tipArea');
-document.querySelector('body').appendChild(tipArea);
+let tipArea = document.createElement('div')
+tipArea.setAttribute('id', 'tipArea')
+document.querySelector('body').appendChild(tipArea)
 
 // 支持的方位设置
 const placement = [
@@ -24,7 +24,7 @@ const placement = [
   'left',
   'left-start',
   'left-end'
-];
+]
 
 /**
  * v-tip 简介：
@@ -57,65 +57,62 @@ const placement = [
  */
 class TipManager {
   constructor(el, binding, vnode) {
-    this.el = el;
-    this.binding = binding;
-    this.vnode = vnode;
-    this.tipTextEncoded = encrypt(binding.value);
-    this.isKnown =
-      this.getTipMode() === 'sure'
-        ? TipManager.tipStatusArr.includes(this.tipTextEncoded)
-        : false;
-    this.init();
+    this.el = el
+    this.binding = binding
+    this.vnode = vnode
+    this.tipTextEncoded = encrypt(binding.value)
+    this.isKnown = this.getTipMode() === 'sure' ? TipManager.tipStatusArr.includes(this.tipTextEncoded) : false
+    this.init()
   }
   init() {
-    this.isElMouseover = false;
-    this.isTooltipMouseover = false;
+    this.isElMouseover = false
+    this.isTooltipMouseover = false
     // 初始化创建 tooltip DOM元素
-    this.tooltip = document.createElement('div');
+    this.tooltip = document.createElement('div')
 
-    let tipText = document.createElement('span');
-    let arrow = document.createElement('div');
+    let tipText = document.createElement('span')
+    let arrow = document.createElement('div')
 
-    tipText.innerHTML = this.binding.value;
-    tipText.className = 'inner_text';
-    this.tooltip.className += 'tooltip';
-    arrow.className = 'arrow';
+    tipText.innerHTML = this.binding.value
+    tipText.className = 'inner_text'
+    this.tooltip.className += 'tooltip'
+    arrow.className = 'arrow'
 
-    this.tooltip.appendChild(tipText);
-    tipArea.appendChild(this.tooltip);
-    this.tooltip.appendChild(arrow);
+    this.tooltip.appendChild(tipText)
+    tipArea.appendChild(this.tooltip)
+    this.tooltip.appendChild(arrow)
     //tooltip 调整宽度
     if (byteLength(this.binding.value) <= 16) {
-      this.tooltip.style.width = '100px';
+      this.tooltip.style.width = '100px'
     }
     // mode == sure, 当前模式为“确认模式”时
     if (this.getTipMode() === 'sure') {
-      this.circle = document.createElement('div');
-      let confirmBtn = document.createElement('button');
-      this.circle.className = 'circle';
-      confirmBtn.className = 'inner_button';
-      confirmBtn.innerHTML = 'sure';
-      this.el.appendChild(this.circle);
-      this.tooltip.appendChild(confirmBtn);
+      this.circle = document.createElement('div')
+      let confirmBtn = document.createElement('button')
+      this.circle.className = 'circle'
+      confirmBtn.className = 'inner_button'
+      confirmBtn.innerHTML = 'sure'
+      this.el.appendChild(this.circle)
+      this.tooltip.appendChild(confirmBtn)
 
-      confirmBtn.addEventListener('click', event => {
-        event.stopPropagation();
+      confirmBtn.addEventListener('click', (event) => {
+        event.stopPropagation()
         // 绑定了相同提示信息的 tip 同时隐藏
-        TipManager.instances.forEach(tipInstance => {
+        TipManager.instances.forEach((tipInstance) => {
           if (tipInstance.tipTextEncoded === this.tipTextEncoded) {
-            tipInstance.isKnown = true;
-            tipInstance.tooltip.style.display = 'none';
-            if (tipInstance.circle) tipInstance.circle.style.display = 'none';
+            tipInstance.isKnown = true
+            tipInstance.tooltip.style.display = 'none'
+            if (tipInstance.circle) tipInstance.circle.style.display = 'none'
           }
-        });
-        this.isKnown = true;
-        this.tooltip.style.display = 'none';
-        addconfirmedItem(this.tipTextEncoded);
-        removeInvalidItem(TipManager.tipStatusArr, TipManager.activeTip);
-      });
+        })
+        this.isKnown = true
+        this.tooltip.style.display = 'none'
+        addconfirmedItem(this.tipTextEncoded)
+        removeInvalidItem(TipManager.tipStatusArr, TipManager.activeTip)
+      })
 
       if (!this.isKnown) {
-        TipManager.tipCount++;
+        TipManager.tipCount++
       }
     }
 
@@ -135,181 +132,173 @@ class TipManager {
           }
         }
       ]
-    });
+    })
 
     // 添加监听器事件
-    this.addEventListeners();
+    this.addEventListeners()
 
     // 根据用户是否已知，决定显示或隐藏tooltip
     if (this.isKnown) {
-      this.hide();
+      this.hide()
     } else {
       if (this.getTipMode() === 'sure' && TipManager.tipCount > 5) {
-        this.circle.style.display = 'none';
+        this.circle.style.display = 'none'
       }
     }
     // 将 tooltip 当前经编码后的文本存入 activeTip 数组中
-    TipManager.activeTip.push(this.tipTextEncoded);
+    TipManager.activeTip.push(this.tipTextEncoded)
   }
   // 获取tip当前模式
   getTipMode() {
-    const keys = Object.keys(this.binding.modifiers);
+    const keys = Object.keys(this.binding.modifiers)
     if (keys.length && keys.includes('sure')) {
-      return 'sure'; // 确认模式
+      return 'sure' // 确认模式
     }
-    return 'normal'; // 普通提示模式
+    return 'normal' // 普通提示模式
   }
   getTipPlacement() {
-    const keys = Object.keys(this.binding.modifiers);
+    const keys = Object.keys(this.binding.modifiers)
     if (keys.length) {
-      const item = keys.find(key => {
-        return placement.includes(key);
-      });
-      let tipPlacement = item ? item : 'bottom';
-      return tipPlacement;
+      const item = keys.find((key) => {
+        return placement.includes(key)
+      })
+      let tipPlacement = item ? item : 'bottom'
+      return tipPlacement
     }
-    return 'bottom';
+    return 'bottom'
   }
   // 给 el 元素绑定事件,控制 tooltip 显示或隐藏
   addEventListeners() {
-    const showEvents = ['mouseenter', 'focus'];
-    const hideEvents = ['mouseleave', 'blur'];
-    showEvents.forEach(event => {
+    const showEvents = ['mouseenter', 'focus']
+    const hideEvents = ['mouseleave', 'blur']
+    showEvents.forEach((event) => {
       this.el.addEventListener(event, () => {
-        this.vnode;
-        this.isElMouseover = true;
+        this.vnode
+        this.isElMouseover = true
         if (this.isElMouseover === true || this.isTooltipMouseover === true) {
-          this.show();
+          this.show()
         }
-      });
+      })
 
       this.tooltip.addEventListener(event, () => {
-        this.isTooltipMouseover = true;
+        this.isTooltipMouseover = true
         if (this.isElMouseover === true || this.isTooltipMouseover === true) {
-          this.show();
+          this.show()
         }
-      });
-    });
-    hideEvents.forEach(event => {
+      })
+    })
+    hideEvents.forEach((event) => {
       this.el.addEventListener(event, () => {
-        this.isElMouseover = false;
+        this.isElMouseover = false
         if (!this.isElMouseover && !this.isTooltipMouseover) {
-          this.hide();
+          this.hide()
         }
-      });
+      })
       this.tooltip.addEventListener(event, () => {
-        this.isTooltipMouseover = false;
+        this.isTooltipMouseover = false
         if (!this.isElMouseover && !this.isTooltipMouseover) {
-          this.hide();
+          this.hide()
         }
-      });
-    });
-    this.tooltip.addEventListener('onclick', e => {
-      var e = e || window.event;
-      var t = e.target || e.srcElement;
+      })
+    })
+    this.tooltip.addEventListener('onclick', (e) => {
+      var e = e || window.event
+      var t = e.target || e.srcElement
       // 按下ESC，即回退页面
       if (e && e.keyCode == 27) {
-        this.hide();
+        this.hide()
       }
-    });
+    })
   }
   show() {
     // 用户未点击“确认”时，显示
     if (!this.isKnown) {
-      this.tooltip.style.transitionDelay = '0.8s';
-      this.tooltip.setAttribute('data-show', '');
+      this.tooltip.style.transitionDelay = '0.8s'
+      this.tooltip.setAttribute('data-show', '')
 
-      this.popperInstance.setOptions(options => ({
+      this.popperInstance.setOptions((options) => ({
         ...options,
-        modifiers: [
-          ...options.modifiers,
-          { name: 'eventListeners', enabled: true }
-        ]
-      }));
+        modifiers: [...options.modifiers, { name: 'eventListeners', enabled: true }]
+      }))
 
       // 在显示 Popper 后，需要通知 Popper 更新位置，否则将会出错
-      this.popperInstance.update();
+      this.popperInstance.update()
     }
   }
   hide() {
-    this.tooltip.style.transitionDelay = '0.3s';
-    this.tooltip.removeAttribute('data-show');
+    this.tooltip.style.transitionDelay = '0.3s'
+    this.tooltip.removeAttribute('data-show')
 
     if (this.getTipMode() === 'sure' && this.isKnown) {
-      this.circle.style.display = 'none';
+      this.circle.style.display = 'none'
     }
 
-    this.popperInstance.setOptions(options => ({
+    this.popperInstance.setOptions((options) => ({
       ...options,
-      modifiers: [
-        ...options.modifiers,
-        { name: 'eventListeners', enabled: false }
-      ]
-    }));
+      modifiers: [...options.modifiers, { name: 'eventListeners', enabled: false }]
+    }))
   }
   destroy() {
-    this.popperInstance.destroy();
+    this.popperInstance.destroy()
   }
 }
-TipManager.instances = [];
-TipManager.tipStatusArr = getTipStatusArr();
-TipManager.activeTip = [];
-TipManager.tipCount = 0;
+TipManager.instances = []
+TipManager.tipStatusArr = getTipStatusArr()
+TipManager.activeTip = []
+TipManager.tipCount = 0
 
 function getTipStatusArr() {
-  return JSON.parse(localStorage.getItem('tipStatusArr'))
-    ? JSON.parse(localStorage.getItem('tipStatusArr'))
-    : [];
+  return JSON.parse(localStorage.getItem('tipStatusArr')) ? JSON.parse(localStorage.getItem('tipStatusArr')) : []
 }
 
 // 将用户已“确认”的提示存入记忆数组
 function addconfirmedItem(tipTextEncoded) {
-  TipManager.tipStatusArr.push(tipTextEncoded);
-  localStorage.setItem('tipStatusArr', JSON.stringify(TipManager.tipStatusArr));
+  TipManager.tipStatusArr.push(tipTextEncoded)
+  localStorage.setItem('tipStatusArr', JSON.stringify(TipManager.tipStatusArr))
 }
 
 // 清理掉“过期”的tooltip提示文本
 function removeInvalidItem(tipStatusArr, activeTip) {
   for (var i = 0; i < tipStatusArr.length; i++) {
     if (!activeTip.includes(tipStatusArr[i])) {
-      tipStatusArr.splice(i, 1);
-      i--; // 如果不减，将漏掉一个元素
+      tipStatusArr.splice(i, 1)
+      i-- // 如果不减，将漏掉一个元素
     }
   }
-  localStorage.removeItem('tipStatusArr');
-  localStorage.setItem('tipStatusArr', JSON.stringify(tipStatusArr));
+  localStorage.removeItem('tipStatusArr')
+  localStorage.setItem('tipStatusArr', JSON.stringify(tipStatusArr))
 }
 
 // 计算字符串的字节数
 function byteLength(string) {
-  var b = 0;
-  length = string.length;
+  var b = 0
+  length = string.length
   if (length) {
     for (var i = 0; i < length; i++) {
       if (string.charCodeAt(i) > 255) {
-        b += 2;
+        b += 2
       } else {
-        b++;
+        b++
       }
     }
-    return b;
+    return b
   } else {
-    return 0;
+    return 0
   }
 }
 
 let options = {
   bind(el, binding, vnode) {
-    TipManager.instances.push(new TipManager(el, binding, vnode));
+    TipManager.instances.push(new TipManager(el, binding, vnode))
   },
   unbind(el, binding) {
-    TipManager.tipCount--;
-    TipManager.instances.forEach(item => {
+    TipManager.tipCount--
+    TipManager.instances.forEach((item) => {
       if (item.binding === binding) {
-        item.popperInstance.destroy();
+        item.popperInstance.destroy()
       }
-    });
+    })
   }
-};
+}
 
-export default options;
+export default options

@@ -6,11 +6,16 @@
           <span class="text-style">brightness</span>
         </el-col>
         <el-col :span="18">
-          <el-slider :min="0" :max="500" v-model="brightness" :format-tooltip="
-            val => {
-              return val + '%';
-            }
-          "></el-slider>
+          <el-slider
+            :min="0"
+            :max="500"
+            v-model="brightness"
+            :format-tooltip="
+              (val) => {
+                return val + '%'
+              }
+            "
+          ></el-slider>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -18,11 +23,16 @@
           <span class="text-style">contrast</span>
         </el-col>
         <el-col :span="18">
-          <el-slider :min="0" :max="500" v-model="contrast" :format-tooltip="
-            val => {
-              return val + '%';
-            }
-          "></el-slider>
+          <el-slider
+            :min="0"
+            :max="500"
+            v-model="contrast"
+            :format-tooltip="
+              (val) => {
+                return val + '%'
+              }
+            "
+          ></el-slider>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -30,11 +40,16 @@
           <span class="text-style">saturate</span>
         </el-col>
         <el-col :span="18">
-          <el-slider :min="0" :max="500" v-model="saturate" :format-tooltip="
-            val => {
-              return val + '%';
-            }
-          "></el-slider>
+          <el-slider
+            :min="0"
+            :max="500"
+            v-model="saturate"
+            :format-tooltip="
+              (val) => {
+                return val + '%'
+              }
+            "
+          ></el-slider>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -42,11 +57,16 @@
           <span class="text-style">grayscale</span>
         </el-col>
         <el-col :span="18">
-          <el-slider :min="0" :max="100" v-model="grayscale" :format-tooltip="
-            val => {
-              return val + '%';
-            }
-          "></el-slider>
+          <el-slider
+            :min="0"
+            :max="100"
+            v-model="grayscale"
+            :format-tooltip="
+              (val) => {
+                return val + '%'
+              }
+            "
+          ></el-slider>
         </el-col>
       </el-row>
       <el-row :gutter="10">
@@ -54,22 +74,25 @@
           <span class="text-style">opacity</span>
         </el-col>
         <el-col :span="18">
-          <el-slider :min="0" :max="100" v-model="opacity" :format-tooltip="
-            val => {
-              return val + '%';
-            }
-          "></el-slider>
+          <el-slider
+            :min="0"
+            :max="100"
+            v-model="opacity"
+            :format-tooltip="
+              (val) => {
+                return val + '%'
+              }
+            "
+          ></el-slider>
         </el-col>
       </el-row>
       <el-row :gutter="10">
-        <el-col :span="6"> <span class="text-style">blur</span></el-col>
+        <el-col :span="6"><span class="text-style">blur</span></el-col>
         <el-col :span="18">
           <el-slider :min="0" :max="15" v-model="blur"></el-slider>
         </el-col>
       </el-row>
-      <el-button @click="resetImageStyle" style="float:right">
-        reset
-      </el-button>
+      <el-button @click="resetImageStyle" style="float: right">reset</el-button>
     </div>
     <el-button type="text" size="medium" id="preview">
       <svg-icon icon-class="eye-open"></svg-icon>
@@ -89,39 +112,37 @@ export default {
       grayscale: 0,
       opacity: 100,
       blur: 0
-    };
+    }
   },
   computed: {
     canvasStyle() {
-      let filter = '';
-      ['brightness', 'contrast', 'saturate', 'grayscale', 'opacity'].forEach(
-        item => {
-          filter += `${item}(${this[item]}%) `;
-        }
-      );
-      ['blur'].forEach(item => {
-        filter += `${item}(${this[item]}px) `;
-      });
-      return filter;
+      let filter = ''
+      ;['brightness', 'contrast', 'saturate', 'grayscale', 'opacity'].forEach((item) => {
+        filter += `${item}(${this[item]}%) `
+      })
+      ;['blur'].forEach((item) => {
+        filter += `${item}(${this[item]}px) `
+      })
+      return filter
     }
   },
   watch: {
     canvasStyle() {
-      this.$emit('change', this.canvasStyle);
+      this.$emit('change', this.canvasStyle)
     }
   },
   methods: {
     resetImageStyle() {
       // 预览处理效果
-      this.brightness = 100;
-      this.contrast = 100;
-      this.saturate = 100;
-      this.grayscale = 0;
-      this.opacity = 100;
-      this.blur = 0;
+      this.brightness = 100
+      this.contrast = 100
+      this.saturate = 100
+      this.grayscale = 0
+      this.opacity = 100
+      this.blur = 0
     }
   }
-};
+}
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
 .image-style-container {

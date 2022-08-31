@@ -185,6 +185,7 @@
     "node-loader": "^1.0.2",
     "playwright": "^1.24.2",
     "portfinder": "^1.0.28",
+    "prettier": "^2.7.0",
     "sass": "1.32.5",
     "sass-loader": "^10.1.1",
     "style-loader": "^2.0.0",

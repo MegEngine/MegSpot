@@ -1,9 +1,9 @@
 <template>
-  <div class="entry-card" style="cursor:pointer" @click="toDetail">
+  <div class="entry-card" style="cursor: pointer" @click="toDetail">
     <el-card>
       <div slot="header" class="header">
         <i :class="icon"></i>
-        <strong> {{ $t(title) }}</strong>
+        <strong>{{ $t(title) }}</strong>
       </div>
       <div class="body">
         <article>{{ desc }}</article>
@@ -37,10 +37,10 @@ export default {
     toDetail() {
       this.$router.push({
         path: this.route
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

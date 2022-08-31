@@ -1,30 +1,30 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-import Performance from '@/tools/performance';
-import store from '../store';
+import Vue from 'vue'
+import Router from 'vue-router'
+import Performance from '@/tools/performance'
+import store from '../store'
 // 引入路由表
-import routes from './routes';
-const originalPush = Router.prototype.push;
+import routes from './routes'
+const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch(err => err);
-};
-Vue.use(Router);
+  return originalPush.call(this, location).catch((err) => err)
+}
+Vue.use(Router)
 const router = new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: routes
-});
+})
 
-var end = null;
+var end = null
 router.beforeEach((to, from, next) => {
-  end = Performance.startExecute(`${from.path} => ${to.path} 路由耗时`); // 路由性能监控
+  end = Performance.startExecute(`${from.path} => ${to.path} 路由耗时`) // 路由性能监控
   setTimeout(() => {
-    end();
-  }, 0);
-  next();
-});
+    end()
+  }, 0)
+  next()
+})
 
 router.afterEach((to, from) => {
   // 储存路由目标跳转
-  store.dispatch('preferenceStore/setLastRouterPath', to.path);
-});
-export default router;
+  store.dispatch('preferenceStore/setLastRouterPath', to.path)
+})
+export default router

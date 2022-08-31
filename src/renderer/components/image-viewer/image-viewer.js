@@ -18,8 +18,8 @@ const install = (Vue, { name = 'viewer', debug = false }) => {
       log('observer not supported')
       return
     }
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
+    const observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
         log('viewer mutation:' + mutation.type)
         debouncedCreateViewer(el, options)
       })
@@ -36,12 +36,16 @@ const install = (Vue, { name = 'viewer', debug = false }) => {
       log('only simple dot-delimited paths can create watcher')
       return
     }
-    el['$viewerUnwatch'] = vnode.context.$watch(expression, function(newVal, oldVal) {
-      log('change detected by watcher: ', expression)
-      debouncedCreateViewer(el, newVal)
-    }, {
-      deep: true
-    })
+    el['$viewerUnwatch'] = vnode.context.$watch(
+      expression,
+      function (newVal, oldVal) {
+        log('change detected by watcher: ', expression)
+        debouncedCreateViewer(el, newVal)
+      },
+      {
+        deep: true
+      }
+    )
     log('watcher created, expression: ', expression)
   }
 

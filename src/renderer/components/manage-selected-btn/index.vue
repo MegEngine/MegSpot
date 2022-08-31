@@ -11,25 +11,16 @@
       :close-on-press-escape="false"
     >
       <div class="content">
-        <div style="text-align:right">
+        <div style="text-align: right">
           <span>{{ $t('general.sortDialogTips') }}</span>
-          <el-button
-            type="text"
-            size="small"
-            :disabled="!dragData.length"
-            @click="$emit('clearAll')"
-          >
+          <el-button type="text" size="small" :disabled="!dragData.length" @click="$emit('clearAll')">
             {{ $t('general.clearAll') }}
           </el-button>
         </div>
         <draggable v-model="dragData">
           <div v-for="item in dragData" class="drag-item" :key="item">
             <span>{{ item }}</span>
-            <i
-              style="float:right"
-              class="el-icon-close"
-              @click="$emit('remove', item)"
-            ></i>
+            <i style="float: right" class="el-icon-close" @click="$emit('remove', item)"></i>
           </div>
         </draggable>
       </div>
@@ -37,7 +28,7 @@
   </div>
 </template>
 <script>
-import draggable from 'vuedraggable';
+import draggable from 'vuedraggable'
 export default {
   name: 'ManageSelectedBtn',
   components: { draggable },
@@ -45,31 +36,31 @@ export default {
     sortData: {
       type: Array,
       required: true,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   data() {
     return {
-      visible: false,
-    };
+      visible: false
+    }
   },
   computed: {
     dragData: {
       get() {
-        return this.sortData;
+        return this.sortData
       },
       set(val) {
-        this.$emit('update', val);
-      },
-    },
+        this.$emit('update', val)
+      }
+    }
   },
   methods: {
     // 提供给外部直接调用。
     show() {
-      this.visible = true;
-    },
-  },
-};
+      this.visible = true
+    }
+  }
+}
 </script>
 <style scoped lang="scss">
 @import '@/styles/variables.scss';

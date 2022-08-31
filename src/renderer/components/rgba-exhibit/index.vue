@@ -12,9 +12,7 @@
               )`
         }"
       ></div>
-      <span class="text-style"
-        >{{ `${RGBAcolor.R}, ${RGBAcolor.G}, ${RGBAcolor.B} ` }}
-      </span>
+      <span class="text-style">{{ `${RGBAcolor.R}, ${RGBAcolor.G}, ${RGBAcolor.B} ` }}</span>
     </div>
   </div>
 </template>
@@ -28,7 +26,7 @@ export default {
       required: true
     }
   }
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>

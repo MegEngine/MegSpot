@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import { formatFileSize } from '@/utils/file';
-import { getImageUrlSync } from '@/utils/image';
+import { formatFileSize } from '@/utils/file'
+import { getImageUrlSync } from '@/utils/image'
 export default {
   name: 'imageThumbnail',
   props: {
@@ -32,7 +32,7 @@ export default {
     fileList: {
       type: Array,
       default: () => {
-        return [];
+        return []
       }
     },
     addVuexItem: {
@@ -46,38 +46,38 @@ export default {
   },
   computed: {
     path() {
-      return this.file.path;
+      return this.file.path
     },
     src() {
-      return getImageUrlSync(this.path).replace(/#/g, '%23');
+      return getImageUrlSync(this.path).replace(/#/g, '%23')
     }
   },
   data() {
     return {
       checked: false
-    };
+    }
   },
   watch: {
     fileList(val) {
-      let newList = val;
-      this.checked = newList.includes(this.file.path) ? true : false;
+      let newList = val
+      this.checked = newList.includes(this.file.path) ? true : false
     }
   },
   mounted() {
-    this.checked = this.fileList.includes(this.file.path) ? true : false;
+    this.checked = this.fileList.includes(this.file.path) ? true : false
   },
   methods: {
     formatFileSize,
     updateImageQueue(event) {
-      event.preventDefault();
+      event.preventDefault()
       if (this.fileList.includes(this.file.path)) {
-        this.removeVuexItem(this.file.path);
+        this.removeVuexItem(this.file.path)
       } else {
-        this.addVuexItem(this.file.path);
+        this.addVuexItem(this.file.path)
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

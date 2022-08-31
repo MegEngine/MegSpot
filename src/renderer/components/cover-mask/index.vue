@@ -25,30 +25,30 @@ export default {
       visible: false,
       canvas: undefined,
       canvasStyle: {}
-    };
+    }
   },
   watch: {
     mask() {
-      this.canvas = this.$refs.canvas;
-      const ctx = this.canvas.getContext('2d');
-      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.canvas = this.$refs.canvas
+      const ctx = this.canvas.getContext('2d')
+      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
       if (this.mask) {
         this.canvasStyle = {
           width: this.mask.width,
           height: this.mask.height
-        };
-        this.visible = true;
+        }
+        this.visible = true
         this.$nextTick(() => {
-          ctx.drawImage(this.mask, 0, 0);
-        });
+          ctx.drawImage(this.mask, 0, 0)
+        })
       } else {
-        this.visible = false;
+        this.visible = false
       }
     }
   },
 
   methods: {}
-};
+}
 </script>
 
 <style lang="scss" scoped>

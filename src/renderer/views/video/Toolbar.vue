@@ -3,15 +3,14 @@
     <div class="left" flex="cross:center">
       <div class="router-back">
         <!-- v-tip.sure="`${$t('common.hotKey')}：esc`" -->
-        <span @click="goBack" class="btn"
-          ><i class="el-icon-d-arrow-left"></i>{{ $t('nav.back') }}</span
-        >
+        <span @click="goBack" class="btn">
+          <i class="el-icon-d-arrow-left"></i>
+          {{ $t('nav.back') }}
+        </span>
       </div>
       <SelectedBtn
         :selectedList="videoList"
-        :focusListIndex="
-          new Array(groupCount).fill(0).map((_, index) => index + startIndex)
-        "
+        :focusListIndex="new Array(groupCount).fill(0).map((_, index) => index + startIndex)"
         @update="setVideos"
         @remove="removeVideos"
         @click="emptyVideos"
@@ -28,12 +27,8 @@
         class="group-number"
       ></el-input-number>
       <el-radio-group v-model="smooth" class="gap" size="mini">
-        <el-radio-button :label="false">{{
-          $t('imageCenter.nearestInterpolation')
-        }}</el-radio-button>
-        <el-radio-button :label="true">{{
-          $t('imageCenter.bilinearInterpolation')
-        }}</el-radio-button>
+        <el-radio-button :label="false">{{ $t('imageCenter.nearestInterpolation') }}</el-radio-button>
+        <el-radio-button :label="true">{{ $t('imageCenter.bilinearInterpolation') }}</el-radio-button>
       </el-radio-group>
     </div>
     <div class="tip" flex="cross:center">
@@ -68,32 +63,20 @@
           v-tip.sure="$t('imageCenter.frameSteps2')"
         >
           <span class="svg-container" v-tip="$t('imageCenter.frameSteps2')">
-            <svg-icon icon-class="frame" style="transform:rotate(180deg);" />
+            <svg-icon icon-class="frame" style="transform: rotate(180deg)" />
           </span>
         </el-button>
-        <el-button
-          type="text"
-          v-tip="$t('video.play')"
-          @click="changeStatus(CONSTANTS.VIDEO_STATUS_START)"
-        >
+        <el-button type="text" v-tip="$t('video.play')" @click="changeStatus(CONSTANTS.VIDEO_STATUS_START)">
           <span class="svg-container">
             <svg-icon icon-class="play" :clicked="!videoPaused" />
           </span>
         </el-button>
-        <el-button
-          type="text"
-          @click="changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE)"
-          v-tip="$t('video.pause')"
-        >
+        <el-button type="text" @click="changeStatus(CONSTANTS.VIDEO_STATUS_PAUSE)" v-tip="$t('video.pause')">
           <span class="svg-container">
             <svg-icon icon-class="pause" :clicked="videoPaused" />
           </span>
         </el-button>
-        <el-button
-          type="text"
-          @click="changeStatus(CONSTANTS.VIDEO_STATUS_RESET)"
-          v-tip="$t('video.reset')"
-        >
+        <el-button type="text" @click="changeStatus(CONSTANTS.VIDEO_STATUS_RESET)" v-tip="$t('video.reset')">
           <span class="svg-container">
             <svg-icon icon-class="restart" />
           </span>
@@ -118,8 +101,7 @@
             :key="index"
             :label="label"
             :value="value"
-          >
-          </el-option>
+          ></el-option>
         </el-select>
         <!-- <VideoProgressBar v-if="isFixed" class="progress-bar" /> -->
       </el-button-group>
@@ -131,17 +113,12 @@
             type="text"
             @click="pickColor"
             size="mini"
-            v-tip="
-              $t('imageCenter.colorPicker') +
-                ' ' +
-                $t('common.hotKey') +
-                ':cmd/ctrl+p'
-            "
+            v-tip="$t('imageCenter.colorPicker') + ' ' + $t('common.hotKey') + ':cmd/ctrl+p'"
           >
             <svg-icon
               icon-class="pick-color"
               :clicked="traggerRGB"
-              style="font-size: 20px; margin-right: 2px; transform: translateY(2px);"
+              style="font-size: 20px; margin-right: 2px; transform: translateY(2px)"
             />
           </el-button>
           <el-button
@@ -155,10 +132,7 @@
               <svg-icon icon-class="gif" />
             </span>
           </el-button>
-          <GifDialog
-            ref="gifDialog"
-            :selectList="videoList.slice(startIndex, startIndex + groupCount)"
-          ></GifDialog>
+          <GifDialog ref="gifDialog" :selectList="videoList.slice(startIndex, startIndex + groupCount)"></GifDialog>
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
         <el-button-group class="gap">
@@ -181,11 +155,7 @@
             v-tip="$t('imageCenter.overlayRight')"
           >
             <span class="svg-container">
-              <svg-icon
-                icon-class="direction-left"
-                class="svg-container"
-                style="transform:rotate(180deg);"
-              />
+              <svg-icon icon-class="direction-left" class="svg-container" style="transform: rotate(180deg)" />
             </span>
           </el-button>
           <el-button
@@ -196,10 +166,7 @@
             v-tip="$t('imageCenter.overlayBottom')"
           >
             <span class="svg-container">
-              <svg-icon
-                icon-class="direction-left"
-                style="transform:rotate(-90deg);"
-              />
+              <svg-icon icon-class="direction-left" style="transform: rotate(-90deg)" />
             </span>
           </el-button>
           <el-button
@@ -210,40 +177,22 @@
             v-tip="$t('imageCenter.overlayTop')"
           >
             <span class="svg-container">
-              <svg-icon
-                icon-class="direction-left"
-                style="transform:rotate(90deg);"
-              />
+              <svg-icon icon-class="direction-left" style="transform: rotate(90deg)" />
             </span>
           </el-button>
         </el-button-group>
         <el-button-group class="gap">
-          <el-button
-            type="text"
-            @click="rotate(90)"
-            size="mini"
-            v-tip="$t('imageCenter.rotate')"
-          >
+          <el-button type="text" @click="rotate(90)" size="mini" v-tip="$t('imageCenter.rotate')">
             <span class="svg-container">
               <svg-icon icon-class="rotate" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            @click="reverse(1)"
-            v-tip="$t('imageCenter.horizontalFlip')"
-            size="mini"
-          >
+          <el-button type="text" @click="reverse(1)" v-tip="$t('imageCenter.horizontalFlip')" size="mini">
             <span class="svg-container">
               <svg-icon icon-class="horizontal-flip" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="reverse(-1)"
-            v-tip="$t('imageCenter.verticalFlip')"
-          >
+          <el-button type="text" size="mini" @click="reverse(-1)" v-tip="$t('imageCenter.verticalFlip')">
             <span class="svg-container">
               <svg-icon icon-class="vertical-flip" />
             </span>
@@ -251,42 +200,22 @@
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
         <el-button-group class="gap">
-          <el-button
-            type="text"
-            size="mini"
-            @click="align(false)"
-            v-tip="$t('imageCenter.align')"
-          >
+          <el-button type="text" size="mini" @click="align(false)" v-tip="$t('imageCenter.align')">
             <span class="svg-container">
               <svg-icon icon-class="align" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="align(true)"
-            v-tip="$t('imageCenter.align2')"
-          >
+          <el-button type="text" size="mini" @click="align(true)" v-tip="$t('imageCenter.align2')">
             <span class="svg-container">
               <svg-icon icon-class="align2" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="resetCanvas(false)"
-            v-tip="$t('imageCenter.adaptive')"
-          >
+          <el-button type="text" size="mini" @click="resetCanvas(false)" v-tip="$t('imageCenter.adaptive')">
             <span class="svg-container">
               <svg-icon icon-class="adaptive" />
             </span>
           </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="resetCanvas(true)"
-            v-tip="$t('imageCenter.fullsize')"
-          >
+          <el-button type="text" size="mini" @click="resetCanvas(true)" v-tip="$t('imageCenter.fullsize')">
             <span class="svg-container">
               <svg-icon icon-class="fullsize" />
             </span>
@@ -312,8 +241,7 @@
             :key="item"
             :label="item"
             :value="item"
-          >
-          </el-option>
+          ></el-option>
         </el-select>
         <el-button-group class="gap">
           <ImageSetting></ImageSetting>
@@ -324,18 +252,16 @@
 </template>
 
 <script>
-import * as GLOBAL_CONSTANTS from '@/constants';
-import * as CONSTANTS from './video-constants';
-import SelectedBtn from '@/components/selected-btn';
-import VideoProgressBar from './components/videoProgressBar';
-import { createNamespacedHelpers } from 'vuex';
-import GifDialog from '@/components/gif-dialog';
-import ImageSetting from '@/components/image-setting';
-const { mapGetters, mapActions } = createNamespacedHelpers('videoStore');
-const { mapGetters: preferenceMapGetters } = createNamespacedHelpers(
-  'preferenceStore'
-);
-import { handleEvent } from '@/tools/hotkey';
+import * as GLOBAL_CONSTANTS from '@/constants'
+import * as CONSTANTS from './video-constants'
+import SelectedBtn from '@/components/selected-btn'
+import VideoProgressBar from './components/videoProgressBar'
+import { createNamespacedHelpers } from 'vuex'
+import GifDialog from '@/components/gif-dialog'
+import ImageSetting from '@/components/image-setting'
+const { mapGetters, mapActions } = createNamespacedHelpers('videoStore')
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
+import { handleEvent } from '@/tools/hotkey'
 
 export default {
   data() {
@@ -378,59 +304,50 @@ export default {
       ],
       hotkeyDownEvents: undefined,
       hotkeyUpEvents: undefined
-    };
+    }
   },
   components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
   mounted() {
-    this.initHotkeyEvents();
-    window.addEventListener('keydown', this.handleHotKey, true);
-    window.addEventListener('keyup', this.handleHotKeyUp, true);
-    this.$bus.$on('image_handleSelect', this.handleSelect);
-    this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused);
+    this.initHotkeyEvents()
+    window.addEventListener('keydown', this.handleHotKey, true)
+    window.addEventListener('keyup', this.handleHotKeyUp, true)
+    this.$bus.$on('image_handleSelect', this.handleSelect)
+    this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused)
   },
   beforeDestroy() {
-    window.removeEventListener('keydown', this.handleHotKey, true);
-    window.removeEventListener('keyup', this.handleHotKeyUp, true);
-    this.$bus.$off('image_handleSelect', this.handleSelect);
-    this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused);
+    window.removeEventListener('keydown', this.handleHotKey, true)
+    window.removeEventListener('keyup', this.handleHotKeyUp, true)
+    this.$bus.$off('image_handleSelect', this.handleSelect)
+    this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused)
   },
   methods: {
-    ...mapActions([
-      'emptyVideos',
-      'removeVideos',
-      'setVideoConfig',
-      'setVideos'
-    ]),
+    ...mapActions(['emptyVideos', 'removeVideos', 'setVideoConfig', 'setVideos']),
     initHotkeyEvents() {
       this.hotkeyDownEvents = new Map([
         [
           'back',
           () => {
-            if (
-              this.fullScreening &&
-              document.fullscreenElement &&
-              document.fullscreenElement.nodeName === 'VIDEO'
-            ) {
-              document.exitFullscreen();
-              this.setVideoConfig({ fullScreening: false });
-              document.body.removeChild(document.body.lastChild);
+            if (this.fullScreening && document.fullscreenElement && document.fullscreenElement.nodeName === 'VIDEO') {
+              document.exitFullscreen()
+              this.setVideoConfig({ fullScreening: false })
+              document.body.removeChild(document.body.lastChild)
             } else {
-              this.goBack();
+              this.goBack()
             }
           }
         ],
         [
           'pickColor',
           () => {
-            this.pickColor();
+            this.pickColor()
           }
         ],
         [
           'previousGroup',
           () => {
             if (this.groupNum > 1) {
-              this.groupNum--;
-              this.changeGroup(this.groupNum, this.groupNum + 1);
+              this.groupNum--
+              this.changeGroup(this.groupNum, this.groupNum + 1)
             }
           }
         ],
@@ -438,8 +355,8 @@ export default {
           'nextGroup',
           () => {
             if (this.groupNum < this.maxGroupNum) {
-              this.groupNum++;
-              this.changeGroup(this.groupNum, this.groupNum - 1);
+              this.groupNum++
+              this.changeGroup(this.groupNum, this.groupNum - 1)
             }
           }
         ],
@@ -447,7 +364,7 @@ export default {
           'previousFrame',
           () => {
             if (this.videoPaused) {
-              this.frameSteps(-1);
+              this.frameSteps(-1)
             }
           }
         ],
@@ -455,75 +372,71 @@ export default {
           'nextFrame',
           () => {
             if (this.videoPaused) {
-              this.frameSteps(1);
+              this.frameSteps(1)
             }
           }
         ],
         [
           'top',
           () => {
-            this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+            this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)
           }
         ],
         [
           'left',
           () => {
-            this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+            this.overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)
           }
         ],
         [
           'bottom',
           () => {
-            this.overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+            this.overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)
           }
         ],
         [
           'right',
           () => {
-            this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+            this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)
           }
         ],
         [
           'togglePlay',
           () => {
-            this.changeStatus(
-              this.videoPaused
-                ? CONSTANTS.VIDEO_STATUS_START
-                : CONSTANTS.VIDEO_STATUS_PAUSE
-            );
+            this.changeStatus(this.videoPaused ? CONSTANTS.VIDEO_STATUS_START : CONSTANTS.VIDEO_STATUS_PAUSE)
           }
         ]
-      ]);
+      ])
 
       this.hotkeyUpEvents = new Map([
         [
           'top',
           () => {
-            this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP);
+            this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)
           }
         ],
         [
           'left',
           () => {
-            this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT);
+            this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)
           }
         ],
         [
           'bottom',
           () => {
-            this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM);
+            this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)
           }
         ],
         [
           'right',
           () => {
-            this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
+            this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)
           }
         ]
-      ]);
+      ])
     },
     handleHotKey(event) {
-      handleEvent(event, this.hotkeyDownEvents);
+      handleEvent(event, this.hotkeyDownEvents)
       // // esc
       // if (event.keyCode === 27) {
       //   // 默认返回上一页， 若为  全屏状态则退出全屏
@@ -608,7 +521,7 @@ export default {
       // }
     },
     handleHotKeyUp(event) {
-      handleEvent(event, this.hotkeyUpEvents);
+      handleEvent(event, this.hotkeyUpEvents)
       // // 向上overlay 的快捷键
       // if (event.key.toLowerCase() === 'w' || event.key === 'ArrowUp') {
       //   event.stopPropagation();
@@ -631,85 +544,77 @@ export default {
       // }
     },
     changeStatus(status) {
-      this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status);
+      this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status)
     },
     changeLoop() {
-      this.loop = !this.loop;
-      this.$bus.$emit('changeLoop', this.loop);
+      this.loop = !this.loop
+      this.$bus.$emit('changeLoop', this.loop)
     },
     changeGroup(groupNum, oldGroupNum) {
-      this.startIndex = Math.max(
-        0,
-        this.startIndex - this.groupCount * (oldGroupNum - groupNum)
-      );
-      this.$refs.gifDialog.clear(); // 清空gifDialog上次所选
-      this.$bus.$emit('changeGroup', this.startIndex);
+      this.startIndex = Math.max(0, this.startIndex - this.groupCount * (oldGroupNum - groupNum))
+      this.$refs.gifDialog.clear() // 清空gifDialog上次所选
+      this.$bus.$emit('changeGroup', this.startIndex)
     },
     changeGroup(groupNum) {
-      this.startIndex = Math.max(
-        0,
-        (groupNum - 1) * this.groupCount + this.offset
-      );
-      this.$bus.$emit('changeGroup', this.startIndex);
+      this.startIndex = Math.max(0, (groupNum - 1) * this.groupCount + this.offset)
+      this.$bus.$emit('changeGroup', this.startIndex)
     },
     handleSelect(data) {
-      this.showSelectedMsg = !!data;
+      this.showSelectedMsg = !!data
     },
     handleReset() {
-      this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_RESET);
-      this.imgScale = 1;
+      this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_RESET)
+      this.imgScale = 1
     },
     handleChangeVideoPaused() {
-      const paused = this.$parent.$refs.content.$refs['video_canvas'].every(
-        item => item.video.paused === true
-      );
+      const paused = this.$parent.$refs.content.$refs['video_canvas'].every((item) => item.video.paused === true)
       if (this.videoPaused !== paused) {
-        this.videoPaused = paused;
+        this.videoPaused = paused
       }
     },
     goBack() {
       if (window.history.length > 1) {
-        this.$router.back();
+        this.$router.back()
       } else {
         // 如果强制reload导致没有历史路由 唯一的历史就是当前页面 则回到默认的历史页面
-        this.$router.push('/video/index');
+        this.$router.push('/video/index')
       }
     },
     resetCanvas(data) {
-      this.$bus.$emit('imageCenter_resetCanvas', { name: 'reset', data });
+      this.$bus.$emit('imageCenter_resetCanvas', { name: 'reset', data })
     },
     overlay(direction) {
       this.$bus.$emit('setOverLay', {
         direction,
         status: true
-      });
+      })
     },
     cancelOverlay(direction) {
       this.$bus.$emit('setOverLay', {
         direction,
         status: false
-      });
+      })
     },
     pickColor() {
-      this.traggerRGB = !this.traggerRGB;
+      this.traggerRGB = !this.traggerRGB
       this.$bus.$emit('image_broadcast', {
         name: 'pickColor',
         data: { status: this.traggerRGB }
-      });
+      })
     },
     /**
      * 图像旋转
      * @param {deg} data 旋转的角度
      */
     rotate(data) {
-      this.$bus.$emit('imageCenter_rotate', { name: 'rotate', data });
+      this.$bus.$emit('imageCenter_rotate', { name: 'rotate', data })
     },
     /**
      * 图像镜像翻转
      * @param {boolean} data 1为水平镜像翻转， -1为垂直镜像翻转
      */
     reverse(data) {
-      this.$bus.$emit('imageCenter_reverse', { name: 'reverse', data });
+      this.$bus.$emit('imageCenter_reverse', { name: 'reverse', data })
     },
     /**
      * 逐帧对比
@@ -719,110 +624,103 @@ export default {
       this.$bus.$emit('imageCenter_frameSteps', {
         name: 'frameSteps',
         data: flag * this.interval
-      });
+      })
     },
     async align(beSameSize) {
-      const data = await new Promise(resolve => {
-        this.$bus.$emit(
-          'imageCenter_getSelectedPosition',
-          { name: 'getSelectedPosition', data: beSameSize },
-          res => resolve(res)
-        );
-      });
+      const data = await new Promise((resolve) => {
+        this.$bus.$emit('imageCenter_getSelectedPosition', { name: 'getSelectedPosition', data: beSameSize }, (res) =>
+          resolve(res)
+        )
+      })
       this.$bus.$emit('imageCenter_align', {
         name: 'align',
         data: { beSameSize, ...data }
-      });
+      })
     }
   },
   computed: {
     ...mapGetters(['videoList', 'videoConfig']),
     ...preferenceMapGetters(['preference']),
     maxGroupNum() {
-      return Math.ceil(
-        this.videoList.length / (this.layout[0] * this.layout[2])
-      );
+      return Math.ceil(this.videoList.length / (this.layout[0] * this.layout[2]))
     },
     // 每组图片数量
     groupCount() {
       const str = this.videoConfig.layout,
-        len = str.length;
-      return str[len - 3] * str[len - 1];
+        len = str.length
+      return str[len - 3] * str[len - 1]
     },
     // 视频逐帧对比间隔，默认为近似1/12秒
     interval() {
-      return this.videoConfig.interval;
+      return this.videoConfig.interval
     },
     // 所有视频都为暂停状态
     videoPaused: {
       get() {
-        return this.videoConfig.allVideoPaused;
+        return this.videoConfig.allVideoPaused
       },
       set(newVal) {
-        this.setVideoConfig({ allVideoPaused: newVal });
+        this.setVideoConfig({ allVideoPaused: newVal })
       }
     },
     smooth: {
       get() {
-        return this.videoConfig.smooth;
+        return this.videoConfig.smooth
       },
       set(newVal) {
-        this.setVideoConfig({ smooth: newVal });
+        this.setVideoConfig({ smooth: newVal })
       }
     },
     layout: {
       get() {
-        return this.videoConfig.layout;
+        return this.videoConfig.layout
       },
       set(val) {
-        this.$bus.$emit('changeVideoSliderVisible', { value: false });
-        const preNum = this.groupCount * (this.groupNum - 1);
-        this.setVideoConfig({ layout: val });
-        const afterNum = this.groupCount * (this.groupNum - 1);
-        this.offset = preNum - afterNum;
-        this.startIndex = Math.max(
-          0,
-          (this.groupNum - 1) * this.groupCount + this.offset
-        );
-        this.$bus.$emit('changeGroup', this.startIndex);
-        this.groupNum = Math.floor(this.startIndex / this.groupCount);
+        this.$bus.$emit('changeVideoSliderVisible', { value: false })
+        const preNum = this.groupCount * (this.groupNum - 1)
+        this.setVideoConfig({ layout: val })
+        const afterNum = this.groupCount * (this.groupNum - 1)
+        this.offset = preNum - afterNum
+        this.startIndex = Math.max(0, (this.groupNum - 1) * this.groupCount + this.offset)
+        this.$bus.$emit('changeGroup', this.startIndex)
+        this.groupNum = Math.floor(this.startIndex / this.groupCount)
       }
     },
     speed: {
       get() {
-        return this.videoConfig.speed;
+        return this.videoConfig.speed
       },
       set(val) {
-        const type = typeof val;
-        let _speed = 1.0;
+        const type = typeof val
+        let _speed = 1.0
         switch (type) {
           case 'number':
-            _speed = val;
-            break;
+            _speed = val
+            break
           case 'string':
-            const reg = /^(?<num>\d+\.?\d*)[xX]?/;
+            const reg = /^(?<num>\d+\.?\d*)[xX]?/
             const {
               groups: { num }
-            } = reg.exec(val);
+            } = reg.exec(val)
             if (num) {
-              _speed = parseFloat(num);
-            } else return;
-            break;
+              _speed = parseFloat(num)
+            } else return
+            break
           default:
-            return;
+            return
         }
-        console.log('current speed:', _speed);
-        this.setVideoConfig({ speed: _speed });
+        console.log('current speed:', _speed)
+        this.setVideoConfig({ speed: _speed })
       }
     },
     fullScreening() {
-      return this.videoConfig.fullScreening;
+      return this.videoConfig.fullScreening
     },
     isFixed() {
-      return this.preference.videoProcessBarStyle === 'fixed';
+      return this.preference.videoProcessBarStyle === 'fixed'
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

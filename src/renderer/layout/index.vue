@@ -7,8 +7,8 @@
   </div>
 </template>
 <script>
-import AppMain from './components/AppMain';
-import AppHeader from './components/AppHeader';
+import AppMain from './components/AppMain'
+import AppHeader from './components/AppHeader'
 
 export default {
   name: 'layout',
@@ -16,7 +16,7 @@ export default {
     AppHeader,
     AppMain
   }
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>

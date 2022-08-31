@@ -7,10 +7,10 @@
 </template>
 
 <script>
-import addDragFileListener from '@/utils/dragFile';
+import addDragFileListener from '@/utils/dragFile'
 export default {
   mounted() {
-    addDragFileListener(window);
+    addDragFileListener(window)
   }
-};
+}
 </script>

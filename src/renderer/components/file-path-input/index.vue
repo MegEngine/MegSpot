@@ -9,8 +9,7 @@
       @input="updateFilePath"
       ref="filePathInput"
       size="mini"
-    >
-    </el-input>
+    ></el-input>
   </div>
 </template>
 
@@ -26,10 +25,10 @@ export default {
   },
   methods: {
     updateFilePath(value) {
-      this.$emit('update:filePath', value);
+      this.$emit('update:filePath', value)
     }
   }
-};
+}
 </script>
 
 <style scoped>

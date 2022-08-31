@@ -25,14 +25,17 @@ require('electron').app.on('ready', () => {
   //   allowFileAccess: true
   // });
   // console.log('已安装: vue-devtools1')
-  const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor"); // Vue2 Extension
-  require("electron").session.defaultSession.loadExtension(VUEJS_DEVTOOLS, {
-    allowFileAccess: true
-  }).then(() => {
-    console.log('dev 已安装: vue-devtools')
-  }).catch((err) => {
-    console.error('dev 拓展安装失败', err)
-  });
+  const { VUEJS_DEVTOOLS } = require('electron-devtools-vendor') // Vue2 Extension
+  require('electron')
+    .session.defaultSession.loadExtension(VUEJS_DEVTOOLS, {
+      allowFileAccess: true
+    })
+    .then(() => {
+      console.log('dev 已安装: vue-devtools')
+    })
+    .catch((err) => {
+      console.error('dev 拓展安装失败', err)
+    })
 })
 
 // Require `main` process to boot app
