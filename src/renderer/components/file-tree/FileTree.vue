@@ -119,7 +119,6 @@ import { generateFileInfo, listDir } from './lib/file.js'
 import { defaultIcon } from './lib/consts.js'
 import { DELIMITER, SORTING_FILE_NAME } from '@/constants'
 import { throttle } from '@/utils'
-import chokidar from 'chokidar'
 
 export default {
   name: 'FileTree',
@@ -224,34 +223,6 @@ export default {
     }
   },
   watch: {
-    treeData(newVal, oldVal) {
-      if (oldVal) {
-        this.watcher && this.watcher.close()
-      }
-      if (newVal) {
-        this.watcher = chokidar
-          .watch(
-            newVal.map((item) => item.path),
-            {
-              // 持续监听
-              persistent: true,
-              // 忽略初始化的目录检测
-              ignoreInitial: true,
-              // 等待写入完成
-              awaitWriteFinish: {
-                stabilityThreshold: 2000,
-                pollInterval: 100
-              }
-            }
-          )
-          .on('all', async (event, path) => {
-            // console.log('FileTree watcher:', event, path);
-            if (path !== this.sortFilePath) {
-              this.treeData = await this.loadMultiDir(this.openedFolders)
-            }
-          })
-      }
-    },
     openedFolders: {
       handler: async function (newVal, oldVal) {
         this.treeData = await this.loadMultiDir(this.openedFolders)
@@ -284,8 +255,6 @@ export default {
   beforeDestroy() {
     this.dblclick = null
     this.closeFolder = null
-    this.watcher && this.watcher.close()
-    this.watcher = null
   },
   methods: {
     async loadNode(node, resolve) {
