@@ -88,6 +88,10 @@
         "AppImage"
       ],
       "category": "Utility"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     }
   },
   "dependencies": {
