@@ -14,7 +14,7 @@
               :min="0"
               :max="duration || 60"
               controls-position="right"
-              @change="(val) => changeVideoTime(val)"
+              @change="val => changeVideoTime(val)"
             />
             <span
               slot="reference"
@@ -65,7 +65,7 @@
           :min="0"
           :max="duration || 60"
           size="small"
-          @change="(val) => changeVideoTime(val)"
+          @change="val => changeVideoTime(val)"
           class="video-process-input"
         />
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
@@ -124,6 +124,7 @@ import { throttle } from '@/utils'
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants'
 import chokidar from 'chokidar'
 import * as CONSTANTS from '../video-constants'
+import { getFileName } from '@/filter/get-file-name'
 
 export default {
   components: {
@@ -268,7 +269,7 @@ export default {
     },
     getTitle() {
       return this.preference.showTitle
-        ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) + this.$options.filters.getFileName(this.path)
+        ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) + this.getName()
         : ' '
     },
     canvasStyle() {
@@ -343,7 +344,7 @@ export default {
   },
   watch: {
     path: {
-      handler: function (newVal, oldVal) {
+      handler: function(newVal, oldVal) {
         if (oldVal && newVal && oldVal !== newVal) {
           this.initVideo()
         }
@@ -365,7 +366,7 @@ export default {
             })
             .on('change', (path, details) => {
               console.log('video--change', path, details)
-              // this.initImage();
+              // this.initHist();
               this.initVideo()
             })
             .on('unlink', (path, details) => {
@@ -377,14 +378,14 @@ export default {
       immediate: true
     },
     muted: {
-      handler: function (newVal, oldVal) {
+      handler: function(newVal, oldVal) {
         if (newVal !== oldVal && this.video) {
           this.video.muted = newVal
         }
       }
     },
     speed: {
-      handler: function (newVal, oldVal) {
+      handler: function(newVal, oldVal) {
         if (newVal !== oldVal && this.video) {
           this.video.defaultPlaybackRate = newVal
           this.video.playbackRate = newVal
@@ -399,6 +400,9 @@ export default {
     }
   },
   methods: {
+    getName(filter = true) {
+      return filter ? this.$options.filters.getFileName(this.path) : getFileName(this.path)
+    },
     fullScreen() {
       this.$emit('fullScreen')
       if (this.video.requestFullscreen) {
@@ -455,7 +459,7 @@ export default {
           if (this.requestId == undefined) {
             this.startAnimation()
           } else if (this.video.readyState > 0 && this.video.paused) {
-            this.video.play().catch((e) => {
+            this.video.play().catch(e => {
               // console.log('error', e);
             })
           }
@@ -464,7 +468,7 @@ export default {
         case 0:
         case CONSTANTS.VIDEO_STATUS_PAUSE:
           this.handleVideoPaused()
-          this.initImage()
+          this.initHist()
           this.requestGenerateHist()
           break
         case -1:
@@ -499,11 +503,11 @@ export default {
     },
     listenEvents() {
       // 广播调度事件
-      this.scheduleCanvasActions.forEach((item) => {
+      this.scheduleCanvasActions.forEach(item => {
         this.$bus.$on(item.event, this[item.action])
       })
       // 分发事件 执行各个子组件的方法 同步状态
-      this.syncCanvasActions.forEach((item) => {
+      this.syncCanvasActions.forEach(item => {
         this.$bus.$on(item.event, ({ name, data }) => {
           this.dispatchCanvasAction({ name, data })
         })
@@ -519,11 +523,11 @@ export default {
       //TODO *.addEventListener('resize', this.handleResize, true);
     },
     removeEvents() {
-      this.scheduleCanvasActions.forEach((item) => {
+      this.scheduleCanvasActions.forEach(item => {
         this.$bus.$off(item.event, this[item.action])
       })
       // 分发事件 执行各个子组件的方法 同步状态
-      this.syncCanvasActions.forEach((item) => {
+      this.syncCanvasActions.forEach(item => {
         this.$bus.$off(item.event, this[item.action])
       })
     },
@@ -537,7 +541,7 @@ export default {
       this.$bus.$emit('changeVideoPaused', state)
       if (state) {
         this.video.pause()
-        await this.initImage()
+        await this.initHist()
         this.paused = true
       } else {
       }
@@ -545,7 +549,7 @@ export default {
     handleVideoResetTime() {
       this.video.currentTime = 0
       if (this.video.readyState > 0 && this.video.paused) {
-        this.video.play().catch((e) => {
+        this.video.play().catch(e => {
           // console.log('error', e);
         })
       }
@@ -575,7 +579,7 @@ export default {
                   this.handleVideoPaused()
                 }
               })
-              .catch((e) => {
+              .catch(e => {
                 console.log('error', e)
               })
           }
@@ -601,12 +605,23 @@ export default {
       }
     },
     // 初始化bitMap， 重新生成直方图hist
-    async initImage() {
+    async initHist() {
       if (this.paused && this.video.videoWidth) {
-        let offsreen = new OffscreenCanvas(this.video.videoWidth, this.video.videoHeight)
-        let offCtx = offsreen.getContext('2d')
+        let offscreen = new OffscreenCanvas(this.video.videoWidth, this.video.videoHeight)
+        let offCtx = offscreen.getContext('2d')
         offCtx.drawImage(this.video, 0, 0)
-        this.bitMap = await offsreen.transferToImageBitmap()
+        this.bitMap = await offscreen.transferToImageBitmap()
+      }
+    },
+    initImage() {
+      if (this.paused && this.video.videoWidth) {
+        let offscreen = new OffscreenCanvas(this.video.videoWidth, this.video.videoHeight)
+        let offCtx = offscreen.getContext('2d')
+        offCtx.drawImage(this.video, 0, 0)
+        const blob = offscreen.convertToBlob({ quality: 1 })
+        return blob
+      } else {
+        console.error('【Video-initImage】 only enable when paused')
       }
     },
     requestGenerateHist() {
@@ -643,7 +658,7 @@ export default {
               this.imagePosition = this.getImageInitPos(this.canvas, this.video)
             }
             this.doZoomEnd()
-            await this.initImage()
+            await this.initHist()
             this.drawImage()
             resolve()
           })
@@ -677,7 +692,7 @@ export default {
           this.drawImage()
         }
         if (this.paused) {
-          // this.initImage()
+          // this.initHist()
           this.stopAnimation()
           return
         }
@@ -698,7 +713,7 @@ export default {
     async reMount() {
       console.log('reMount')
       this.initCanvas()
-      await this.initImage()
+      await this.initHist()
       this.drawImage()
     },
     clearCanvas() {
@@ -773,7 +788,7 @@ export default {
     setRadius(radius) {
       this.radius = radius
     },
-    handleMove: throttle(40, function (mousePos) {
+    handleMove: throttle(40, function(mousePos) {
       this.broadCast({
         name: 'doHandleMove',
         data: { mousePos }

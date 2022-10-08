@@ -133,6 +133,17 @@
             </span>
           </el-button>
           <GifDialog ref="gifDialog" :selectList="videoList.slice(startIndex, startIndex + groupCount)"></GifDialog>
+          <el-button
+            :disabled="!videoPaused"
+            type="text"
+            size="mini"
+            v-tip.sure="$t('general.shareAsProject')"
+            @click="handleShare"
+          >
+            <span class="svg-container" v-tip="$t('general.share')">
+              <svg-icon icon-class="share" />
+            </span>
+          </el-button>
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
         <el-button-group class="gap">
@@ -559,6 +570,9 @@ export default {
       this.startIndex = Math.max(0, (groupNum - 1) * this.groupCount + this.offset)
       this.$bus.$emit('changeGroup', this.startIndex)
     },
+    handleShare() {
+      this.$bus.$emit('share')
+    },
     handleSelect(data) {
       this.showSelectedMsg = !!data
     },
@@ -567,7 +581,7 @@ export default {
       this.imgScale = 1
     },
     handleChangeVideoPaused() {
-      const paused = this.$parent.$refs.content.$refs['video_canvas'].every((item) => item.video.paused === true)
+      const paused = this.$parent.$refs.content.$refs['video_canvas'].every(item => item.video.paused === true)
       if (this.videoPaused !== paused) {
         this.videoPaused = paused
       }
@@ -627,8 +641,8 @@ export default {
       })
     },
     async align(beSameSize) {
-      const data = await new Promise((resolve) => {
-        this.$bus.$emit('imageCenter_getSelectedPosition', { name: 'getSelectedPosition', data: beSameSize }, (res) =>
+      const data = await new Promise(resolve => {
+        this.$bus.$emit('imageCenter_getSelectedPosition', { name: 'getSelectedPosition', data: beSameSize }, res =>
           resolve(res)
         )
       })

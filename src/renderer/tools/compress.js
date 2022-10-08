@@ -22,11 +22,11 @@ export class SnapshotHelper {
       this.zipInstance = new JSZip()
     }
     this.zipInstance.file(SHARE_FILE_NAME, JSON.stringify(config, null, 4))
-    // console.log('save', { config, files });
+    // console.log('save', { config, files })
     files.forEach(({ name, fileData }) => {
       this.zipInstance.file(name, fileData, { binary: true })
     })
-    this.zipInstance.generateAsync({ type: 'blob' }).then((content) => {
+    this.zipInstance.generateAsync({ type: 'blob' }).then(content => {
       // console.log(content, content.type);
       setTimeout(() => {
         Message.closeAll()
@@ -80,7 +80,7 @@ export class SnapshotHelper {
     const { files } = zipPackage
     const keys = Object.keys(files)
     // .map(key => files[key].unsafeOriginalName || files[key].name);
-    const configFileIndex = keys.findIndex((name) => name === SHARE_FILE_NAME)
+    const configFileIndex = keys.findIndex(name => name === SHARE_FILE_NAME)
     if (configFileIndex === -1 || keys.length < 2) {
       console.error('invalid MegSpot project file!')
       return false
@@ -92,7 +92,7 @@ export class SnapshotHelper {
     try {
       const keys = Object.keys(files)
       const res = { config: {}, files: [] }
-      const configKey = keys.find((key) => files[key].name === SHARE_FILE_NAME)
+      const configKey = keys.find(key => files[key].name === SHARE_FILE_NAME)
       if (configKey) {
         const arraybuffer = await files[configKey].async('arraybuffer')
         const buffer = Buffer.from(arraybuffer)
@@ -120,7 +120,7 @@ export class SnapshotHelper {
             path: objectURL,
             imageData: blob
           }
-          const posConfig = posConfigs?.find((config) => config.name === file.name)
+          const posConfig = posConfigs?.find(config => config.name === file.name)
           if (posConfig) {
             Object.assign(fileObj, posConfig)
           }
