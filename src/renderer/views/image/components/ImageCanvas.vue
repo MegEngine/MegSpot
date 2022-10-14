@@ -339,12 +339,12 @@ export default {
     async initImage(initPosition = true) {
       this.image = new Image()
       this.image.onload = async () => {
+        this.reDraw(initPosition)
         let offsreen = new OffscreenCanvas(this.image.width, this.image.height)
         let offCtx = offsreen.getContext('2d')
         offCtx.drawImage(this.image, 0, 0)
         this.bitMap = await offsreen.transferToImageBitmap()
-        initPosition && this.reDraw(true)
-        console.log('image', this.image, this.image.width)
+        // console.log('image', this.image, this.image.width)
         if (this.image && this.image.width) {
           this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(this.image))
         }

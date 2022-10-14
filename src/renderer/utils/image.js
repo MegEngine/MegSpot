@@ -6,7 +6,7 @@ export const getImageUrlSync = (path) => {
   return 'file://' + [...uri, encodeURIComponent(name)].join('/')
 }
 export const getImageUrlSyncNoCache = (path) => {
-  return `${NO_CACHE_FILE_PROTOCOL}://${path}`
+  return encodeURI(`${NO_CACHE_FILE_PROTOCOL}://${path}`)
 }
 export const getImageType = (str) => {
   var reg = /\.(png|jpg|gif|jpeg|webp)$/
