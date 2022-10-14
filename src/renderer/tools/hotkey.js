@@ -1,4 +1,3 @@
-import console from 'console'
 import store from '../store'
 import { Message } from 'element-ui'
 

@@ -23,6 +23,7 @@ import _ from 'lodash'
 import path from 'path'
 import fse from 'fs-extra'
 import ImageCanvas from './components/ImageCanvas'
+import store from '@/store'
 import { throttle } from '@/utils'
 import { getDirectoryPath } from '@/utils/file'
 import { SnapshotHelper } from '@/tools/compress'
@@ -117,6 +118,7 @@ export default {
     this.scheduleCanvasActions.forEach((item) => {
       this.$bus.$off(item.event, this[item.action])
     })
+    store.dispatch('imageSnapshotStore/setFiles', [])
   },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
