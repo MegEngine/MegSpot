@@ -65,8 +65,6 @@ function onAppReady() {
   }
   const registerSucceed = protocol.registerFileProtocol(NO_CACHE_FILE_PROTOCOL, (request, callback) => {
     const url = decodeURI(request.url).substr(`${NO_CACHE_FILE_PROTOCOL}://`.length)
-    // const url = request.url.substr(`${NO_CACHE_FILE_PROTOCOL}://`.length)
-    console.log('request url: ', url)
     callback({
       path: url,
       headers: {

@@ -113,6 +113,7 @@
     "jszip": "^3.10.0",
     "lodash": "^4.17.21",
     "swiper": "5.2.0",
+    "utif2": "^4.0.1",
     "viewerjs": "^1.9.0",
     "vue": "^2.6.12",
     "vue-awesome-swiper": "^4.1.1",

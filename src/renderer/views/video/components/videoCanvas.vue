@@ -14,7 +14,7 @@
               :min="0"
               :max="duration || 60"
               controls-position="right"
-              @change="val => changeVideoTime(val)"
+              @change="(val) => changeVideoTime(val)"
             />
             <span
               slot="reference"
@@ -65,7 +65,7 @@
           :min="0"
           :max="duration || 60"
           size="small"
-          @change="val => changeVideoTime(val)"
+          @change="(val) => changeVideoTime(val)"
           class="video-process-input"
         />
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
@@ -85,7 +85,7 @@
         @dbclick="handleDbclick"
         @mouseMove="handleMove"
       >
-        <div class="canvas-item" @contextmenu.prevent>
+        <div v-loading="loading" element-loading-background="rgba(0, 0, 0, 0)" class="canvas-item" @contextmenu.prevent>
           <ScaleEditor
             v-if="preference.showScale"
             class="scale-editor"
@@ -162,6 +162,7 @@ export default {
     return {
       // 监听图像文件的变化,变化后自动刷新图像
       wacther: undefined,
+      loading: false,
       header: null,
       canvas: null,
       video: null,
@@ -344,7 +345,7 @@ export default {
   },
   watch: {
     path: {
-      handler: function(newVal, oldVal) {
+      handler: function (newVal, oldVal) {
         if (oldVal && newVal && oldVal !== newVal) {
           this.initVideo()
         }
@@ -378,14 +379,14 @@ export default {
       immediate: true
     },
     muted: {
-      handler: function(newVal, oldVal) {
+      handler: function (newVal, oldVal) {
         if (newVal !== oldVal && this.video) {
           this.video.muted = newVal
         }
       }
     },
     speed: {
-      handler: function(newVal, oldVal) {
+      handler: function (newVal, oldVal) {
         if (newVal !== oldVal && this.video) {
           this.video.defaultPlaybackRate = newVal
           this.video.playbackRate = newVal
@@ -459,7 +460,7 @@ export default {
           if (this.requestId == undefined) {
             this.startAnimation()
           } else if (this.video.readyState > 0 && this.video.paused) {
-            this.video.play().catch(e => {
+            this.video.play().catch((e) => {
               // console.log('error', e);
             })
           }
@@ -503,11 +504,11 @@ export default {
     },
     listenEvents() {
       // 广播调度事件
-      this.scheduleCanvasActions.forEach(item => {
+      this.scheduleCanvasActions.forEach((item) => {
         this.$bus.$on(item.event, this[item.action])
       })
       // 分发事件 执行各个子组件的方法 同步状态
-      this.syncCanvasActions.forEach(item => {
+      this.syncCanvasActions.forEach((item) => {
         this.$bus.$on(item.event, ({ name, data }) => {
           this.dispatchCanvasAction({ name, data })
         })
@@ -523,11 +524,11 @@ export default {
       //TODO *.addEventListener('resize', this.handleResize, true);
     },
     removeEvents() {
-      this.scheduleCanvasActions.forEach(item => {
+      this.scheduleCanvasActions.forEach((item) => {
         this.$bus.$off(item.event, this[item.action])
       })
       // 分发事件 执行各个子组件的方法 同步状态
-      this.syncCanvasActions.forEach(item => {
+      this.syncCanvasActions.forEach((item) => {
         this.$bus.$off(item.event, this[item.action])
       })
     },
@@ -549,7 +550,7 @@ export default {
     handleVideoResetTime() {
       this.video.currentTime = 0
       if (this.video.readyState > 0 && this.video.paused) {
-        this.video.play().catch(e => {
+        this.video.play().catch((e) => {
           // console.log('error', e);
         })
       }
@@ -579,7 +580,7 @@ export default {
                   this.handleVideoPaused()
                 }
               })
-              .catch(e => {
+              .catch((e) => {
                 console.log('error', e)
               })
           }
@@ -649,6 +650,7 @@ export default {
     initVideo() {
       return new Promise((resolve, reject) => {
         try {
+          this.loading = true
           this.video = document.createElement('video')
           this.video.addEventListener('loadeddata', async () => {
             this.$emit('loaded')
@@ -658,6 +660,7 @@ export default {
               this.imagePosition = this.getImageInitPos(this.canvas, this.video)
             }
             this.doZoomEnd()
+            this.loading = false
             await this.initHist()
             this.drawImage()
             resolve()
@@ -788,7 +791,7 @@ export default {
     setRadius(radius) {
       this.radius = radius
     },
-    handleMove: throttle(40, function(mousePos) {
+    handleMove: throttle(40, function (mousePos) {
       this.broadCast({
         name: 'doHandleMove',
         data: { mousePos }

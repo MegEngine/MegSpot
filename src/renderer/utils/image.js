@@ -1,5 +1,8 @@
+import fse from 'fs-extra'
 import { readFileSync, formatFileSize, getFileStat, getFileSize } from './file'
 import { NO_CACHE_FILE_PROTOCOL } from '@/constants'
+import { decode, decodeImage, toRGBA8 } from 'utif2'
+
 export const getImageUrlSync = (path) => {
   const uri = path.split(/[/\\]/)
   const name = uri.pop()
@@ -59,4 +62,25 @@ export const getImageInfoMulti = (paths) => {
     }
     getInfo(index)
   })
+}
+
+export const loadTiffAsImageData = async (val) => {
+  if (!val) return
+  if (val instanceof String) {
+    // val as path
+    const file = await fse.readFile(val)
+    const arraybuffer = file.buffer
+    const ifds = decode(arraybuffer)
+    const ifd = ifds[0]
+    decodeImage(file, ifd)
+    const imageData = toRGBA8(ifd)
+    console.log('this.image.width', this.image.width, file, arraybuffer, ifds, ifd, imageData)
+    this.cs.putImageData(
+      new ImageData(new Uint8ClampedArray(imageData), ifd.width, ifd.height, { colorSpace: 'srgb' }),
+      0,
+      0
+    )
+  } else {
+    console.log('obj', val)
+  }
 }

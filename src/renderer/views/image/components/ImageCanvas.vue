@@ -26,7 +26,7 @@
         @dbclick="handleDbclick"
         @mouseMove="handleMove"
       >
-        <div class="canvas-item" @contextmenu.prevent>
+        <div v-loading="loading" element-loading-background="rgba(0, 0, 0, 0)" class="canvas-item" @contextmenu.prevent>
           <ScaleEditor
             v-if="preference.showScale"
             class="scale-editor"
@@ -49,6 +49,7 @@
 <script>
 import Vue from 'vue'
 const cv = Vue.prototype.$cv
+import fse from 'fs-extra'
 import OperationContainer from '@/components/operation-container'
 import HistContainer from '@/components/hist-container'
 import CoverMask from '@/components/cover-mask'
@@ -63,6 +64,8 @@ import { throttle } from '@/utils'
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants'
 import chokidar from 'chokidar'
 import { getFileName } from '@/filter/get-file-name'
+import { getDataURL } from '@/utils/data'
+import { decode, decodeImage, toRGBA8 } from 'utif2'
 
 export default {
   components: {
@@ -104,6 +107,7 @@ export default {
     return {
       // 监听图像文件的变化,变化后自动刷新图像
       wacther: undefined,
+      loading: false,
       header: null,
       canvas: null,
       maskDom: undefined,
@@ -193,7 +197,7 @@ export default {
       return this.preference.background.style
     }
   },
-  mounted() {
+  async mounted() {
     this.header = this.$refs.header
     this.canvas = this.$refs.canvas
     this.initCanvas()
@@ -336,42 +340,70 @@ export default {
         this[name](data)
       }
     },
-    async initImage(initPosition = true) {
-      this.image = new Image()
-      this.image.onload = async () => {
-        this.reDraw(initPosition)
-        let offsreen = new OffscreenCanvas(this.image.width, this.image.height)
-        let offCtx = offsreen.getContext('2d')
-        offCtx.drawImage(this.image, 0, 0)
-        this.bitMap = await offsreen.transferToImageBitmap()
-        // console.log('image', this.image, this.image.width)
-        if (this.image && this.image.width) {
-          this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(this.image))
-        }
+    initHist() {
+      if (this.image && this.image.width) {
+        this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(this.image))
       }
-      if (this.snapshotMode) {
-        fetch(this.path)
-          .then(() => {
-            this.image.src = this.path
-          })
-          .catch((err) => {
-            // TODO: A: reload后imageData为空，（从vuex）取imageData
-            // B: 或退回文件浏览器页
-            console.log(err)
-
-            // method A
-            // const path = URL.createObjectURL(
-            //   new Blob([this.snapInfo.imageData])
-            // );
-            // this.image.src = path;
-
-            // method B
-            this.$router.push({
-              path: '/image/index'
+    },
+    async initBitMap(imageData) {
+      this.bitMap = await createImageBitmap(
+        imageData
+          ? new ImageData(new Uint8ClampedArray(imageData), this.image.width, this.image.height, { colorSpace: 'srgb' })
+          : this.image
+      )
+    },
+    resolvePath() {
+      return new Promise((resolve) => {
+        if (this.snapshotMode) {
+          fetch(this.path)
+            .then(() => {
+              resolve(this.path)
             })
-          })
+            .catch((err) => {
+              // TODO: A: reload后imageData为空，（从vuex）取imageData
+              // B: 或退回文件浏览器页
+              console.log(err)
+
+              // method A
+              // const path = URL.createObjectURL(
+              //   new Blob([this.snapInfo.imageData])
+              // );
+              // this.image.src = path;
+
+              // method B
+              this.$router.push({
+                path: '/image/index'
+              })
+            })
+        } else {
+          resolve(getImageUrlSyncNoCache(this.path)) //        'C:/Demo/1-1%20-%20副本.jpg'
+        }
+      })
+    },
+    async initImage(initPosition = true, initHist = true, initBitMap = true) {
+      this.loading = true
+      if (/tiff?$/.test(this.path)) {
+        const file = await fse.readFile(this.path)
+        const arraybuffer = file.buffer
+        const ifds = decode(arraybuffer)
+        const ifd = ifds[0]
+        decodeImage(file, ifd)
+        const imageData = toRGBA8(ifd)
+        this.image = new Image(ifd.width, ifd.height)
+
+        initHist && this.initHist()
+        initBitMap && (await this.initBitMap(imageData))
+        this.loading = false
+        this.reDraw(initPosition)
       } else {
-        this.image.src = getImageUrlSyncNoCache(this.path) //        'C:/Demo/1-1%20-%20副本.jpg'
+        this.image = new Image()
+        this.image.onload = async () => {
+          initHist && this.initHist()
+          initBitMap && (await this.initBitMap())
+          this.loading = false
+          this.reDraw(initPosition)
+        }
+        this.image.src = await this.resolvePath()
       }
     },
     initCanvas() {
