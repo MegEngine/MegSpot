@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -43,8 +43,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1. 新增功能：支持hevc视频硬解码(需系统GPU支持)等; 支持显示光标所在图像坐标位置； \n2. 优化体验: 图像设置面板所有选项完成翻译；支持控制显示/隐藏 缩放提示和光标位置提示；\n3. 修复bug: 如视频切换组时未及时刷新等。",
-      "releaseDate": "2022.08.19"
+      "releaseNotes": "1. 新增功能：支持tiff图片格式; 支持快速添加黑白二值化xray滤镜； \n2. 优化体验: 添加图像加载动画；\n3. 修复bug: 优化文件目录加载卡顿的问题；修复解析文件名错误的问题。",
+      "releaseDate": "2022.10.19"
     },
     "directories": {
       "output": "build"

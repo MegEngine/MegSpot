@@ -71,6 +71,23 @@
       </el-row>
       <el-row :gutter="10">
         <el-col :span="6">
+          <span class="text-style">invert</span>
+        </el-col>
+        <el-col :span="18">
+          <el-slider
+            :min="0"
+            :max="100"
+            v-model="invert"
+            :format-tooltip="
+              (val) => {
+                return val + '%'
+              }
+            "
+          ></el-slider>
+        </el-col>
+      </el-row>
+      <el-row :gutter="10">
+        <el-col :span="6">
           <span class="text-style">opacity</span>
         </el-col>
         <el-col :span="18">
@@ -92,7 +109,10 @@
           <el-slider :min="0" :max="15" v-model="blur"></el-slider>
         </el-col>
       </el-row>
-      <el-button @click="resetImageStyle" style="float: right">reset</el-button>
+      <div flex="main:justify">
+        <el-switch v-model="enableXray" active-text="Xray"></el-switch>
+        <el-button @click="resetImageStyle">reset</el-button>
+      </div>
     </div>
     <el-button type="text" size="medium" id="preview">
       <svg-icon icon-class="eye-open"></svg-icon>
@@ -110,14 +130,16 @@ export default {
       contrast: 100,
       saturate: 100,
       grayscale: 0,
+      invert: 0,
       opacity: 100,
-      blur: 0
+      blur: 0,
+      enableXray: false
     }
   },
   computed: {
     canvasStyle() {
       let filter = ''
-      ;['brightness', 'contrast', 'saturate', 'grayscale', 'opacity'].forEach((item) => {
+      ;['brightness', 'contrast', 'saturate', 'grayscale', 'opacity', 'invert'].forEach((item) => {
         filter += `${item}(${this[item]}%) `
       })
       ;['blur'].forEach((item) => {
@@ -129,6 +151,11 @@ export default {
   watch: {
     canvasStyle() {
       this.$emit('change', this.canvasStyle)
+    },
+    // 黑白二值化
+    enableXray(enable) {
+      this.grayscale = enable ? 100 : 0
+      this.invert = enable ? 100 : 0
     }
   },
   methods: {
@@ -138,6 +165,7 @@ export default {
       this.contrast = 100
       this.saturate = 100
       this.grayscale = 0
+      this.invert = 0
       this.opacity = 100
       this.blur = 0
     }
@@ -146,7 +174,7 @@ export default {
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
 .image-style-container {
-  width: 300px;
+  width: 310px;
 
   // padding-right: 5px;
   #preview {

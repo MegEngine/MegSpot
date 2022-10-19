@@ -64,7 +64,6 @@ import { throttle } from '@/utils'
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants'
 import chokidar from 'chokidar'
 import { getFileName } from '@/filter/get-file-name'
-import { getDataURL } from '@/utils/data'
 import { decode, decodeImage, toRGBA8 } from 'utif2'
 
 export default {
