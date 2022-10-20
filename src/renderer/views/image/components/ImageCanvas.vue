@@ -621,6 +621,7 @@ export default {
       let offset = data.offset
       let transX = this.imagePosition.x + offset.x
       let transY = this.imagePosition.y + offset.y
+      console.log('offset', offset)
       if (this.checkBorder(transX, transY)) {
         // 判断是否只在指定范围内拖动
         this.imagePosition.x = transX

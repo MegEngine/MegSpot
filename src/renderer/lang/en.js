@@ -34,7 +34,9 @@ export default {
     videoProcessBarStyle: 'Video Control Bar Position',
     fixed: 'fixed',
     float: 'floating ball',
+    move: 'Movement distance (px/per keystroke)',
     defaultFileListShowType: 'Default Show Type of File List',
+    importOrExportSettings: 'import/export settings',
     list: 'list',
     share: 'share',
     shareAsProject: 'Create snapshot file for sharing',
@@ -80,6 +82,10 @@ export default {
     left: 'Overlay contrast to the left',
     right: 'Overlay contrast to the right',
     bottom: 'Overlay down the contrast',
+    moveUp: 'move up',
+    moveLeft: 'move left',
+    moveRight: 'move right',
+    moveDown: 'move downward',
     pickColor: 'Turn on/off the color picker'
   },
   dashboard: {

@@ -211,6 +211,8 @@ import { createNamespacedHelpers } from 'vuex'
 import GifDialog from '@/components/gif-dialog'
 import ImageSetting from '@/components/image-setting'
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore')
+const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
+import { throttle } from '@/utils'
 import { handleEvent } from '@/tools/hotkey'
 
 export default {
@@ -237,6 +239,7 @@ export default {
   },
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
+    ...preferenceMapGetters(['preference']),
     maxGroupNum() {
       return Math.ceil(this.imageList.length / (this.layout[0] * this.layout[2]))
     },
@@ -293,6 +296,30 @@ export default {
       hotkeyDownEvents.set('right', () => {
         this.overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)
       })
+      hotkeyDownEvents.set('moveDown', () => {
+        this.broadCast({
+          name: 'doDrag',
+          data: { offset: { x: 0, y: this.preference.moveDistance } }
+        })
+      })
+      hotkeyDownEvents.set('moveUp', () => {
+        this.broadCast({
+          name: 'doDrag',
+          data: { offset: { x: 0, y: -this.preference.moveDistance } }
+        })
+      })
+      hotkeyDownEvents.set('moveRight', () => {
+        this.broadCast({
+          name: 'doDrag',
+          data: { offset: { x: this.preference.moveDistance, y: 0 } }
+        })
+      })
+      hotkeyDownEvents.set('moveLeft', () => {
+        this.broadCast({
+          name: 'doDrag',
+          data: { offset: { x: -this.preference.moveDistance, y: 0 } }
+        })
+      })
       hotkeyDownEvents.set('previousGroup', () => {
         if (this.groupNum > 1) {
           this.groupNum--
@@ -327,6 +354,14 @@ export default {
     },
     handleHotKeyUp(event) {
       handleEvent(event, this.hotkeyUpEvents)
+    },
+    broadCast({ name, data }) {
+      throttle(16, () => {
+        this.$bus.$emit('image_broadcast', {
+          name,
+          data
+        })
+      })()
     },
     changeGroup(groupNum, oldGroupNum) {
       this.startIndex = Math.max(0, this.startIndex - this.groupCount * (oldGroupNum - groupNum))

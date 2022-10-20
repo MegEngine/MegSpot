@@ -34,7 +34,9 @@ export default {
     videoProcessBarStyle: 'ビデオコントロールバーの位置',
     fixed: '安定',
     float: 'フローティングボール',
+    move: '移動距離(ピクセル/キーごとのプレス)',
     defaultFileListShowType: 'ファイルリストのデフォルトの表示タイプ',
+    importOrExportSettings: 'インポート/エクスポート設定',
     list: 'リスト',
     share: '共有',
     shareAsProject: '共有するスナップショットファイルを作成する',
@@ -80,6 +82,10 @@ export default {
     left: '左にコントラストをオーバーレイ',
     right: '右にコントラストを重ねる',
     bottom: '比較のために積み重ねる',
+    moveUp: '上に移動',
+    moveLeft: '左に移動',
+    moveRight: '向右移动',
+    moveDown: '下に移動',
     pickColor: 'カラーピッカーのオン/オフを切り替えます'
   },
   dashboard: {

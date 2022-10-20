@@ -272,6 +272,7 @@ import GifDialog from '@/components/gif-dialog'
 import ImageSetting from '@/components/image-setting'
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore')
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
+import { throttle } from '@/utils'
 import { handleEvent } from '@/tools/hotkey'
 
 export default {
@@ -416,6 +417,42 @@ export default {
           () => {
             this.changeStatus(this.videoPaused ? CONSTANTS.VIDEO_STATUS_START : CONSTANTS.VIDEO_STATUS_PAUSE)
           }
+        ],
+        [
+          'moveDown',
+          () => {
+            this.broadCast({
+              name: 'doDrag',
+              data: { offset: { x: 0, y: this.preference.moveDistance } }
+            })
+          }
+        ],
+        [
+          'moveUp',
+          () => {
+            this.broadCast({
+              name: 'doDrag',
+              data: { offset: { x: 0, y: -this.preference.moveDistance } }
+            })
+          }
+        ],
+        [
+          'moveRight',
+          () => {
+            this.broadCast({
+              name: 'doDrag',
+              data: { offset: { x: this.preference.moveDistance, y: 0 } }
+            })
+          }
+        ],
+        [
+          'moveLeft',
+          () => {
+            this.broadCast({
+              name: 'doDrag',
+              data: { offset: { x: -this.preference.moveDistance, y: 0 } }
+            })
+          }
         ]
       ])
 
@@ -557,6 +594,14 @@ export default {
     changeStatus(status) {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status)
     },
+    broadCast({ name, data }) {
+      throttle(16, () => {
+        this.$bus.$emit('image_broadcast', {
+          name,
+          data
+        })
+      })()
+    },
     changeLoop() {
       this.loop = !this.loop
       this.$bus.$emit('changeLoop', this.loop)
@@ -581,7 +626,7 @@ export default {
       this.imgScale = 1
     },
     handleChangeVideoPaused() {
-      const paused = this.$parent.$refs.content.$refs['video_canvas'].every(item => item.video.paused === true)
+      const paused = this.$parent.$refs.content.$refs['video_canvas'].every((item) => item.video.paused === true)
       if (this.videoPaused !== paused) {
         this.videoPaused = paused
       }
@@ -641,8 +686,8 @@ export default {
       })
     },
     async align(beSameSize) {
-      const data = await new Promise(resolve => {
-        this.$bus.$emit('imageCenter_getSelectedPosition', { name: 'getSelectedPosition', data: beSameSize }, res =>
+      const data = await new Promise((resolve) => {
+        this.$bus.$emit('imageCenter_getSelectedPosition', { name: 'getSelectedPosition', data: beSameSize }, (res) =>
           resolve(res)
         )
       })

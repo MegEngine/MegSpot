@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { isExist } from '../utils/file'
+import _ from 'lodash'
 
 // 注释这个的原因是因为会导致vuex操作失败
 import PersistedState from 'vuex-electron-store'
@@ -25,6 +26,17 @@ const checkStore = function (pathList = [], removeFnName = '') {
   })
   store.dispatch(removeFnName, removeList)
 }
+
+const checkHotkeysStore = () => {
+  const validHotkeys = preferenceStore.preference.hotkeys.length
+    ? _.intersectionBy(preferenceStore.preference.hotkeys, DEFAULT_HOTKEYS, 'name')
+    : []
+  const newHotkeys = _.unionBy(validHotkeys, DEFAULT_HOTKEYS, 'name')
+  store.dispatch('preferenceStore/setPreference', {
+    hotkeys: newHotkeys
+  })
+}
+
 // 校验文件/文件夹存在性 移除不存在的  todo:改成单次不展示
 const { imageStore = {}, videoStore = {}, preferenceStore } = store.state
 const { imageFolders = [], imageList = [] } = imageStore
@@ -33,9 +45,6 @@ checkStore(imageFolders, 'imageStore/removeImageFolders')
 checkStore(imageList, 'imageStore/removeImages')
 checkStore(videoFolders, 'videoStore/removeVideoFolders')
 checkStore(videoList, 'videoStore/removeVideos')
-if (!preferenceStore.preference && preferenceStore.preference.hotkeys.length === 0) {
-  store.dispatch('preferenceStore/setPreference', {
-    hotkeys: DEFAULT_HOTKEYS
-  })
-}
+checkHotkeysStore()
+
 export default store

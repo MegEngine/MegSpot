@@ -33,7 +33,9 @@ export default {
     videoProcessBarStyle: '视频控制条位置',
     fixed: '固定',
     float: '悬浮球',
+    move: '移动距离(像素/每次按键)',
     defaultFileListShowType: '文件列表的默认显示类型',
+    importOrExportSettings: '导入/导出配置',
     list: '列表',
     share: '分享',
     shareAsProject: '创建快照文件进行共享',
@@ -79,6 +81,10 @@ export default {
     left: '向左叠加对比',
     right: '向右叠加对比',
     bottom: '向下叠加对比',
+    moveUp: '向上移动',
+    moveLeft: '向左移动',
+    moveRight: '向右移动',
+    moveDown: '向下移动',
     pickColor: '打开/关闭取色器'
   },
   dashboard: {

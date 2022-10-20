@@ -67,37 +67,31 @@ const ctrlOrCommand = isDrawn ? 'Meta' : 'Control'
 
 export const DEFAULT_HOTKEYS = [
   {
-    index: 1,
     name: 'gotoCompare',
     desc: 'jump to compare',
     keysArr: [[ctrlOrCommand, 'Enter']]
   },
   {
-    index: 2,
     name: 'emptyAll',
     desc: 'empty all selected files',
     keysArr: [[ctrlOrCommand, 'Delete']]
   },
   {
-    index: 3,
     name: 'back',
     desc: 'back to file select',
     keysArr: [['Escape']]
   },
   {
-    index: 4,
     name: 'gallery',
     desc: 'show/hide select file gallery',
     keysArr: [[ctrlOrCommand, 'f']]
   },
   {
-    index: 5,
     name: 'previousGroup',
     desc: 'change to previous group',
     keysArr: [[ctrlOrCommand, 'ArrowLeft']]
   },
   {
-    index: 6,
     name: 'nextGroup',
     desc: 'change to next group',
     keysArr: [[ctrlOrCommand, 'ArrowRight']]
@@ -111,48 +105,64 @@ export const DEFAULT_HOTKEYS = [
   },
   // 后一帧 (暂停时可用)
   {
-    index: 8,
     name: 'nextFrame',
     desc: 'Compare video frame by frame (play backwards →)',
     keysArr: [[ctrlOrCommand, 'n']]
   },
   {
-    index: 9,
     name: 'togglePlay',
     desc: 'paly/pause video',
     keysArr: [[' ']]
   },
   {
-    index: 10,
-    name: 'top',
-    desc: 'compare to top',
-    keysArr: [['w'], ['ArrowUp']]
+    name: 'moveUp',
+    desc: 'move upward',
+    keysArr: [['w']]
   },
   {
-    index: 11,
-    name: 'left',
-    desc: 'compare to left',
-    keysArr: [['a'], ['ArrowLeft']]
+    name: 'moveLeft',
+    desc: 'move left',
+    keysArr: [['a']]
   },
   {
-    index: 12,
-    name: 'bottom',
-    desc: 'compare to bottom',
-    keysArr: [['s'], ['ArrowDown']]
+    name: 'moveDown',
+    desc: 'move downward',
+    keysArr: [['s']]
   },
   {
-    index: 13,
-    name: 'right',
-    desc: 'compare to right',
-    keysArr: [['d'], ['ArrowRight']]
+    name: 'moveRight',
+    desc: 'move right',
+    keysArr: [['d']]
   },
   {
-    index: 14,
     name: 'pickColor',
     desc: 'pick color in image',
     keysArr: [[ctrlOrCommand, 'p']]
+  },
+  {
+    name: 'top',
+    desc: 'compare to top',
+    keysArr: [['ArrowUp']]
+  },
+  {
+    name: 'left',
+    desc: 'compare to left',
+    keysArr: [['ArrowLeft']]
+  },
+  {
+    name: 'bottom',
+    desc: 'compare to bottom',
+    keysArr: [['ArrowDown']]
+  },
+  {
+    name: 'right',
+    desc: 'compare to right',
+    keysArr: [['ArrowRight']]
   }
-]
+].map((item, index) => {
+  item.index = index
+  return item
+})
 
 export function getArrStr(arr) {
   return JSON.parse(JSON.stringify(arr)).sort().toString()

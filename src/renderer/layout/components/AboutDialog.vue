@@ -31,7 +31,10 @@
                 <el-option :label="$t('general.thumbnail')" value="thumbnail"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item :label="'导入/导出配置'">
+            <el-form-item :label="$t('general.move')">
+              <el-input-number v-model="moveDistance" :min="1"></el-input-number>
+            </el-form-item>
+            <el-form-item :label="$t('general.importOrExportSettings')">
               <el-button @click="settingsImport" type="primary">{{ $t('general.import') }}</el-button>
               <el-button @click="settingsExport" type="primary">{{ $t('general.export') }}</el-button>
             </el-form-item>
@@ -221,7 +224,9 @@ export default {
       }
     },
     hotkeyStrArr() {
-      return this.preference.hotkeys.map(keyConf => keyConf.keysArr.map(keys => [...keys].sort().toString())).flat(2)
+      return this.preference.hotkeys
+        .map((keyConf) => keyConf.keysArr.map((keys) => [...keys].sort().toString()))
+        .flat(2)
     },
     appLanguage: {
       get() {
@@ -252,17 +257,27 @@ export default {
           defaultFileListShowType: arg
         })
       }
+    },
+    moveDistance: {
+      get() {
+        return this.preference.moveDistance
+      },
+      set(arg) {
+        this.setPreference({
+          moveDistance: arg
+        })
+      }
     }
   },
   watch: {
     appLanguage: {
-      handler: function() {
+      handler: function () {
         this.$i18n.locale = this.appLanguage
       },
       immediate: true
     },
     activeTab: {
-      handler: function() {
+      handler: function () {
         if (this.activeTab === 'hotkey') {
           this.$nextTick(() => {
             this.maxHeight = this.$refs.container.offsetHeight
@@ -272,7 +287,7 @@ export default {
     }
   },
   mounted() {
-    ipcRenderer.on('aboutDialog', event => {
+    ipcRenderer.on('aboutDialog', (event) => {
       this.visible = !this.visible
       ipcRenderer.send(this.visible ? 'put-in-tray' : 'tray-removed')
     })
@@ -280,7 +295,7 @@ export default {
     try {
       const logs = this.$log.transports.file.readAllLogs()
       const lastLog = logs[0]?.lines.slice(-100)
-      lastLog.forEach(logLine => {
+      lastLog.forEach((logLine) => {
         this.logTxt += logLine + '\r\n'
       })
     } catch (e) {
@@ -313,7 +328,7 @@ export default {
                 //   value: this.neverCheckLanguage
                 // },
                 on: {
-                  input: event => {
+                  input: (event) => {
                     this.neverCheckLanguage = event.target.checked
                   }
                 }
@@ -368,7 +383,7 @@ export default {
           if (filePaths && filePaths.length) {
             const filePath = filePaths[0]
             try {
-              await fse.readJson(filePath).then(json => {
+              await fse.readJson(filePath).then((json) => {
                 this.$store.replaceState(json)
               })
               this.$message.success(i18nRender('general.import') + ' ' + i18nRender('general.success'))
@@ -387,7 +402,7 @@ export default {
       return `hotkey-${rowIndex}-${index}`
     },
     getOriginStr(row, index) {
-      return [...this.hotkeys.find(keyConf => keyConf.name === row.name).keysArr[index]].sort().toString()
+      return [...this.hotkeys.find((keyConf) => keyConf.name === row.name).keysArr[index]].sort().toString()
     },
     expandVisibleMethod({ rowIndex }) {
       return this.activeRowId === this.generateRowId(rowIndex)
@@ -417,14 +432,14 @@ export default {
         return // Do nothing if the event was already processed
       }
       const { index } = this.parseRowId(event.target.id)
-      const attrsKeys = ATTRS_KEYS.map(item => item.name)
-      const specialKeys = SPECIAL_KEYS.map(item => item.key)
+      const attrsKeys = ATTRS_KEYS.map((item) => item.name)
+      const specialKeys = SPECIAL_KEYS.map((item) => item.key)
       // 转换ctrlKey、altKey等按键信号
-      const attrsKeyIndex = attrsKeys.findIndex(key => event[key])
-      const isCommon = key => (key.length === 1 && /\w/.test(key)) || !specialKeys.includes(key)
+      const attrsKeyIndex = attrsKeys.findIndex((key) => event[key])
+      const isCommon = (key) => (key.length === 1 && /\w/.test(key)) || !specialKeys.includes(key)
       let eventKey = event.key
       if (attrsKeyIndex > -1 && !isCommon(eventKey)) {
-        eventKey = ATTRS_KEYS.find(keyConf => keyConf.name === attrsKeys[attrsKeyIndex]).key
+        eventKey = ATTRS_KEYS.find((keyConf) => keyConf.name === attrsKeys[attrsKeyIndex]).key
       }
       // 已出现则不响应
       if (this.temporaryKeysArr[index].includes(eventKey)) {
@@ -452,7 +467,7 @@ export default {
       this.temporaryKeysArrProxy = new Proxy(this.temporaryKeysArr, {
         get: (target, key) => {
           if (!isNaN(key) && target[key].map) {
-            return target[key].map(key => this.getLabel(key)).join('+')
+            return target[key].map((key) => this.getLabel(key)).join('+')
           }
           return target[key]
         },
@@ -482,24 +497,20 @@ export default {
       const { name, keysArr } = row
       const temporaryKeysArr = JSON.parse(JSON.stringify(this.temporaryKeysArr))
       const temporaryKeysStr = temporaryKeysArr.sort().toString()
-      if (
-        JSON.parse(JSON.stringify(keysArr))
-          .sort()
-          .toString() === temporaryKeysStr
-      ) {
+      if (JSON.parse(JSON.stringify(keysArr)).sort().toString() === temporaryKeysStr) {
         this.$message.info('无更改')
       } else {
-        if (temporaryKeysArr.some(keys => this.hotkeyStrArr.includes([...keys].sort().toString()))) {
+        if (temporaryKeysArr.some((keys) => this.hotkeyStrArr.includes([...keys].sort().toString()))) {
           this.$message.info('已存在相同快捷键')
           return
         }
-        if (temporaryKeysArr.some(keys => keys.length === 0)) {
+        if (temporaryKeysArr.some((keys) => keys.length === 0)) {
           this.$message.info('快捷键不可为空')
           return
         }
         this.hotkeys = JSON.parse(
           JSON.stringify([
-            ...this.hotkeys.filter(keyConf => keyConf.name !== name),
+            ...this.hotkeys.filter((keyConf) => keyConf.name !== name),
             Object.assign({}, row, {
               keysArr: temporaryKeysArr
             })
