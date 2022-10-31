@@ -516,8 +516,8 @@ export default {
       const { x, y } = mousePos
       const { x: imageX, y: imageY, width, height } = this.imagePosition
       const isOutside = x < imageX || y < imageY || x > imageX + width || y > imageY + height
-      const originWidth = this.image.naturalWidth
-      const originHeight = this.image.naturalHeight
+      const originWidth = this.image.width
+      const originHeight = this.image.height
       if (!isOutside && originWidth && originHeight) {
         const posX = ((x - imageX) * originWidth) / width
         const posY = ((y - imageY) * originHeight) / height
@@ -549,8 +549,8 @@ export default {
       if (val) {
         let x = 0,
           y = 0
-        let width = this.image.naturalWidth
-        let height = this.image.naturalHeight
+        let width = this.image.width
+        let height = this.image.height
         this.afterFullSize = true
         this.imagePosition = { x, y, width, height }
         this.doZoomEnd()
@@ -621,7 +621,7 @@ export default {
       let offset = data.offset
       let transX = this.imagePosition.x + offset.x
       let transY = this.imagePosition.y + offset.y
-      console.log('offset', offset)
+      // console.log('offset', offset)
       if (this.checkBorder(transX, transY)) {
         // 判断是否只在指定范围内拖动
         this.imagePosition.x = transX
@@ -803,6 +803,7 @@ export default {
 </script>
 <style scoped lang="scss">
 @import '@/styles/variables.scss';
+
 .image-canvas {
   .header {
     height: 18px;
@@ -810,27 +811,33 @@ export default {
     background-color: #f6f6f6;
     padding-right: 10px;
   }
+
   .canvas-container {
     .canvas-item {
       position: relative;
       width: 100%;
       height: 100%;
+
       img {
         object-fit: contain;
         vertical-align: middle;
       }
+
       ::v-deep {
         input,
         .el-input-group__append {
           border-radius: 0;
         }
+
         .el-input-group__append,
         .el-input-group__prepend {
           padding: 0 6px;
+
           &:hover {
             color: green;
           }
         }
+
         .el-input__inner {
           padding: 0 2px;
         }
