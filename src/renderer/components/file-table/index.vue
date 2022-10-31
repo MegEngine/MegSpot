@@ -36,7 +36,7 @@
       </span>
       <span v-else>There is no available files in current directory.</span>
     </template>
-    <vxe-column type="checkbox" width="40"></vxe-column>
+    <vxe-column type="checkbox" width="48"></vxe-column>
     <vxe-column align="left" show-overflow="tooltip" field="name" title="Name" sortable>
       <template #header>
         <div flex="cross:center">
@@ -166,13 +166,7 @@ export default {
           }
           return result1 && result2
         })
-
-        if (!this.$refs.xTable?.getSortColumns()?.length) {
-          return this.mySort(data, this.defaultSort?.field || 'name', this.defaultSort?.order || 'asc')
-        }
-
-        const { property, order } = this.$refs.xTable.getSortColumns()[0]
-        return this.mySort(data, property, order)
+        return this.mySort(data, this.defaultSort?.field || 'name', this.defaultSort?.order || 'asc')
       },
       set(data) {
         console.log('setData', data)
@@ -307,7 +301,7 @@ export default {
       if (order === 'desc') {
         list.reverse()
       }
-      // console.log(`sort by ${property}, result:`, list);
+      console.log(`sort by ${property}, result:`, list)
       return list
     },
     async customSortMethod({ data, sortList, ...rest }) {
@@ -422,6 +416,7 @@ export default {
     },
     // 可外部直接调用触发逻辑
     async refreshFileList() {
+      console.info(`-----------refresh file list-----------`)
       if (this.currentPath && isDirectory(this.currentPath)) {
         const files = await readDir(this.currentPath).catch((err) => {
           throw err
@@ -442,7 +437,6 @@ export default {
       }
       // 重新触发排序
       this.$nextTick(() => {
-        console.log('refreshFileList')
         this.$refs.xTable.sort(this.defaultSort.field, this.defaultSort.order ?? 'null').then(() => {
           // 向父级反馈 最新的顺序
           this.$emit('sort-change', this.$refs.xTable.getSortColumns()[0])
