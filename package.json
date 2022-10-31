@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -43,8 +43,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1. 新增功能：支持tiff图片格式; 支持快速添加黑白二值化xray滤镜； \n2. 优化体验: 添加图像加载动画；\n3. 修复bug: 优化文件目录加载卡顿的问题；修复解析文件名错误的问题。",
-      "releaseDate": "2022.10.19"
+      "releaseNotes": "1. 新增功能：支持tiff图片格式; 支持快速添加黑白二值化xray滤镜； \n2. 优化体验: 添加图像加载动画；优化视频同步播放；\n3. 修复bug: 优化文件目录加载卡顿的问题；修复解析文件名错误的问题。",
+      "releaseDate": "2022.10.31"
     },
     "directories": {
       "output": "build"
