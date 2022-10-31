@@ -11,6 +11,7 @@ export default {
   name: 'Operationcontainer',
   data() {
     return {
+      scaleFactor: 1.1,
       contentPos: { ix: 0, iy: 0, iw: 800, ih: 800 },
       mousePos: { mx: 0, my: 0 },
       isMouseDown: false,
@@ -99,18 +100,19 @@ export default {
       this.isMouseDown = false
     },
     doMouseScroll: function (e) {
-      const delta = (e.wheelDelta / 120).toFixed(2)
+      const delta = (e.wheelDelta / 80).toFixed(2)
       if (delta > 0) {
         this.containerDom.style.cursor = 'zoom-in'
       } else {
         this.containerDom.style.cursor = 'zoom-out'
       }
       const mousePos = this.transformLocationToParent(this.containerDom, e.clientX, e.clientY)
-      let rate = 1 + 0.1 * delta
-      // 避免极值
-      if (rate < 0.5) {
-        rate = 0.5
-      }
+      // let rate = 1 + 0.1 * delta
+      // // 避免极值
+      // if (rate < 0.5) {
+      //   rate = 0.5
+      // }
+      let rate = Math.pow(this.scaleFactor, delta)
       this.$emit('zoom', rate, mousePos)
       clearTimeout(this.scrollEnd)
       this.scrollEnd = setTimeout(() => {
