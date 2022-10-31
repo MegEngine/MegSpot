@@ -196,6 +196,8 @@
     "style-loader": "^2.0.0",
     "svg-sprite-loader": "^5.2.1",
     "terser-webpack-plugin": "^4.2.3",
+    "timing-object": "^3.1.48",
+    "timingsrc": "^1.2.8",
     "url-loader": "^4.1.1",
     "vue-html-loader": "^1.2.4",
     "vue-loader": "^15.9.6",

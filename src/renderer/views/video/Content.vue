@@ -16,7 +16,7 @@
       v-if="isFloating"
       :contentDragDisabled="false"
       :disableDragFn="
-        event => {
+        (event) => {
           return (
             event.target.className.toString().includes('el-slider__') || event.target.tagName.toLowerCase() === 'strong'
           )
@@ -45,6 +45,7 @@ import { SnapshotHelper } from '@/tools/compress'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore')
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
+import { TimeManager } from '@/utils/video'
 
 export default {
   components: { VideoCanvas, Sticky, VideoProgressBar },
@@ -80,6 +81,7 @@ export default {
         }
       ],
       marks: [],
+      timer: null,
       containerWidth: 9999,
       subVideoControlMenu: false
     }
@@ -108,18 +110,19 @@ export default {
       }
       this.setVideoConfig({ layout: smartLayout })
     }
+    TimeManager.cleartimeConfigs()
   },
   mounted() {
     this.calcCanvasSize()
     // 调度事件  使用当前组件的方法
-    this.scheduleCanvasActions.forEach(item => {
+    this.scheduleCanvasActions.forEach((item) => {
       this.$bus.$on(item.event, this[item.action])
     })
     // resize 后重新计算宽高并渲染
     window.addEventListener('resize', this.handleResize, true)
   },
   beforeDestroy() {
-    this.scheduleCanvasActions.forEach(item => {
+    this.scheduleCanvasActions.forEach((item) => {
       this.$bus.$off(item.event, this[item.action])
     })
     window.removeEventListener('resize', this.handleResize, true)
@@ -216,7 +219,7 @@ export default {
     changeGroup(groupStartIndex) {
       this.groupStartIndex = groupStartIndex
     },
-    handleResize: throttle(50, function() {
+    handleResize: throttle(50, function () {
       this.calcCanvasSize()
       // 非全屏状态时重新布局图片容器;
       if (!this.fullScreening) {
@@ -279,8 +282,8 @@ export default {
       let canvasViews = this.$refs['video_canvas']
       try {
         let details = canvasViews
-          .filter(item => imageNameList.findIndex(name => name === item.path) > -1)
-          .map(item => {
+          .filter((item) => imageNameList.findIndex((name) => name === item.path) > -1)
+          .map((item) => {
             return {
               path: item.path,
               canvas: item.canvas
@@ -293,7 +296,7 @@ export default {
       }
     },
     updateAllCanvas() {
-      this.$refs['video_canvas'].forEach(item => {
+      this.$refs['video_canvas'].forEach((item) => {
         // 重新设定宽高 然后重新绘制canvas
         item.height = Math.floor(this.canvasHeight)
         item.width = Math.floor(this.canvasWidth)
@@ -391,7 +394,7 @@ export default {
         coveredArr
       }
     },
-    handleVideoLoaded() {
+    async handleVideoLoaded() {
       // TODO: 下次重构时使用， 多合一视频进度控制(el原生组件不支持，需采用其他组件)
       // if (this.marks.length > 0) {
       //   return;
@@ -407,6 +410,18 @@ export default {
       //   ]);
       // });
       // this.$bus.$emit('videoLoaded', this.marks);
+      // this.$refs['video_canvas'].forEach((item, index) => {
+      //   console.log(`video-${index} readyState`, item.video.readyState)
+      // })
+      // const videoRefs = this.$refs['video_canvas']
+      // if (!this.timer && videoRefs.every((item) => item.video.readyState === 4)) {
+      //   const videos = videoRefs.map((item, index) => ({
+      //     id: index + 1,
+      //     video: item.video
+      //   }))
+      //   this.timer = await new Timer(videos)
+      //   console.log('timer', this.timer)
+      // }
     },
     getMarks(data, callback) {
       callback(this.marks)
@@ -422,9 +437,9 @@ export default {
       let snapshotMode = false
       const shareProject = GLOBAL_CONSTANTS.SHARE_PROJECT_DEFAULT_PROPS()
       const modules = ['imageStore', 'preferenceStore']
-      modules.forEach(moduleKey => {
+      modules.forEach((moduleKey) => {
         const module = shareProject.config[moduleKey]
-        Object.keys(module).forEach(key => {
+        Object.keys(module).forEach((key) => {
           if (configObj[moduleKey][key] !== undefined) {
             module[key] = configObj[moduleKey][key]
           }
@@ -434,9 +449,9 @@ export default {
       // shareCanvas
       const canvasViews = this.$refs['video_canvas']
       // let base = '_width'; // '_width' or '_height'
-      shareProject.canvas = canvasViews.map(canvas => {
+      shareProject.canvas = canvasViews.map((canvas) => {
         const shareCanvas = GLOBAL_CONSTANTS.SHARE_CANVAS_DEFAULT_PROPS()
-        Object.keys(shareCanvas).forEach(key => {
+        Object.keys(shareCanvas).forEach((key) => {
           if (canvas[key] !== undefined) {
             shareCanvas[key] = canvas[key]
           }
@@ -454,11 +469,8 @@ export default {
         try {
           let depth = 2
           while (_.unionBy(shareProject.canvas, 'name').length < shareProject.canvas.length) {
-            shareProject.canvas.forEach(canvas => {
-              canvas.name = canvas.path
-                .split(GLOBAL_CONSTANTS.DELIMITER)
-                .slice(-depth)
-                .join('-')
+            shareProject.canvas.forEach((canvas) => {
+              canvas.name = canvas.path.split(GLOBAL_CONSTANTS.DELIMITER).slice(-depth).join('-')
             })
             depth++
           }
@@ -471,7 +483,7 @@ export default {
     },
     async saveShareProject(config) {
       const results = await Promise.allSettled(
-        config.canvas.map(async canvas => {
+        config.canvas.map(async (canvas) => {
           const { name, image } = canvas
           const imageBlob = image
           delete canvas.path
@@ -479,7 +491,7 @@ export default {
           return { name, fileData: imageBlob }
         })
       )
-      const files = results.map(item => item.value)
+      const files = results.map((item) => item.value)
       const snapshotHelper = new SnapshotHelper()
       // console.log('files', files)
       snapshotHelper.save(config, files)

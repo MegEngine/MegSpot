@@ -986,6 +986,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.19.0":
+  version "7.19.4"
+  resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.19.4.tgz#a42f814502ee467d55b38dd1c256f53a7b885c78"
+  integrity sha512-EXpLCrk55f+cYqmHsSR+yD/0gAIMxxA9QK9lnQWzhMCvt+YmoBN7Zx94s++Kv0+unHk39vxNO8t+CMA2WSS3wA==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/template@^7.15.4":
   version "7.15.4"
   resolved "https://registry.nlark.com/@babel/template/download/@babel/template-7.15.4.tgz?cache=0&sync_timestamp=1630618813723&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40babel%2Ftemplate%2Fdownload%2F%40babel%2Ftemplate-7.15.4.tgz#51898d35dcf3faa670c4ee6afcfd517ee139f194"
@@ -9178,6 +9185,11 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   dependencies:
     aproba "^1.1.1"
 
+rxjs-interop@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/rxjs-interop/-/rxjs-interop-2.0.0.tgz#dca61a93789a8304f653d2e159e377cefa348ec7"
+  integrity sha512-ASEq9atUw7lualXB+knvgtvwkCEvGWV2gDD/8qnASzBkzEARZck9JAyxmY8OS6Nc1pCPEgDTKNcx+YqqYfzArw==
+
 rxjs@^6.6.0, rxjs@^6.6.7:
   version "6.6.7"
   resolved "https://registry.nlark.com/rxjs/download/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
@@ -9951,6 +9963,15 @@ style-loader@^2.0.0:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
+subscribable-things@^2.1.7:
+  version "2.1.7"
+  resolved "https://registry.npmjs.org/subscribable-things/-/subscribable-things-2.1.7.tgz#4bbbfc8d22fee72b3c8fdccbd6ca1be568892bdc"
+  integrity sha512-z8CMs8i0KSz69Lk83db40io5OEEq4TeuB/g6Z8tpSzmG20oNAL+C2Uys7XAOvcU4Iqrvvc/gcdFLRn6bi1Gb/w==
+  dependencies:
+    "@babel/runtime" "^7.19.0"
+    rxjs-interop "^2.0.0"
+    tslib "^2.4.0"
+
 sumchecker@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npm.taobao.org/sumchecker/download/sumchecker-3.0.1.tgz#6377e996795abb0b6d348e9b3e1dfb24345a8e42"
@@ -10185,6 +10206,24 @@ timers-browserify@^2.0.4:
   dependencies:
     setimmediate "^1.0.4"
 
+timing-object@^3.1.48:
+  version "3.1.48"
+  resolved "https://registry.npmjs.org/timing-object/-/timing-object-3.1.48.tgz#fb2fd7e67c85794d5234eebc8f28e5ef558b5d92"
+  integrity sha512-ti8dfW/qDSmgpFOhiHHAP/tL7kqhyAk8AbwIuHS4v1eJmiMRsEMh2gtZFqSpoLslx8o6ZhsstrFS8D6zFNUrNw==
+  dependencies:
+    "@babel/runtime" "^7.19.0"
+    tslib "^2.4.0"
+
+timingsrc@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.npmjs.org/timingsrc/-/timingsrc-1.2.8.tgz#19c8d7789b9a866758920ce694396b4064ff4f3f"
+  integrity sha512-j1d4Yl/ZWBm3OKQGn/fum5U9o+enqniA7d7vzH4MiwwQ6fVgBtMghkMxdz8l0jSE26od8mYS0XHM19JFosoWlg==
+  dependencies:
+    "@babel/runtime" "^7.19.0"
+    subscribable-things "^2.1.7"
+    timing-object "^3.1.48"
+    tslib "^2.4.0"
+
 title-case@^2.1.0:
   version "2.1.1"
   resolved "https://registry.nlark.com/title-case/download/title-case-2.1.1.tgz#3e127216da58d2bc5becf137ab91dae3a7cd8faa"
@@ -10305,6 +10344,11 @@ tslib@^2.0.3:
   version "2.3.1"
   resolved "https://registry.nlark.com/tslib/download/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha1-6KM1rdXOrlGqJh0ypJAVjvBC7wE=
+
+tslib@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.npmjs.org/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
+  integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
 
 tty-browserify@0.0.0:
   version "0.0.0"

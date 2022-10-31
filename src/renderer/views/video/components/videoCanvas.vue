@@ -47,6 +47,7 @@
           <span class="size">{{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span>
         </div>
       </el-tooltip>
+      <!-- {{ Number(currentTimeData).toFixed(1) }} -->
       <videoSlider
         :time.sync="currentTimeData"
         :duration="duration"
@@ -55,12 +56,12 @@
         :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
       />
       <span ref="num" v-show="!subVideoControlMenu && videoSliderVisible">
-        {{ Number(currentTimeData).toFixed(1) }}
+        {{ (video && video.currentTime && video.currentTime.toFixed(1)) || 0 }}
       </span>
       <div ref="header-right" class="header-right" flex="main:right cross:center">
         <el-input-number
           v-show="subVideoControlMenu && videoSliderVisible"
-          :value="currentTimeData"
+          :value="(video && video.currentTime && video.currentTime) || 0"
           :precision="4"
           :min="0"
           :max="duration || 60"
@@ -125,6 +126,7 @@ import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants'
 import chokidar from 'chokidar'
 import * as CONSTANTS from '../video-constants'
 import { getFileName } from '@/filter/get-file-name'
+import { TimeManager } from '@/utils/video'
 
 export default {
   components: {
@@ -166,6 +168,7 @@ export default {
       header: null,
       canvas: null,
       video: null,
+      timeConfig: null,
       requestId: undefined,
       duration: 60,
       currentTime: 0,
@@ -651,9 +654,25 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           this.loading = true
+          if (this.video) {
+            console.log(this.video)
+            this.video.pause()
+            this.video = null
+          }
           this.video = document.createElement('video')
+
           this.video.addEventListener('loadeddata', async () => {
             this.$emit('loaded')
+            if (this.timeConfig) {
+              this.timeConfig?.deleteFn()
+              this.timeConfig = null
+            }
+            this.timeConfig = TimeManager.setTime({
+              id: this.path,
+              video: this.video
+            })
+            console.log('timeConfig ', this.timeConfig, TimeManager.gettimeConfigs())
+
             this.duration = isNaN(this.video.duration) ? 60 : Number(Number(this.video.duration).toFixed(5))
             this.handleVideoPaused()
             if (this.imagePosition == undefined || isNaN(this.imagePosition?.height)) {
@@ -690,10 +709,16 @@ export default {
     },
     startAnimation(play = true) {
       this.stopAnimation()
+
+      // const updateCanvas = (now, metadata) => {
+      //   this.drawImage()
+      //   this.video.requestVideoFrameCallback(updateCanvas)
+      // }
+      // this.video.requestVideoFrameCallback(updateCanvas)
       const render = () => {
-        if (this.video !== null) {
-          this.drawImage()
-        }
+        this.drawImage()
+        // if (this.video !== null) {
+        // }
         if (this.paused) {
           // this.initHist()
           this.stopAnimation()

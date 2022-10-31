@@ -319,7 +319,7 @@ export default {
     }
   },
   components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
-  mounted() {
+  async mounted() {
     this.initHotkeyEvents()
     window.addEventListener('keydown', this.handleHotKey, true)
     window.addEventListener('keyup', this.handleHotKeyUp, true)
