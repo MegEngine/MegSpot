@@ -274,6 +274,7 @@ const { mapGetters, mapActions } = createNamespacedHelpers('videoStore')
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
 import { throttle } from '@/utils'
 import { handleEvent } from '@/tools/hotkey'
+import { TimeManager } from '@/utils/video'
 
 export default {
   data() {
@@ -592,6 +593,23 @@ export default {
       // }
     },
     changeStatus(status) {
+      switch (status) {
+        case 1:
+        case CONSTANTS.VIDEO_STATUS_START:
+          TimeManager.play()
+          break
+        case 0:
+        case CONSTANTS.VIDEO_STATUS_PAUSE:
+          TimeManager.pause()
+          break
+        case -1:
+        case CONSTANTS.VIDEO_STATUS_RESET:
+          TimeManager.reset()
+          break
+        default:
+          console.error('unknown actions:', status)
+          break
+      }
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION, status)
     },
     broadCast({ name, data }) {
