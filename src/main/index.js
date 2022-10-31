@@ -50,7 +50,7 @@ function onAppReady() {
   if (process.env.NODE_ENV === 'development') {
     const { VUEJS_DEVTOOLS } = require('electron-devtools-vendor') // Vue2 Extension
     session.defaultSession
-      .loadExtension(VUEJS_DEVTOOLS, {
+      .loadExtension(path.resolve(VUEJS_DEVTOOLS), {
         allowFileAccess: true
       })
       .then(() => {
