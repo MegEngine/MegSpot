@@ -1,6 +1,7 @@
 import { TimingObject } from 'timing-object'
 import { setTimingsrc } from 'timingsrc'
 import { getUuidv4 } from '@/utils'
+import store from '../store'
 
 export const DEFAULT_TIMING_FN = ({ acceleration, position, timestamp, velocity }) => {
   return {
@@ -16,11 +17,12 @@ export class Timer {
     this.timingObj = new TimingObject()
     this.timeConfigs = new Map()
     this.ready = false
+    this.maxDuration = 0
 
     this.timingObj.addEventListener('readystatechange', () => {
       if (this.timingObj.readyState === 'open') {
-        this.ready = true
-        console.log('readystatechange', this.timingObj, this.callbackFns)
+        this.checkStatus()
+        // console.log('readystatechange', this.timingObj, this.callbackFns)
       }
     })
     // if (videos.length) {
@@ -38,15 +40,52 @@ export class Timer {
     // }
   }
 
+  createVideo({ id = getUuidv4(), path, callback }) {
+    if (!path) {
+      console.error('invalid path', path)
+      return
+    }
+
+    return new Promise((resolve) => {
+      this.ready = false
+
+      const video = document.createElement('video')
+      const videoConfig = this.setTime({ id, video })
+
+      video.crossOrigin = 'anonymous'
+      video.muted = true
+      video.autoplay = false
+      video.loop = false
+      // video.defaultPlaybackRate = this.speed
+      // video.playbackRate = this.speed
+
+      video.addEventListener('loadstart', () => {
+        this.ready = false
+      })
+      video.addEventListener('loadedmetadata', () => {
+        this.checkStatus()
+        callback('loadedmetadata', video)
+      })
+      video.addEventListener('loadeddata', () => {
+        this.checkStatus()
+        callback('loadeddata', video)
+      })
+
+      video.src = path
+
+      resolve(videoConfig)
+    })
+  }
+
   setTime({ id = getUuidv4(), video, timingFn = DEFAULT_TIMING_FN }) {
-    const deleteTimingsrc = setTimingsrc(video, this.timingObj, timingFn)
+    let deleteTimingsrc = setTimingsrc(video, this.timingObj, timingFn)
     const newVideoConfig = {
       id,
       video,
       timingFn,
       changeFn: (newTimingStateVectorFunction) => {
         deleteTimingsrc && deleteTimingsrc()
-        this.setTime(video, newTimingStateVectorFunction)
+        deleteTimingsrc = setTimingsrc(video, this.timingObj, newTimingStateVectorFunction)
       },
       deleteFn: () => {
         if (this.timeConfigs.has(id)) {
@@ -55,12 +94,13 @@ export class Timer {
         }
       }
     }
+    this.maxDuration = Math.max(this.maxDuration, video.duration)
     this.timeConfigs.set(id, newVideoConfig)
     return newVideoConfig
   }
 
   play(options) {
-    if (!this.checkStatus()) return
+    if (!this.ready) return
     this.timeConfigs.forEach((videoObj) => videoObj.video?.play())
 
     if (options) {
@@ -68,42 +108,53 @@ export class Timer {
     } else {
       const { position, velocity } = this.timingObj.query()
 
-      if (position === 100 && velocity === 0) {
-        this.timingObj.update({ position: 0, velocity: 1 })
+      const speed = store.getters?.['videoStore/videoConfig']?.speed || 1
+      // console.log('speed', speed)
+      if (position >= this.maxDuration) {
+        this.timingObj.update({ position: 0, velocity: speed })
       } else {
-        this.timingObj.update({ velocity: 1 })
+        this.timingObj.update({ velocity: speed })
       }
     }
   }
 
   pause() {
-    if (!this.checkStatus()) return
+    if (!this.ready) return
     this.timingObj.update({ velocity: 0 })
   }
 
-  reset() {
-    if (!this.checkStatus()) return
-    this.timingObj.update({ position: 0 })
+  reset(pause = false) {
+    if (!this.ready) return
+    const { velocity } = this.timingObj.query()
+    this.timingObj.update({ position: 0, velocity: pause ? 0 : velocity })
   }
 
   skip(offset) {
-    if (!this.checkStatus() || isNaN(offset)) return
+    if (!this.ready || isNaN(offset)) return
 
     const { position } = this.timingObj.query()
 
     this.timingObj.update({ position: position + Number(offset) })
   }
 
+  setVelocity(velocity) {
+    if (!this.ready) return
+    this.timingObj.update({ velocity })
+    // console.log('velocity', velocity, this.timingObj.query())
+  }
+
   checkStatus() {
-    const reallyReady = this.ready && Array.from(this.timeConfigs.values()).every((item) => item.video.readyState === 4)
-    !reallyReady &&
-      console.log(
-        'video timer not ready',
-        this.ready,
-        Array.from(this.timeConfigs.values()).every((item) => item.video.readyState === 4),
-        Array.from(this.timeConfigs.values()).map((item) => item.video.readyState)
-      )
-    return reallyReady
+    this.ready =
+      this.timingObj.readyState === 'open' &&
+      Array.from(this.timeConfigs.values()).every((item) => item.video.readyState >= 2)
+
+    console.log(
+      'video timer ready status',
+      this.ready,
+      Array.from(this.timeConfigs.values()).every((item) => item.video.readyState >= 2)
+      // Array.from(this.timeConfigs.values()).map((item) => item.video.readyState)
+    )
+    return this.ready
   }
 
   cleartimeConfigs() {

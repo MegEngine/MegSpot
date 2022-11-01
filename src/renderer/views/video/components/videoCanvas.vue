@@ -7,7 +7,7 @@
         </CoverMask>
         <div class="icon-btn-group" flex="main:justify cross:center">
           <el-popover v-model="videoProcessBarInputVisible" effect="light" placement="left" trigger="manual">
-            <el-input-number
+            <!-- <el-input-number
               v-if="videoProcessBarInputVisible"
               :value="currentTimeData"
               :precision="4"
@@ -15,7 +15,7 @@
               :max="duration || 60"
               controls-position="right"
               @change="(val) => changeVideoTime(val)"
-            />
+            /> -->
             <span
               slot="reference"
               @click="handleVideoSliderVisible"
@@ -48,20 +48,29 @@
         </div>
       </el-tooltip>
       <!-- {{ Number(currentTimeData).toFixed(1) }} -->
-      <videoSlider
-        :time.sync="currentTimeData"
+      <!-- <videoSlider
+        :time="currentTime"
         :duration="duration"
         :show="videoSliderVisible"
         :_width="processWidth"
         :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
-      />
+      /> -->
+      <div v-show="videoSliderVisible" :style="`width:${processWidth}px`">
+        <el-progress
+          :percentage="duration !== 0 ? (currentTime / duration) * 100 : 0"
+          :stroke-width="14"
+          :show-text="false"
+          :style="`display:flex;align-items:center;${selected ? `fontWeight: bold; color: red` : ``}`"
+        ></el-progress>
+      </div>
+
       <span ref="num" v-show="!subVideoControlMenu && videoSliderVisible">
         {{ (video && video.currentTime && video.currentTime.toFixed(1)) || 0 }}
       </span>
       <div ref="header-right" class="header-right" flex="main:right cross:center">
         <el-input-number
           v-show="subVideoControlMenu && videoSliderVisible"
-          :value="(video && video.currentTime && video.currentTime) || 0"
+          :value="currentTime"
           :precision="4"
           :min="0"
           :max="duration || 60"
@@ -252,6 +261,7 @@ export default {
       histVisible: true,
       traggerRGB: false,
       radius: 10,
+      offset: 0,
       RGBAcolor: {
         R: 0,
         G: 0,
@@ -334,7 +344,7 @@ export default {
     this.removeEvents()
     this.stopAnimation()
     if (this.video) {
-      if (this.video?.readyState > 0 && !this.video.paused) {
+      if (this.video?.readyState >= 2 && !this.video.paused) {
         try {
           this.video.pause()
         } catch (e) {
@@ -404,6 +414,15 @@ export default {
     }
   },
   methods: {
+    // formatTime() {
+    //   let seconds = Number(this.currentTime).toFixed(4)
+    //   var hours = Math.floor(seconds / 3600)
+    //   seconds = seconds - hours * 3600
+    //   var minutes = Math.floor(seconds / 60)
+    //   seconds = seconds - minutes * 60
+
+    //   return `${hours > 0 ? hours + 'h' : ''}${minutes > 0 ? minutes + 'm' : ''}${seconds > 0 ? seconds + 's' : ''}`
+    // },
     getName(filter = true) {
       return filter ? this.$options.filters.getFileName(this.path) : getFileName(this.path)
     },
@@ -460,14 +479,15 @@ export default {
         case 1:
         case CONSTANTS.VIDEO_STATUS_START:
           this.cs.restore()
-          if (this.requestId == undefined) {
-            this.startAnimation()
-          } else if (this.video.readyState > 0 && this.video.paused) {
+          if (this.video.readyState >= 2 && this.video.paused) {
             this.video.play().catch((e) => {
               // console.log('error', e);
             })
           }
           this.handleVideoPaused(false)
+          if (this.requestId == undefined) {
+            this.startAnimation()
+          }
           break
         case 0:
         case CONSTANTS.VIDEO_STATUS_PAUSE:
@@ -478,8 +498,16 @@ export default {
         case -1:
         case CONSTANTS.VIDEO_STATUS_RESET:
           this.cs.restore()
+          this.offset = 0
+          this.currentTime = 0
+          this.timeConfig &&
+            this.timeConfig.changeFn(({ ...rest }) => {
+              return {
+                ...rest
+              }
+            })
           // this.video.currentTime = 0;
-          this.currentTimeData = 0
+          // this.currentTimeData = 0
           break
         default:
           console.error('unknown actions:' + action)
@@ -540,19 +568,19 @@ export default {
         this[name](data)
       }
     },
-    async handleVideoPaused(state = true) {
+    handleVideoPaused(state = true) {
       this.paused = state
       this.$bus.$emit('changeVideoPaused', state)
       if (state) {
         this.video.pause()
-        await this.initHist()
+        this.initHist()
         this.paused = true
       } else {
       }
     },
     handleVideoResetTime() {
       this.video.currentTime = 0
-      if (this.video.readyState > 0 && this.video.paused) {
+      if (this.video.readyState >= 2 && this.video.paused) {
         this.video.play().catch((e) => {
           // console.log('error', e);
         })
@@ -563,41 +591,52 @@ export default {
       if (!this.video) return
 
       this.handleVideoPaused(false)
-      if (this.requestId == undefined) {
-        // console.log('requestId undefined, startAnimation');
-        this.startAnimation(false)
-      }
-
+      // if (this.requestId == undefined) {
+      //   // console.log('requestId undefined, startAnimation');
+      //   this.startAnimation(false)
+      // }
+      const timingObj = TimeManager.getTimingObj()
+      const { position } = timingObj.query()
+      // console.log(currentTime, this.video.currentTime, position)
       // 设置时间节点是否在视频时长范围之内
       if (currentTime <= this.duration) {
+        this.offset = currentTime - position
         // 比较当前时间和设置的时间差值 是否大于 视频最小渲染间隔(默认为0.01s)
-        if (Math.abs(this.video.currentTime - currentTime) >= this.minRenderInterval) {
-          this.video.currentTime = Number(currentTime).toFixed(5)
-
-          if (this.video.readyState > 0) {
-            this.video
-              .play()
-              .then(() => {
-                if (paused) {
-                  this.video.pause()
-                  this.handleVideoPaused()
-                }
-              })
-              .catch((e) => {
-                console.log('error', e)
-              })
-          }
-        }
+        // if (Math.abs(this.video.currentTime - currentTime) >= this.minRenderInterval) {
+        // this.video.currentTime = Number(currentTime).toFixed(5)
+        // if (this.video.readyState  >= 2 ) {
+        //   this.video
+        //     .play()
+        //     .then(() => {
+        //       if (paused) {
+        //         this.video.pause()
+        //         this.handleVideoPaused()
+        //       }
+        //     })
+        //     .catch((e) => {
+        //       console.log('error', e)
+        //     })
+        // }
+        // }
       } else {
-        this.video.currentTime = this.duration
-        if (this.video.readyState > 0 && !this.video.paused) {
-          try {
-            this.video.pause()
-          } catch (e) {
-            console.log(this.video.readyState, this.video.paused, e)
-          }
-        }
+        // this.video.currentTime = this.duration
+        this.offset = this.duration - position
+        // if (this.video.readyState  >= 2  && !this.video.paused) {
+        //   try {
+        //     this.video.pause()
+        //   } catch (e) {
+        //     console.log(this.video.readyState, this.video.paused, e)
+        //   }
+        // }
       }
+      // console.log('offset', this.offset)
+      this.timeConfig &&
+        this.timeConfig.changeFn(({ position, ...rest }) => {
+          return {
+            position: position + this.offset,
+            ...rest
+          }
+        })
     },
     handleBroadcast({ name, data }) {
       if (this.selectedId) {
@@ -655,7 +694,7 @@ export default {
         try {
           this.loading = true
           if (this.video) {
-            console.log(this.video)
+            // console.log(this.video)
             this.video.pause()
             this.video = null
           }
@@ -667,11 +706,12 @@ export default {
               this.timeConfig?.deleteFn()
               this.timeConfig = null
             }
+            this.offset = 0
             this.timeConfig = TimeManager.setTime({
               id: this.path,
               video: this.video
             })
-            console.log('timeConfig ', this.timeConfig, TimeManager.gettimeConfigs())
+            // console.log('timeConfig ', this.timeConfig, TimeManager.gettimeConfigs())
 
             this.duration = isNaN(this.video.duration) ? 60 : Number(Number(this.video.duration).toFixed(5))
             this.handleVideoPaused()
@@ -684,11 +724,16 @@ export default {
             this.drawImage()
             resolve()
           })
-          this.video.addEventListener('timeupdate', () => {
-            if (this.paused || !this.video) return
-            this.currentTime = this.video.currentTime
-            // console.log('currentTime', this.video.currentTime, this.currentTime);
-          })
+          const updateTime = (now, metadata) => {
+            this.currentTime = metadata?.mediaTime || this.video.currentTime
+            this.video.requestVideoFrameCallback(updateTime)
+          }
+          this.video.requestVideoFrameCallback(updateTime)
+          // this.video.addEventListener('timeupdate', () => {
+          //   if (this.paused || !this.video) return
+          //   this.currentTime = this.video.currentTime
+          //   // console.log('currentTime', this.video.currentTime, this.currentTime);
+          // })
           this.video.addEventListener('pause', () => {
             this.$bus.$emit('changeVideoPaused', true)
           })
@@ -717,17 +762,14 @@ export default {
       // this.video.requestVideoFrameCallback(updateCanvas)
       const render = () => {
         this.drawImage()
-        // if (this.video !== null) {
-        // }
         if (this.paused) {
-          // this.initHist()
           this.stopAnimation()
           return
         }
         this.requestId = window.requestAnimationFrame(render)
       }
       render()
-      if (play && this.video.readyState > 0 && this.video.paused) {
+      if (play && this.video.readyState >= 2 && this.video.paused) {
         this.video.play()
       }
     },

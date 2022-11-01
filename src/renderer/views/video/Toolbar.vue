@@ -81,11 +81,11 @@
             <svg-icon icon-class="restart" />
           </span>
         </el-button>
-        <el-button type="text" @click="changeLoop" v-tip="$t('video.loop')">
+        <!-- <el-button type="text" @click="changeLoop" v-tip="$t('video.loop')">
           <span class="svg-container" flex="cross:center">
             <svg-icon icon-class="loop" :clicked="loop" />
           </span>
-        </el-button>
+        </el-button> -->
         <!-- 不加allow-create属性， 即不允许创建自定义速度，因为经测试发现视频设置3及之上的播放速度时，时快时慢 -->
         <el-select
           v-model="speed"
@@ -93,6 +93,7 @@
           size="mini"
           filterable
           default-first-option
+          allow-create
           v-tip="$t('video.speed')"
           class="layout-selector"
         >
@@ -288,7 +289,7 @@ export default {
       startIndex: 0,
       offset: 0,
       // 默认开启视频循环
-      loop: true,
+      loop: false, // true
       speedOpts: [
         {
           label: '2.0x',
@@ -604,7 +605,7 @@ export default {
           break
         case -1:
         case CONSTANTS.VIDEO_STATUS_RESET:
-          TimeManager.reset()
+          TimeManager.reset(true)
           break
         default:
           console.error('unknown actions:', status)
@@ -786,6 +787,7 @@ export default {
           default:
             return
         }
+        TimeManager.setVelocity(_speed)
         console.log('current speed:', _speed)
         this.setVideoConfig({ speed: _speed })
       }
