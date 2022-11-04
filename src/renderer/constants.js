@@ -10,6 +10,7 @@ export const DIRECTION_BOTTOM = 'direction_bottom'
 export const DIRECTION_TOP = 'direction_top'
 
 export const LAYOUT_1X1 = '1x1'
+export const LAYOUT_1X2 = '1x2'
 export const LAYOUT_2X1 = '2x1'
 export const LAYOUT_3X1 = '3x1'
 export const LAYOUT_4X1 = '4x1'

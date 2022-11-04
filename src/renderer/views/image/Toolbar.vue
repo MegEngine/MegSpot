@@ -186,6 +186,7 @@
             v-for="item in [
               GLOBAL_CONSTANTS.LAYOUT_2X2,
               GLOBAL_CONSTANTS.LAYOUT_2X1,
+              GLOBAL_CONSTANTS.LAYOUT_1X2,
               GLOBAL_CONSTANTS.LAYOUT_3X1,
               GLOBAL_CONSTANTS.LAYOUT_3X2,
               GLOBAL_CONSTANTS.LAYOUT_4X1,

@@ -150,6 +150,11 @@ export default {
             display: 'grid',
             gridTemplateColumns: '1fr 1fr'
           }
+        case GLOBAL_CONSTANTS.LAYOUT_1X2:
+          return {
+            display: 'grid',
+            gridTemplateRows: '50% 50%'
+          }
         case GLOBAL_CONSTANTS.LAYOUT_3X1:
           return {
             display: 'grid',
@@ -332,6 +337,7 @@ export default {
       const containerWidth = document.body.clientWidth
       switch (this.imageConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
+        case GLOBAL_CONSTANTS.LAYOUT_1X2:
           return containerWidth
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
         case GLOBAL_CONSTANTS.LAYOUT_2X2:
@@ -355,6 +361,7 @@ export default {
           return containerHeight
         case GLOBAL_CONSTANTS.LAYOUT_2X2:
         case GLOBAL_CONSTANTS.LAYOUT_3X2:
+        case GLOBAL_CONSTANTS.LAYOUT_1X2:
           return containerHeight / 2
       }
     },
@@ -490,7 +497,7 @@ export default {
       if ([GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(this.imageConfig.layout)) {
         return 3
       }
-      if ([GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1, GLOBAL_CONSTANTS.LAYOUT_1X2].includes(this.imageConfig.layout)) {
         return 2
       }
       if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.imageConfig.layout)) {

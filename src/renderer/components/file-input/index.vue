@@ -1,6 +1,6 @@
 <template>
   <div class="file-input">
-    <el-tooltip :content="filePath" placement="top" effect="light" :open-delay="800">
+    <el-tooltip :content="filePath" placement="top" effect="light" :open-delay="300">
       <span class="viewer-name">{{ filePath | getFileName }}</span>
     </el-tooltip>
     <el-button size="mini" type="text" class="el-icon-circle-plus" @click="getFile"></el-button>

@@ -104,7 +104,6 @@
             :value="value"
           ></el-option>
         </el-select>
-        <!-- <VideoProgressBar v-if="isFixed" class="progress-bar" /> -->
       </el-button-group>
     </div>
     <div class="right">
@@ -267,7 +266,6 @@
 import * as GLOBAL_CONSTANTS from '@/constants'
 import * as CONSTANTS from './video-constants'
 import SelectedBtn from '@/components/selected-btn'
-import VideoProgressBar from './components/videoProgressBar'
 import { createNamespacedHelpers } from 'vuex'
 import GifDialog from '@/components/gif-dialog'
 import ImageSetting from '@/components/image-setting'
@@ -287,9 +285,11 @@ export default {
       showSelectedMsg: false,
       groupNum: 0,
       startIndex: 0,
+      currentTime: 0,
+      timeId: null,
       offset: 0,
-      // 默认开启视频循环
-      loop: false, // true
+      loop: false,
+      videoPaused: true,
       speedOpts: [
         {
           label: '2.0x',
@@ -320,19 +320,17 @@ export default {
       hotkeyUpEvents: undefined
     }
   },
-  components: { SelectedBtn, GifDialog, ImageSetting, VideoProgressBar },
+  components: { SelectedBtn, GifDialog, ImageSetting },
   async mounted() {
     this.initHotkeyEvents()
     window.addEventListener('keydown', this.handleHotKey, true)
     window.addEventListener('keyup', this.handleHotKeyUp, true)
     this.$bus.$on('image_handleSelect', this.handleSelect)
-    this.$bus.$on('changeVideoPaused', this.handleChangeVideoPaused)
   },
   beforeDestroy() {
     window.removeEventListener('keydown', this.handleHotKey, true)
     window.removeEventListener('keyup', this.handleHotKeyUp, true)
     this.$bus.$off('image_handleSelect', this.handleSelect)
-    this.$bus.$off('changeVideoPaused', this.handleChangeVideoPaused)
   },
   methods: {
     ...mapActions(['emptyVideos', 'removeVideos', 'setVideoConfig', 'setVideos']),
@@ -593,18 +591,35 @@ export default {
       //   this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
       // }
     },
+    // updateTime() {
+    //   const callback = () => {
+    //     const { position } = TimeManager.timingObj.query()
+    //     TimeManager.checkPosition()
+    //     this.currentTime = position.toFixed(2)
+    //     this.timeId = window.requestAnimationFrame(callback)
+    //   }
+    //   this.timeId = window.requestAnimationFrame(callback)
+    // },
+    stopUpdateTime() {
+      this.timeId && window.cancelAnimationFrame(this.timeId)
+    },
     changeStatus(status) {
       switch (status) {
         case 1:
         case CONSTANTS.VIDEO_STATUS_START:
+          this.videoPaused = false
+          // this.updateTime()
           TimeManager.play()
           break
         case 0:
         case CONSTANTS.VIDEO_STATUS_PAUSE:
+          this.videoPaused = true
           TimeManager.pause()
+          this.stopUpdateTime()
           break
         case -1:
         case CONSTANTS.VIDEO_STATUS_RESET:
+          this.videoPaused = true
           TimeManager.reset(true)
           break
         default:
@@ -644,12 +659,12 @@ export default {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_RESET)
       this.imgScale = 1
     },
-    handleChangeVideoPaused() {
-      const paused = this.$parent.$refs.content.$refs['video_canvas'].every((item) => item.video.paused === true)
-      if (this.videoPaused !== paused) {
-        this.videoPaused = paused
-      }
-    },
+    // handleChangeVideoPaused() {
+    //   const paused = this.$parent.$refs.content.$refs['video_canvas'].every((item) => item.paused === true)
+    //   if (this.videoPaused !== paused) {
+    //     this.videoPaused = paused
+    //   }
+    // },
     goBack() {
       if (window.history.length > 1) {
         this.$router.back()
@@ -696,12 +711,12 @@ export default {
     },
     /**
      * 逐帧对比
-     * @param {number} flag 向后播放为1，向前播放为-1
+     * @param {number} flag 下一帧为1，前一帧为-1
      */
     frameSteps(flag = 1) {
       this.$bus.$emit('imageCenter_frameSteps', {
         name: 'frameSteps',
-        data: flag * this.interval
+        data: flag
       })
     },
     async align(beSameSize) {
@@ -728,19 +743,15 @@ export default {
         len = str.length
       return str[len - 3] * str[len - 1]
     },
-    // 视频逐帧对比间隔，默认为近似1/12秒
-    interval() {
-      return this.videoConfig.interval
-    },
     // 所有视频都为暂停状态
-    videoPaused: {
-      get() {
-        return this.videoConfig.allVideoPaused
-      },
-      set(newVal) {
-        this.setVideoConfig({ allVideoPaused: newVal })
-      }
-    },
+    // videoPaused: {
+    //   get() {
+    //     return this.videoConfig.allVideoPaused
+    //   },
+    //   set(newVal) {
+    //     this.setVideoConfig({ allVideoPaused: newVal })
+    //   }
+    // },
     smooth: {
       get() {
         return this.videoConfig.smooth

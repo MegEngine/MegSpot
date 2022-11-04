@@ -1,83 +1,94 @@
 <template>
   <div :class="['image-canvas', { selected: selected }]" @click.stop>
-    <div ref="header" class="header" flex="main:justify cross:center">
-      <div ref="header-left" class="header-left" flex="cross:center">
+    <div ref="header" :class="['header', selected ? 'selected-item' : '']" flex="main:justify cross:center">
+      <div class="header-left" flex="cross:center" flex-box="0">
         <CoverMask :mask="maskDom" class="cover-mask">
           <HistContainer ref="hist-container" v-tip="$t('general.histogram')" @changeVisible="handleHistVisible" />
         </CoverMask>
         <div class="icon-btn-group" flex="main:justify cross:center">
-          <el-popover v-model="videoProcessBarInputVisible" effect="light" placement="left" trigger="manual">
-            <!-- <el-input-number
-              v-if="videoProcessBarInputVisible"
-              :value="currentTimeData"
-              :precision="4"
-              :min="0"
-              :max="duration || 60"
-              controls-position="right"
-              @change="(val) => changeVideoTime(val)"
-            /> -->
-            <span
-              slot="reference"
-              @click="handleVideoSliderVisible"
-              @contextmenu.stop="changeVideoProcessBarInputVisible"
-              class="svg-container"
-              v-tip.sure="$t('video.processTip')"
-            >
-              <svg-icon
-                icon-class="video-bar"
-                v-tip="$t('video.processTip')"
-                :class="[videoProcessBarInputVisible ? 'icon-hover' : '']"
-              />
-            </span>
-          </el-popover>
-          <span v-show="videoSliderVisible" class="svg-containe" @click="executeAction(1)">
+          <el-button
+            slot="reference"
+            type="text"
+            size="mini"
+            @click="handleVideoSliderVisible"
+            class="svg-container"
+            v-tip.sure="$t('video.processTip')"
+          >
+            <svg-icon icon-class="video-bar" v-tip="$t('video.processTip')" />
+          </el-button>
+          <!-- 默认使用视频同步，不再单独播放、暂停单个视频； 可采用offset调整 -->
+          <!-- <span v-show="videoSliderVisible" class="svg-containe" @click="executeAction(1)">
             <svg-icon :clicked="!allVideoPaused && !paused" icon-class="play" />
           </span>
           <span v-show="videoSliderVisible" class="svg-containe" @click="executeAction(0)">
             <svg-icon :clicked="allVideoPaused || paused" icon-class="pause" />
-          </span>
+          </span> -->
         </div>
       </div>
+
       <el-tooltip v-if="!videoSliderVisible" placement="bottom" :open-delay="800">
         <span class="compare-name" flex-box="1" v-html="getTitle"></span>
         <div slot="content">
-          {{ path }}
+          <div>
+            {{ path }}
+          </div>
           <br />
-          <br />
-          <span class="size">{{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span>
+          <div>
+            <div style="float: left">
+              <span class="size">{{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span>
+              &nbsp;&nbsp;
+              <span class="duration">{{ formatTime() }}</span>
+            </div>
+            &nbsp;&nbsp;
+            <span style="float: right" class="frame" v-html="formatMediaInfo"></span>
+          </div>
         </div>
       </el-tooltip>
-      <!-- {{ Number(currentTimeData).toFixed(1) }} -->
-      <!-- <videoSlider
-        :time="currentTime"
-        :duration="duration"
-        :show="videoSliderVisible"
-        :_width="processWidth"
-        :style="[selected ? { fontWeight: 'bold', color: 'red' } : {}]"
-      /> -->
-      <div v-show="videoSliderVisible" :style="`width:${processWidth}px`">
-        <el-progress
-          :percentage="duration !== 0 ? (currentTime / duration) * 100 : 0"
-          :stroke-width="14"
-          :show-text="false"
-          :style="`display:flex;align-items:center;${selected ? `fontWeight: bold; color: red` : ``}`"
-        ></el-progress>
+      <div v-else flex="cross:center" flex-box="0">
+        <el-button
+          :disabled="!previousFrameAvailable"
+          type="text"
+          size="mini"
+          class="svg-container"
+          v-tip="`previous frame`"
+          @click="changeFrame(-1)"
+        >
+          <svg-icon icon-class="frame" />
+        </el-button>
+        <el-button
+          :disabled="!nextFrameAvailable"
+          type="text"
+          size="mini"
+          class="svg-container"
+          v-tip="`next frame`"
+          @click="changeFrame(1)"
+          style="margin-left: 0"
+        >
+          <svg-icon icon-class="frame" style="transform: rotate(180deg)" />
+        </el-button>
       </div>
 
-      <span ref="num" v-show="!subVideoControlMenu && videoSliderVisible">
-        {{ (video && video.currentTime && video.currentTime.toFixed(1)) || 0 }}
-      </span>
-      <div ref="header-right" class="header-right" flex="main:right cross:center">
-        <el-input-number
-          v-show="subVideoControlMenu && videoSliderVisible"
-          :value="currentTime"
-          :precision="4"
-          :min="0"
-          :max="duration || 60"
-          size="small"
-          @change="(val) => changeVideoTime(val)"
-          class="video-process-input"
-        />
+      <div v-show="videoSliderVisible" class="progress-container" flex="main:center cross:center" flex-box="1">
+        <video-slider :value="currentTime" :max="duration" @update="changeVideoTime"></video-slider>
+      </div>
+
+      <div class="header-right" flex="main:right cross:center" flex-box="0">
+        <div v-show="videoSliderVisible" class="video-tool" flex="cross:center">
+          <input :value="currentTime.toFixed(2)" @change="changeVideoTime" class="time-input" />
+          <FrameSetting
+            :path="path"
+            :frameRate.sync="frameRate"
+            :frameCount.sync="frameCount"
+            :displayedFrames="displayedFrames"
+          >
+            <div class="frames" flex="cross:center">
+              <el-tooltip :content="frameTip" placement="right">
+                <span>frame {{ displayedFramesInSecond }}</span>
+              </el-tooltip>
+            </div>
+          </FrameSetting>
+        </div>
+
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
         <EffectPreview @change="changeCanvasStyle" />
         <span class="svg-container" @click="fullScreen" v-tip="$t('video.fullscreen')">
@@ -122,10 +133,11 @@ const cv = Vue.prototype.$cv
 import OperationContainer from '@/components/operation-container'
 import HistContainer from '@/components/hist-container'
 import CoverMask from '@/components/cover-mask'
+import VideoSlider from './slider.vue'
 import RGBAExhibit from '@/components/rgba-exhibit'
 import ScaleEditor from '@/components/scale-editor'
 import EffectPreview from '@/components/effect-preview'
-import videoSlider from './videoSlider.vue'
+import FrameSetting from './frameSetting.vue'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore')
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
@@ -136,6 +148,7 @@ import chokidar from 'chokidar'
 import * as CONSTANTS from '../video-constants'
 import { getFileName } from '@/filter/get-file-name'
 import { TimeManager } from '@/utils/video'
+import { debounce } from '@/utils'
 
 export default {
   components: {
@@ -145,7 +158,8 @@ export default {
     RGBAExhibit,
     ScaleEditor,
     EffectPreview,
-    videoSlider
+    VideoSlider,
+    FrameSetting
   },
   props: {
     index: {
@@ -174,6 +188,12 @@ export default {
       // 监听图像文件的变化,变化后自动刷新图像
       wacther: undefined,
       loading: false,
+      mediaInfo: {
+        // FrameRate: 25,
+        // frameCount: 1000
+      },
+      frameRate: 30,
+      frameCount: 300,
       header: null,
       canvas: null,
       video: null,
@@ -182,7 +202,6 @@ export default {
       duration: 60,
       currentTime: 0,
       videoSliderVisible: false,
-      videoProcessBarInputVisible: false,
       paused: true,
       maskDom: undefined,
       currentHist: undefined,
@@ -286,25 +305,33 @@ export default {
         ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) + this.getName()
         : ' '
     },
+    frameTip() {
+      return `the ${this.displayedFramesInSecond} frame in this second of ${this.frameRate} frames`
+    },
+    frameFrequency() {
+      return 1 / this.frameRate
+    },
+    millisecond() {
+      return this.currentTime - Math.floor(this.currentTime)
+    },
+    displayedFramesInSecond() {
+      return this.frameRate ? Math.ceil(this.millisecond * this.frameRate) : 0
+    },
+    displayedFrames() {
+      return this.frameRate ? Math.ceil(this.currentTime * this.frameRate) : 0
+    },
+    previousFrameAvailable() {
+      return this.paused && this.currentTime > 0
+    },
+    nextFrameAvailable() {
+      return this.paused && this.currentTime < this.duration
+    },
     canvasStyle() {
       return this.preference.background.style
-    },
-    processWidth() {
-      return (
-        (this._width -
-          (this.$refs['header-left']?.offsetWidth || 83) -
-          (this.$refs['header-right']?.offsetWidth || 191) -
-          (this.$refs['num']?.offsetWidth || 20)) *
-        0.6
-      )
     },
     // 是否所有视频都为暂停状态
     allVideoPaused() {
       return this.videoConfig.allVideoPaused
-    },
-    // 视频逐帧对比间隔，默认为近似1/12秒
-    interval() {
-      return this.videoConfig.interval
     },
     dynamicPickColor() {
       return this.videoConfig.dynamicPickColor
@@ -321,24 +348,20 @@ export default {
     speed() {
       return this.videoConfig.speed
     },
-    currentTimeData: {
-      get() {
-        return this.currentTime
-      },
-      set(value) {
-        this.changeVideoTime(value)
-      }
+    formatMediaInfo() {
+      return `<span>${this.mediaInfo?.FrameRate ? this.frameRate + ' FPS' : '' || ''}</span>&nbsp;&nbsp;<span>${
+        this.mediaInfo?.FrameCount ? this.frameCount + ' Frame' : ''
+      }</span>`
     }
   },
   async mounted() {
     this.header = this.$refs.header
     this.canvas = this.$refs.canvas
     this.degree = 0
-
     this.initCanvas()
     this.listenEvents()
     await this.initVideo()
-    this.requestGenerateHist()
+    this.startAnimation()
   },
   beforeDestroy() {
     this.removeEvents()
@@ -380,7 +403,7 @@ export default {
             })
             .on('change', (path, details) => {
               console.log('video--change', path, details)
-              // this.initHist();
+              // this.initbitMap();
               this.initVideo()
             })
             .on('unlink', (path, details) => {
@@ -414,15 +437,33 @@ export default {
     }
   },
   methods: {
-    // formatTime() {
-    //   let seconds = Number(this.currentTime).toFixed(4)
-    //   var hours = Math.floor(seconds / 3600)
-    //   seconds = seconds - hours * 3600
-    //   var minutes = Math.floor(seconds / 60)
-    //   seconds = seconds - minutes * 60
+    changeFrame(step = 0) {
+      const subTime = step * this.frameFrequency
+      const nextTime = Math.min(Math.max(0, this.currentTime + subTime), this.duration)
+      if (isNaN(nextTime)) {
+        console.log('invalid nextFrame')
+        return
+      }
+      // else if (nextTime === this.currentTime) {
+      //   console.log('this is nextFrame', nextTime, this.currentTime)
+      //   return
+      // }
+      if (this.paused) {
+        this.changeVideoTime(nextTime)
+      }
+    },
+    formatTime(time) {
+      if (!time) {
+        time = this.video?.duration || this.video?.currentTime
+      }
+      let seconds = Number(time).toFixed(4)
+      var hours = Math.floor(seconds / 3600)
+      seconds = seconds - hours * 3600
+      var minutes = Math.floor(seconds / 60)
+      seconds = /\d+.\d{2}/.exec(seconds - minutes * 60)
 
-    //   return `${hours > 0 ? hours + 'h' : ''}${minutes > 0 ? minutes + 'm' : ''}${seconds > 0 ? seconds + 's' : ''}`
-    // },
+      return `${hours > 0 ? hours + 'h' : ''}${minutes > 0 ? minutes + 'm' : ''}${seconds > 0 ? seconds + 's' : ''}`
+    },
     getName(filter = true) {
       return filter ? this.$options.filters.getFileName(this.path) : getFileName(this.path)
     },
@@ -432,9 +473,6 @@ export default {
         document.body.appendChild(this.video)
         this.video.requestFullscreen()
       }
-    },
-    changeVideoProcessBarInputVisible() {
-      this.videoProcessBarInputVisible = !this.subVideoControlMenu && !this.videoProcessBarInputVisible
     },
     ...mapActions(['removeVideos']),
     // 检查边界， 保证图像至少部分在canvas内(显示大小至少为当前图像大小的DRAG_CONSTANTS)
@@ -457,7 +495,7 @@ export default {
     },
     // 约束缩放，保证图像的宽(或高)不小于canvas宽(或高)的SCALE_CONSTANTS
     checkSize(transW, transH) {
-      let isTooSmall = transW < this.canvas.width * SCALE_CONSTANTS || transH < this.canvas.height * SCALE_CONSTANTS
+      let isTooSmall = transW < this.canvas.width * SCALE_CONSTANTS && transH < this.canvas.height * SCALE_CONSTANTS
       if (this.afterFullSize && !isTooSmall) {
         this.afterFullSize = false
       }
@@ -479,35 +517,21 @@ export default {
         case 1:
         case CONSTANTS.VIDEO_STATUS_START:
           this.cs.restore()
-          if (this.video.readyState >= 2 && this.video.paused) {
-            this.video.play().catch((e) => {
-              // console.log('error', e);
-            })
-          }
-          this.handleVideoPaused(false)
+          this.paused = false
           if (this.requestId == undefined) {
             this.startAnimation()
           }
+          this.changeVideoSliderVisible({ value: true })
           break
         case 0:
         case CONSTANTS.VIDEO_STATUS_PAUSE:
           this.handleVideoPaused()
-          this.initHist()
-          this.requestGenerateHist()
           break
         case -1:
         case CONSTANTS.VIDEO_STATUS_RESET:
           this.cs.restore()
-          this.offset = 0
           this.currentTime = 0
-          this.timeConfig &&
-            this.timeConfig.changeFn(({ ...rest }) => {
-              return {
-                ...rest
-              }
-            })
-          // this.video.currentTime = 0;
-          // this.currentTimeData = 0
+          this.changeVideoTime(0)
           break
         default:
           console.error('unknown actions:' + action)
@@ -568,38 +592,30 @@ export default {
         this[name](data)
       }
     },
-    handleVideoPaused(state = true) {
-      this.paused = state
-      this.$bus.$emit('changeVideoPaused', state)
-      if (state) {
-        this.video.pause()
-        this.initHist()
-        this.paused = true
-      } else {
+    handleVideoPaused() {
+      this.paused = true
+      if (this.paused) {
+        this.initbitMap()
       }
     },
     handleVideoResetTime() {
-      this.video.currentTime = 0
-      if (this.video.readyState >= 2 && this.video.paused) {
-        this.video.play().catch((e) => {
-          // console.log('error', e);
-        })
-      }
-    },
-    changeVideoTime(currentTime) {
-      const paused = this.video.paused
-      if (!this.video) return
-
-      this.handleVideoPaused(false)
-      // if (this.requestId == undefined) {
-      //   // console.log('requestId undefined, startAnimation');
-      //   this.startAnimation(false)
+      // this.video.currentTime = 0
+      // if (this.video.readyState >= 2 && this.video.paused) {
+      //   this.video.play().catch((e) => {
+      //     // console.log('error', e);
+      //   })
       // }
+    },
+    changeVideoTime(event) {
+      const currentTime = Number(event?.target?.value || event)
+      if (!this.video || isNaN(currentTime)) return
+
       const timingObj = TimeManager.getTimingObj()
       const { position } = timingObj.query()
+
       // console.log(currentTime, this.video.currentTime, position)
       // 设置时间节点是否在视频时长范围之内
-      if (currentTime <= this.duration) {
+      if (currentTime < this.duration) {
         this.offset = currentTime - position
         // 比较当前时间和设置的时间差值 是否大于 视频最小渲染间隔(默认为0.01s)
         // if (Math.abs(this.video.currentTime - currentTime) >= this.minRenderInterval) {
@@ -619,24 +635,27 @@ export default {
         // }
         // }
       } else {
-        // this.video.currentTime = this.duration
         this.offset = this.duration - position
-        // if (this.video.readyState  >= 2  && !this.video.paused) {
-        //   try {
-        //     this.video.pause()
-        //   } catch (e) {
-        //     console.log(this.video.readyState, this.video.paused, e)
-        //   }
-        // }
       }
       // console.log('offset', this.offset)
+
+      const handleUpdateFrame = debounce(100, () => {
+        this.currentTime = this.video.currentTime
+        this.initbitMap()
+      })
       this.timeConfig &&
         this.timeConfig.changeFn(({ position, ...rest }) => {
-          return {
-            position: position + this.offset,
-            ...rest
+          const nextPosition = position + this.offset
+          const vector = {
+            ...rest,
+            position: nextPosition
           }
-        })
+          // if (position > this.duration) {
+          //   vector.velocity = 0
+          // }
+          return vector
+        }, handleUpdateFrame)
+      currentTime >= this.duration && handleUpdateFrame()
     },
     handleBroadcast({ name, data }) {
       if (this.selectedId) {
@@ -647,13 +666,15 @@ export default {
         this[name](data)
       }
     },
-    // 初始化bitMap， 重新生成直方图hist
-    async initHist() {
+    // 初始化bitMap
+    async initbitMap(draw = true) {
       if (this.paused && this.video.videoWidth) {
         let offscreen = new OffscreenCanvas(this.video.videoWidth, this.video.videoHeight)
         let offCtx = offscreen.getContext('2d')
         offCtx.drawImage(this.video, 0, 0)
         this.bitMap = await offscreen.transferToImageBitmap()
+        draw && this.drawImage(this.bitMap)
+        this.requestGenerateHist()
       }
     },
     initImage() {
@@ -709,38 +730,41 @@ export default {
             this.offset = 0
             this.timeConfig = TimeManager.setTime({
               id: this.path,
-              video: this.video
+              video: this.video,
+              timingFn: (vector) => {
+                return vector
+              }
             })
             // console.log('timeConfig ', this.timeConfig, TimeManager.gettimeConfigs())
 
             this.duration = isNaN(this.video.duration) ? 60 : Number(Number(this.video.duration).toFixed(5))
-            this.handleVideoPaused()
+
             if (this.imagePosition == undefined || isNaN(this.imagePosition?.height)) {
               this.imagePosition = this.getImageInitPos(this.canvas, this.video)
             }
             this.doZoomEnd()
             this.loading = false
-            await this.initHist()
-            this.drawImage()
+            await this.initbitMap()
             resolve()
           })
-          const updateTime = (now, metadata) => {
-            this.currentTime = metadata?.mediaTime || this.video.currentTime
-            this.video.requestVideoFrameCallback(updateTime)
-          }
-          this.video.requestVideoFrameCallback(updateTime)
+          // const updateTime = (now, metadata) => {
+          //   if (!this.paused) {
+          //     this.currentTime = metadata?.mediaTime || this.video.currentTime
+          //   }
+          //   this.video.requestVideoFrameCallback(updateTime)
+          // }
+          // this.video.requestVideoFrameCallback(updateTime)
+
           // this.video.addEventListener('timeupdate', () => {
           //   if (this.paused || !this.video) return
           //   this.currentTime = this.video.currentTime
           //   // console.log('currentTime', this.video.currentTime, this.currentTime);
           // })
-          this.video.addEventListener('pause', () => {
-            this.$bus.$emit('changeVideoPaused', true)
-          })
+
           this.video.src = getImageUrlSyncNoCache(this.path)
           this.video.autoplay = true
           // 默认开启视频循环
-          this.video.loop = true
+          this.video.loop = false
           // 视频是否静音
           this.video.muted = this.muted
           // 视频播放速度
@@ -761,6 +785,11 @@ export default {
       // }
       // this.video.requestVideoFrameCallback(updateCanvas)
       const render = () => {
+        if (!this.paused) {
+          this.currentTime = this.video.currentTime
+          // console.log('update time', this.currentTime)
+        }
+
         this.drawImage()
         if (this.paused) {
           this.stopAnimation()
@@ -768,10 +797,7 @@ export default {
         }
         this.requestId = window.requestAnimationFrame(render)
       }
-      render()
-      if (play && this.video.readyState >= 2 && this.video.paused) {
-        this.video.play()
-      }
+      this.requestId = window.requestAnimationFrame(render)
     },
     stopAnimation() {
       if (this.requestId) {
@@ -783,8 +809,7 @@ export default {
     async reMount() {
       console.log('reMount')
       this.initCanvas()
-      await this.initHist()
-      this.drawImage()
+      this.initbitMap()
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4
@@ -1158,8 +1183,8 @@ export default {
     // 逐帧对比
     handleFrameSteps({ name, data }) {
       // // 存在选中使只使选中视频进行逐帧操作
-      // if (this.selectedId && this.selectedId !== this.path) return;
-      this.currentTime = Math.min(Math.max(this.currentTime + (data ?? this.interval), 0), this.duration)
+      if (this.selectedId && this.selectedId !== this.path) return
+      this.changeFrame(data)
     },
     getSelectedPosition(data, callback) {
       if (this.selected || this.path === this.selectedId || (!this.selectedId && this.path === this.videoList[0])) {
@@ -1183,34 +1208,49 @@ export default {
     background-color: #f6f6f6;
     // padding-right: 10px;
     .svg-container {
-      cursor: pointer;
-      margin-right: 5px;
+      // cursor: pointer;
+      // margin-right: 5px;
       font-size: 16px;
-      .icon-hover {
-        color: $primaryColor;
-      }
+      // .icon-hover {
+      //   color: $primaryColor;
+      // }
     }
 
-    .progress-bar {
-      display: inline-block;
-      // margin-left: 20px;
+    .progress-container {
+      width: 100%;
+      height: 16px;
+      padding: 0 8px;
+      progress {
+        appearance: none;
+        display: block;
+        width: 100%;
+        height: 14px;
+        &::-webkit-progress-bar {
+          background-color: rgba(255, 255, 255, 0.938);
+          border-radius: 3px;
+          border: 1px solid #707078;
+        }
+
+        &::-webkit-progress-value {
+          background-color: $primaryColor;
+        }
+      }
     }
     .header-left {
       .svg-container + .svg-container {
         margin-right: 3px;
       }
-      .video-process-input {
-        .el-input-number,
-        .el-input-number__increase,
-        .el-input-number__decrease {
-          height: 12px !important;
-        }
-        ::v-deep {
-          .el-input-number,
-          .el-input-number__increase,
-          .el-input-number__decrease {
-            height: 12px !important;
+      ::v-deep {
+        .el-button {
+          & + & {
+            margin-left: 0;
           }
+        }
+      }
+
+      .icon-btn-group {
+        .svg-container + .svg-container {
+          margin: 0 0 0 3px;
         }
       }
     }
@@ -1219,8 +1259,32 @@ export default {
       .svg-container {
         font-size: 20px;
       }
+      .video-tool {
+        .time-input {
+          max-width: 40px;
+          height: 16px;
+          text-align: center;
+          border: 1px solid #707078;
+          border-radius: 4px;
+          &:focus {
+            border: unset;
+            outline: 1px solid $primaryColor;
+          }
+        }
+        .frames {
+          margin-left: 3px;
+          min-width: 60px;
+          max-width: 70px;
+          font-size: 14px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          cursor: pointer;
+          user-select: none;
+        }
+      }
     }
   }
+
   .canvas-container {
     .canvas-item {
       position: relative;
@@ -1275,6 +1339,11 @@ export default {
         color: rgba(0, 0, 0, 0.6);
       }
     }
+  }
+
+  .selected-item {
+    outline: 1px dashed red;
+    outline-offset: -2px;
   }
 }
 

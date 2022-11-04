@@ -187,8 +187,7 @@ export default {
     fullscreen: 'フルスクリーン\nESC終了フルスクリーン',
     dynamicPickColor: 'カラーピッカー調和',
     minRenderInterval: 'ビデオレンダリングの最小間隔',
-    processTip:
-      '左クリックしてビデオプログレスバーを表示/非表示にし、右クリックしてビデオプログレスの正確なコントロールコンポーネントを表示/非表示にします'
+    processTip: 'ビデオ プログレス バーの表示/非表示'
   },
   sortFile: {
     apply: '応用',

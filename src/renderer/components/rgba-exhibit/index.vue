@@ -40,6 +40,7 @@ export default {
     .text-style {
       // margin-right: 5px;
       white-space: nowrap;
+      user-select: none;
     }
     #rgba-block {
       width: 18px;

@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip effect="light" placement="bottom" :open-delay="800">
+  <el-tooltip effect="light" placement="bottom" :open-delay="300">
     <div slot="content" class="image-style-container">
       <el-row :gutter="10">
         <el-col :span="6">

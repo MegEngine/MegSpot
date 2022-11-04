@@ -84,6 +84,9 @@ export default {
   position: absolute;
   bottom: 4px;
   left: 4px;
+  .scale-number {
+    user-select: none;
+  }
   ::v-deep {
     .el-input-number {
       width: 100px;

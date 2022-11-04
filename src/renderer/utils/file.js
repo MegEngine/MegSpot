@@ -1,5 +1,6 @@
-import fs from 'fs'
+import fs,{ promises as fsPromises } from 'fs'
 import path from 'path'
+import MediaInfoFactory from "mediainfo.js";
 var sizeof = require('image-size')
 const { dialog } = require('@electron/remote')
 import { SHARE_ZIP_EXT } from '@/tools/compress'
@@ -23,6 +24,56 @@ export const formatFileSize = (fileSize) => {
   } else {
     return (fileSize / (1024 * 1024 * 1024)).toFixed(2) + 'GB'
   }
+}
+
+// 获取图像、视频文件格式信息 
+// const result = await analyze({
+//   coverData: true,
+//   file: "path/to/file",
+//   format: "JSON",
+//   full: true,
+// });
+export const analyze = async ({ coverData, file, format, full }) => {
+  let fileHandle;
+  let fileSize;
+  let mediainfo;
+  let result;
+
+  if (coverData && !["JSON", "XML"].includes(format)) {
+    throw TypeError(
+      "For cover data you need to choose JSON or XML as output format!"
+    );
+  }
+
+  const readChunk = async (size, offset) => {
+    const buffer = new Uint8Array(size);
+    await fileHandle.read(buffer, 0, size, offset);
+    return buffer;
+  };
+
+  try {
+    fileHandle = await fsPromises.open(file, "r");
+    fileSize = (await fileHandle.stat()).size;
+    // console.log("fileHandle", fileHandle.stat());
+    mediainfo = await MediaInfoFactory({ format, coverData, full });
+    // console.log("mediainfo", mediainfo);
+    result = await mediainfo.analyzeData(() => fileSize, readChunk);
+  } finally {
+    fileHandle && (await fileHandle.close());
+    mediainfo && mediainfo.close();
+  }
+
+  return result;
+};
+
+export const analyzeFile = async (path, options = {}) => {
+  const result = await analyze(Object.assign({
+    coverData: false,
+    file: path,
+    format: "JSON",
+    full: true
+  }, options));
+  return result
 }
 
 // 获取文件尺寸

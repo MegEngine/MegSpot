@@ -186,8 +186,7 @@ export default {
     fullscreen: 'fullscreen\nESC exit fullscreen',
     dynamicPickColor: 'dynamic color picker',
     minRenderInterval: 'min-interval of video rendering',
-    processTip:
-      'Left click to show/hide video progress bar, right click to show/hide precise control component of video progress'
+    processTip: 'show/hide video progress bar'
   },
   sortFile: {
     apply: 'Apply',
