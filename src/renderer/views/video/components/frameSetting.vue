@@ -111,6 +111,7 @@ export default {
           // console.log('analyzeFile', result)
           this.mediaInfo = result?.media?.track?.find((item) => item?.['@type']?.toLowerCase() === 'video')
           this.setFromMediaInfo()
+          this.$emit('update', this.mediaInfo)
         })
         .catch((err) => {
           console.error('analyze video error', err)

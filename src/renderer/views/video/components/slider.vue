@@ -6,6 +6,9 @@
       :interval="interval"
       :duration="duration"
       :max="maxData"
+      :tooltip="'hover'"
+      :tooltip-formatter="formatTime"
+      :tooltip-placement="`top`"
       :drag-on-click="dragOnClick"
       style="cursor: pointer"
     ></vue-slider>
@@ -86,6 +89,18 @@ export default {
   methods: {
     setValue(value) {
       this.$emit('update', value)
+    },
+    formatTime(time) {
+      if (!time) {
+        return ''
+      }
+      let seconds = Number(time).toFixed(4)
+      var hours = Math.floor(seconds / 3600)
+      seconds = seconds - hours * 3600
+      var minutes = Math.floor(seconds / 60)
+      seconds = /\d+.\d{2}/.exec(seconds - minutes * 60)
+
+      return `${hours > 0 ? hours + 'h' : ''}${minutes > 0 ? minutes + 'm' : ''}${seconds > 0 ? seconds + 's' : ''}`
     }
   }
 }

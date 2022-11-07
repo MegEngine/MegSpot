@@ -80,6 +80,7 @@
             :frameRate.sync="frameRate"
             :frameCount.sync="frameCount"
             :displayedFrames="displayedFrames"
+            @update="handleUpdateMediaInfo"
           >
             <div class="frames" flex="cross:center">
               <el-tooltip :content="frameTip" placement="right">
@@ -148,7 +149,7 @@ import chokidar from 'chokidar'
 import * as CONSTANTS from '../video-constants'
 import { getFileName } from '@/filter/get-file-name'
 import { TimeManager } from '@/utils/video'
-import { debounce } from '@/utils'
+import { debounce, getUuidv4 } from '@/utils'
 
 export default {
   components: {
@@ -452,6 +453,9 @@ export default {
         this.changeVideoTime(nextTime)
       }
     },
+    handleUpdateMediaInfo(mediaInfo) {
+      this.mediaInfo = mediaInfo
+    },
     formatTime(time) {
       if (!time) {
         time = this.video?.duration || this.video?.currentTime
@@ -729,7 +733,7 @@ export default {
             }
             this.offset = 0
             this.timeConfig = TimeManager.setTime({
-              id: this.path,
+              id: `${this.path}?uid=${getUuidv4()}`,
               video: this.video,
               timingFn: (vector) => {
                 return vector
