@@ -170,6 +170,7 @@ export class Timer {
     console.log('cleartimeConfigs')
     this.timeConfigs = null
     this.timeConfigs = new Map()
+    this.reset()
   }
 
   getStatus() {

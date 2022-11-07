@@ -50,7 +50,7 @@
           type="text"
           size="mini"
           class="svg-container"
-          v-tip="`previous frame`"
+          v-tip="$t('imageCenter.previousFrame')"
           @click="changeFrame(-1)"
         >
           <svg-icon icon-class="frame" />
@@ -60,7 +60,7 @@
           type="text"
           size="mini"
           class="svg-container"
-          v-tip="`next frame`"
+          v-tip="$t('imageCenter.nextFrame')"
           @click="changeFrame(1)"
           style="margin-left: 0"
         >
@@ -92,7 +92,7 @@
 
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
         <EffectPreview @change="changeCanvasStyle" />
-        <span class="svg-container" @click="fullScreen" v-tip="$t('video.fullscreen')">
+        <span class="svg-container" @click="fullScreen" v-tip="$t('video.fullscreen')" style="cursor: pointer">
           <svg-icon icon-class="fullscreen" />
         </span>
       </div>
@@ -724,6 +724,10 @@ export default {
             this.video = null
           }
           this.video = document.createElement('video')
+
+          this.video.addEventListener('ended', () => {
+            this.$emit('ended')
+          })
 
           this.video.addEventListener('loadeddata', async () => {
             this.$emit('loaded')

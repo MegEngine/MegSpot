@@ -9,6 +9,7 @@
         :_height="canvasHeight"
         :subVideoControlMenu="subVideoControlMenu"
         @loaded="handleVideoLoaded"
+        @ended="handleEnded"
         @fullScreen="handleFullscreen"
       ></VideoCanvas>
     </div>
@@ -110,9 +111,9 @@ export default {
       }
       this.setVideoConfig({ layout: smartLayout })
     }
-    TimeManager.cleartimeConfigs()
   },
   mounted() {
+    TimeManager.cleartimeConfigs()
     this.calcCanvasSize()
     // 调度事件  使用当前组件的方法
     this.scheduleCanvasActions.forEach((item) => {
@@ -429,6 +430,12 @@ export default {
       //   this.timer = await new Timer(videos)
       //   console.log('timer', this.timer)
       // }
+    },
+    handleEnded() {
+      const allEnded = this.$refs['video_canvas'].every(
+        (item) => item.video.ended || item.video.currentTime >= item.video.duration
+      )
+      allEnded && this.$bus.$emit('allVideoEnded')
     },
     getMarks(data, callback) {
       callback(this.marks)

@@ -2,7 +2,7 @@
   <el-dialog ref="aboutDialog" :visible.sync="visible" title="Preference" center width="80%">
     <div ref="container" style="height: 100%">
       <el-tabs v-model="activeTab" tab-position="left" stretch style="height: 600px">
-        <el-tab-pane name="introduction" label="introduction">
+        <el-tab-pane name="introduction" :label="$t('help.introduction')">
           <div style="text-align: left">
             <div class="introduction">
               {{ $t('common.desc') }}
@@ -13,7 +13,7 @@
             <img src="../../assets/images/group-qrcode.png" alt style="width: 300px" />
           </div>
         </el-tab-pane>
-        <el-tab-pane name="settings" label="settings">
+        <el-tab-pane name="settings" :label="$t('help.settings')">
           <el-form label-position="right">
             <el-form-item :label="$t('general.language')">
               <el-select v-model="appLanguage">
@@ -40,7 +40,7 @@
             </el-form-item>
           </el-form>
         </el-tab-pane>
-        <el-tab-pane name="version" label="version">
+        <el-tab-pane name="version" :label="$t('help.version')">
           <el-row class="row-style">
             <el-col :span="5">version</el-col>
             <el-col :span="15">
@@ -58,7 +58,7 @@
             <el-col :span="17" style="white-space: break-spaces">{{ releaseNotes }}</el-col>
           </el-row>
         </el-tab-pane>
-        <el-tab-pane name="hotkey" label="hotkey">
+        <el-tab-pane name="hotkey" :label="$t('help.hotkey')">
           <vxe-table
             ref="xTable"
             :data="hotkeys"
@@ -145,7 +145,7 @@
             </vxe-column>
           </vxe-table>
         </el-tab-pane>
-        <el-tab-pane name="log" label="log">
+        <el-tab-pane name="log" :label="$t('help.log')">
           <el-row>
             <el-col :span="3" style="line-height: 32px">log path</el-col>
             <el-col :span="21">

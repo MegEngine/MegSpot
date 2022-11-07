@@ -137,6 +137,8 @@ export default {
     overlayTop: '向上叠加显示',
     verticalFlip: '纵向翻转',
     horizontalFlip: '水平翻转翻转',
+    previousFrame: '上一帧',
+    nextFrame: '下一帧',
     frameStep: '逐帧对比播放间隔',
     frameSteps1: '逐帧对比\n向前播放: Cmd/Ctrl + b',
     frameSteps2: '逐帧对比\n向后播放: Cmd/Ctrl + n',
@@ -205,5 +207,12 @@ export default {
     enableNameSortTip: '是否按照名称进行先后排序',
     smartSort: '智能排序',
     smartSortTip: '不同文件夹下的同名文件排序在一起，便于对比'
+  },
+  help: {
+    introduction: '介绍',
+    settings: '设置',
+    version: '版本信息',
+    hotkey: '快捷键',
+    log: '日志'
   }
 }

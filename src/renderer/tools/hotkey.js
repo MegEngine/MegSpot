@@ -165,7 +165,9 @@ export const DEFAULT_HOTKEYS = [
 })
 
 export function getArrStr(arr) {
-  return JSON.parse(JSON.stringify(arr)).sort().toString()
+  let cloneArr = JSON.parse(JSON.stringify(arr))
+  cloneArr = Array.isArray(cloneArr) ? cloneArr : [cloneArr]
+  return cloneArr.sort().toString()
 }
 
 export function getPressedKeysStr(event) {

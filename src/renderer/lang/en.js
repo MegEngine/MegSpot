@@ -137,6 +137,8 @@ export default {
     overlayBottom: 'overlay bottom',
     overlayTop: 'overlay top',
     verticalFlip: 'vertical flip',
+    previousFrame: 'previous frame',
+    nextFrame: 'next frame',
     frameStep: 'the interval of Frame Compare',
     frameSteps1: 'Compare video frame by frame\nplay forward: Cmd/Ctrl + b',
     frameSteps2: 'Compare video frame by frame\nplay backward: Cmd/Ctrl + n',
@@ -207,5 +209,12 @@ export default {
     enableNameSortTip: 'Whether to sort by name',
     smartSort: 'Smart Sort',
     smartSortTip: 'files with the same name in different folders are sorted together for easy comparison'
+  },
+  help: {
+    introduction: 'introduction',
+    settings: 'settings',
+    version: 'version',
+    hotkey: 'shortcut',
+    log: 'log'
   }
 }

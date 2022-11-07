@@ -327,11 +327,13 @@ export default {
     window.addEventListener('keydown', this.handleHotKey, true)
     window.addEventListener('keyup', this.handleHotKeyUp, true)
     this.$bus.$on('image_handleSelect', this.handleSelect)
+    this.$bus.$on('allVideoEnded', this.handleAllVideoEnded)
   },
   beforeDestroy() {
     window.removeEventListener('keydown', this.handleHotKey, true)
     window.removeEventListener('keyup', this.handleHotKeyUp, true)
     this.$bus.$off('image_handleSelect', this.handleSelect)
+    this.$bus.$off('allVideoEnded', this.handleAllVideoEnded)
   },
   methods: {
     ...mapActions(['emptyVideos', 'removeVideos', 'setVideoConfig', 'setVideos']),
@@ -655,6 +657,9 @@ export default {
     },
     handleSelect(data) {
       this.showSelectedMsg = !!data
+    },
+    handleAllVideoEnded() {
+      this.changeStatus(0)
     },
     handleReset() {
       this.$bus.$emit(CONSTANTS.BUS_VIDEO_COMPARE_ACTION_RESET)

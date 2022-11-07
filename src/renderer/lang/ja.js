@@ -138,6 +138,8 @@ export default {
     overlayBottom: '下にオーバーレイ表示',
     overlayTop: '上にオーバーレイ表示',
     verticalFlip: '上下に反転',
+    previousFrame: '前のフレーム',
+    nextFrame: '次のフレーム',
     frameStep: 'フレーム比較の間隔',
     frameSteps1: '一つ一つ比較する\n逆さまに: Cmd/Ctrl + b',
     frameSteps2: '一つ一つ比較する\n再生を再開します: Cmd/Ctrl + n',
@@ -208,5 +210,12 @@ export default {
     enableNameSortTip: '名前で並べ替えるかどうか',
     smartSort: 'スマートソーティング',
     smartSortTip: '異なるフォルダにある同じ名前のファイルは、簡単に比較できるように一緒に並べ替えられます'
+  },
+  help: {
+    introduction: '紹介',
+    settings: '設定',
+    version: 'バージョン',
+    hotkey: 'ショートカット',
+    log: 'ログ'
   }
 }
