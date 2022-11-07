@@ -6,6 +6,8 @@
       :interval="interval"
       :duration="duration"
       :max="maxData"
+      :marks="marks"
+      :hide-label="true"
       :tooltip="'hover'"
       :tooltip-formatter="formatTime"
       :tooltip-placement="`top`"
@@ -49,6 +51,29 @@ export default {
     max: {
       type: Number,
       default: 60
+    }
+  },
+  data() {
+    return {
+      marks: (time) =>
+        time % 1 === 0
+          ? {
+              style: {
+                width: '8px',
+                height: '8px',
+                display: 'block',
+                backgroundColor: '#3498db',
+                transform: 'translate(-2px, -2px)'
+              }
+              // label: `${time}%`,
+              // labelStyle: {
+              //   opacity: time * 0.01 * 0.7 + 0.3
+              // },
+              // labelActiveStyle: {
+              //   color: '#3498db'
+              // }
+            }
+          : false
     }
   },
   computed: {

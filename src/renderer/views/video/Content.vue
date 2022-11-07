@@ -149,6 +149,11 @@ export default {
             display: 'flex',
             flexDirection: 'column'
           }
+        case GLOBAL_CONSTANTS.LAYOUT_1X2:
+          return {
+            display: 'grid',
+            gridTemplateRows: '50% 50%'
+          }
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
           return {
             display: 'grid',
@@ -247,6 +252,7 @@ export default {
       this.containerWidth = containerWidth
       switch (this.videoConfig.layout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
+        case GLOBAL_CONSTANTS.LAYOUT_1X2:
           return containerWidth
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
         case GLOBAL_CONSTANTS.LAYOUT_2X2:
@@ -271,6 +277,7 @@ export default {
           return containerHeight
         case GLOBAL_CONSTANTS.LAYOUT_2X2:
         case GLOBAL_CONSTANTS.LAYOUT_3X2:
+        case GLOBAL_CONSTANTS.LAYOUT_1X2:
           return containerHeight / 2
       }
     },
@@ -371,7 +378,7 @@ export default {
           lineLen = lineLen - 1
         }
         const compareLine = lineLen
-        if (columnLen === 2 || columnLen === 3 || columnLen === 4) {
+        if (columnLen) {
           for (let i = 0; i < compareLine; i = i + 2) {
             for (let j = 0; j < columnLen; j++) {
               const topItem = canvasViews[i * columnLen + j]
@@ -513,17 +520,17 @@ export default {
     },
     getColumnLine() {
       //获取列数
-      if ([GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(this.videoConfig.layout)) {
-        return 3
+      if ([GLOBAL_CONSTANTS.LAYOUT_1X1, GLOBAL_CONSTANTS.LAYOUT_1X2].includes(this.videoConfig.layout)) {
+        return 1
       }
       if ([GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(this.videoConfig.layout)) {
         return 2
       }
+      if ([GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(this.videoConfig.layout)) {
+        return 3
+      }
       if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.videoConfig.layout)) {
         return 4
-      }
-      if ([GLOBAL_CONSTANTS.LAYOUT_1X1].includes(this.videoConfig.layout)) {
-        return 1
       }
     }
   }

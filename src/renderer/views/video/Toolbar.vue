@@ -241,12 +241,13 @@
         >
           <el-option
             v-for="item in [
-              GLOBAL_CONSTANTS.LAYOUT_2X2,
+              GLOBAL_CONSTANTS.LAYOUT_1X1,
+              GLOBAL_CONSTANTS.LAYOUT_1X2,
               GLOBAL_CONSTANTS.LAYOUT_2X1,
+              GLOBAL_CONSTANTS.LAYOUT_2X2,
               GLOBAL_CONSTANTS.LAYOUT_3X1,
               GLOBAL_CONSTANTS.LAYOUT_3X2,
-              GLOBAL_CONSTANTS.LAYOUT_4X1,
-              GLOBAL_CONSTANTS.LAYOUT_1X1
+              GLOBAL_CONSTANTS.LAYOUT_4X1
             ]"
             :disabled="videoList.length < parseInt(item[0]) * parseInt(item[2])"
             :key="item"
