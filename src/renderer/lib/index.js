@@ -5,7 +5,10 @@ const loadLib = function (cb) {
   script.setAttribute('async', 'false')
   script.setAttribute('type', 'text/javascript')
   script.addEventListener('load', async () => {
-    cb(cv)
+    cv['onRuntimeInitialized'] = () => {
+      //0.5s 左右的延时  https://stackoverflow.com/questions/56671436/cv-mat-is-not-a-constructor-opencv
+      cb(cv)
+    }
   })
   script.addEventListener('error', () => {
     console.error('Failed to load ' + OPENCV_URL)
