@@ -69,6 +69,7 @@ export default {
       hist.delete()
       mask.delete()
       dst.delete()
+      sourceMat.delete()
       return this.getHistCanvas()
     },
     getHistCanvas() {

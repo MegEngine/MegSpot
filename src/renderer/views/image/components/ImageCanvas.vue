@@ -345,6 +345,9 @@ export default {
       }
     },
     async initBitMap(imageData) {
+      if (this.bitMap) {
+        this.bitMap.close()
+      }
       this.bitMap = await createImageBitmap(
         imageData
           ? new ImageData(new Uint8ClampedArray(imageData), this.image.width, this.image.height, { colorSpace: 'srgb' })
@@ -379,7 +382,7 @@ export default {
         }
       })
     },
-    async initImage(initPosition = true, initHist = true, initBitMap = true) {
+    async initImage(initPosition = true) {
       this.loading = true
       if (/tiff?$/.test(this.path)) {
         const file = await fse.readFile(this.path)
@@ -389,16 +392,13 @@ export default {
         decodeImage(file, ifd)
         const imageData = toRGBA8(ifd)
         this.image = new Image(ifd.width, ifd.height)
-
-        initHist && this.initHist()
-        initBitMap && (await this.initBitMap(imageData))
+        await this.initBitMap(imageData)
         this.loading = false
         this.reDraw(initPosition)
       } else {
         this.image = new Image()
         this.image.onload = async () => {
-          initHist && this.initHist()
-          initBitMap && (await this.initBitMap())
+          this.initBitMap()
           this.loading = false
           this.reDraw(initPosition)
         }
@@ -437,7 +437,10 @@ export default {
         data: { visible }
       })
     },
-    doHistVisible({ visible }) {
+    async doHistVisible({ visible }) {
+      if (!this.currentHist) {
+        await this.initHist()
+      }
       this.$refs['hist-container'].setVisible(visible)
     },
     handleScaleDbClick(data) {
