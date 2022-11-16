@@ -39,7 +39,7 @@ import VideoCanvas from './components/videoCanvas'
 import Sticky from '@/components/sticky'
 import _ from 'lodash'
 import VideoProgressBar from './components/videoProgressBar'
-import { throttle } from '@/utils'
+import { debounce } from '@/utils'
 import { i18nRender } from '@/lang'
 import * as GLOBAL_CONSTANTS from '@/constants'
 import { SnapshotHelper } from '@/tools/compress'
@@ -225,7 +225,7 @@ export default {
     changeGroup(groupStartIndex) {
       this.groupStartIndex = groupStartIndex
     },
-    handleResize: throttle(50, function () {
+    handleResize: debounce(300, function () {
       this.calcCanvasSize()
       // 非全屏状态时重新布局图片容器;
       if (!this.fullScreening) {

@@ -72,7 +72,7 @@ import fse from 'fs-extra'
 import dayjs from 'dayjs'
 import { arraySortByName } from '@/utils/file'
 import { createNamespacedHelpers } from 'vuex'
-import { throttle, debounce } from '@/utils'
+import {  debounce } from '@/utils'
 import { formatFileSize } from '@/utils/file'
 import SearchInput from '../search-input'
 import { isImage, isVideo } from '@/components/file-tree/lib/util'
@@ -177,7 +177,7 @@ export default {
     }
   },
   async mounted() {
-    window.addEventListener('resize', throttle(300, this.updateTableHeight))
+    window.addEventListener('resize', debounce(300, this.updateTableHeight))
     window.addEventListener('keydown', (code) => {
       // 开启多选
       if (code.keyCode === 16 && code.shiftKey) {

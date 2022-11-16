@@ -51,7 +51,7 @@ import FileTree from '@/components/file-tree/FileTree.vue'
 import ShowPath from '@/components/show-path'
 import VueSplit from 'vue-split-panel'
 import VideoPreview from './VideoPreview'
-import { throttle } from '@/utils'
+import { debounce } from '@/utils'
 import { createNamespacedHelpers } from 'vuex'
 import SelectedBtn from '@/components/selected-btn'
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore')
@@ -99,7 +99,7 @@ export default {
       'addExpandData',
       'removeExpandData'
     ]),
-    handleResize: throttle(50, function () {
+    handleResize: debounce(300, function () {
       this.calcSplitHeight()
     }),
     initHotkeyEvents() {

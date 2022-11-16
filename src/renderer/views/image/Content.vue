@@ -24,7 +24,7 @@ import path from 'path'
 import fse from 'fs-extra'
 import ImageCanvas from './components/ImageCanvas'
 import store from '@/store'
-import { throttle } from '@/utils'
+import { debounce } from '@/utils'
 import { getDirectoryPath } from '@/utils/file'
 import { SnapshotHelper } from '@/tools/compress'
 import * as GLOBAL_CONSTANTS from '@/constants'
@@ -211,7 +211,7 @@ export default {
     },
     ...mapActions(['setImageConfig']),
     ...snapMapActions(['setSnapshotConfig']),
-    handleResize: throttle(50, function () {
+    handleResize: debounce(300, function () {
       this.calcCanvasSize()
       // 重新布局图片容器;
       this.updateAllCanvas()

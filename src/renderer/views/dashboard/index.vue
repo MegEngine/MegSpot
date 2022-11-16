@@ -20,7 +20,7 @@
 <script>
 import EntryCard from './EntryCard'
 import HelpVideo from './HelpVideo'
-import { throttle } from '@/utils'
+import { debounce } from '@/utils'
 
 export default {
   name: 'dashboard',
@@ -71,7 +71,7 @@ export default {
     window.addEventListener('resize', this.handleResize, true)
   },
   methods: {
-    handleResize: throttle(50, function () {
+    handleResize: debounce(300, function () {
       // this.$nextTick(() => {
       const container = this.$refs.container
       this.size = {
