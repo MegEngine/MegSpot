@@ -37,8 +37,7 @@ const videoStore = {
   },
   mutations: {
     SET_VIDEO_CONFIG: (state, configOb) => {
-      const newConfig = Object.assign({}, state.videoConfig, configOb)
-      state.videoConfig = newConfig
+      Object.assign(state.videoConfig, configOb)
     },
     SET_VIDEO_FOLDERS: (state, folders) => {
       state.videoFolders = folders.map(trimSep)
