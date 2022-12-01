@@ -2,7 +2,7 @@
   <div flex="main:justify cross:center" class="toolbar">
     <div class="left" flex="cross:center">
       <div class="router-back">
-        <!-- v-tip.sure="`${$t('common.hotKey')}：esc`" -->
+        <!-- :title="`${$t('common.hotKey')}：esc`" -->
         <span @click="goBack" class="btn">
           <i class="el-icon-d-arrow-left"></i>
           {{ $t('nav.back') }}
@@ -24,7 +24,7 @@
         :step="1"
         :min="1"
         :max="maxGroupNum"
-        v-tip="$t('general.groupNum')"
+        :title="$t('general.groupNum')"
         label="groupNum"
         class="group-number"
       ></el-input-number>
@@ -37,7 +37,7 @@
         type="text"
         size="mini"
         @click="resetSnapshotPos"
-        v-tip="$t('image.toolbar.resetPositionTip')"
+        :title="$t('image.toolbar.resetPositionTip')"
         style="margin-left: 10px"
       >
         {{ $t('image.toolbar.resetPosition') }}
@@ -48,9 +48,9 @@
         size="mini"
         @click="exportImage"
         v-loading.fullscreen.lock="fullscreenLoading"
-        v-tip.sure="$t('image.toolbar.exportTip')"
+        :title="$t('image.toolbar.exportTip')"
       >
-        <span class="svg-container" v-tip="$t('image.toolbar.exportTip')">
+        <span class="svg-container" :title="$t('image.toolbar.exportTip')">
           <svg-icon icon-class="export" />
         </span>
       </el-button>
@@ -67,7 +67,7 @@
           size="mini"
           @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
           @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_LEFT)"
-          v-tip="$t('imageCenter.overlayLeft')"
+          :title="$t('imageCenter.overlayLeft')"
         >
           <span class="svg-container">
             <svg-icon icon-class="direction-left" />
@@ -78,7 +78,7 @@
           size="mini"
           @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
           @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT)"
-          v-tip="$t('imageCenter.overlayRight')"
+          :title="$t('imageCenter.overlayRight')"
         >
           <span class="svg-container">
             <svg-icon icon-class="direction-left" class="svg-container" style="transform: rotate(180deg)" />
@@ -89,7 +89,7 @@
           size="mini"
           @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
           @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_BOTTOM)"
-          v-tip="$t('imageCenter.overlayBottom')"
+          :title="$t('imageCenter.overlayBottom')"
         >
           <span class="svg-container">
             <svg-icon icon-class="direction-left" style="transform: rotate(-90deg)" />
@@ -100,20 +100,20 @@
           size="mini"
           @mousedown.native="overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
           @mouseup.native="cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_TOP)"
-          v-tip="$t('imageCenter.overlayTop')"
+          :title="$t('imageCenter.overlayTop')"
         >
           <span class="svg-container">
             <svg-icon icon-class="direction-left" style="transform: rotate(90deg)" />
           </span>
         </el-button>
-        <el-button type="text" size="mini" v-tip.sure="`choose images to generate GIF`" @click="$refs.gifDialog.show()">
-          <span class="svg-container" v-tip="$t('imageCenter.generateGIF')">
+        <el-button type="text" size="mini" :title="`choose images to generate GIF`" @click="$refs.gifDialog.show()">
+          <span class="svg-container" :title="$t('imageCenter.generateGIF')">
             <svg-icon icon-class="gif" />
           </span>
         </el-button>
         <GifDialog ref="gifDialog" :selectList="imageList.slice(startIndex, startIndex + groupCount)"></GifDialog>
-        <el-button type="text" size="mini" v-tip.sure="$t('general.shareAsProject')" @click="handleShare">
-          <span class="svg-container" v-tip="$t('general.share')">
+        <el-button type="text" size="mini" :title="$t('general.shareAsProject')" @click="handleShare">
+          <span class="svg-container" :title="$t('general.share')">
             <svg-icon icon-class="share" />
           </span>
         </el-button>
@@ -126,7 +126,7 @@
             type="text"
             @click="pickColor"
             size="mini"
-            v-tip="$t('imageCenter.colorPicker') + ' ' + $t('common.hotKey') + ':cmd/ctrl+p'"
+            :title="$t('imageCenter.colorPicker') + ' ' + $t('common.hotKey') + ':cmd/ctrl+p'"
           >
             <span class="svg-container" style="font-size: 20px">
               <svg-icon icon-class="pick-color" :clicked="traggerRGB" />
@@ -135,17 +135,17 @@
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
         <el-button-group class="gap">
-          <el-button type="text" @click="rotate(90)" size="mini" v-tip="$t('imageCenter.rotate')">
+          <el-button type="text" @click="rotate(90)" size="mini" :title="$t('imageCenter.rotate')">
             <span class="svg-container">
               <svg-icon icon-class="rotate" />
             </span>
           </el-button>
-          <el-button type="text" @click="reverse(1)" v-tip="$t('imageCenter.horizontalFlip')" size="mini">
+          <el-button type="text" @click="reverse(1)" :title="$t('imageCenter.horizontalFlip')" size="mini">
             <span class="svg-container">
               <svg-icon icon-class="horizontal-flip" />
             </span>
           </el-button>
-          <el-button type="text" size="mini" @click="reverse(-1)" v-tip="$t('imageCenter.verticalFlip')">
+          <el-button type="text" size="mini" @click="reverse(-1)" :title="$t('imageCenter.verticalFlip')">
             <span class="svg-container">
               <svg-icon icon-class="vertical-flip" />
             </span>
@@ -153,22 +153,22 @@
         </el-button-group>
         <el-divider direction="vertical"></el-divider>
         <el-button-group class="gap">
-          <el-button type="text" size="mini" @click="align(false)" v-tip="$t('imageCenter.align')">
+          <el-button type="text" size="mini" @click="align(false)" :title="$t('imageCenter.align')">
             <span class="svg-container">
               <svg-icon icon-class="align" />
             </span>
           </el-button>
-          <el-button type="text" size="mini" @click="align(true)" v-tip="$t('imageCenter.align2')">
+          <el-button type="text" size="mini" @click="align(true)" :title="$t('imageCenter.align2')">
             <span class="svg-container">
               <svg-icon icon-class="align2" />
             </span>
           </el-button>
-          <el-button type="text" size="mini" @click="resetCanvas(false)" v-tip="$t('imageCenter.adaptive')">
+          <el-button type="text" size="mini" @click="resetCanvas(false)" :title="$t('imageCenter.adaptive')">
             <span class="svg-container">
               <svg-icon icon-class="adaptive" />
             </span>
           </el-button>
-          <el-button type="text" size="mini" @click="resetCanvas(true)" v-tip="$t('imageCenter.fullsize')">
+          <el-button type="text" size="mini" @click="resetCanvas(true)" :title="$t('imageCenter.fullsize')">
             <span class="svg-container">
               <svg-icon icon-class="fullsize" />
             </span>
@@ -180,7 +180,7 @@
           placeholder="layout"
           class="layout-selector"
           size="mini"
-          v-tip.left="$t('general.layout')"
+          :title="$t('general.layout')"
         >
           <el-option
             v-for="item in [

@@ -3,7 +3,7 @@
     <div ref="header" :class="['header', selected ? 'selected-item' : '']" flex="main:justify cross:center">
       <div class="header-left" flex="cross:center" flex-box="0">
         <CoverMask :mask="maskDom" class="cover-mask">
-          <HistContainer ref="hist-container" v-tip="$t('general.histogram')" @changeVisible="handleHistVisible" />
+          <HistContainer ref="hist-container" :title="$t('general.histogram')" @changeVisible="handleHistVisible" />
         </CoverMask>
         <div class="icon-btn-group" flex="main:justify cross:center">
           <el-button
@@ -12,9 +12,9 @@
             size="mini"
             @click="handleVideoSliderVisible"
             class="svg-container"
-            v-tip.sure="$t('video.processTip')"
+            :title="$t('video.processTip')"
           >
-            <svg-icon icon-class="video-bar" v-tip="$t('video.processTip')" />
+            <svg-icon icon-class="video-bar" :title="$t('video.processTip')" />
           </el-button>
           <!-- 默认使用视频同步，不再单独播放、暂停单个视频； 可采用offset调整 -->
           <!-- <span v-show="videoSliderVisible" class="svg-containe" @click="executeAction(1)">
@@ -50,7 +50,7 @@
           type="text"
           size="mini"
           class="svg-container"
-          v-tip="$t('imageCenter.previousFrame')"
+          :title="$t('imageCenter.previousFrame')"
           @click="changeFrame(-1)"
         >
           <svg-icon icon-class="frame" />
@@ -60,7 +60,7 @@
           type="text"
           size="mini"
           class="svg-container"
-          v-tip="$t('imageCenter.nextFrame')"
+          :title="$t('imageCenter.nextFrame')"
           @click="changeFrame(1)"
           style="margin-left: 0"
         >
@@ -92,7 +92,7 @@
 
         <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
         <EffectPreview @change="changeCanvasStyle" />
-        <span class="svg-container" @click="fullScreen" v-tip="$t('video.fullscreen')" style="cursor: pointer">
+        <span class="svg-container" @click="fullScreen" :title="$t('video.fullscreen')" style="cursor: pointer">
           <svg-icon icon-class="fullscreen" />
         </span>
       </div>

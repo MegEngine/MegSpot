@@ -5,7 +5,7 @@
       size="mini"
       @click="showModal"
       :disabled="!sortList.length"
-      v-tip.sure="'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'"
+      :title="'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'"
     >
       {{ $t('general.selected') }}
     </el-button>
@@ -54,7 +54,7 @@
                         <img name="dragItem" :src="getImageUrlSync(item)" v-if="isImage(item)" />
                         <video name="dragItem" :src="getImageUrlSync(item)" v-if="isVideo(item)" />
                       </div>
-                      <div class="name" v-tip="item">
+                      <div class="name" :title="item">
                         <span v-html="$options.filters.getFileName(item)"></span>
                       </div>
                     </div>
@@ -246,40 +246,50 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
+
 @keyframes appearOpacity {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
+
 @keyframes disappearOpacity {
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
 }
+
 @keyframes appear {
   from {
     left: -200px;
   }
+
   to {
     left: 0px;
   }
 }
+
 @keyframes disappear {
   from {
     left: 0;
   }
+
   to {
     left: -200px;
   }
 }
+
 .gallery {
   display: inline-block;
+
   .modal {
     width: 100%;
     height: 100%;
@@ -292,6 +302,7 @@ export default {
     left: 0;
     display: none;
     z-index: 1000;
+
     .split {
       overflow-y: hidden;
 
@@ -302,78 +313,97 @@ export default {
         height: 100%;
         left: -200px;
         overflow-y: hidden;
+
         .toolbar {
           height: 28px;
           margin-top: 5px;
+
           .btn {
             margin-left: 10px;
           }
+
           .clear-btn {
             position: absolute;
             top: 10px;
             right: 10px;
+
             // margin-left: 20px;
             &:hover {
               cursor: pointer;
             }
           }
         }
+
         .sortList {
           padding-right: 10px;
           padding-bottom: 33px;
+
           ::v-deep {
             .el-button--mini {
               padding: 1px 5px;
             }
           }
+
           .setting-btn {
             float: right;
+
             .svg-icon {
               font-size: 18px;
             }
           }
+
           #drag {
             :first-child {
               // margin-top: 0 !important;
             }
+
             width: 100%;
             display: flex;
             flex-wrap: wrap;
+
             .dragItem:hover {
               .close-button {
                 display: initial;
               }
             }
+
             .dragItem {
               position: relative;
               margin: 10px 0 0 10px;
               border-radius: 5px;
               box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
               border: 1px solid #dee1e5;
+
               .close-button {
                 display: none;
                 position: absolute;
                 top: 10px;
                 right: 10px;
                 z-index: 1000;
+
                 .svg-icon {
                   color: $primaryColor;
                 }
               }
+
               .close-button:hover {
                 cursor: pointer;
+
                 .svg-icon {
                   color: red;
                 }
               }
+
               .content {
                 width: 200px;
                 height: 130px;
+
                 :first-child {
                   max-width: 200px;
                   max-height: 130px;
                 }
               }
+
               .name {
                 width: 200px;
                 text-align: center;
@@ -388,39 +418,46 @@ export default {
         }
       }
     }
+
     .blank {
       width: 100%;
       height: 100%;
     }
   }
 }
+
 .focus-item {
   border: 1px solid #1067d1;
 }
+
 .appearModal {
   animation-name: appearOpacity;
   animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
 }
+
 .disappearModal {
   animation-name: disappearOpacity;
   animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
 }
+
 .appearDragList {
   animation-name: appear;
   animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
 }
+
 .disappearDragList {
   animation-name: disappear;
   animation-duration: 0.2s;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
 }
+
 #drag::-webkit-scrollbar {
   display: none;
 }

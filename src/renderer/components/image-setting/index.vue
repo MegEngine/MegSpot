@@ -10,7 +10,7 @@
     >
       <div class="header">
         <div class="title">{{ $t('imageSetting.title') }}</div>
-        <el-button type="text" class="close-btn" @click="visible = false" v-tip="'close'">
+        <el-button type="text" class="close-btn" @click="visible = false" :title="'close'">
           <svg-icon icon-class="close" class="icon"></svg-icon>
         </el-button>
       </div>

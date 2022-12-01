@@ -3,19 +3,19 @@
     <el-tooltip :content="$t(this.allSelectd ? 'general.clearAll' : 'general.selectAll')" :open-delay="300">
       <vxe-checkbox :value="allSelectd" :indeterminate="oneOrMoreSelected" @change="handleSelectAll"></vxe-checkbox>
     </el-tooltip>
-    <el-button v-show="generateVisible" v-tip="'Generate Sorting File'" @click="generateSortFile">
+    <el-button v-show="generateVisible" :title="'Generate Sorting File'" @click="generateSortFile">
       {{ $t('sortFile.generate') }}
     </el-button>
     <span v-show="generateVisible" class="tip">{{ $t('sortFile.generateTip') }}</span>
     <!-- <el-button
       v-show="!generateVisible"
       :disabled="btnDisabled"
-      v-tip="'Apply Sorting File'"
+      :title="'Apply Sorting File'"
       @click="applySortFile"
     >
       {{ $t('sortFile.apply') }}
     </el-button> -->
-    <el-button v-show="!generateVisible" v-tip="'Edit Sorting File'" @click="editSortFile">
+    <el-button v-show="!generateVisible" :title="'Edit Sorting File'" @click="editSortFile">
       {{ $t('sortFile.edit') }}
     </el-button>
   </div>

@@ -2,7 +2,7 @@
   <div id="image-drag-drop-compare">
     <div class="buttons" flex="main:justify cross:center">
       <div class="changeButton">
-        <div class="router-back" v-tip.left="`${$t('common.hotKey')}：esc`">
+        <div class="router-back" :title="`${$t('common.hotKey')}：esc`">
           <span @click="goBack" class="btn">
             <i class="el-icon-d-arrow-left"></i>
             {{ $t('nav.back') }}

@@ -9,7 +9,7 @@
                 type="text"
                 size="mini"
                 :disabled="!imageList.length"
-                v-tip.sure="'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'"
+                :title="'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'"
               >
                 {{ $t('general.selected') }}
               </el-button>
@@ -34,25 +34,25 @@
             icon="el-icon-caret-left"
             @click="changeImage(-1)"
             :disabled="imgIndex === 0"
-            v-tip.sure.right="`switch to previous image.\r\n${$t('common.hotKey')}:cmd/ctrl+[`"
+            :title="`switch to previous image.\r\n${$t('common.hotKey')}:cmd/ctrl+[`"
           ></el-button>
           <el-button
             type="primary"
             icon="el-icon-caret-right"
             @click="changeImage(1)"
             :disabled="imgIndex === imageList.length - 1"
-            v-tip.sure.right="`switch to next image\r\n${$t('common.hotKey')}:cmd/ctrl+]`"
+            :title="`switch to next image\r\n${$t('common.hotKey')}:cmd/ctrl+]`"
           ></el-button>
         </el-button-group>
         <el-button-group style="margin-left: 10px">
           <el-button
             type="primary"
             @click="adapterShow"
-            v-tip.sure.right="'Fill the display area with 100% height or 100% width'"
+            :title="'Fill the display area with 100% height or 100% width'"
           >
             {{ $t('imageCenter.adaptive') }}
           </el-button>
-          <el-button type="primary" @click="fullsize" v-tip.sure.right="'Show pictures in real picture size'">
+          <el-button type="primary" @click="fullsize" :title="'Show pictures in real picture size'">
             {{ $t('imageCenter.fullsize') }}
           </el-button>
         </el-button-group>
@@ -161,13 +161,13 @@
             type="primary"
             style="margin-left: 5px"
             class="el-icon-view"
-            v-tip.sure.right="'Only affect the display effect, not the image data, such as histogram and RGBA'"
+            :title="'Only affect the display effect, not the image data, such as histogram and RGBA'"
           ></el-button>
         </el-tooltip>
         <div
           id="rgba-container"
           flex="main:center cross:center"
-          v-tip.sure.right="`dbclick start or stop get average RGBA value. \nChange region by hover setting button`"
+          :title="`dbclick start or stop get average RGBA value. \nChange region by hover setting button`"
         >
           <el-tooltip effect="light" placement="bottom">
             <div slot="content" id="rgba-region" flex="main:center cross:center">
@@ -206,7 +206,7 @@
     <div id="main-content" flex-box="1">
       <div
         id="hist-container"
-        v-tip.sure.right="
+        :title="
           `Show whole image Histogram by default.Show certain area Histogram by right mouse drag any region. click to fold histogram.`
         "
       >

@@ -2,7 +2,7 @@
   <div :class="['image-canvas', { selected: selected }]" @click.stop>
     <div ref="header" class="header" flex="cross:center">
       <CoverMask :mask="maskDom" class="cover-mask">
-        <HistContainer ref="hist-container" v-tip="$t('general.histogram')" @changeVisible="handleHistVisible" />
+        <HistContainer ref="hist-container" :title="$t('general.histogram')" @changeVisible="handleHistVisible" />
       </CoverMask>
       <el-tooltip placement="bottom" :open-delay="800">
         <span class="compare-name" flex-box="1" v-html="getTitle"></span>
