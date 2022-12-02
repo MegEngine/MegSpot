@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -41,10 +41,10 @@
     "productName": "MegSpot",
     "artifactName": "${productName}-${version}-${os}.${ext}",
     "appId": "org.megvii.megspot",
-    "copyright": " Copyright (c) 2021 Megvii Inc. All rights reserved.",
+    "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1. 新增功能：支持支持tiff图片格式；支持按键控制图像快速移动；支持快速添加黑白二值化xray滤镜； \n2. 优化体验: 添加图像加载动画；优化视频同步播放；支持自定义安装位置；\n3. 修复bug: 优化文件目录加载卡顿的问题；修复解析文件名错误的问题。",
-      "releaseDate": "2022.11.1"
+      "releaseNotes": "1. 新增功能：可以显示视频的详细信息，包括：分辨率，时长，帧率，帧数。悬浮对比页面图片名称即可查看；支持视频逐帧选取，逐帧对比，控制帧率等操作；\n2. 优化体验: 直方图信息通过懒加载的方式计算，提示图片显示效率；优化视频对比同步播放；优化调整应用窗口后的展现效率；tip展示方式优化，移除之前需要确认的功能；\n3. 修复bug: 修复一定概率图片对比无法正常展现的问题；修复切换差值算法对比页面错误刷新的问题；",
+      "releaseDate": "2022.12.2"
     },
     "directories": {
       "output": "build"
