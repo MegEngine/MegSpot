@@ -1,29 +1,17 @@
 <template>
   <div id="image-container" ref="container" class="canvas-container" :style="containerStyle">
     <div v-for="(video, index) in videoGroupList" :key="index">
-      <VideoCanvas
-        ref="video_canvas"
-        :index="index"
-        :path="video"
-        :_width="canvasWidth"
-        :_height="canvasHeight"
-        :subVideoControlMenu="subVideoControlMenu"
-        @loaded="handleVideoLoaded"
-        @ended="handleEnded"
-        @fullScreen="handleFullscreen"
-      ></VideoCanvas>
+      <VideoCanvas ref="video_canvas" :index="index" :path="video" :_width="canvasWidth" :_height="canvasHeight"
+        :subVideoControlMenu="subVideoControlMenu" @loaded="handleVideoLoaded" @ended="handleEnded"
+        @fullScreen="handleFullscreen"></VideoCanvas>
     </div>
-    <Sticky
-      v-if="isFloating"
-      :contentDragDisabled="false"
-      :disableDragFn="
-        (event) => {
-          return (
-            event.target.className.toString().includes('el-slider__') || event.target.tagName.toLowerCase() === 'strong'
-          )
-        }
-      "
-    >
+    <Sticky v-if="isFloating" :contentDragDisabled="false" :disableDragFn="
+      (event) => {
+        return (
+          event.target.className.toString().includes('el-slider__') || event.target.tagName.toLowerCase() === 'strong'
+        )
+      }
+    ">
       <template v-slot:icon>
         <el-button type="text">
           <svg-icon icon-class="play" :clicked="true" class="svg-container" />
@@ -209,6 +197,7 @@ export default {
         this.$nextTick(() => {
           this.calcCanvasSize()
           this.updateAllCanvas()
+          TimeManager.reset()
         })
       }
     },
@@ -549,23 +538,28 @@ export default {
   gap: 2px;
   width: 100%;
   height: 100%;
-  .canvas-item + .canvas-item {
+
+  .canvas-item+.canvas-item {
     border-left: 1px solid red;
   }
 }
+
 #image-container::-webkit-scrollbar {
   display: block;
   -webkit-appearance: none;
   width: 7px;
 }
+
 #image-container::-webkit-scrollbar:vertical {
   width: 10px;
 }
+
 #image-container::-webkit-scrollbar-thumb {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
+
 .svg-container {
   font-size: 24px;
 }
