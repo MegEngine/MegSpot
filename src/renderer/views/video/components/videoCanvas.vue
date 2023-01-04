@@ -80,12 +80,11 @@
             :frameRate.sync="frameRate"
             :frameCount.sync="frameCount"
             :displayedFrames="displayedFrames"
+            :displayedFramesInSecond="displayedFramesInSecond"
             @update="handleUpdateMediaInfo"
           >
-            <div class="frames" flex="cross:center">
-              <el-tooltip :content="frameTip" placement="right">
-                <span>frame {{ displayedFramesInSecond }}</span>
-              </el-tooltip>
+            <div class="frames" flex="main:center cross:center">
+              <span class="frame-text ellipsis">{{ displayedFrames }}</span>
             </div>
           </FrameSetting>
         </div>
@@ -306,20 +305,21 @@ export default {
         ? (this.selected ? `<span style='color: red'>(✔)</span>` : ``) + this.getName()
         : ' '
     },
-    frameTip() {
-      return `the ${this.displayedFramesInSecond} frame in this second of ${this.frameRate} frames`
-    },
     frameFrequency() {
       return 1 / this.frameRate
     },
     millisecond() {
       return this.currentTime - Math.floor(this.currentTime)
     },
-    displayedFramesInSecond() {
-      return this.frameRate ? Math.ceil(this.millisecond * this.frameRate) : 0
-    },
     displayedFrames() {
-      return this.frameRate ? Math.ceil(this.currentTime * this.frameRate) : 0
+      return this.frameRate
+        ? Math.min(Math.floor((this.currentTime / this.duration) * this.frameCount) + 1, this.frameCount)
+        : 0
+    },
+    displayedFramesInSecond() {
+      return this.frameRate
+        ? this.displayedFrames - Math.floor((Math.floor(this.currentTime) / this.duration) * this.frameCount)
+        : 0
     },
     previousFrameAvailable() {
       return this.paused && this.currentTime > 0
@@ -753,6 +753,7 @@ export default {
             this.doZoomEnd()
             this.loading = false
             await this.initbitMap()
+            this.reset()
             resolve()
           })
           // const updateTime = (now, metadata) => {
@@ -1190,6 +1191,7 @@ export default {
     },
     // 逐帧对比
     handleFrameSteps({ name, data }) {
+      !this.videoSliderVisible && this.changeVideoSliderVisible({ value: true })
       // // 存在选中使只使选中视频进行逐帧操作
       if (this.selectedId && this.selectedId !== this.path) return
       this.changeFrame(data)
@@ -1289,6 +1291,9 @@ export default {
           cursor: pointer;
           user-select: none;
         }
+      }
+      .frame-text {
+        font-weight: bold;
       }
     }
   }

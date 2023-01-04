@@ -594,31 +594,17 @@ export default {
       //   this.cancelOverlay(GLOBAL_CONSTANTS.DIRECTION_RIGHT);
       // }
     },
-    // updateTime() {
-    //   const callback = () => {
-    //     const { position } = TimeManager.timingObj.query()
-    //     TimeManager.checkPosition()
-    //     this.currentTime = position.toFixed(2)
-    //     this.timeId = window.requestAnimationFrame(callback)
-    //   }
-    //   this.timeId = window.requestAnimationFrame(callback)
-    // },
-    stopUpdateTime() {
-      this.timeId && window.cancelAnimationFrame(this.timeId)
-    },
     changeStatus(status) {
       switch (status) {
         case 1:
         case CONSTANTS.VIDEO_STATUS_START:
           this.videoPaused = false
-          // this.updateTime()
           TimeManager.play()
           break
         case 0:
         case CONSTANTS.VIDEO_STATUS_PAUSE:
           this.videoPaused = true
           TimeManager.pause()
-          this.stopUpdateTime()
           break
         case -1:
         case CONSTANTS.VIDEO_STATUS_RESET:

@@ -80,3 +80,8 @@ a:hover {
 .el-table {
   color: $textColor;
 }
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

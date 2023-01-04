@@ -1,7 +1,11 @@
 <template>
-  <el-tooltip effect="light" placement="bottom-end" :open-delay="300">
+  <el-tooltip effect="light" placement="bottom-end">
     <div slot="content" class="frame-setting-container">
       <slot name="description"></slot>
+      <div v-if="FrameRateisInteger" class="setting-item" flex="main:right cross:center">
+        <span class="text-style" flex-box="1">displayed frames in this second</span>
+        <span class="text-style" flex-box="1" style="font-weight: bold">{{ displayedFramesInSecond }}</span>
+      </div>
       <div class="setting-item" flex="main:right cross:center">
         <span class="text-style" flex-box="1">displayed frames</span>
         <span class="text-style" flex-box="1" style="font-weight: bold">{{ displayedFrames }}</span>
@@ -54,6 +58,10 @@ export default {
     displayedFrames: {
       type: Number,
       default: 0
+    },
+    displayedFramesInSecond: {
+      type: Number,
+      default: 0
     }
   },
   data() {
@@ -88,6 +96,9 @@ export default {
     },
     minRows() {
       return this.mediaInfoInJson.toString().split(EOF).length
+    },
+    FrameRateisInteger() {
+      return Number.isInteger(this.frameRateData)
     }
   },
   watch: {
@@ -141,7 +152,7 @@ export default {
 <style lang="scss" scoped>
 @import '@/styles/variables.scss';
 .frame-setting-container {
-  width: 200px;
+  width: 240px;
 
   .text-style {
     display: inline-block;

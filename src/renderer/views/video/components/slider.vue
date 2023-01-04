@@ -6,7 +6,6 @@
       :interval="interval"
       :duration="duration"
       :max="maxData"
-      :marks="marks"
       :hide-label="true"
       :tooltip="'hover'"
       :tooltip-formatter="formatTime"
