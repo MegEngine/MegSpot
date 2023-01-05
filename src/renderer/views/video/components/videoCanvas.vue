@@ -69,12 +69,16 @@
       </div>
 
       <div v-show="videoSliderVisible" class="progress-container" flex="main:center cross:center" flex-box="1">
-        <video-slider :value="currentTime" :max="duration" @update="changeVideoTime"></video-slider>
+        <video-slider
+          :value="currentTime / frameChangeRate"
+          :max="duration / frameChangeRate"
+          @update="changeVideoTime"
+        ></video-slider>
       </div>
 
       <div class="header-right" flex="main:right cross:center" flex-box="0">
         <div v-show="videoSliderVisible" class="video-tool" flex="cross:center">
-          <input :value="currentTime.toFixed(2)" @change="changeVideoTime" class="time-input" />
+          <input :value="(currentTime / frameChangeRate).toFixed(2)" @change="changeVideoTime" class="time-input" />
           <FrameSetting
             :path="path"
             :frameRate.sync="frameRate"
@@ -194,6 +198,7 @@ export default {
       },
       frameRate: 30,
       frameCount: 300,
+      frameChangeRate: 1,
       header: null,
       canvas: null,
       video: null,
@@ -435,12 +440,23 @@ export default {
         this.setSmooth()
       },
       immediate: true
+    },
+    frameRate(newRate) {
+      if (!this.mediaInfo?.FrameRate) {
+        return
+      }
+      const originFrameRate = Number(this.mediaInfo?.FrameRate)
+      if (originFrameRate !== newRate) {
+        this.frameChangeRate = newRate / originFrameRate
+        // this.duration = this.video.duration / this.frameChangeRate
+        this.changeFrameUpdateFN()
+      }
     }
   },
   methods: {
     changeFrame(step = 0) {
       const subTime = step * this.frameFrequency
-      const nextTime = Math.min(Math.max(0, this.currentTime + subTime), this.duration)
+      const nextTime = Math.min(Math.max(0, this.currentTime / this.frameChangeRate + subTime), this.duration)
       if (isNaN(nextTime)) {
         console.log('invalid nextFrame')
         return
@@ -452,6 +468,25 @@ export default {
       if (this.paused) {
         this.changeVideoTime(nextTime)
       }
+    },
+    changeFrameUpdateFN(newCurrentTime) {
+      this.timeConfig &&
+        this.timeConfig.changeFn(({ position, ...rest }) => {
+          const nextPosition = position * this.frameChangeRate + this.offset
+          const vector = {
+            ...rest,
+            position: nextPosition
+          }
+          return vector
+        })
+
+      this.handleUpdateFrame(newCurrentTime)
+    },
+    handleUpdateFrame(newCurrentTime = null) {
+      if (newCurrentTime) {
+        this.currentTime = newCurrentTime
+      }
+      this.initbitMap()
     },
     handleUpdateMediaInfo(mediaInfo) {
       this.mediaInfo = mediaInfo
@@ -534,6 +569,7 @@ export default {
         case -1:
         case CONSTANTS.VIDEO_STATUS_RESET:
           this.cs.restore()
+          this.offset = 0
           this.currentTime = 0
           this.changeVideoTime(0)
           break
@@ -611,7 +647,7 @@ export default {
       // }
     },
     changeVideoTime(event) {
-      const currentTime = Number(event?.target?.value || event)
+      const currentTime = Number(event?.target?.value ?? event) * this.frameChangeRate
       if (!this.video || isNaN(currentTime)) return
 
       const timingObj = TimeManager.getTimingObj()
@@ -642,24 +678,8 @@ export default {
         this.offset = this.duration - position
       }
       // console.log('offset', this.offset)
-
-      const handleUpdateFrame = debounce(100, () => {
-        this.currentTime = this.video.currentTime
-        this.initbitMap()
-      })
-      this.timeConfig &&
-        this.timeConfig.changeFn(({ position, ...rest }) => {
-          const nextPosition = position + this.offset
-          const vector = {
-            ...rest,
-            position: nextPosition
-          }
-          // if (position > this.duration) {
-          //   vector.velocity = 0
-          // }
-          return vector
-        }, handleUpdateFrame)
-      currentTime >= this.duration && handleUpdateFrame()
+      this.changeFrameUpdateFN(currentTime)
+      // this.initbitMap()
     },
     handleBroadcast({ name, data }) {
       if (this.selectedId) {
@@ -672,7 +692,7 @@ export default {
     },
     // 初始化bitMap
     async initbitMap(draw = true) {
-      if (this.paused && this.video.videoWidth) {
+      if (this.paused && this.video?.videoWidth) {
         let offscreen = new OffscreenCanvas(this.video.videoWidth, this.video.videoHeight)
         let offCtx = offscreen.getContext('2d')
         offCtx.drawImage(this.video, 0, 0)
@@ -726,6 +746,8 @@ export default {
           this.video = document.createElement('video')
 
           this.video.addEventListener('ended', () => {
+            this.currentTime = this.video.currentTime
+            this.initbitMap()
             this.$emit('ended')
           })
 
