@@ -188,7 +188,16 @@ export default {
     fullscreen: 'fullscreen\nESC exit fullscreen',
     dynamicPickColor: 'dynamic color picker',
     minRenderInterval: 'min-interval of video rendering',
-    processTip: 'show/hide video progress bar'
+    processTip: 'show/hide video progress bar',
+    displayedFrames: 'displayed frames',
+    displayedFramesInSecond: 'displayed frames in this second',
+    totalFrames: 'total frames',
+    frameRate: 'frame rate (FPS)',
+    videoInfoViewerTitle: 'Video Info',
+    videoInfoTip: 'show video info',
+    reAnalyze: 'reAnalyze',
+    reAnalyzeTip: 'reAnalyze video info',
+    resetAnalyze: 'reset'
   },
   sortFile: {
     apply: 'Apply',

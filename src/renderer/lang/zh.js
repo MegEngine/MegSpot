@@ -186,7 +186,16 @@ export default {
     fullscreen: '全屏\nESC退出全屏',
     dynamicPickColor: '取色器动态监听',
     minRenderInterval: '视频渲染最小间隔',
-    processTip: '显示/隐藏 视频进度条'
+    processTip: '显示/隐藏 视频进度条',
+    displayedFrames: '当前帧的序号',
+    displayedFramesInSecond: '当前帧序在该秒内的序号',
+    totalFrames: '总帧数',
+    frameRate: '帧率(FPS)',
+    videoInfoViewerTitle: '视频信息',
+    videoInfoTip: '显示视频信息',
+    reAnalyze: '检测',
+    reAnalyzeTip: '重新检测视频信息',
+    resetAnalyze: '重置'
   },
   sortFile: {
     apply: '应用',

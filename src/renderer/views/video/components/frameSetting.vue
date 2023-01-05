@@ -3,31 +3,39 @@
     <div slot="content" class="frame-setting-container">
       <slot name="description"></slot>
       <div v-if="FrameRateisInteger" class="setting-item" flex="main:right cross:center">
-        <span class="text-style" flex-box="1">displayed frames in this second</span>
+        <span class="text-style" flex-box="1">{{ $t('video.displayedFramesInSecond') }}</span>
         <span class="text-style" flex-box="1" style="font-weight: bold">{{ displayedFramesInSecond }}</span>
       </div>
       <div class="setting-item" flex="main:right cross:center">
-        <span class="text-style" flex-box="1">displayed frames</span>
+        <span class="text-style" flex-box="1">{{ $t('video.displayedFrames') }}</span>
         <span class="text-style" flex-box="1" style="font-weight: bold">{{ displayedFrames }}</span>
       </div>
       <div class="setting-item" flex="main:right cross:center">
-        <span class="text-style" flex-box="8">total frames</span>
+        <span class="text-style" flex-box="8">{{ $t('video.totalFrames') }}</span>
         <input v-model.number="frameCountData" flex-box="16" class="number-input" />
       </div>
       <div class="setting-item" flex="main:right cross:center">
-        <span class="text-style" flex-box="8">frame rate (FPS)</span>
+        <span class="text-style" flex-box="8">{{ $t('video.frameRate') }}</span>
         <input v-model.number="frameRateData" flex-box="16" class="number-input" />
       </div>
-      <div class="setting-footer" flex="main:right">
-        <el-button title="show video info" :disabled="loading" @click="showInfo">
+      <div class="setting-footer" flex="main:justify">
+        <el-button :title="$t('video.videoInfoTip')" :disabled="loading" @click="showInfo">
           <svg-icon icon-class="eye-open"></svg-icon>
         </el-button>
-        <el-button v-loading="loading" title="analyze video info" type="primary" size="mini" @click="analyzeVideo">
-          reAnalyze
+        <el-button
+          v-loading="loading"
+          :title="$t('video.reAnalyzeTip')"
+          type="primary"
+          size="mini"
+          @click="analyzeVideo"
+        >
+          {{ $t('video.reAnalyze') }}
         </el-button>
-        <el-button type="primary" size="mini" :disabled="loading" @click="setFromMediaInfo">reset</el-button>
+        <el-button type="primary" size="mini" :disabled="loading" @click="setFromMediaInfo">
+          {{ $t('video.resetAnalyze') }}
+        </el-button>
       </div>
-      <el-dialog :visible.sync="visible" title="Video Info" width="80%" center append-to-body>
+      <el-dialog :visible.sync="visible" :title="$t('video.videoInfoViewerTitle')" width="80%" center append-to-body>
         <el-input :value="mediaInfoInJson" type="textarea" :autosize="{ minRows }" :validate-event="false"></el-input>
       </el-dialog>
     </div>

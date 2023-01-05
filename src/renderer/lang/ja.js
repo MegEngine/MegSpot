@@ -189,7 +189,16 @@ export default {
     fullscreen: 'フルスクリーン\nESC終了フルスクリーン',
     dynamicPickColor: 'カラーピッカー調和',
     minRenderInterval: 'ビデオレンダリングの最小間隔',
-    processTip: 'ビデオ プログレス バーの表示/非表示'
+    processTip: 'ビデオ プログレス バーの表示/非表示',
+    displayedFrames: '現在のフレームのシーケンス番号',
+    displayedFramesInSecond: 'この秒内の現在のフレーム シーケンスのシリアル番号',
+    totalFrames: '総フレーム数',
+    frameRate: 'フレームレート(FPS)',
+    videoInfoViewerTitle: 'ビデオ情報',
+    videoInfoTip: 'ビデオ情報を表示',
+    reAnalyze: '検出',
+    reAnalyzeTip: 'ビデオ情報を検出する',
+    resetAnalyze: 'リセット'
   },
   sortFile: {
     apply: '応用',
