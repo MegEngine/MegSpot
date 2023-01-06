@@ -477,7 +477,7 @@ export default {
             position: nextPosition
           }
           return vector
-        }, this.handleUpdateFrame)
+        })
     },
     handleUpdateFrame(newCurrentTime = null) {
       if (newCurrentTime) {
@@ -485,7 +485,11 @@ export default {
       } else if (this.video?.currentTime) {
         this.currentTime = this.video.currentTime
       }
-      this.initbitMap()
+      if (this.paused && this.video?.videoWidth) {
+        this.initbitMap()
+      } else {
+        this.drawImage()
+      }
     },
     handleUpdateMediaInfo(mediaInfo) {
       this.mediaInfo = mediaInfo
@@ -760,10 +764,21 @@ export default {
             this.timeConfig = TimeManager.setTime({
               id: `${this.path}?uid=${getUuidv4()}`,
               video: this.video,
-              timingFn: (vector) => {
+              timingFn: ({ position, ...rest }) => {
+                const nextPosition = position * this.frameChangeRate + this.offset
+                const vector = {
+                  ...rest,
+                  position: nextPosition
+                }
                 return vector
               }
             })
+
+            const render = (now, metadata) => {
+              this.handleUpdateFrame()
+              this.video.requestVideoFrameCallback(render)
+            }
+            this.video.requestVideoFrameCallback(render)
             // console.log('timeConfig ', this.timeConfig, TimeManager.gettimeConfigs())
 
             this.duration = isNaN(this.video.duration) ? 60 : Number(Number(this.video.duration).toFixed(5))
@@ -814,20 +829,21 @@ export default {
       //   this.video.requestVideoFrameCallback(updateCanvas)
       // }
       // this.video.requestVideoFrameCallback(updateCanvas)
-      const render = () => {
-        if (!this.paused) {
-          this.currentTime = this.video.currentTime
-          // console.log('update time', this.currentTime)
-        }
 
-        this.drawImage()
-        if (this.paused) {
-          this.stopAnimation()
-          return
-        }
-        this.requestId = window.requestAnimationFrame(render)
-      }
-      this.requestId = window.requestAnimationFrame(render)
+      // const render = () => {
+      //   if (!this.paused) {
+      //     this.currentTime = this.video.currentTime
+      //     // console.log('update time', this.currentTime)
+      //   }
+
+      //   this.drawImage()
+      //   if (this.paused) {
+      //     this.stopAnimation()
+      //     return
+      //   }
+      //   this.requestId = window.requestAnimationFrame(render)
+      // }
+      // this.requestId = window.requestAnimationFrame(render)
     },
     stopAnimation() {
       if (this.requestId) {
@@ -1001,7 +1017,8 @@ export default {
       } else {
         this.snapShot = null
         this.maskDom = null
-        this.startAnimation(false)
+        // this.startAnimation(false)
+        this.drawImage()
       }
     },
     reset(val) {

@@ -93,10 +93,13 @@ export class Timer {
       timingFn: timingFn ?? DEFAULT_TIMING_FN,
       changeFn: (newTimingStateVectorFunction, nextFrameCallback) => {
         deleteTimingsrc && deleteTimingsrc()
-        getType(nextFrameCallback) === 'Function' &&
-          video.requestVideoFrameCallback((now, metadata) => {
-            nextFrameCallback()
-          })
+        // if (getType(nextFrameCallback) === 'Function') {
+        //   const render = (now, metadata) => {
+        //     nextFrameCallback()
+        //     video.requestVideoFrameCallback(render)
+        //   }
+        //   video.requestVideoFrameCallback(render)
+        // }
         deleteTimingsrc = setTimingsrc(video, this.timingObj, newTimingStateVectorFunction)
       },
       deleteFn: () => {
