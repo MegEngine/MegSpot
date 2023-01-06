@@ -548,7 +548,7 @@ export default {
         this.drawImage()
       }
     },
-    reset(val) {
+    async reset(val) {
       if (val) {
         let x = 0,
           y = 0
@@ -559,18 +559,26 @@ export default {
         this.doZoomEnd()
         this.drawImage()
       } else {
-        this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap)
-        this.doZoomEnd()
-        this.drawImage()
+        if (this.bitMap) {
+          this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap)
+          this.doZoomEnd()
+          this.drawImage()
+        } else {
+          this.initImage()
+        }
       }
     },
+
     reDraw(init = false) {
-      window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(async () => {
         if (init) {
-          this.imagePosition = this.snapshotMode
-            ? this.snapshotModeInitPos()
-            : this.getImageInitPos(this.canvas, this.bitMap)
-          this.doZoomEnd()
+          if (this.snapshotMode) {
+            this.imagePosition = this.snapshotModeInitPos()
+          } else if (this.bitMap) {
+            this.imagePosition = this.getImageInitPos(this.canvas, this.bitMap)
+          } else {
+            this.initImage()
+          }
         }
         this.drawImage()
       })
