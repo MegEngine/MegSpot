@@ -701,7 +701,7 @@ export default {
         offCtx.drawImage(this.video, 0, 0)
         this.bitMap = await offscreen.transferToImageBitmap()
         draw && this.drawImage(this.bitMap)
-        this.requestGenerateHist()
+        this.$refs['hist-container'].visible && this.generateHist()
       }
     },
     initImage() {
@@ -715,20 +715,23 @@ export default {
         console.error('【Video-initImage】 only enable when paused')
       }
     },
-    requestGenerateHist() {
-      window.requestAnimationFrame(this.generateHist)
-    },
     generateHist() {
-      try {
-        const histCanvas = document.createElement('canvas')
-        histCanvas.width = this.video.videoWidth
-        histCanvas.height = this.video.videoHeight
-        let histCanvasCtx = histCanvas.getContext('2d')
-        histCanvasCtx.drawImage(this.video, 0, 0)
-        this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(histCanvas))
-      } catch (err) {
-        console.log('err', err)
-      }
+      return new Promise((resolve, reject) => {
+        try {
+          const histCanvas = document.createElement('canvas')
+          if (!cv) {
+            return reject()
+          }
+          histCanvas.width = this.video.videoWidth
+          histCanvas.height = this.video.videoHeight
+          let histCanvasCtx = histCanvas.getContext('2d')
+          histCanvasCtx.drawImage(this.video, 0, 0)
+          this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(histCanvas))
+          resolve()
+        } catch (err) {
+          console.log('err', err)
+        }
+      })
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d')
@@ -903,7 +906,13 @@ export default {
       this.videoSliderVisible = value ?? !this.videoSliderVisible
     },
     doHistVisible({ visible }) {
-      this.$refs['hist-container'].setVisible(visible)
+      if (!visible) {
+        this.$refs['hist-container'].setVisible(visible)
+        return
+      }
+      this.generateHist().then(() => {
+        this.$refs['hist-container'].setVisible(visible)
+      })
     },
     handleScaleDbClick(data) {
       console.log('handleScaleDbClick', Object.values(arguments))

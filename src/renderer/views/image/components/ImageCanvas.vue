@@ -47,8 +47,6 @@
   </div>
 </template>
 <script>
-import Vue from 'vue'
-const cv = Vue.prototype.$cv
 import fse from 'fs-extra'
 import OperationContainer from '@/components/operation-container'
 import HistContainer from '@/components/hist-container'
@@ -340,9 +338,14 @@ export default {
       }
     },
     initHist() {
-      if (this.image && this.image.width) {
-        this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(this.image))
-      }
+      return new Promise((resolve, reject) => {
+        const cv = window.cv
+        if (cv && this.image?.width) {
+          this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(this.image))
+          resolve()
+        }
+        return reject()
+      })
     },
     async initBitMap(imageData) {
       if (this.bitMap) {
@@ -437,11 +440,15 @@ export default {
         data: { visible }
       })
     },
-    async doHistVisible({ visible }) {
-      if (!this.currentHist) {
-        await this.initHist()
+    doHistVisible({ visible }) {
+      if (!visible) {
+        this.$refs['hist-container'].setVisible(visible)
+        return
       }
-      this.$refs['hist-container'].setVisible(visible)
+
+      this.initHist().then(() => {
+        this.$refs['hist-container'].setVisible(visible)
+      })
     },
     handleScaleDbClick(data) {
       console.log('handleScaleDbClick', Object.values(arguments))
@@ -581,6 +588,7 @@ export default {
           }
         }
         this.drawImage()
+        this.$refs['hist-container'].visible && this.initHist()
       })
     },
     snapshotModeInitPos() {

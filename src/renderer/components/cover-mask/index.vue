@@ -58,7 +58,7 @@ export default {
   .mask-canvas {
     position: absolute;
     left: 0;
-    top: 9px !important; // 需要和hist-container样式保持一致，使得hist完全覆盖重叠
+    top: 20px !important; // 需要和hist-container样式保持一致，使得hist完全覆盖重叠
     z-index: 2;
     width: 160px;
     height: 90px;

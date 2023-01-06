@@ -106,15 +106,15 @@ export default {
     position: absolute;
     z-index: 1;
     left: 0px;
-    top: 9px;
+    top: 20px;
     #hist {
       width: 160px;
       height: 90px;
     }
     .close-icon {
       position: absolute;
-      left: 161px;
-      top: 63px;
+      left: 158px;
+      top: 74px;
       &:hover {
         color: red;
       }

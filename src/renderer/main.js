@@ -52,14 +52,13 @@ Object.defineProperties(Vue.prototype, {
 loadLib((cv) => {
   console.info(`-----------opencv loaded-----------`)
   Vue.prototype.$cv = cv
+  new Vue({
+    components: { App },
+    router,
+    i18n,
+    store,
+    template: '<App/>'
+  }).$mount('#app')
 })
-
-new Vue({
-  components: { App },
-  router,
-  i18n,
-  store,
-  template: '<App/>'
-}).$mount('#app')
 
 export default Vue

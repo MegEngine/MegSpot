@@ -1,5 +1,8 @@
 import path from 'path'
 const loadLib = function (cb) {
+  if (window.cv) {
+    cb(window.cv)
+  }
   const OPENCV_URL = path.join(__static, '/lib/opencv.js')
   const script = document.createElement('script')
   script.setAttribute('async', 'false')
