@@ -446,9 +446,8 @@ export default {
         return
       }
       const originFrameRate = Number(this.mediaInfo?.FrameRate)
-      if (originFrameRate !== newRate) {
+      if (originFrameRate && newRate) {
         this.frameChangeRate = newRate / originFrameRate
-        // this.duration = this.video.duration / this.frameChangeRate
         this.changeFrameUpdateFN()
       }
     }

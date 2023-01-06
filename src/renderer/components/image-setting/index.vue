@@ -122,6 +122,10 @@
             @change="handleRadiusChange"
           ></el-input-number>
         </div>
+        <div flex="main:justify" class="setting-item">
+          <span>{{ $t('general.move') }}(px)：</span>
+          <el-input-number v-model="moveDistance" :min="1"></el-input-number>
+        </div>
       </div>
       <el-button slot="reference" type="text" @click="visible = !visible">
         <svg-icon :clicked="visible" icon-class="settings" style="font-size: 22px"></svg-icon>
@@ -292,6 +296,16 @@ export default {
       set(newVal) {
         console.log('radius', radius)
         this.$bus.$emit('radius', newVal)
+      }
+    },
+    moveDistance: {
+      get() {
+        return this.preference.moveDistance
+      },
+      set(arg) {
+        this.setPreference({
+          moveDistance: arg
+        })
       }
     }
   }
