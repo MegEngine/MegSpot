@@ -477,13 +477,13 @@ export default {
             position: nextPosition
           }
           return vector
-        })
-
-      this.handleUpdateFrame(newCurrentTime)
+        }, this.handleUpdateFrame)
     },
     handleUpdateFrame(newCurrentTime = null) {
       if (newCurrentTime) {
         this.currentTime = newCurrentTime
+      } else if (this.video?.currentTime) {
+        this.currentTime = this.video.currentTime
       }
       this.initbitMap()
     },
