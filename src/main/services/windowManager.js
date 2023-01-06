@@ -1,5 +1,5 @@
 import { BrowserWindow, Menu, ipcMain } from 'electron'
-const path = require('path')
+import path from 'path'
 import menuconfig from '../config/menu'
 import config from '@config/index'
 import { platform } from 'os'
@@ -14,8 +14,7 @@ export var mainWindow = null
 
 const appIconName = 'logo_icon.png'
 const iconPath = path.join(__dirname, '../../renderer/assets/images/' + appIconName)
-
-function createMainWindow() {
+export function createMainWindow() {
   mainWindow = new BrowserWindow({
     height: 800,
     useContentSize: true,
@@ -23,6 +22,7 @@ function createMainWindow() {
     show: false,
     frame: config.IsUseSysTitle,
     titleBarStyle: platform().includes('win32') ? 'default' : 'hidden',
+    // backgroundColor: '#2e2c29',
     icon: iconPath, // sets window icon
     webPreferences: {
       experimentalFeatures: true,
@@ -67,11 +67,12 @@ function createMainWindow() {
   ipcMain.on('get_start_cmd_arg', (event) => {
     event.returnValue = cmdArg
   })
-  mainWindow.webContents.once('dom-ready', () => {
+  mainWindow.once('ready-to-show', () => {
+    console.log('=== show mainWindow ===')
     mainWindow.show()
+    if (config.UseStartupChart && loadWindow) loadWindow?.destroy()
   })
 
-  if (config.UseStartupChart) loadWindow.destroy()
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools(true)
@@ -89,6 +90,7 @@ function loadingWindow() {
     height: 600,
     frame: false,
 
+    show: true,
     backgroundColor: '#222',
     skipTaskbar: true,
     transparent: true,
@@ -103,10 +105,9 @@ function loadingWindow() {
   loadWindow.loadURL(loadingURL)
 
   loadWindow.show()
+  console.log('=== show loadWindow   ===')
 
-  setTimeout(() => {
-    createMainWindow()
-  }, 2000)
+  createMainWindow()
 
   loadWindow.on('closed', () => {
     loadWindow = null
