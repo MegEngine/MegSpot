@@ -8,7 +8,7 @@
   "main": "./dist/electron/main.js",
   "scripts": {
     "dev": "cross-env BUILD_TARGET=clean node .electron-vue/build.js &&  node .electron-vue/dev-runner.js",
-    "build": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder",
+    "build": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js",
     "build:win32": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --win  --ia32",
     "build:win64": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --win  --x64",
     "build:mac": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --mac",
