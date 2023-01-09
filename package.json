@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -45,7 +45,7 @@
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
       "releaseNotes": "1. 新增功能：支持自定义视频FPS；2.优化体验：添加部分翻译；修改直方图开始生成的时间； \n3. 修复bug: 修复视频帧不能对齐的情况，若还是未对齐，可再次点击视频暂停；",
-      "releaseDate": "2023.1.6"
+      "releaseDate": "2023.1.9"
     },
     "directories": {
       "output": "build"
