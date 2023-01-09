@@ -215,9 +215,9 @@ export default {
       this.groupStartIndex = groupStartIndex
     },
     handleResize: debounce(300, function () {
-      this.calcCanvasSize()
       // 非全屏状态时重新布局图片容器;
       if (!this.fullScreening) {
+        this.calcCanvasSize()
         this.updateAllCanvas()
       }
     }),

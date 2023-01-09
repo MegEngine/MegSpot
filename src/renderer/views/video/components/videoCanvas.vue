@@ -509,11 +509,19 @@ export default {
     getName(filter = true) {
       return filter ? this.$options.filters.getFileName(this.path) : getFileName(this.path)
     },
+    fullscreenHandler() {
+      const fullscreenElement = document.fullscreenElement
+      if (!fullscreenElement) {
+        document.body.removeChild(this.video)
+        document.removeEventListener('fullscreenchange', this.fullscreenHandler)
+      }
+    },
     fullScreen() {
       this.$emit('fullScreen')
       if (this.video.requestFullscreen) {
         document.body.appendChild(this.video)
         this.video.requestFullscreen()
+        document.addEventListener('fullscreenchange', this.fullscreenHandler)
       }
     },
     ...mapActions(['removeVideos']),
