@@ -113,10 +113,10 @@ export default {
       //   rate = 0.5
       // }
       let rate = Math.pow(this.scaleFactor, delta)
-      this.$emit('zoom', rate, mousePos)
+      this.$emit('zoom',e, rate, mousePos)
       clearTimeout(this.scrollEnd)
       this.scrollEnd = setTimeout(() => {
-        this.$emit('scrollEnd')
+        this.$emit('scrollEnd',e)
       }, 200)
       return e.preventDefault() && false
     },

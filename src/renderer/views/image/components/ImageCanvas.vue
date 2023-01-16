@@ -13,7 +13,6 @@
           <span class="size">{{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span>
         </div>
       </el-tooltip>
-      <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
       <EffectPreview @change="changeCanvasStyle" />
     </div>
     <div ref="container" class="canvas-container" id="canvas-container" :style="canvasStyle">
@@ -23,6 +22,7 @@
         @drag="handleDrag"
         @zoom="handleZoom"
         @scrollEnd="handleZoomEnd"
+        @click="handleClick"
         @dbclick="handleDbclick"
         @mouseMove="handleMove"
       >
@@ -36,10 +36,18 @@
             @reset="resetZoom"
             @update="setZoom"
           />
+          <ZoomViewer
+            v-if="this.triggerRGB"
+            ref="zoom-viewer"
+            :RGBAcolor.sync="RGBAcolor"
+            :mousePos="mousePos"
+            :parentWidth="_width"
+            :parentHeight="_height"
+          />
           <canvas ref="canvas" :width="_width" :height="_height"></canvas>
-          <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
-          <div v-if="preference.showMousePos" class="mouse-position" v-show="showPosition && mousePosInfo.x !== ''">
-            <span>x={{ mousePosInfo.x }},y={{ mousePosInfo.y }}</span>
+          <div ref="feedback" id="feedback" :style="feedbackStyle"></div>
+          <div v-if="preference.showMousePos" class="mouse-position" v-show="showPosition && mousePosInfo.x">
+            <span>x={{ mousePosInfo.x.toFixed(2) }},y={{ mousePosInfo.y.toFixed(2) }}</span>
           </div>
         </div>
       </OperationContainer>
@@ -51,8 +59,8 @@ import fse from 'fs-extra'
 import OperationContainer from '@/components/operation-container'
 import HistContainer from '@/components/hist-container'
 import CoverMask from '@/components/cover-mask'
-import RGBAExhibit from '@/components/rgba-exhibit'
 import ScaleEditor from '@/components/scale-editor'
+import ZoomViewer from '@/components/zoom-viewer'
 import EffectPreview from '@/components/effect-preview'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore')
@@ -69,9 +77,9 @@ export default {
     OperationContainer,
     HistContainer,
     CoverMask,
-    RGBAExhibit,
     ScaleEditor,
-    EffectPreview
+    EffectPreview,
+    ZoomViewer
   },
   props: {
     _width: {
@@ -161,7 +169,8 @@ export default {
         }
       ],
       histVisible: true,
-      traggerRGB: false,
+      triggerRGB: false,
+      updateZoomViewer: null,
       radius: 10,
       RGBAcolor: {
         R: 0,
@@ -170,9 +179,15 @@ export default {
         A: 0
       },
       showPosition: true,
+      // 鼠标相对canvas的坐标
+      mousePos: {
+        x: 0,
+        y: 0
+      },
+      // 鼠标相对图像的坐标
       mousePosInfo: {
-        x: '',
-        y: ''
+        x: 0,
+        y: 0
       }
     }
   },
@@ -192,6 +207,16 @@ export default {
     },
     canvasStyle() {
       return this.preference.background.style
+    },
+    feedbackStyle() {
+      const x = this.mousePos.x
+      const y = this.mousePos.y
+      return {
+        left: `${x}px`,
+        top: `${y}px`,
+        backgroundColor: 'red',
+        opacity: 0.5
+      }
     }
   },
   async mounted() {
@@ -313,6 +338,11 @@ export default {
         },
         false
       )
+
+      // 至多30FPS的频率来更新取色器画面
+      this.updateZoomViewer = throttle(1000 / 30, function () {
+        this.$refs['zoom-viewer']?.draw(...arguments)
+      })
     },
     removeEvents() {
       this.scheduleCanvasActions.forEach((item) => {
@@ -409,7 +439,7 @@ export default {
       }
     },
     initCanvas() {
-      this.cs = this.canvas.getContext('2d')
+      this.cs = this.canvas?.getContext('2d')
       this.$nextTick(() => {
         this.cs.imageSmoothingEnabled = this.imageConfig.smooth
       })
@@ -423,6 +453,9 @@ export default {
       let { x, y, width, height } = this.imagePosition
       this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height)
       this.cs.drawImage(this.bitMap, x, y, width, height)
+    },
+    handleClick() {
+      this.triggerRGB && this.$refs['zoom-viewer']?.copyColor()
     },
     handleDbclick() {
       if (!this.selected) {
@@ -461,7 +494,8 @@ export default {
       console.log('changeZoom', data)
     },
     pickColor({ status }) {
-      this.traggerRGB = status
+      this.$refs['zoom-viewer']?.changeCanvas()
+      this.triggerRGB = status
     },
     changeCanvasStyle(newStyle) {
       // FIXME: 具体的值没有被广播
@@ -479,47 +513,27 @@ export default {
         data: { mousePos }
       })
     }),
-    doHandleMove({ mousePos }) {
+    doHandleMove(e) {
+      let mousePos = undefined
+      if (!e?.mousePos) {
+        mousePos = this.mousePos
+      } else {
+        mousePos = e.mousePos
+        this.mousePos = mousePos
+      }
       this.preference.showMousePos && this.changeMousePosInfo(mousePos)
-      this.preference.showScale && this.changeRGBA(mousePos)
-      // console.log(`${this.getName()}-changeMousePosInfo`, mousePos, {
-      //   ...this.mousePosInfo
-      // });
+      this.preference.showScale && this.changeRGBA()
     },
-    changeRGBA(mousePos) {
-      if (!this.traggerRGB) return
-      const { x, y } = mousePos
-      const feedback = this.$refs.feedback
-      feedback.style.left = x - this.radius + 'px'
-      feedback.style.top = y - this.radius + 'px'
-      feedback.style.width = this.radius * 2 + 'px'
-      feedback.style.height = this.radius * 2 + 'px'
-      Promise.resolve().then(() => {
-        const data = this.cs.getImageData(x, y, this.radius, this.radius).data
-        const count = data.length / 4
-        let r = 0,
-          g = 0,
-          b = 0,
-          a = 0
-        for (var i = 0; i < count; i++) {
-          r += data[i * 4]
-          g += data[i * 4 + 1]
-          b += data[i * 4 + 2]
-          a += data[i * 4 + 3]
-        }
-        this.RGBAcolor = {
-          R: parseInt(r / count),
-          G: parseInt(g / count),
-          B: parseInt(b / count),
-          A: parseInt(a / count)
-        }
-      })
+    changeRGBA() {
+      if (!this.triggerRGB) return
+
+      this.updateZoomViewer && this.updateZoomViewer(this.bitMap, this.mousePosInfo)
     },
     changeMousePosInfo(mousePos) {
-      if (!this.imagePosition?.x || !this.imagePosition?.width) {
+      if (isNaN(this.imagePosition?.x ) || isNaN(this.imagePosition?.width)) {
         this.mousePosInfo = {
-          x: '',
-          y: ''
+          x: 0,
+          y: 0
         }
         return
       }
@@ -532,13 +546,13 @@ export default {
         const posX = ((x - imageX) * originWidth) / width
         const posY = ((y - imageY) * originHeight) / height
         this.mousePosInfo = {
-          x: Number(posX).toFixed(2),
-          y: Number(posY).toFixed(2)
+          x: Number(posX),
+          y: Number(posY)
         }
       } else {
         this.mousePosInfo = {
-          x: '',
-          y: ''
+          x: 0,
+          y: 0
         }
       }
     },
@@ -702,9 +716,12 @@ export default {
     },
     /******************ScaleEditor END******************/
     doZoom(data) {
+      const { e, rate, mousePos } = data
+      if (e?.ctrlKey || e?.altKey) {
+        this.$refs['zoom-viewer']?.changeCanvas(rate > 1 ? 180 : 40)
+        return
+      }
       if (this.imagePosition == null) return
-      let mousePos = data.mousePos
-      let rate = data.rate
       let x = mousePos.x - (mousePos.x - this.imagePosition.x) * rate
       let y = mousePos.y - (mousePos.y - this.imagePosition.y) * rate
       let height = this.imagePosition.height * rate
@@ -730,10 +747,10 @@ export default {
         data: { offset: offset, id: this.path }
       })
     },
-    handleZoom(rate, mousePos) {
+    handleZoom(e, rate, mousePos) {
       this.broadCast({
         name: 'doZoom',
-        data: { rate: rate, mousePos: mousePos, id: this.path }
+        data: { e, rate: rate, mousePos: mousePos, id: this.path }
       })
     },
     handleZoomEnd() {
@@ -880,7 +897,13 @@ export default {
 
       #feedback {
         position: absolute;
-        border: 1px solid red;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        z-index: 2;
+        pointer-events: none;
+        background-color: red;
+        transform: translate(-50%, -50%);
       }
 
       .mouse-position {

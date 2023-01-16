@@ -680,7 +680,7 @@ export default {
         status: false
       })
     },
-    pickColor() {
+    async pickColor() {
       this.traggerRGB = !this.traggerRGB
       this.$bus.$emit('image_broadcast', {
         name: 'pickColor',

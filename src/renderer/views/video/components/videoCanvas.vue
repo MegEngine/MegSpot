@@ -92,8 +92,6 @@
             </div>
           </FrameSetting>
         </div>
-
-        <RGBAExhibit :RGBAcolor="RGBAcolor"></RGBAExhibit>
         <EffectPreview @change="changeCanvasStyle" />
         <span class="svg-container" @click="fullScreen" :title="$t('video.fullscreen')" style="cursor: pointer">
           <svg-icon icon-class="fullscreen" />
@@ -107,6 +105,7 @@
         @drag="handleDrag"
         @zoom="handleZoom"
         @scrollEnd="handleZoomEnd"
+        @click="handleClick"
         @dbclick="handleDbclick"
         @mouseMove="handleMove"
       >
@@ -120,10 +119,18 @@
             @reset="resetZoom"
             @update="setZoom"
           />
+          <ZoomViewer
+            v-if="this.triggerRGB"
+            ref="zoom-viewer"
+            :RGBAcolor.sync="RGBAcolor"
+            :mousePos="mousePos"
+            :parentWidth="_width"
+            :parentHeight="_height"
+          />
           <canvas ref="canvas" :width="_width" :height="_height"></canvas>
-          <div ref="feedback" id="feedback" v-show="traggerRGB"></div>
-          <div v-if="preference.showMousePos" class="mouse-position" v-show="showPosition && mousePosInfo.x !== ''">
-            <span>x={{ mousePosInfo.x }},y={{ mousePosInfo.y }}</span>
+          <div ref="feedback" id="feedback" :style="feedbackStyle"></div>
+          <div v-if="preference.showMousePos" class="mouse-position" v-show="showPosition && mousePosInfo.x">
+            <span>x={{ mousePosInfo.x.toFixed(2) }},y={{ mousePosInfo.y.toFixed(2) }}</span>
           </div>
         </div>
       </OperationContainer>
@@ -138,32 +145,31 @@ import OperationContainer from '@/components/operation-container'
 import HistContainer from '@/components/hist-container'
 import CoverMask from '@/components/cover-mask'
 import VideoSlider from './slider.vue'
-import RGBAExhibit from '@/components/rgba-exhibit'
 import ScaleEditor from '@/components/scale-editor'
 import EffectPreview from '@/components/effect-preview'
+import ZoomViewer from '@/components/zoom-viewer'
 import FrameSetting from './frameSetting.vue'
 import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore')
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
 import { getImageUrlSyncNoCache } from '@/utils/image'
-import { throttle } from '@/utils'
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants'
 import chokidar from 'chokidar'
 import * as CONSTANTS from '../video-constants'
 import { getFileName } from '@/filter/get-file-name'
 import { TimeManager } from '@/utils/video'
-import { debounce, getUuidv4 } from '@/utils'
+import { throttle, getUuidv4 } from '@/utils'
 
 export default {
   components: {
     OperationContainer,
     HistContainer,
     CoverMask,
-    RGBAExhibit,
     ScaleEditor,
     EffectPreview,
     VideoSlider,
-    FrameSetting
+    FrameSetting,
+    ZoomViewer
   },
   props: {
     index: {
@@ -283,7 +289,7 @@ export default {
         }
       ],
       histVisible: true,
-      traggerRGB: false,
+      triggerRGB: false,
       radius: 10,
       offset: 0,
       RGBAcolor: {
@@ -292,10 +298,17 @@ export default {
         B: 0,
         A: 0
       },
+      updateZoomViewer: null,
       showPosition: true,
+      // 鼠标相对canvas的坐标
+      mousePos: {
+        x: 0,
+        y: 0
+      },
+      // 鼠标相对图像的坐标
       mousePosInfo: {
-        x: '',
-        y: ''
+        x: 0,
+        y: 0
       }
     }
   },
@@ -358,6 +371,17 @@ export default {
       return `<span>${this.mediaInfo?.FrameRate ? this.frameRate + ' FPS' : '' || ''}</span>&nbsp;&nbsp;<span>${
         this.mediaInfo?.FrameCount ? this.frameCount + ' Frame' : ''
       }</span>`
+    },
+    feedbackStyle() {
+      const x = this.mousePos.x
+      const y = this.mousePos.y
+      return {
+        left: `${x}px`,
+        top: `${y}px`,
+        // backgroundColor: '#1067d1',
+        backgroundColor: 'red',
+        opacity: 0.5
+      }
     }
   },
   async mounted() {
@@ -450,6 +474,11 @@ export default {
         this.frameChangeRate = newRate / originFrameRate
         this.changeFrameUpdateFN()
       }
+
+      // 至多(1000/newRate) FPS的频率来更新取色器画面
+      this.updateZoomViewer = throttle(1000 / newRate, function () {
+        this.$refs['zoom-viewer']?.draw(...arguments)
+      })
     }
   },
   methods: {
@@ -707,7 +736,7 @@ export default {
         let offscreen = new OffscreenCanvas(this.video.videoWidth, this.video.videoHeight)
         let offCtx = offscreen.getContext('2d')
         offCtx.drawImage(this.video, 0, 0)
-        this.bitMap = await offscreen.transferToImageBitmap()
+        this.bitMap = offscreen.transferToImageBitmap()
         draw && this.drawImage(this.bitMap)
         this.$refs['hist-container'].visible && this.generateHist()
       }
@@ -866,7 +895,8 @@ export default {
     async reMount() {
       console.log('reMount')
       this.initCanvas()
-      this.initbitMap()
+      await this.initbitMap()
+      this.reset()
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4
@@ -887,9 +917,12 @@ export default {
       }
 
       this.cs.restore()
-      if (this.dynamicPickColor && this.traggerRGB) {
+      if (this.dynamicPickColor && this.triggerRGB) {
         this.doHandleMove()
       }
+    },
+    handleClick() {
+      this.triggerRGB && this.$refs['zoom-viewer']?.copyColor()
     },
     handleDbclick() {
       if (!this.selected) {
@@ -934,7 +967,8 @@ export default {
     },
     // toolbar广播触发， 改变取色器显示状态
     pickColor({ status }) {
-      this.traggerRGB = status
+      this.$refs['zoom-viewer']?.changeCanvas()
+      this.triggerRGB = status
     },
     changeCanvasStyle(newStyle) {
       // FIXME: 具体的值没有被广播
@@ -961,45 +995,27 @@ export default {
         this.mousePos = mousePos
       }
       this.preference.showMousePos && this.changeMousePosInfo(mousePos)
-      this.preference.showScale && this.changeRGBA(mousePos)
+      this.changeRGBA()
       // console.log(`${this.path-changeMousePosInfo`, mousePos, {
       //   ...this.mousePosInfo
       // });
     },
-    changeRGBA(mousePos) {
-      if (!this.traggerRGB) return
-      const { x, y } = mousePos
-      const feedback = this.$refs.feedback
-      feedback.style.left = x - this.radius + 'px'
-      feedback.style.top = y - this.radius + 'px'
-      feedback.style.width = this.radius * 2 + 'px'
-      feedback.style.height = this.radius * 2 + 'px'
-      Promise.resolve().then(() => {
-        const data = this.cs.getImageData(x, y, this.radius, this.radius).data
-        const count = data.length / 4
-        let r = 0,
-          g = 0,
-          b = 0,
-          a = 0
-        for (var i = 0; i < count; i++) {
-          r += data[i * 4]
-          g += data[i * 4 + 1]
-          b += data[i * 4 + 2]
-          a += data[i * 4 + 3]
-        }
-        this.RGBAcolor = {
-          R: parseInt(r / count),
-          G: parseInt(g / count),
-          B: parseInt(b / count),
-          A: parseInt(a / count)
-        }
-      })
+    async changeRGBA() {
+      if (!this.triggerRGB || !this.video?.videoWidth) return
+
+      let { x, y } = this.mousePosInfo
+      if (!isNaN(x) && !isNaN(y) && this.paused) {
+        this.updateZoomViewer && this.updateZoomViewer(this.bitMap, { x, y })
+      } else if (this.dynamicPickColor) {
+        // !this.paused or canvas mode
+        this.updateZoomViewer && this.updateZoomViewer(this.canvas, mousePos)
+      }
     },
     changeMousePosInfo(mousePos) {
-      if (!this.imagePosition?.x || !this.imagePosition?.width) {
+      if (isNaN(this.imagePosition?.x ) || isNaN(this.imagePosition?.width)) {
         this.mousePosInfo = {
-          x: '',
-          y: ''
+          x: 0,
+          y: 0
         }
         return
       }
@@ -1012,13 +1028,13 @@ export default {
         const posX = ((x - imageX) * originWidth) / width
         const posY = ((y - imageY) * originHeight) / height
         this.mousePosInfo = {
-          x: Number(posX).toFixed(2),
-          y: Number(posY).toFixed(2)
+          x: Number(posX),
+          y: Number(posY)
         }
       } else {
         this.mousePosInfo = {
-          x: '',
-          y: ''
+          x: 0,
+          y: 0
         }
       }
     },
@@ -1153,9 +1169,13 @@ export default {
     },
     /******************ScaleEditor END******************/
     doZoom(data) {
+      const { e, rate, mousePos } = data
+      if (e?.ctrlKey || e?.altKey) {
+        this.$refs['zoom-viewer']?.changeCanvas(rate > 1 ? 180 : 40)
+        return
+      }
       if (this.imagePosition == null) return
-      let mousePos = data.mousePos
-      let rate = data.rate
+
       let x = mousePos.x - (mousePos.x - this.imagePosition.x) * rate
       let y = mousePos.y - (mousePos.y - this.imagePosition.y) * rate
       let height = this.imagePosition.height * rate
@@ -1181,17 +1201,17 @@ export default {
         data: { offset: offset, id: this.path }
       })
     },
-    handleZoom(rate, mousePos) {
+    handleZoom(e, rate, mousePos) {
       this.broadCast({
         name: 'doZoom',
-        data: { rate: rate, mousePos: mousePos, id: this.path }
+        data: { e, rate, mousePos, id: this.path }
       })
     },
-    handleZoomEnd() {
+    handleZoomEnd(e) {
       this.imagePosition &&
         this.broadCast({
           name: 'doZoomEnd',
-          data: {}
+          data: { e }
         })
     },
     broadCast({ name, data }) {
@@ -1379,6 +1399,17 @@ export default {
         }
       }
 
+      #feedback {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        z-index: 2;
+        pointer-events: none;
+        background-color: red;
+        transform: translate(-50%, -50%);
+      }
+
       .canvas {
         vertical-align: middle;
         font-size: 0;
@@ -1394,11 +1425,6 @@ export default {
       //   background-position: 0 0, 10px 10px, 10px 10px, 20px 20px;
       //   background-size: 20px 20px;
       // }
-
-      #feedback {
-        position: absolute;
-        border: 1px solid red;
-      }
 
       .mouse-position {
         position: absolute;
