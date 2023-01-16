@@ -77,3 +77,18 @@ export function getUuidv4() {
 }
 
 export const getType = (obj) => Object.prototype.toString.call(obj).slice(8, -1)
+
+export const clamp = (num, min, max) => Math.max(min, Math.min(num, max))
+
+export const checkBoundary = (x, y, width, height, parentWidth, parentHeight, offsetX = 0, offsetY = 0) => {
+  const lx = x - width - offsetX
+  const ly = y - height - offsetY
+  const rx = x + offsetX
+  const ry = y + offsetY
+  const res = {}
+
+  res.x = rx + width <= parentWidth ? rx : lx
+  res.y = ry + height <= parentHeight ? ry : ly
+
+  return res
+}
