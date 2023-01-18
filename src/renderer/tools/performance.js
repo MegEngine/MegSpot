@@ -4,6 +4,7 @@
  * @returns {void}
  */
 import Timer from './timer'
+
 class Performance {
   /**
    * 计算情况
@@ -52,6 +53,21 @@ class Performance {
   toMBSize(byteSize) {
     return (byteSize / (1024 * 1024)).toFixed(1)
   }
+}
+
+export function toMBSize(byteSize) {
+  return byteSize / (1024 * 1024)
+}
+
+export const getPerformance = (toMB = true) => {
+  const { jsHeapSizeLimit, totalJSHeapSize, usedJSHeapSize } = performance.memory
+  const data = JSON.parse(JSON.stringify(performance))
+  data.memory = {
+    jsHeapSizeLimit: toMB ? Math.ceil(toMBSize(jsHeapSizeLimit)) : jsHeapSizeLimit,
+    totalJSHeapSize: toMB ? Math.ceil(toMBSize(totalJSHeapSize)) : totalJSHeapSize,
+    usedJSHeapSize: toMB ? Math.ceil(toMBSize(usedJSHeapSize)) : usedJSHeapSize
+  }
+  return data
 }
 
 export default new Performance()

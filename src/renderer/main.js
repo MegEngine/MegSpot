@@ -22,6 +22,8 @@ import 'vxe-table/lib/style.css'
 import VueSplit from 'vue-split-panel'
 import VueScroll from 'vuescroll'
 
+import { initAnalyze } from '@/utils/analyze'
+
 Vue.use(VXETable)
 Vue.use(VueSplit)
 Vue.use(VueScroll)
@@ -48,6 +50,9 @@ Object.defineProperties(Vue.prototype, {
     }
   }
 })
+
+initAnalyze()
+
 // 由于加载lib是异步的 所以通过callback调用Vue初始化 保证lib初始化完成
 loadLib((cv) => {
   console.info(`-----------opencv loaded-----------`)

@@ -4,6 +4,8 @@ import Performance from '@/tools/performance'
 import store from '../store'
 // 引入路由表
 import routes from './routes'
+import { trackEvent } from '@/utils/analyze'
+
 const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch((err) => err)
@@ -25,6 +27,12 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to, from) => {
   // 储存路由目标跳转
-  store.dispatch('preferenceStore/setLastRouterPath', to.path)
+  store.dispatch('preferenceStore/setLastRouterPath', to.path).then(() => {
+    trackEvent('page_view', {
+      category: 'change-view',
+      view: to.path,
+      from: from.path
+    })
+  })
 })
 export default router

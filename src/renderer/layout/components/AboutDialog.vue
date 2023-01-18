@@ -173,6 +173,7 @@ import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore')
 import { i18nRender } from '@/lang'
 import { ATTRS_KEYS, SPECIAL_KEYS, PRESET_KEYS_MAP, DEFAULT_HOTKEYS } from '@/tools/hotkey'
+import { trackEvent } from '@/utils/analyze'
 
 export default {
   name: 'AboutDialog',
@@ -293,6 +294,11 @@ export default {
       this.hotkeys = JSON.parse(JSON.stringify(DEFAULT_HOTKEYS))
     }
     this.checkSystemLanguage()
+    trackEvent('page_view',{
+      category: 'help',
+      view: 'help',
+      from: this.$route?.path
+    })
   },
   methods: {
     ...mapActions(['setPreference', 'setHotkey']),
