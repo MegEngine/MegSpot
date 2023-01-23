@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.0.8",
+  "version": "v2.0.9",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -44,8 +44,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1. 新增功能：重构取色器，支持预览原图像素，点击左键复制色值; \n2. bugfix: 若干;",
-      "releaseDate": "2023.1.16"
+      "releaseNotes": "修复光标显示问题",
+      "releaseDate": "2023.1.24"
     },
     "directories": {
       "output": "build"

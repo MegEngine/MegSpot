@@ -37,7 +37,7 @@
             @update="setZoom"
           />
           <ZoomViewer
-            v-if="this.triggerRGB"
+            v-if="triggerRGB"
             ref="zoom-viewer"
             :RGBAcolor.sync="RGBAcolor"
             :mousePos="mousePos"
@@ -45,8 +45,8 @@
             :parentHeight="_height"
           />
           <canvas ref="canvas" :width="_width" :height="_height"></canvas>
-          <div ref="feedback" id="feedback" :style="feedbackStyle"></div>
-          <div v-if="preference.showMousePos" class="mouse-position" v-show="showPosition && mousePosInfo.x">
+          <div v-if="triggerRGB || preference.showDot" ref="feedback" id="feedback" :style="feedbackStyle"></div>
+          <div v-if="preference.showMousePos" v-show="mousePosInfo.x" class="mouse-position">
             <span>x={{ mousePosInfo.x.toFixed(2) }},y={{ mousePosInfo.y.toFixed(2) }}</span>
           </div>
         </div>
@@ -178,7 +178,6 @@ export default {
         B: 0,
         A: 0
       },
-      showPosition: true,
       // 鼠标相对canvas的坐标
       mousePos: {
         x: 0,
@@ -530,7 +529,7 @@ export default {
       this.updateZoomViewer && this.updateZoomViewer(this.bitMap, this.mousePosInfo)
     },
     changeMousePosInfo(mousePos) {
-      if (isNaN(this.imagePosition?.x ) || isNaN(this.imagePosition?.width)) {
+      if (isNaN(this.imagePosition?.x) || isNaN(this.imagePosition?.width)) {
         this.mousePosInfo = {
           x: 0,
           y: 0

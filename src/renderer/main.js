@@ -51,7 +51,7 @@ Object.defineProperties(Vue.prototype, {
   }
 })
 
-initAnalyze()
+// initAnalyze()
 
 // 由于加载lib是异步的 所以通过callback调用Vue初始化 保证lib初始化完成
 loadLib((cv) => {

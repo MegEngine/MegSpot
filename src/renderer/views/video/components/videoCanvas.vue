@@ -120,7 +120,7 @@
             @update="setZoom"
           />
           <ZoomViewer
-            v-if="this.triggerRGB"
+            v-if="triggerRGB"
             ref="zoom-viewer"
             :RGBAcolor.sync="RGBAcolor"
             :mousePos="mousePos"
@@ -128,8 +128,8 @@
             :parentHeight="_height"
           />
           <canvas ref="canvas" :width="_width" :height="_height"></canvas>
-          <div ref="feedback" id="feedback" :style="feedbackStyle"></div>
-          <div v-if="preference.showMousePos" class="mouse-position" v-show="showPosition && mousePosInfo.x">
+          <div v-if="triggerRGB || preference.showDot" ref="feedback" id="feedback" :style="feedbackStyle"></div>
+          <div v-if="preference.showMousePos" v-show="mousePosInfo.x" class="mouse-position">
             <span>x={{ mousePosInfo.x.toFixed(2) }},y={{ mousePosInfo.y.toFixed(2) }}</span>
           </div>
         </div>
@@ -299,7 +299,6 @@ export default {
         A: 0
       },
       updateZoomViewer: null,
-      showPosition: true,
       // 鼠标相对canvas的坐标
       mousePos: {
         x: 0,
