@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.0.9",
+  "version": "v2.0.10",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -8,15 +8,15 @@
   "main": "./dist/electron/main.js",
   "scripts": {
     "dev": "cross-env BUILD_TARGET=clean node .electron-vue/build.js &&  node .electron-vue/dev-runner.js",
-    "build": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js",
-    "build:win32": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --win  --ia32",
-    "build:win64": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --win  --x64",
-    "build:mac": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --mac",
-    "build:linux": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --linux",
-    "build:dir": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --dir",
-    "build:ml": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && sudo electron-builder -ml",
-    "build:all": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && sudo electron-builder -wml",
-    "publish:all": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && node .electron-vue/build.js && sudo electron-builder -wml -p onTag",
+    "build": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js",
+    "build:win32": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --win  --ia32",
+    "build:win64": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --win  --x64",
+    "build:mac": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --mac",
+    "build:linux": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --linux",
+    "build:dir": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js && electron-builder --dir",
+    "build:ml": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js && sudo electron-builder -ml",
+    "build:all": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js && sudo electron-builder -wml",
+    "publish:all": "cross-env BUILD_TARGET=clean NODE_ENV=production node .electron-vue/build.js && node .electron-vue/build.js && sudo electron-builder -wml -p onTag",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web ENV_TARGET=web node .electron-vue/build.js",
     "pack": "npm run pack:main && npm run pack:renderer",
@@ -44,8 +44,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "修复光标显示问题",
-      "releaseDate": "2023.1.24"
+      "releaseNotes": "1. 修复直方图显示；\n2. 修复构建问题；",
+      "releaseDate": "2023.2.3"
     },
     "directories": {
       "output": "build"
@@ -195,6 +195,7 @@
     "prettier": "^2.7.0",
     "sass": "1.32.5",
     "sass-loader": "^10.1.1",
+    "string-replace-loader": "^3.1.0",
     "style-loader": "^2.0.0",
     "svg-sprite-loader": "^5.2.1",
     "terser-webpack-plugin": "^4.2.3",

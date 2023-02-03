@@ -30,8 +30,9 @@ router.afterEach((to, from) => {
   store.dispatch('preferenceStore/setLastRouterPath', to.path).then(() => {
     trackEvent('page_view', {
       category: 'change-view',
-      view: to.path,
-      from: from.path
+      name: to.name || to.path,
+      view: to.fullPath,
+      from: from.fullPath
     })
   })
 })

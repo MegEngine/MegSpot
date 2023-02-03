@@ -9,6 +9,8 @@ jobs:
   release:
     runs-on: ${{ matrix.os }}
 
+    environment: deploy
+
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]

@@ -21,7 +21,6 @@
 import EntryCard from './EntryCard'
 import HelpVideo from './HelpVideo'
 import { debounce } from '@/utils'
-import { trackEvent } from '@/utils/analyze'
 
 export default {
   name: 'dashboard',
@@ -70,11 +69,6 @@ export default {
       }
     ]
     window.addEventListener('resize', this.handleResize, true)
-    trackEvent('page_view',{
-      category: 'dashboard',
-      view: 'dashboard',
-      from: ''
-    })
   },
   methods: {
     handleResize: debounce(300, function () {

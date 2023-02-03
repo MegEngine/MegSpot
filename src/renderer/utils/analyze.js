@@ -9,7 +9,7 @@ export let app, analytics, db
 
 export const initAnalyze = () => {
   const firebaseConfig = {
-    apiKey: process.env.API_KEY,
+    apiKey: '$API_KEY',
     authDomain: 'megspot-0.firebaseapp.com',
     projectId: 'megspot-0',
     storageBucket: 'megspot-0.appspot.com',
@@ -35,8 +35,7 @@ export const addRecord = async (tableName, data = {}) => {
     if (!data?.performance) {
       data.performance = getPerformance()
     }
-    const docRef = await addDoc(collection(db, tableName), data)
-    return docRef
+    addDoc(collection(db, tableName), data)
   } catch (e) {
     console.error('Error adding document: ', e)
   }
@@ -47,7 +46,5 @@ export const trackEvent = (event, data = {}) => {
     data.performance = getPerformance()
   }
   analytics && logEvent(analytics, event, data)
-  Promise.resolve().then(() => {
-    addRecord('logs', data)
-  })
+  addRecord('logs', data)
 }

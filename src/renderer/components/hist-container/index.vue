@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-button id="hist-icon" type="text" @click="changeVisible(true)">
+    <el-button id="hist-icon" type="text" @click="changeVisible()">
       <svg-icon icon-class="chart"></svg-icon>
     </el-button>
     <div class="hist-container">
@@ -85,7 +85,7 @@ export default {
     },
 
     changeVisible(visible) {
-      this.visible = visible
+      this.visible = visible ?? !this.visible
       this.$emit('changeVisible', this.visible)
     },
     // 供外部直接调用

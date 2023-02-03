@@ -49,6 +49,14 @@ let rendererConfig = {
       //   }
       // },
       {
+        test: /analyze\.js$/,
+        loader: 'string-replace-loader',
+        options: {
+          search: /\$API_KEY/i,
+          replace: process.env.API_KEY
+        }
+      },
+      {
         test: /\.scss$/,
         use: [
           'vue-style-loader',
