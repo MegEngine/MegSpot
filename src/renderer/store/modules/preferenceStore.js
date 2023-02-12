@@ -24,13 +24,28 @@ const preferenceStore = {
       videoProcessBarStyle: 'fixed',
       showScale: true,
       showMousePos: true,
-      hotkeys: []
+      hotkeys: [],
+      // gamma校正
+      // TODO:迁移出preference，如到adjusts或filters
+      gamma: 1,
+      // [input_shadow, input_highlight, mid, output_shadow, output_highlight]
+      colorLevelSetting: [0, 255, 1, 0, 255]
+    },
+    colorLevelSetting: {
+      inputMidtones: 1,
+      inputs: [0, 255],
+      outputs: [0, 255]
+      // inputShadow: 0,
+      // inputHighlight: 255,
+      // outputShadow: 0,
+      // outputHighlight: 255
     },
     lastRouterPath: '/dashboard',
     hotkeysMap: null
   },
   getters: {
     preference: (state) => state.preference,
+    colorLevelSetting: (state) => state.colorLevelSetting,
     lastRouterPath: (state) => state.lastRouterPath,
     hotkeysMap: (state) => state.hotkeysMap
   },
@@ -44,6 +59,10 @@ const preferenceStore = {
           newPreOb.hotkeys.map(({ name, keysArr }) => keysArr.map((keys) => [getArrStr(keys), name])).flat()
         )
       }
+    },
+    SET_COLOR_LEVEL: (state, newPreOb) => {
+      const newPreference = Object.assign({}, state.colorLevelSetting, newPreOb)
+      state.colorLevelSetting = newPreference
     },
     SET_LAST_ROUTER_PATH: (state, routerPath) => {
       state.lastRouterPath = routerPath
@@ -64,6 +83,9 @@ const preferenceStore = {
   actions: {
     setPreference({ commit }, newPreOb) {
       commit('SET_PREFERENCE', newPreOb)
+    },
+    setColorLevel({ commit }, newPreOb) {
+      commit('SET_COLOR_LEVEL', newPreOb)
     },
     setLastRouterPath({ commit }, routerPath) {
       commit('SET_LAST_ROUTER_PATH', routerPath)

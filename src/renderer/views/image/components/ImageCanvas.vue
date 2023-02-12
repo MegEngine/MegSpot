@@ -16,34 +16,14 @@
       <EffectPreview @change="changeCanvasStyle" />
     </div>
     <div ref="container" class="canvas-container" id="canvas-container" :style="canvasStyle">
-      <OperationContainer
-        id="canvas-container"
-        ref="canvas-container"
-        @drag="handleDrag"
-        @zoom="handleZoom"
-        @scrollEnd="handleZoomEnd"
-        @click="handleClick"
-        @dbclick="handleDbclick"
-        @mouseMove="handleMove"
-      >
+      <OperationContainer id="canvas-container" ref="canvas-container" @drag="handleDrag" @zoom="handleZoom"
+        @scrollEnd="handleZoomEnd" @click="handleClick" @dbclick="handleDbclick" @mouseMove="handleMove">
         <div v-loading="loading" element-loading-background="rgba(0, 0, 0, 0)" class="canvas-item" @contextmenu.prevent>
-          <ScaleEditor
-            v-if="preference.showScale"
-            class="scale-editor"
-            :scale="imgScale"
-            :scaleEditorVisible.sync="scaleEditorVisible"
-            @show="showScaleEditor"
-            @reset="resetZoom"
-            @update="setZoom"
-          />
-          <ZoomViewer
-            v-if="triggerRGB"
-            ref="zoom-viewer"
-            :RGBAcolor.sync="RGBAcolor"
-            :mousePos="mousePos"
-            :parentWidth="_width"
-            :parentHeight="_height"
-          />
+          <ScaleEditor v-if="preference.showScale" class="scale-editor" :scale="imgScale"
+            :scaleEditorVisible.sync="scaleEditorVisible" @show="showScaleEditor" @reset="resetZoom"
+            @update="setZoom" />
+          <ZoomViewer v-if="triggerRGB" ref="zoom-viewer" :RGBAcolor.sync="RGBAcolor" :mousePos="mousePos"
+            :parentWidth="_width" :parentHeight="_height" />
           <canvas ref="canvas" :width="_width" :height="_height"></canvas>
           <div v-if="triggerRGB || preference.showDot" ref="feedback" id="feedback" :style="feedbackStyle"></div>
           <div v-if="preference.showMousePos" v-show="mousePosInfo.x" class="mouse-position">
@@ -104,7 +84,7 @@ export default {
     // },
     snapInfo: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   inject: ['getSnapshotMode'],
@@ -166,7 +146,11 @@ export default {
         {
           event: 'radius',
           action: 'setRadius'
-        }
+        },
+        {
+          event: 'adjustLevels',
+          action: 'adjustLevels'
+        },
       ],
       histVisible: true,
       triggerRGB: false,
@@ -192,7 +176,7 @@ export default {
   },
   computed: {
     ...mapGetters(['imageConfig', 'imageList']),
-    ...preferenceMapGetters(['preference']),
+    ...preferenceMapGetters(['preference', 'colorLevelSetting']),
     snapshotMode() {
       return this.getSnapshotMode() || false
     },
@@ -207,6 +191,9 @@ export default {
     canvasStyle() {
       return this.preference.background.style
     },
+    gammaData() {
+      return this.preference.gamma
+    },
     feedbackStyle() {
       const x = this.mousePos.x
       const y = this.mousePos.y
@@ -216,7 +203,37 @@ export default {
         backgroundColor: 'red',
         opacity: 0.5
       }
-    }
+    },
+    inputLevels: {
+      get() {
+        return this.colorLevelSetting.inputs
+      },
+      set(newVal) {
+        this.setColorLevel({
+          inputs: newVal
+        })
+      }
+    },
+    inputMidtonesData: {
+      get() {
+        return this.colorLevelSetting.inputMidtones
+      },
+      set(newVal) {
+        this.setColorLevel({
+          inputMidtones: newVal
+        })
+      }
+    },
+    outputLevels: {
+      get() {
+        return this.colorLevelSetting.outputs
+      },
+      set(newVal) {
+        this.setColorLevel({
+          outputs: newVal
+        })
+      }
+    },
   },
   async mounted() {
     this.header = this.$refs.header
@@ -265,6 +282,16 @@ export default {
         this.setSmooth()
       },
       immediate: true
+    },
+    gammaData: {
+      handler(newVal, oldVal) {
+        if (newVal) {
+          newVal !== oldVal && this.adjustGamma(newVal)
+        } else if (this.gammaData !== 1) {
+          this.adjustGamma(this.gammaData)
+        }
+      },
+      immediate: false
     }
   },
   methods: {
@@ -315,8 +342,8 @@ export default {
       return this.snapshotMode
         ? this.snapInfo.name
         : filter
-        ? this.$options.filters.getFileName(this.path)
-        : getFileName(this.path)
+          ? this.$options.filters.getFileName(this.path)
+          : getFileName(this.path)
     },
     listenEvents() {
       // 广播调度事件
@@ -386,6 +413,90 @@ export default {
           : this.image
       )
     },
+    async adjustGamma(gamma) {
+      console.log("adjustGamma", gamma)
+      const cv = window.cv
+      // const newCanvas = window.document.createElement('canvas');
+      // newCanvas.width = this.image.width;
+      // newCanvas.height = this.image.height;
+      // const ctx = newCanvas.getContext('2d');
+      // ctx.drawImage(this.bitMap, 0, 0, newCanvas.width, newCanvas.height);
+      let src = cv.imread(this.image);
+      // console.log("src", src)
+      const channel = 3;
+      for (let i = 0; i < src.rows; i++) {
+        for (let j = 0; j < src.cols; j++) {
+          for (let index = 0; index < channel; index++) {
+            // R, G, B
+            let color = src.ucharPtr(i, j)[index];
+            src.ucharPtr(i, j)[index] =
+              255 * (color / 255) ** (1 / gamma);
+          }
+        }
+      }
+      // const newBitmap = await createImageBitmap(src.data, src.cols, src.rows)
+      this.bitMap = await createImageBitmap(new ImageData(new Uint8ClampedArray(src.data), src.cols, src.rows))
+
+      this.drawImage().then(() => {
+        // newBitmap.close()
+        src.delete();
+      });
+    },
+    // TODO: gamma与色阶同时生效
+    async adjustLevels({
+      inputShadow,
+      inputHighlight,
+      inputMidtones,
+      outputShadow,
+      outputHighlight
+    }) {
+      console.log("adjustLevels", {
+        inputShadow,
+        inputHighlight,
+        inputMidtones,
+        outputShadow,
+        outputHighlight
+      })
+      const cv = window.cv
+      // const newCanvas = window.document.createElement('canvas');
+      // newCanvas.width = this.image.width;
+      // newCanvas.height = this.image.height;
+      // const ctx = newCanvas.getContext('2d');
+      // ctx.drawImage(this.bitMap, 0, 0, newCanvas.width, newCanvas.height);
+      let src = cv.imread(this.image);
+      // TODO: 调整单通道色阶
+      const channel = 3; // 默认应用rgb三通道
+      const clamp = (val, min = 0, max = 255) =>
+        Math.max(min, Math.min(max, val));
+      for (let i = 0; i < src.rows; i++) {
+        for (let j = 0; j < src.cols; j++) {
+          for (let index = 0; index < channel; index++) {
+            let input_map_color = clamp(
+              ((src.ucharPtr(i, j)[index] - inputShadow) /
+                (inputHighlight - inputShadow)) *
+              255
+            );
+            // const input_map_color = clamp(
+            //   src.ucharPtr(i, j)[index] - inputShadow
+            // );
+            // src.ucharPtr(i, j)[index] = clamp(color,inputShadow, inputHighlight);
+            const mid_color =
+              (input_map_color / 255) ** (1 / inputMidtones) * 255;
+            const output_map_color =
+              (mid_color / 255) * (outputHighlight - outputShadow) +
+              outputShadow;
+            src.ucharPtr(i, j)[index] = clamp(output_map_color);
+          }
+        }
+      }
+      // const newBitmap = await createImageBitmap(src.data, src.cols, src.rows)
+      this.bitMap = await createImageBitmap(new ImageData(new Uint8ClampedArray(src.data), src.cols, src.rows))
+
+      this.drawImage().then(() => {
+        // newBitmap.close()
+        src.delete();
+      });
+    },
     resolvePath() {
       return new Promise((resolve) => {
         if (this.snapshotMode) {
@@ -416,26 +527,30 @@ export default {
     },
     async initImage(initPosition = true) {
       this.loading = true
-      if (/tiff?$/.test(this.path)) {
-        const file = await fse.readFile(this.path)
-        const arraybuffer = file.buffer
-        const ifds = decode(arraybuffer)
-        const ifd = ifds[0]
-        decodeImage(file, ifd)
-        const imageData = toRGBA8(ifd)
-        this.image = new Image(ifd.width, ifd.height)
-        await this.initBitMap(imageData)
-        this.loading = false
-        this.reDraw(initPosition)
-      } else {
-        this.image = new Image()
-        this.image.onload = async () => {
-          this.initBitMap()
+      return new Promise(async (resolve, reject) => {
+        if (/tiff?$/.test(this.path)) {
+          const file = await fse.readFile(this.path)
+          const arraybuffer = file.buffer
+          const ifds = decode(arraybuffer)
+          const ifd = ifds[0]
+          decodeImage(file, ifd)
+          const imageData = toRGBA8(ifd)
+          this.image = new Image(ifd.width, ifd.height)
+          await this.initBitMap(imageData)
           this.loading = false
           this.reDraw(initPosition)
+          resolve()
+        } else {
+          this.image = new Image()
+          this.image.onload = async () => {
+            this.initBitMap()
+            this.loading = false
+            this.reDraw(initPosition)
+            resolve()
+          }
+          this.image.src = await this.resolvePath()
         }
-        this.image.src = await this.resolvePath()
-      }
+      })
     },
     initCanvas() {
       this.cs = this.canvas?.getContext('2d')
@@ -448,10 +563,10 @@ export default {
       this.initCanvas()
       this.initImage()
     },
-    drawImage() {
+    async drawImage(img = null) {
       let { x, y, width, height } = this.imagePosition
       this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height)
-      this.cs.drawImage(this.bitMap, x, y, width, height)
+      this.cs.drawImage(img ?? this.bitMap, x, y, width, height)
     },
     handleClick() {
       this.triggerRGB && this.$refs['zoom-viewer']?.copyColor()
@@ -779,11 +894,11 @@ export default {
       if (degree < 0) {
         offCtx.translate(0, this.bitMap.width)
         offCtx.rotate((-90 * Math.PI) / 180)
-        ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
+          ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
       } else if (degree > 0) {
         offCtx.translate(this.bitMap.height, 0)
         offCtx.rotate((90 * Math.PI) / 180)
-        ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
+          ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
       }
       offCtx.drawImage(this.bitMap, 0, 0)
       this.bitMap.close()
@@ -859,6 +974,7 @@ export default {
       }
 
       ::v-deep {
+
         input,
         .el-input-group__append {
           border-radius: 0;
