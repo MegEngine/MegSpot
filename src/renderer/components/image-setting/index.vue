@@ -1,13 +1,7 @@
 <template>
   <div flex="main:right">
-    <el-popover
-      v-model="visible"
-      effect="light"
-      placement="bottom"
-      trigger="manual"
-      popper-class="image-setting"
-      @click.stop
-    >
+    <el-popover v-model="visible" effect="light" placement="bottom" trigger="manual" popper-class="image-setting"
+      @click.stop>
       <div class="header">
         <div class="title">{{ $t('imageSetting.title') }}</div>
         <el-button type="text" class="close-btn" @click="visible = false" :title="'close'">
@@ -41,20 +35,11 @@
         </div>
         <div flex="main:justify" class="setting-item">
           <span>{{ $t('imageSetting.backgroundMode') }}：</span>
-          <el-select
-            v-model="mode"
-            placeholder="please select background color"
-            style="width: 100px"
-            @change="handleModeChange"
-          >
+          <el-select v-model="mode" placeholder="please select background color" style="width: 100px"
+            @change="handleModeChange">
             <div>
-              <el-option
-                v-for="(item, index) in colorOptions"
-                :key="index"
-                :label="item.mode"
-                :value="item.mode"
-                style="padding: 0 10px 0 5px"
-              >
+              <el-option v-for="(item, index) in colorOptions" :key="index" :label="item.mode" :value="item.mode"
+                style="padding: 0 10px 0 5px">
                 <div flex="main:justify cross:center">
                   <div :style="baseStyle + item.style"></div>
                   <span>{{ item.mode }}</span>
@@ -76,51 +61,26 @@
         </div> -->
         <div flex="main:justify" class="setting-item">
           <span>{{ $t('imageSetting.scaleOpt') }}：</span>
-          <el-select
-            v-model="scaleOptions"
-            multiple
-            filterable
-            allow-create
-            default-first-option
-            placeholder="setting default scale options"
-          >
-            <el-option
-              v-for="(item, index) in preference.scaleOptions"
-              :key="index"
-              :label="item"
-              :value="item"
-            ></el-option>
+          <el-select v-model="scaleOptions" multiple filterable allow-create default-first-option
+            placeholder="setting default scale options">
+            <el-option v-for="(item, index) in preference.scaleOptions" :key="index" :label="item"
+              :value="item"></el-option>
           </el-select>
         </div>
         <div v-if="$route.path.includes('video')" flex="main:justify" class="setting-item">
           <span>{{ $t('imageCenter.frameStep') }}(s):</span>
-          <el-input-number
-            v-model="frameCompareInterval"
-            :step="0.01"
-            :min="0.001"
-            :precision="4"
-            controls-position="right"
-          ></el-input-number>
+          <el-input-number v-model="frameCompareInterval" :step="0.01" :min="0.001" :precision="4"
+            controls-position="right"></el-input-number>
         </div>
         <div v-if="$route.path.includes('video')" flex="main:justify" class="setting-item">
           <span>{{ $t('video.minRenderInterval') }}(s):</span>
-          <el-input-number
-            v-model="renderInterval"
-            :step="0.01"
-            :min="0.001"
-            :precision="4"
-            controls-position="right"
-          ></el-input-number>
+          <el-input-number v-model="renderInterval" :step="0.01" :min="0.001" :precision="4"
+            controls-position="right"></el-input-number>
         </div>
         <div flex="main:justify" class="setting-item">
           <span>{{ $t('imageCenter.region') }}(px)：</span>
-          <el-input-number
-            v-model="radius"
-            :min="1"
-            :max="200"
-            controls-position="right"
-            @change="handleRadiusChange"
-          ></el-input-number>
+          <el-input-number v-model="radius" :min="1" :max="200" controls-position="right"
+            @change="handleRadiusChange"></el-input-number>
         </div>
         <div flex="main:justify" class="setting-item">
           <span>{{ $t('general.move') }}(px)：</span>
@@ -314,9 +274,11 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss">
 @import '@/styles/variables.scss';
+
 .image-setting {
   position: relative;
   font-size: 16px;
+
   .header {
     .title {
       font-weight: bold;
@@ -327,14 +289,17 @@ export default {
       position: absolute;
       top: 5px;
       right: 10px;
+
       .icon {
         &:hover {
           color: red;
         }
+
         font-size: 18px;
       }
     }
   }
+
   .setting-group {
     .setting-item {
       margin-top: 10px;

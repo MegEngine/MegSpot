@@ -123,7 +123,29 @@ export default {
       loadingText: '文件夹资源获取中...'
     }
   },
-  imagePreview: {},
+  imagePreview: {
+    title: '色彩与滤镜',
+    brightness: '亮度',
+    contrast: '对比度',
+    saturate: '饱和度',
+    grayscale: '灰度',
+    invert: '反转',
+    opacity: '不透明度',
+    blur: '模糊度',
+    gamma: 'gamma值',
+    colorLevel: {
+      title: '色阶',
+      input: "输入色阶",
+      output: "输出色阶",
+      inputShadow: '黑场',
+      inputHighlight: '白场',
+      inputMidtones: '中间调',
+      outputShadow: '输出黑场',
+      outputHighlight: '输出白场'
+    },
+    reset: '重置',
+    resetAll: '重置所有'
+  },
   imageCenter: {
     bilinearInterpolation: '双线性',
     shortSelectedMsg: '已选中',
