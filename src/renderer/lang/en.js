@@ -124,7 +124,29 @@ export default {
       loadingText: 'loading resource...'
     }
   },
-  imagePreview: {},
+  imagePreview: {
+    title: 'Color and Filters',
+    brightness: 'brightness',
+    contrast: 'contrast',
+    saturate: 'saturate',
+    grayscale: 'grayscale',
+    invert: 'invert',
+    opacity: 'opacity',
+    blur: 'blur',
+    gamma: 'gamma',
+    colorLevel: {
+      title: 'Color Levels',
+      input: "input levels",
+      output: "output levels",
+      inputShadow: 'inputShadow',
+      inputHighlight: 'inputHighlight',
+      inputMidtones: 'inputMidtones',
+      outputShadow: 'outputShadow',
+      outputHighlight: 'outputHighlight'
+    },
+    reset: "reset",
+    resetAll: "reset all"
+  },
   imageCenter: {
     bilinearInterpolation: 'bilinar',
     shortSelectedMsg: 'selected',

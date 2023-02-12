@@ -125,7 +125,29 @@ export default {
       loadingText: 'データの読み込み...'
     }
   },
-  imagePreview: {},
+  imagePreview: {
+    title: '色とフィルター',
+    brightness: '明るさ',
+    contrast: 'コントラスト',
+    saturate: '飽和',
+    grayscale: 'グレースケール',
+    invert: '反転',
+    opacity: '不透明度',
+    blur: 'ぼかし',
+    gamma: 'ガンマ値',
+    colorLevel: {
+      title: '色レベル',
+      input: '入力レベル',
+      output: '出力レベル',
+      inputShadow: '入力シャドウ',
+      inputHighlight: '入力ハイライト',
+      inputMidtones: '入力中間調',
+      outputShadow: '出力シャドウ',
+      outputHighlight: '出力ハイライト'
+    },
+    reset: 'リセット',
+    resetAll: 'すべてリセット'
+  },
   imageCenter: {
     bilinearInterpolation: 'バイリニア補間',
     shortSelectedMsg: 'が選択されています',
