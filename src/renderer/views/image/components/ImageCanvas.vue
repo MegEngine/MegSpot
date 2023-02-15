@@ -13,7 +13,7 @@
           <span class="size">{{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span>
         </div>
       </el-tooltip>
-      <EffectPreview @change="changeCanvasStyle" />
+      <EffectPreview ref="effect-settings" @change="changeCanvasStyle" />
     </div>
     <div ref="container" class="canvas-container" id="canvas-container" :style="canvasStyle">
       <OperationContainer id="canvas-container" ref="canvas-container" @drag="handleDrag" @zoom="handleZoom"
@@ -46,11 +46,12 @@ import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore')
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
 import { getImageUrlSyncNoCache } from '@/utils/image'
-import { throttle } from '@/utils'
+import { throttle, debounce } from '@/utils'
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants'
 import chokidar from 'chokidar'
 import { getFileName } from '@/filter/get-file-name'
 import { decode, decodeImage, toRGBA8 } from 'utif2'
+import { useWorker } from '@/utils/worker'
 
 export default {
   components: {
@@ -151,6 +152,10 @@ export default {
           event: 'adjustLevels',
           action: 'adjustLevels'
         },
+        {
+          event: 'adjustGamma',
+          action: 'adjustGamma'
+        },
       ],
       histVisible: true,
       triggerRGB: false,
@@ -244,7 +249,8 @@ export default {
   },
   beforeDestroy() {
     this.removeEvents()
-    this.bitMap && this.bitMap.close()
+    this.bitMap && this.bitMap?.close()
+    this.initFilters()
   },
   watch: {
     path: {
@@ -282,16 +288,6 @@ export default {
         this.setSmooth()
       },
       immediate: true
-    },
-    gammaData: {
-      handler(newVal, oldVal) {
-        if (newVal) {
-          newVal !== oldVal && this.adjustGamma(newVal)
-        } else if (this.gammaData !== 1) {
-          this.adjustGamma(this.gammaData)
-        }
-      },
-      immediate: false
     }
   },
   methods: {
@@ -403,99 +399,55 @@ export default {
         return reject()
       })
     },
-    async initBitMap(imageData) {
-      if (this.bitMap) {
-        this.bitMap.close()
-      }
-      this.bitMap = await createImageBitmap(
-        imageData
-          ? new ImageData(new Uint8ClampedArray(imageData), this.image.width, this.image.height, { colorSpace: 'srgb' })
-          : this.image
-      )
-    },
-    async adjustGamma(gamma) {
-      console.log("adjustGamma", gamma)
-      const cv = window.cv
-      // const newCanvas = window.document.createElement('canvas');
-      // newCanvas.width = this.image.width;
-      // newCanvas.height = this.image.height;
-      // const ctx = newCanvas.getContext('2d');
-      // ctx.drawImage(this.bitMap, 0, 0, newCanvas.width, newCanvas.height);
-      let src = cv.imread(this.image);
-      // console.log("src", src)
-      const channel = 3;
-      for (let i = 0; i < src.rows; i++) {
-        for (let j = 0; j < src.cols; j++) {
-          for (let index = 0; index < channel; index++) {
-            // R, G, B
-            let color = src.ucharPtr(i, j)[index];
-            src.ucharPtr(i, j)[index] =
-              255 * (color / 255) ** (1 / gamma);
-          }
+    async initBitMap(_imageData) {
+      return new Promise(async (resolve) => {
+        if (this.bitMap) {
+          this.bitMap?.close()
+          this.bitMap = null
         }
-      }
-      // const newBitmap = await createImageBitmap(src.data, src.cols, src.rows)
-      this.bitMap = await createImageBitmap(new ImageData(new Uint8ClampedArray(src.data), src.cols, src.rows))
-
-      this.drawImage().then(() => {
-        // newBitmap.close()
-        src.delete();
-      });
-    },
-    // TODO: gamma与色阶同时生效
-    async adjustLevels({
-      inputShadow,
-      inputHighlight,
-      inputMidtones,
-      outputShadow,
-      outputHighlight
-    }) {
-      console.log("adjustLevels", {
-        inputShadow,
-        inputHighlight,
-        inputMidtones,
-        outputShadow,
-        outputHighlight
+        const imageData = _imageData
+          ? new ImageData(new Uint8ClampedArray(_imageData), this.image.width, this.image.height, { colorSpace: 'srgb' })
+          : this.getImageData()
+        this.bitMap = await createImageBitmap(imageData)
+        useWorker(this.getName(false), 'all', imageData, this.$refs["effect-settings"].generateFilterParams({})).then(res => {
+          this.bitMap && this.bitMap?.close()
+          this.bitMap = null
+          this.bitMap = res
+          this.drawImage()
+          resolve(res)
+        })
+        // resolve(this.bitMap)
       })
-      const cv = window.cv
-      // const newCanvas = window.document.createElement('canvas');
-      // newCanvas.width = this.image.width;
-      // newCanvas.height = this.image.height;
-      // const ctx = newCanvas.getContext('2d');
-      // ctx.drawImage(this.bitMap, 0, 0, newCanvas.width, newCanvas.height);
-      let src = cv.imread(this.image);
-      // TODO: 调整单通道色阶
-      const channel = 3; // 默认应用rgb三通道
-      const clamp = (val, min = 0, max = 255) =>
-        Math.max(min, Math.min(max, val));
-      for (let i = 0; i < src.rows; i++) {
-        for (let j = 0; j < src.cols; j++) {
-          for (let index = 0; index < channel; index++) {
-            let input_map_color = clamp(
-              ((src.ucharPtr(i, j)[index] - inputShadow) /
-                (inputHighlight - inputShadow)) *
-              255
-            );
-            // const input_map_color = clamp(
-            //   src.ucharPtr(i, j)[index] - inputShadow
-            // );
-            // src.ucharPtr(i, j)[index] = clamp(color,inputShadow, inputHighlight);
-            const mid_color =
-              (input_map_color / 255) ** (1 / inputMidtones) * 255;
-            const output_map_color =
-              (mid_color / 255) * (outputHighlight - outputShadow) +
-              outputShadow;
-            src.ucharPtr(i, j)[index] = clamp(output_map_color);
-          }
-        }
+    },
+    async applyFilters(type, params) {
+      const imageData = this.getImageData();
+      useWorker(this.getName(false), type, imageData, params).then(res => {
+        this.bitMap && this.bitMap?.close()
+        this.bitMap = res
+        this.drawImage()
+      })
+    },
+    async adjustGamma({ parentId, ...params }) {
+      const { gamma } = params
+      if (!this.image || !gamma) {
+        return
       }
-      // const newBitmap = await createImageBitmap(src.data, src.cols, src.rows)
-      this.bitMap = await createImageBitmap(new ImageData(new Uint8ClampedArray(src.data), src.cols, src.rows))
-
-      this.drawImage().then(() => {
-        // newBitmap.close()
-        src.delete();
-      });
+      const settingRef = this.$refs["effect-settings"];
+      settingRef.generateFilterParams({ gamma });
+      this.applyFilters('gamma', params)
+    },
+    async adjustLevels({ parentId, ...params }) {
+      if (!this.image) {
+        return
+      }
+      const settingRef = this.$refs["effect-settings"];
+      settingRef.generateFilterParams(params)
+      this.applyFilters('level', params)
+      // const preParams = settingRef.getParams()
+      // if (parentId !== this.path && Object.keys(preParams).some(key => preParams[key] !== params[key])) {
+        
+      // }
+      return
     },
     resolvePath() {
       return new Promise((resolve) => {
@@ -525,6 +477,21 @@ export default {
         }
       })
     },
+    async initFilters() {
+      await useWorker(this.getName(false), 'initFilters')
+    },
+    getImageData(_img) {
+      const img = _img ?? this.image
+      if (!img) {
+        return null
+      }
+      const _canvas = document.createElement('canvas');
+      _canvas.width = img.width;
+      _canvas.height = img.height;
+      const _ctx = _canvas.getContext('2d');
+      _ctx.drawImage(img, 0, 0);
+      return _ctx.getImageData(0, 0, _canvas.width, _canvas.height);
+    },
     async initImage(initPosition = true) {
       this.loading = true
       return new Promise(async (resolve, reject) => {
@@ -543,7 +510,7 @@ export default {
         } else {
           this.image = new Image()
           this.image.onload = async () => {
-            this.initBitMap()
+            await this.initBitMap()
             this.loading = false
             this.reDraw(initPosition)
             resolve()
@@ -564,7 +531,7 @@ export default {
       this.initImage()
     },
     async drawImage(img = null) {
-      let { x, y, width, height } = this.imagePosition
+      let { x, y, width, height } = this.imagePosition || this.getImageInitPos(this.canvas, this.image)
       this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height)
       this.cs.drawImage(img ?? this.bitMap, x, y, width, height)
     },
@@ -901,7 +868,7 @@ export default {
           ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
       }
       offCtx.drawImage(this.bitMap, 0, 0)
-      this.bitMap.close()
+      this.bitMap?.close()
       this.bitMap = offsreen.transferToImageBitmap()
       this.drawImage()
     },
@@ -921,7 +888,7 @@ export default {
         offCtx.scale(1, -1)
       }
       offCtx.drawImage(this.bitMap, 0, 0)
-      this.bitMap.close()
+      this.bitMap?.close()
       this.bitMap = offsreen.transferToImageBitmap()
       this.drawImage()
     },

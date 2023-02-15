@@ -24,13 +24,10 @@ const preferenceStore = {
       videoProcessBarStyle: 'fixed',
       showScale: true,
       showMousePos: true,
-      hotkeys: [],
-      // gamma校正
-      // TODO:迁移出preference，如到adjusts或filters
-      gamma: 1,
-      // [input_shadow, input_highlight, mid, output_shadow, output_highlight]
-      colorLevelSetting: [0, 255, 1, 0, 255]
+      hotkeys: []
     },
+    // gamma校正
+    gamma: 1,
     colorLevelSetting: {
       inputMidtones: 1,
       inputs: [0, 255],
@@ -40,14 +37,17 @@ const preferenceStore = {
       // outputShadow: 0,
       // outputHighlight: 255
     },
+    uuid: null,
     lastRouterPath: '/dashboard',
     hotkeysMap: null
   },
   getters: {
+    uuid: (state) => state.uuid,
+    gamma: (state) => state.gamma,
     preference: (state) => state.preference,
-    colorLevelSetting: (state) => state.colorLevelSetting,
+    hotkeysMap: (state) => state.hotkeysMap,
     lastRouterPath: (state) => state.lastRouterPath,
-    hotkeysMap: (state) => state.hotkeysMap
+    colorLevelSetting: (state) => state.colorLevelSetting
   },
   mutations: {
     SET_PREFERENCE: (state, newPreOb) => {
@@ -59,6 +59,12 @@ const preferenceStore = {
           newPreOb.hotkeys.map(({ name, keysArr }) => keysArr.map((keys) => [getArrStr(keys), name])).flat()
         )
       }
+    },
+    SET_UUID: (state, newUuid) => {
+      state.uuid = newUuid
+    },
+    SET_GAMMA: (state, newGamma) => {
+      state.gamma = newGamma
     },
     SET_COLOR_LEVEL: (state, newPreOb) => {
       const newPreference = Object.assign({}, state.colorLevelSetting, newPreOb)
@@ -86,6 +92,12 @@ const preferenceStore = {
     },
     setColorLevel({ commit }, newPreOb) {
       commit('SET_COLOR_LEVEL', newPreOb)
+    },
+    setUuid({ commit }, newUuid) {
+      commit('SET_UUID', newUuid)
+    },
+    setGamma({ commit }, newGamma) {
+      commit('SET_GAMMA', newGamma)
     },
     setLastRouterPath({ commit }, routerPath) {
       commit('SET_LAST_ROUTER_PATH', routerPath)
