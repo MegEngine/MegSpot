@@ -12,7 +12,7 @@ English | [中文](README.md)
 
 - Support superimposed comparison, drag-and-drop comparison, and GIF result presentation.
 - Support pixel-level image viewing, image histogram, RGB color information, coordinate information viewing.
-- Support to adjust the brightness, contrast, saturation, gray level and other indicators for preview.
+- Support to adjust the brightness, contrast, saturation, grayscale and other indicators in time for preview, and support gamma and color scale adjustment.
 - Support video comparison, and inherit all image comparison functions.
 - Mac, Linux, Window cross-platform support & automatic update support.
 - **HEVC/H.265 video hard decoding support**.
