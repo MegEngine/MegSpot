@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.0.10",
+  "version": "v2.1.0",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -44,8 +44,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "1. 修复直方图显示；\n2. 修复构建问题；",
-      "releaseDate": "2023.2.3"
+      "releaseNotes": "1. 新增功能：支持图像gamma及光阶调整(支持效果叠加)。 \n2. 优化体验：完善“色彩与滤镜”模块的翻译。 \n3. 修复一些问题；",
+      "releaseDate": "2023.2.15"
     },
     "directories": {
       "output": "build"
