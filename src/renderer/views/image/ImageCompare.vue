@@ -8,6 +8,7 @@
 <script>
 import Toolbar from './Toolbar'
 import Content from './Content'
+import { useWorker } from '@/utils/worker'
 
 export default {
   name: 'image-compare',
@@ -24,12 +25,24 @@ export default {
     return {
       getSnapshotMode: () => this.snapshotMode
     }
+  },
+  mounted() {
+    this.initFiltersMap()
+  },
+  beforeDestroy() {
+    this.initFiltersMap()
+  },
+  methods: {
+    async initFiltersMap() {
+      await useWorker('all', 'initFiltersMap')
+    },
   }
 }
 </script>
 <style lang="scss" scoped>
 .image-center {
   height: 100%;
+
   .content-container {
     background: #f4f4f5;
   }

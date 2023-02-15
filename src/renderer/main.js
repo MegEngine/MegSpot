@@ -43,17 +43,17 @@ if (process.env.NODE_ENV === 'production') {
   console.log('not initAnalyze')
 }
 
+new Vue({
+  components: { App },
+  router,
+  i18n,
+  store,
+  template: '<App/>'
+}).$mount('#app')
 // 由于加载lib是异步的 所以通过callback调用Vue初始化 保证lib初始化完成
 loadLib((cv) => {
   console.info(`-----------opencv loaded-----------`)
   Vue.prototype.$cv = cv
-  new Vue({
-    components: { App },
-    router,
-    i18n,
-    store,
-    template: '<App/>'
-  }).$mount('#app')
 })
 
 export default Vue

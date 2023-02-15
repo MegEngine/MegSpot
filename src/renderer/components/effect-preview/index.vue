@@ -83,26 +83,28 @@
       <el-row :gutter="10" flex="cross:center">
         <el-col :span="6"><span class="text-style">{{ $t("imagePreview.gamma") }}</span></el-col>
         <el-col :span="18">
-          <el-slider :min="0.01" :max="10" :step="0.01" v-model="gammaData" show-input></el-slider>
+          <el-slider :min="0.01" :max="10" :step="0.01" v-model="gammaData" show-input @input="updateGama"></el-slider>
         </el-col>
       </el-row>
       <el-divider><span class="title-style">{{ $t("imagePreview.colorLevel.title") }}</span></el-divider>
       <el-row :gutter="10" flex="cross:center">
         <el-col :span="6"><span class="text-style">{{ $t("imagePreview.colorLevel.input") }}</span></el-col>
         <el-col :span="18">
-          <el-slider v-model="inputLevels" range :min="0" :max="255"> </el-slider>
+          <el-slider v-model="inputLevels" range :min="0" :max="255" :step="1" @input="updateInputLevels"> </el-slider>
         </el-col>
       </el-row>
       <el-row :gutter="10" flex="cross:center">
         <el-col :span="6"><span class="text-style">{{ $t("imagePreview.colorLevel.inputMidtones") }}</span></el-col>
         <el-col :span="18">
-          <el-slider v-model="inputMidtonesData" :min="0.01" :max="10" :step="0.01" show-input> </el-slider>
+          <el-slider v-model="inputMidtonesData" :min="0.01" :max="10" :step="0.01" show-input
+            @input="updateInputMidtones"> </el-slider>
         </el-col>
       </el-row>
       <el-row :gutter="10" flex="cross:center">
         <el-col :span="6"><span class="text-style">{{ $t("imagePreview.colorLevel.output") }}</span></el-col>
         <el-col :span="18">
-          <el-slider v-model="outputLevels" range :min="0" :max="255"> </el-slider>
+          <el-slider v-model="outputLevels" range :min="0" :max="255" :step="1" @input="updateOutputLevels">
+          </el-slider>
         </el-col>
       </el-row>
 
@@ -135,11 +137,17 @@ export default {
       invert: 0,
       opacity: 100,
       blur: 0,
-      enableXray: false
+      enableXray: false,
+      preGammaData: 1,
+      gammaData: 1,
+      preLevels: "025510255",
+      inputLevels: [0, 255],
+      inputMidtonesData: 1,
+      outputLevels: [0, 255],
     }
   },
   computed: {
-    ...mapGetters(['preference', 'colorLevelSetting']),
+    ...mapGetters(['preference']),
     canvasStyle() {
       let filter = ''
         ;['brightness', 'contrast', 'saturate', 'grayscale', 'opacity', 'invert'].forEach((item) => {
@@ -149,47 +157,6 @@ export default {
           filter += `${item}(${this[item]}px) `
         })
       return filter
-    },
-    gammaData: {
-      get() {
-        // TODO:迁移出preference，如到adjusts或filters
-        return this.preference.gamma
-      },
-      set(newVal) {
-        this.setPreference({
-          gamma: newVal
-        })
-      }
-    },
-    inputLevels: {
-      get() {
-        return this.colorLevelSetting.inputs
-      },
-      set(newVal) {
-        this.setColorLevel({
-          inputs: newVal
-        })
-      }
-    },
-    inputMidtonesData: {
-      get() {
-        return this.colorLevelSetting.inputMidtones
-      },
-      set(newVal) {
-        this.setColorLevel({
-          inputMidtones: newVal
-        })
-      }
-    },
-    outputLevels: {
-      get() {
-        return this.colorLevelSetting.outputs
-      },
-      set(newVal) {
-        this.setColorLevel({
-          outputs: newVal
-        })
-      }
     },
   },
   watch: {
@@ -201,60 +168,9 @@ export default {
       this.grayscale = enable ? 100 : 0
       this.invert = enable ? 100 : 0
     },
-    inputLevels: {
-      handler: debounce(200, function (newVal, oldVal) {
-        if (newVal && newVal.some((val, index) => oldVal[index] !== val)) {
-          bus.$emit('image_broadcast', {
-            name: "adjustLevels",
-            data: {
-              inputShadow: newVal[0],
-              inputHighlight: newVal[1],
-              inputMidtones: this.inputMidtonesData,
-              outputShadow: this.outputLevels[0],
-              outputHighlight: this.outputLevels[1]
-            }
-          })
-        }
-      }),
-      immediate: false
-    },
-    inputMidtonesData: {
-      handler: debounce(200, function (newVal, oldVal) {
-        if (newVal && newVal !== oldVal) {
-          bus.$emit('image_broadcast', {
-            name: "adjustLevels",
-            data: {
-              inputShadow: this.inputLevels[0],
-              inputHighlight: this.inputLevels[1],
-              inputMidtones: newVal,
-              outputShadow: this.outputLevels[0],
-              outputHighlight: this.outputLevels[1]
-            }
-          })
-        }
-      }),
-      immediate: false
-    },
-    outputLevels: {
-      handler: debounce(200, function (newVal, oldVal) {
-        if (newVal && newVal.some((val, index) => oldVal[index] !== val)) {
-          bus.$emit('image_broadcast', {
-            name: "adjustLevels",
-            data: {
-              inputShadow: this.inputLevels[0],
-              inputHighlight: this.inputLevels[1],
-              inputMidtones: this.inputMidtonesData,
-              outputShadow: newVal[0],
-              outputHighlight: newVal[1]
-            }
-          })
-        }
-      }),
-      immediate: false
-    }
   },
   methods: {
-    ...mapActions(['setPreference', 'setColorLevel']),
+    ...mapActions(['setPreference']),
     resetImageStyle() {
       // 预览处理效果
       this.brightness = 100
@@ -272,8 +188,97 @@ export default {
       this.inputLevels = [0, 255]
       this.inputMidtonesData = 1
       this.outputLevels = [0, 255]
+    },
+    updateGama: debounce(200, function (newGama) {
+      if (newGama) {
+        this.preGammaData = this.gammaData
+        this.gammaData = newGama
+        const params = this.generateFilterParams({
+          gamma: newGama
+        })
+        bus.$emit('image_broadcast', {
+          name: "adjustGamma",
+          data: params
+        })
+      }
+    }),
+    updateInputLevels: debounce(200, function (inputLevels) {
+      const paramsStr = this.inputLevels.concat([this.inputMidtonesData]).concat(this.outputLevels).join("");
+      if (paramsStr === this.preLevels) {
+        return
+      }
+      this.preLevels = paramsStr
+      const params = this.generateFilterParams({
+        inputShadow: inputLevels[0],
+        inputHighlight: inputLevels[1],
+      })
+      this.updateLevels(params, false)
+      bus.$emit('image_broadcast', {
+        name: "adjustLevels",
+        data: params
+      })
+    }),
+    updateInputMidtones: debounce(200, function (inputMidtones) {
+      const paramsStr = this.inputLevels.concat([this.inputMidtonesData]).concat(this.outputLevels).join("");
+      if (paramsStr === this.preLevels) {
+        return
+      }
+      this.preLevels = paramsStr
+      const params = this.generateFilterParams({
+        inputMidtones
+      })
+      this.updateLevels(params, false)
+      bus.$emit('image_broadcast', {
+        name: "adjustLevels",
+        data: params
+      })
+    }),
+    updateOutputLevels: debounce(200, function (outputLevels) {
+      const paramsStr = this.inputLevels.concat([this.inputMidtonesData]).concat(this.outputLevels).join("");
+      if (paramsStr === this.preLevels) {
+        return
+      }
+      this.preLevels = paramsStr
+      const params = this.generateFilterParams({
+        outputShadow: outputLevels[0],
+        outputHighlight: outputLevels[1],
+      })
+      this.updateLevels(params, false)
+      bus.$emit('image_broadcast', {
+        name: "adjustLevels",
+        data: params
+      })
+    }),
+    updateLevels({ inputShadow, inputHighlight, inputMidtones, outputShadow, outputHighlight }, check = true) {
+      if (check) {
+        const paramsStr = this.inputLevels.concat([this.inputMidtonesData]).concat(this.outputLevels).join("");
+        if (paramsStr === this.preLevels) {
+          return
+        }
+        this.preLevels = paramsStr
+      }
+      this.inputLevels = [inputShadow, inputHighlight]
+      this.inputMidtonesData = inputMidtones
+      this.outputLevels = [outputShadow, outputHighlight]
+    },
+    generateFilterParams(params) {
+      const _params = {
+        gamma: params.gamma ?? this.gammaData,
+        inputShadow: params.inputShadow ?? this.inputLevels[0],
+        inputHighlight: params.inputHighlight ?? this.inputLevels[1],
+        inputMidtones: params.inputMidtones ?? this.inputMidtonesData,
+        outputShadow: params.outputShadow ?? this.outputLevels[0],
+        outputHighlight: params.outputHighlight ?? this.outputLevels[1],
+      }
+      const { gamma, inputShadow, inputHighlight, inputMidtones, outputShadow, outputHighlight } = _params
+      if (gamma !== this.gammaData) {
+        this.preGammaData = this.gammaData
+        this.gammaData = gamma
+      }
+      [inputShadow, inputHighlight, inputMidtones, outputShadow, outputHighlight].every(num => !isNaN(num)) && this.updateLevels(_params)
+      return _params
     }
-  }
+  },
 }
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
