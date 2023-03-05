@@ -1,22 +1,12 @@
 <template>
-  <el-dialog
-    ref="aboutDialog"
-    :visible.sync="visible"
-    :title="$t('generateGIF.title')"
-    width="80%"
-    class="gifDialog"
-    center
-  >
+  <el-dialog ref="aboutDialog" :visible.sync="visible" :title="$t('generateGIF.title')" width="80%" class="gifDialog"
+    center>
     <div id="imageItems">
       <el-table :data="gifImageList">
         <el-table-column :label="$t('generateGIF.image')" prop="imageName" width="350px">
           <template slot-scope="scope">
-            <el-select
-              class="select"
-              v-model="scope.row.imageName"
-              placeholder="select image"
-              @change="selectImage(scope.row.imageName, scope.$index)"
-            >
+            <el-select class="select" v-model="scope.row.imageName" placeholder="select image"
+              @change="selectImage(scope.row.imageName, scope.$index)">
               <div v-for="item in selectList" :key="item">
                 <el-option :label="$options.filters.getFileName(item, false)" :value="item"></el-option>
               </div>
@@ -40,12 +30,8 @@
       <div>
         <el-form :inline="true" :model="optionList">
           <el-form-item label="Image interval">
-            <el-input-number
-              v-model="optionList.delay"
-              placeholder="Image interval"
-              controls-position="right"
-              :step="100"
-            >
+            <el-input-number v-model="optionList.delay" placeholder="Image interval" controls-position="right"
+              :step="100">
               <template slot="append">ms</template>
             </el-input-number>
           </el-form-item>
@@ -200,16 +186,17 @@ export default {
           console.log('error: ' + error)
         })
     },
+    generateCanvas() {
+      const canvas = document.createElement('canvas')
+      canvas.width = this.canvasSize.width
+      canvas.height = this.canvasSize.height * 1.04
+      return canvas
+    },
     generateGif() {
       this.current = Date.now()
       let delay = this.optionList.delay
-      let canvas = document.createElement('canvas')
-      canvas.width = this.canvasSize.width
-      canvas.height = this.canvasSize.height
-      const fontSize = canvas.height / 25
-      canvas.height += fontSize * 2
+      const fontSize = this.canvasSize.height / 25
 
-      let cs = canvas.getContext('2d')
       let gif = new GIF({
         workers: 8,
         workerScript: '/gif.worker.js',
@@ -220,12 +207,15 @@ export default {
 
       this.gifCanvasList.forEach((element) => {
         let index = this.imageDetails.findIndex((item) => item.imageName === element.imageName)
-        cs.drawImage(this.imageDetails[index].canvas, 0, 0, this.canvasSize.width, this.canvasSize.height)
-        cs.font = `${fontSize}px Arial`
-        cs.textAlign = 'center'
-        cs.fillText(element.description, canvas.width / 2, canvas.height - (fontSize * 2) / 3)
-        gif.addFrame(canvas, { copy: true, delay: delay })
-        cs.clearRect(0, 0, canvas.width, canvas.height)
+        const canvas = this.generateCanvas()
+        const ctx = canvas.getContext('2d')
+        const originCanvas = this.imageDetails[index].canvas
+        ctx.filter = originCanvas.style.filter
+        ctx.drawImage(originCanvas, 0, 0, this.canvasSize.width, this.canvasSize.height)
+        ctx.font = `${fontSize}px Arial`
+        ctx.textAlign = 'center'
+        ctx.fillText(element.description, canvas.width / 2, canvas.height - (fontSize * 2) / 3)
+        gif.addFrame(canvas, { delay: delay })
       })
 
       gif.on('finished', (blob) => {
@@ -270,28 +260,35 @@ export default {
       margin-top: 10px;
     }
   }
+
   .el-select {
     width: 100%;
   }
+
   hr {
     color: #c6c0c0;
     opacity: 0.4;
   }
+
   .options {
     margin-top: 10px;
   }
+
   .tip {
     font-size: 12px;
     color: red;
     margin-bottom: 5px;
   }
+
   .gifPreview {
     height: 50vh;
     border: 1px solid gray;
     text-align: center;
     overflow: hidden;
+
     .image {
       text-align: center;
+
       img {
         object-fit: contain;
       }
