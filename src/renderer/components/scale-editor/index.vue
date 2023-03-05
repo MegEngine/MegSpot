@@ -1,10 +1,10 @@
 <template>
-  <div class="scale-editor" @click.stop>
+  <div class="scale-editor" @click.stop @dblclick.stop>
     <span
       v-show="!scaleEditorVisible"
       class="scale-number"
       :style="{ color: textColor }"
-      @dblclick="handleScaleDbClick"
+      @dblclick.capture.stop="handleScaleDbClick"
     >
       {{ scaleData }}
     </span>
