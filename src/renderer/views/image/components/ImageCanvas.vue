@@ -2,7 +2,7 @@
   <div :class="['image-canvas', { selected: selected }]" @click.stop>
     <div ref="header" class="header" flex="cross:center">
       <CoverMask :mask="maskDom" class="cover-mask">
-        <HistContainer ref="hist-container" :index="index" :title="$t('general.histogram')" @changeVisible="handleHistVisible" />
+        <HistContainer ref="hist-container" :index="index" @changeVisible="handleHistVisible" />
       </CoverMask>
       <el-tooltip placement="bottom" :open-delay="800">
         <span class="compare-name" flex-box="1" v-html="getTitle"></span>
@@ -16,14 +16,34 @@
       <EffectPreview ref="effect-settings" @change="changeCanvasStyle" />
     </div>
     <div ref="container" class="canvas-container" id="canvas-container" :style="canvasStyle">
-      <OperationContainer id="canvas-container" ref="canvas-container" @drag="handleDrag" @zoom="handleZoom"
-        @scrollEnd="handleZoomEnd" @click="handleClick" @dbclick="handleDbclick" @mouseMove="handleMove">
+      <OperationContainer
+        id="canvas-container"
+        ref="canvas-container"
+        @drag="handleDrag"
+        @zoom="handleZoom"
+        @scrollEnd="handleZoomEnd"
+        @click="handleClick"
+        @dbclick="handleDbclick"
+        @mouseMove="handleMove"
+      >
         <div v-loading="loading" element-loading-background="rgba(0, 0, 0, 0)" class="canvas-item" @contextmenu.prevent>
-          <ScaleEditor v-if="preference.showScale" class="scale-editor" :scale="imgScale"
-            :scaleEditorVisible.sync="scaleEditorVisible" @show="showScaleEditor" @reset="resetZoom"
-            @update="setZoom" />
-          <ZoomViewer v-if="triggerRGB" ref="zoom-viewer" :RGBAcolor.sync="RGBAcolor" :mousePos="mousePos"
-            :parentWidth="_width" :parentHeight="_height" />
+          <ScaleEditor
+            v-if="preference.showScale"
+            class="scale-editor"
+            :scale="imgScale"
+            :scaleEditorVisible.sync="scaleEditorVisible"
+            @show="showScaleEditor"
+            @reset="resetZoom"
+            @update="setZoom"
+          />
+          <ZoomViewer
+            v-if="triggerRGB"
+            ref="zoom-viewer"
+            :RGBAcolor.sync="RGBAcolor"
+            :mousePos="mousePos"
+            :parentWidth="_width"
+            :parentHeight="_height"
+          />
           <canvas ref="canvas" :width="_width" :height="_height"></canvas>
           <div v-if="triggerRGB || preference.showDot" ref="feedback" id="feedback" :style="feedbackStyle"></div>
           <div v-if="preference.showMousePos" v-show="mousePosInfo.x" class="mouse-position">
@@ -89,7 +109,7 @@ export default {
     // },
     snapInfo: {
       type: Object,
-      default: () => { }
+      default: () => {}
     }
   },
   inject: ['getSnapshotMode'],
@@ -160,6 +180,10 @@ export default {
           event: 'adjustGamma',
           action: 'adjustGamma'
         },
+        {
+          event: 'changeHistTypes',
+          action: 'handleChangeHistTypes'
+        }
       ],
       histVisible: true,
       triggerRGB: false,
@@ -242,7 +266,7 @@ export default {
           outputs: newVal
         })
       }
-    },
+    }
   },
   async mounted() {
     this.header = this.$refs.header
@@ -342,8 +366,8 @@ export default {
       return this.snapshotMode
         ? this.snapInfo.name
         : filter
-          ? this.$options.filters.getFileName(this.path)
-          : getFileName(this.path)
+        ? this.$options.filters.getFileName(this.path)
+        : getFileName(this.path)
     },
     listenEvents() {
       // 广播调度事件
@@ -393,15 +417,20 @@ export default {
         this[name](data)
       }
     },
-    initHist() {
+    initHist(reGenerate = true) {
       return new Promise((resolve, reject) => {
         const cv = window.cv
         if (cv && this.image?.width) {
-          this.currentHist = this.$refs['hist-container'].reGenerateHist(cv.imread(this.image))
+          this.currentHist = reGenerate
+            ? this.$refs['hist-container'].reGenerateHist(cv.imread(this.image))
+            : this.$refs['hist-container'].generateHist(cv.imread(this.image))
           resolve()
         }
         return reject()
       })
+    },
+    handleChangeHistTypes() {
+      this.initHist(false)
     },
     async initBitMap(_imageData) {
       return new Promise(async (resolve) => {
@@ -410,22 +439,26 @@ export default {
           this.bitMap = null
         }
         const imageData = _imageData
-          ? new ImageData(new Uint8ClampedArray(_imageData), this.image.width, this.image.height, { colorSpace: 'srgb' })
+          ? new ImageData(new Uint8ClampedArray(_imageData), this.image.width, this.image.height, {
+              colorSpace: 'srgb'
+            })
           : this.getImageData()
         this.bitMap = await createImageBitmap(imageData)
-        useWorker(this.getName(false), 'all', imageData, this.$refs["effect-settings"].generateFilterParams({})).then(res => {
-          this.bitMap && this.bitMap?.close()
-          this.bitMap = null
-          this.bitMap = res
-          this.drawImage()
-          resolve(res)
-        })
+        useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
+          (res) => {
+            this.bitMap && this.bitMap?.close()
+            this.bitMap = null
+            this.bitMap = res
+            this.drawImage()
+            resolve(res)
+          }
+        )
         // resolve(this.bitMap)
       })
     },
     async applyFilters(type, params) {
-      const imageData = this.getImageData();
-      useWorker(this.getName(false), type, imageData, params).then(res => {
+      const imageData = this.getImageData()
+      useWorker(this.getName(false), type, imageData, params).then((res) => {
         this.bitMap && this.bitMap?.close()
         this.bitMap = res
         this.drawImage()
@@ -436,20 +469,20 @@ export default {
       if (!this.image || !gamma) {
         return
       }
-      const settingRef = this.$refs["effect-settings"];
-      settingRef.generateFilterParams({ gamma });
+      const settingRef = this.$refs['effect-settings']
+      settingRef.generateFilterParams({ gamma })
       this.applyFilters('gamma', params)
     },
     async adjustLevels({ parentId, ...params }) {
       if (!this.image) {
         return
       }
-      const settingRef = this.$refs["effect-settings"];
+      const settingRef = this.$refs['effect-settings']
       settingRef.generateFilterParams(params)
       this.applyFilters('level', params)
       // const preParams = settingRef.getParams()
       // if (parentId !== this.path && Object.keys(preParams).some(key => preParams[key] !== params[key])) {
-        
+
       // }
       return
     },
@@ -489,12 +522,12 @@ export default {
       if (!img) {
         return null
       }
-      const _canvas = document.createElement('canvas');
-      _canvas.width = img.width;
-      _canvas.height = img.height;
-      const _ctx = _canvas.getContext('2d');
-      _ctx.drawImage(img, 0, 0);
-      return _ctx.getImageData(0, 0, _canvas.width, _canvas.height);
+      const _canvas = document.createElement('canvas')
+      _canvas.width = img.width
+      _canvas.height = img.height
+      const _ctx = _canvas.getContext('2d')
+      _ctx.drawImage(img, 0, 0)
+      return _ctx.getImageData(0, 0, _canvas.width, _canvas.height)
     },
     async initImage(initPosition = true) {
       this.loading = true
@@ -865,11 +898,11 @@ export default {
       if (degree < 0) {
         offCtx.translate(0, this.bitMap.width)
         offCtx.rotate((-90 * Math.PI) / 180)
-          ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
+        ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
       } else if (degree > 0) {
         offCtx.translate(this.bitMap.height, 0)
         offCtx.rotate((90 * Math.PI) / 180)
-          ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
+        ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
       }
       offCtx.drawImage(this.bitMap, 0, 0)
       this.bitMap?.close()
@@ -945,7 +978,6 @@ export default {
       }
 
       ::v-deep {
-
         input,
         .el-input-group__append {
           border-radius: 0;

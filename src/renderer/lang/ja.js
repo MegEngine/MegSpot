@@ -42,7 +42,6 @@ export default {
     shareAsProject: '共有するスナップショットファイルを作成する',
     show: '見せる',
     hide: '隠れる',
-    histogram: 'ヒストグラム',
     thumbnail: 'サムネイル画像',
     fileName: 'ファイル名',
     fileLoading: 'ファイルを読み込んでいます...',
@@ -64,7 +63,8 @@ export default {
     videoList: 'ビデオリスト',
     invalidFolderTip: 'フォルダが存在しません。有効なパスを入力してください',
     imageFolderList: '画像フォルダ一覧',
-    videoFolderList: 'ビデオフォルダリスト'
+    videoFolderList: 'ビデオフォルダリスト',
+    common: "一般"
   },
   hotkey: {
     desc: '説明',
@@ -248,5 +248,19 @@ export default {
     version: 'バージョン',
     hotkey: 'ショートカット',
     log: 'ログ'
+  },
+  histogram: {
+    title: 'ヒストグラム',
+    close: 'ヒストグラムを閉じる',
+    setting: 'ヒストグラム設定',
+    tip: 'このチャンネルのヒストグラムを追加/削除します',
+    lineWidth: "線幅",
+    multi: "チャンネル選択タイプ",
+    singleType: "無線モード",
+    multiType: "複数選択モード",
+    line: "複数選択モード",
+    rect: "充填",
+    backgroundColor: "背景色",
+    drawType: "背景色"
   }
 }

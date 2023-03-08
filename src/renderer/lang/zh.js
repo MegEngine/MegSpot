@@ -41,7 +41,6 @@ export default {
     shareAsProject: '创建快照文件进行共享',
     show: '显示',
     hide: '隐藏',
-    histogram: '直方图',
     thumbnail: '缩略图',
     fileName: '文件名',
     fileLoading: '加载文件中...',
@@ -63,7 +62,8 @@ export default {
     videoList: '视频列表',
     invalidFolderTip: '文件夹不存在，请输入有效路径',
     imageFolderList: '图片目录列表',
-    videoFolderList: '视频目录列表'
+    videoFolderList: '视频目录列表',
+    common: "通用"
   },
   hotkey: {
     desc: '描述',
@@ -135,8 +135,8 @@ export default {
     gamma: 'gamma值',
     colorLevel: {
       title: '色阶',
-      input: "输入色阶",
-      output: "输出色阶",
+      input: '输入色阶',
+      output: '输出色阶',
       inputShadow: '黑场',
       inputHighlight: '白场',
       inputMidtones: '中间调',
@@ -245,5 +245,19 @@ export default {
     version: '版本信息',
     hotkey: '快捷键',
     log: '日志'
+  },
+  histogram: {
+    title: '直方图',
+    close: '关闭直方图',
+    setting: '直方图设置',
+    tip: "添加/移除该通道的直方图",
+    lineWidth: "线宽",
+    multi: "通道切换模式",
+    singleType: "单选模式",
+    multiType: "多选模式",
+    line: "线型",
+    rect: "填充",
+    backgroundColor: "背景颜色",
+    drawType: "绘制模式"
   }
 }

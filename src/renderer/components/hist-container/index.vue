@@ -4,22 +4,53 @@
       <svg-icon icon-class="chart"></svg-icon>
     </el-button>
     <div :id="`hist-container-${index}`" class="hist-container">
-      <canvas v-loading="loading" ref="hist" v-show="visible" id="hist" @click="changeVisible(false)"></canvas>
-      <el-button
-        class="close-icon"
-        icon="el-icon-circle-close"
-        size="medium"
-        type="text"
-        @click="changeVisible(false)"
+      <canvas
+        ref="hist"
         v-show="visible"
-      ></el-button>
+        id="hist"
+        :title="$t('histogram.title')"
+        @click="changeVisible(false)"
+      ></canvas>
+      <el-checkbox-group
+        v-if="multi"
+        v-show="visible"
+        v-model="histTypes"
+        class="mode-group"
+        :title="$t('histogram.tip')"
+      >
+        <el-checkbox-button v-for="histType in histTypeOptions" size="mini" :label="histType" :key="histType">
+          {{ histType }}
+        </el-checkbox-button>
+      </el-checkbox-group>
+      <el-radio-group v-else v-show="visible" v-model="singleHistType" class="mode-group" :title="$t('histogram.tip')">
+        <el-radio-button
+          v-for="histType in histTypeOptions"
+          size="mini"
+          :label="histType"
+          :key="histType"
+          :value="histType"
+        ></el-radio-button>
+      </el-radio-group>
+      <div class="setting-group" flex="dir:top main:left cross:center">
+        <el-button
+          class="close-icon"
+          icon="el-icon-circle-close"
+          size="medium"
+          type="text"
+          :title="$t('histogram.close')"
+          @click="changeVisible(false)"
+          v-show="visible"
+        ></el-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { createNamespacedHelpers } from 'vuex'
+import { histTypeOptions, get_default_histconfig, setHistConfig, isBright } from './config'
 const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore')
+
 export default {
   name: 'HistContainer',
   props: {
@@ -32,7 +63,6 @@ export default {
     return {
       visible: false,
       hist: undefined,
-      loading: false,
       mask: undefined,
       rgbaPlanes: undefined,
       grayHist: undefined,
@@ -40,28 +70,32 @@ export default {
       rHist: undefined,
       gHist: undefined,
       bHist: undefined,
-      histConfig: {
-        histTypes: ['rgb'], // 'gray', 'rgb', 'red', 'green', 'blue'
-        scale: 1.0,
-        lineWidth: 1,
-        drawType: 'line', // "line"/"rect"
-        backgroundColor: [255, 255, 255, 255],
-        colors: new Map([
-          ['gray', [0, 0, 0]],
-          ['red', [255, 0, 0]],
-          ['green', [0, 255, 0]],
-          ['blue', [0, 0, 255]],
-          ['rgb', [0, 0, 0]]
-        ]),
-        accumulate: true,
-        histSize: [256],
-        ranges: [0, 256]
-      }
+      histTypeOptions
     }
   },
   computed: {
+    ...mapGetters(['preference', 'histConfig']),
     containerId() {
       return `hist-container-${this.index}`
+    },
+    multi() {
+      return this.histConfig.multi
+    },
+    histTypes: {
+      get() {
+        return this.histConfig.histTypes
+      },
+      set(histTypes) {
+        this.applayHistTypes(histTypes)
+      }
+    },
+    singleHistType: {
+      get() {
+        return this.histConfig.histTypes[0]
+      },
+      set(histType) {
+        this.applayHistTypes([histType])
+      }
     }
   },
   created() {
@@ -75,7 +109,11 @@ export default {
     this.resetHists()
   },
   methods: {
+    setHistConfig,
     ...mapActions(['setPreference']),
+    restHistConfig() {
+      this.setHistConfig(get_default_histconfig())
+    },
     resetHists() {
       this.rgbaPlanes?.delete()
       this.grayHist?.delete()
@@ -148,6 +186,13 @@ export default {
       }
       return this.rgbaPlanes
     },
+    getLineColor(histType) {
+      const { backgroundColor, colors } = this.histConfig
+      if (['rgb', 'gray'].includes(histType)) {
+        return isBright(...backgroundColor.slice(0, 3)) ? [0, 0, 0] : [255, 255, 255]
+      }
+      return colors[histType]
+    },
     reGenerateHist(sourceMat, config = null) {
       this.resetHists()
       return this.generateHist(sourceMat, config)
@@ -159,19 +204,19 @@ export default {
      * @param {array} config 直方图通道类型 // "gray"/"red"/"green"/"blue"
      */
     generateHist(sourceMat, config = null) {
-      this.loading = this.$loading({
+      const loading = this.$loading({
         target: `#hist-container-${this.index}`,
         lock: false,
         text: 'Loading',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       })
-      const { histTypes, drawType, lineWidth, scale, colors, histSize, backgroundColor } = config ?? this.histConfig
+      const { histTypes, drawType, lineWidth, scale, histSize, backgroundColor } = config ?? this.histConfig
       let histRows = sourceMat.rows
-      let dst = new cv.Mat(histRows, histSize[0] * scale, cv.CV_8UC3, backgroundColor) // black background
+      let dst = new cv.Mat(histRows, histSize[0] * scale, cv.CV_8UC3, backgroundColor.slice(0, 4)) // black background
       for (let histType of histTypes) {
         const hist = this.getHist(sourceMat, histType)
-        const color = new cv.Scalar(...colors.get(histType))
+        const color = new cv.Scalar(...this.getLineColor(histType))
         const mask = this.getMask()
         let result = cv.minMaxLoc(hist, mask)
         let max = result.maxVal
@@ -193,7 +238,7 @@ export default {
         }
       }
 
-      this.loading?.close()
+      loading?.close()
       cv.imshow(this.$refs.hist, dst)
       dst.delete()
       sourceMat.delete()
@@ -213,13 +258,20 @@ export default {
       this.visible = visible ?? !this.visible
       this.$emit('changeVisible', this.visible)
     },
+    applayHistTypes(histTypes) {
+      if (histTypes.length > 0) {
+        this.setHistConfig({
+          histTypes
+        })
+        this.$bus.$emit('changeHistTypes')
+      } else {
+        this.$message.error('at least one histogram channel')
+      }
+    },
     // 供外部直接调用
     setVisible(visible) {
       this.visible = visible
     }
-  },
-  computed: {
-    ...mapGetters(['preference'])
   }
 }
 </script>
@@ -236,17 +288,53 @@ export default {
       width: 160px;
       height: 90px;
     }
-    .close-icon {
+    .mode-group {
       position: absolute;
-      left: 158px;
-      top: 74px;
-      &:hover {
-        color: red;
+      left: 0;
+      top: 90px;
+      width: 800px;
+    }
+    .setting-group {
+      position: absolute;
+      left: 155px;
+      top: 0px;
+      width: 30px;
+      height: 90px;
+      gap: 8px;
+
+      .setting-icon {
+        &:hover {
+          color: rgb(183, 0, 255);
+        }
+      }
+      .close-icon {
+        &:hover {
+          color: red;
+        }
+      }
+    }
+    .mode-group,
+    .setting-group {
+      visibility: hidden;
+      transition: visibility 0.8s ease-in;
+    }
+    &:hover {
+      .mode-group,
+      .setting-group {
+        visibility: visible;
       }
     }
   }
   #hist-icon {
     font-size: 16px;
+  }
+}
+::v-deep {
+  .el-button + .el-button {
+    margin-left: 0;
+  }
+  .el-button {
+    padding: 0 0 0 0;
   }
 }
 </style>

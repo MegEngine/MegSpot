@@ -37,6 +37,25 @@ const preferenceStore = {
       // outputShadow: 0,
       // outputHighlight: 255
     },
+    histConfig: {
+      histTypes: ['rgb'], // 'gray', 'rgb', 'red', 'green', 'blue'
+      scale: 1.0,
+      lineWidth: 1,
+      drawType: 'line', // "line"/"rect"
+      backgroundColor: [255, 255, 255, 255],
+      colors: {
+        gray: [0, 0, 0],
+        red: [255, 0, 0],
+        green: [0, 255, 0],
+        blue: [0, 0, 255],
+        rgb: [0, 0, 0]
+      },
+      accumulate: true,
+      histSize: [256],
+      ranges: [0, 256],
+      // ui config
+      multi: true
+    },
     uuid: null,
     lastRouterPath: '/dashboard',
     hotkeysMap: null
@@ -45,6 +64,7 @@ const preferenceStore = {
     uuid: (state) => state.uuid,
     gamma: (state) => state.gamma,
     preference: (state) => state.preference,
+    histConfig: (state) => state.histConfig,
     hotkeysMap: (state) => state.hotkeysMap,
     lastRouterPath: (state) => state.lastRouterPath,
     colorLevelSetting: (state) => state.colorLevelSetting
@@ -59,6 +79,10 @@ const preferenceStore = {
           newPreOb.hotkeys.map(({ name, keysArr }) => keysArr.map((keys) => [getArrStr(keys), name])).flat()
         )
       }
+    },
+    SET_HISTCONFIG: (state, newHistConfig) => {
+      const _newHistConfig = Object.assign({}, state.histConfig, newHistConfig)
+      state.histConfig = _newHistConfig
     },
     SET_UUID: (state, newUuid) => {
       state.uuid = newUuid
@@ -89,6 +113,9 @@ const preferenceStore = {
   actions: {
     setPreference({ commit }, newPreOb) {
       commit('SET_PREFERENCE', newPreOb)
+    },
+    setHistConfig({ commit }, newHistConfig) {
+      commit('SET_HISTCONFIG', newHistConfig)
     },
     setColorLevel({ commit }, newPreOb) {
       commit('SET_COLOR_LEVEL', newPreOb)

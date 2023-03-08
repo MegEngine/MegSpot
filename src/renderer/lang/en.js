@@ -42,7 +42,6 @@ export default {
     shareAsProject: 'Create snapshot file for sharing',
     show: 'show',
     hide: 'hide',
-    histogram: 'histogram',
     thumbnail: 'thumbnail',
     fileName: 'file name',
     fileLoading: 'Loading files...',
@@ -64,7 +63,8 @@ export default {
     videoList: 'Video List',
     invalidFolderTip: 'Folder does not exist,please input valid path',
     imageFolderList: 'Image Folder List',
-    videoFolderList: 'Video Folder List'
+    videoFolderList: 'Video Folder List',
+    common: "common"
   },
   hotkey: {
     desc: 'description',
@@ -136,16 +136,16 @@ export default {
     gamma: 'gamma',
     colorLevel: {
       title: 'Color Levels',
-      input: "input levels",
-      output: "output levels",
+      input: 'input levels',
+      output: 'output levels',
       inputShadow: 'inputShadow',
       inputHighlight: 'inputHighlight',
       inputMidtones: 'inputMidtones',
       outputShadow: 'outputShadow',
       outputHighlight: 'outputHighlight'
     },
-    reset: "reset",
-    resetAll: "reset all"
+    reset: 'reset',
+    resetAll: 'reset all'
   },
   imageCenter: {
     bilinearInterpolation: 'bilinar',
@@ -247,5 +247,19 @@ export default {
     version: 'version',
     hotkey: 'shortcut',
     log: 'log'
+  },
+  histogram: {
+    title: 'histogram',
+    close: 'close histogram',
+    setting: 'histogram settings',
+    tip: "add/remove the histogram of this channel",
+    lineWidth: "line width",
+    multi: "channel select type",
+    singleType: "radio mode",
+    multiType: "multiple mode",
+    line: "line",
+    rect: "filled rect",
+    backgroundColor: "background color",
+    drawType: "draw type"
   }
 }

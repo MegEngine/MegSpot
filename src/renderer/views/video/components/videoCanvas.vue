@@ -3,12 +3,7 @@
     <div ref="header" :class="['header', selected ? 'selected-item' : '']" flex="main:justify cross:center">
       <div class="header-left" flex="cross:center" flex-box="0">
         <CoverMask :mask="maskDom" class="cover-mask">
-          <HistContainer
-            ref="hist-container"
-            :index="index"
-            :title="$t('general.histogram')"
-            @changeVisible="handleHistVisible"
-          />
+          <HistContainer ref="hist-container" :index="index" @changeVisible="handleHistVisible" />
         </CoverMask>
         <div class="icon-btn-group" flex="main:justify cross:center">
           <el-button
@@ -291,6 +286,10 @@ export default {
         {
           event: 'changeVideoSliderVisible',
           action: 'changeVideoSliderVisible'
+        },
+        {
+          event: 'changeHistTypes',
+          action: 'handleChangeHistTypes'
         }
       ],
       histVisible: true,
@@ -756,7 +755,7 @@ export default {
         console.error('【Video-initImage】 only enable when paused')
       }
     },
-    generateHist() {
+    generateHist(reGenerate = true) {
       return new Promise((resolve, reject) => {
         try {
           const histCanvas = document.createElement('canvas')
@@ -767,12 +766,17 @@ export default {
           histCanvas.height = this.video.videoHeight
           let histCanvasCtx = histCanvas.getContext('2d')
           histCanvasCtx.drawImage(this.video, 0, 0)
-          this.currentHist = this.$refs['hist-container'].reGenerateHist(window.cv.imread(histCanvas))
+          this.currentHist = reGenerate
+            ? this.$refs['hist-container'].reGenerateHist(window.cv.imread(histCanvas))
+            : this.$refs['hist-container'].generateHist(window.cv.imread(histCanvas))
           resolve()
         } catch (err) {
           console.log('err', err)
         }
       })
+    },
+    handleChangeHistTypes() {
+      this.generateHist(false)
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d')
