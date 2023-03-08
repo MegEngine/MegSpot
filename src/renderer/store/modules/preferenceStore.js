@@ -41,8 +41,8 @@ const preferenceStore = {
       histTypes: ['rgb'], // 'gray', 'rgb', 'red', 'green', 'blue'
       scale: 1.0,
       lineWidth: 1,
-      drawType: 'line', // "line"/"rect"
-      backgroundColor: [255, 255, 255, 255],
+      drawType: 'rect', // "line"/"rect"
+      backgroundColor: [0, 0, 0, 255],
       colors: {
         gray: [0, 0, 0],
         red: [255, 0, 0],
@@ -54,7 +54,7 @@ const preferenceStore = {
       histSize: [256],
       ranges: [0, 256],
       // ui config
-      multi: true
+      multi: false
     },
     uuid: null,
     lastRouterPath: '/dashboard',

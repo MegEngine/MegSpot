@@ -291,7 +291,7 @@ export default {
     .mode-group {
       position: absolute;
       left: 0;
-      top: 90px;
+      top: 91px;
       width: 800px;
     }
     .setting-group {
