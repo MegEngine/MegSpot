@@ -2,7 +2,7 @@
   <div :class="['image-canvas', { selected: selected }]" @click.stop>
     <div ref="header" class="header" flex="cross:center">
       <CoverMask :mask="maskDom" class="cover-mask">
-        <HistContainer ref="hist-container" :title="$t('general.histogram')" @changeVisible="handleHistVisible" />
+        <HistContainer ref="hist-container" :index="index" :title="$t('general.histogram')" @changeVisible="handleHistVisible" />
       </CoverMask>
       <el-tooltip placement="bottom" :open-delay="800">
         <span class="compare-name" flex-box="1" v-html="getTitle"></span>
@@ -63,6 +63,10 @@ export default {
     ZoomViewer
   },
   props: {
+    index: {
+      type: Number,
+      default: 0
+    },
     _width: {
       type: Number,
       default: 500
@@ -393,7 +397,7 @@ export default {
       return new Promise((resolve, reject) => {
         const cv = window.cv
         if (cv && this.image?.width) {
-          this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(this.image))
+          this.currentHist = this.$refs['hist-container'].reGenerateHist(cv.imread(this.image))
           resolve()
         }
         return reject()

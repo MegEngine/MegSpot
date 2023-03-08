@@ -4,6 +4,7 @@
       <div v-for="(snapInfo, index) in files" :key="index">
         <ImageCanvas
           ref="image_canvas"
+          :index="index"
           :path="snapInfo.path"
           :snapInfo="snapInfo"
           :_width="canvasWidth"
@@ -13,7 +14,13 @@
     </div>
     <div v-else id="image-container" ref="container" class="canvas-container" :style="containerStyle">
       <div v-for="(imgs, index) in imageGroupList" :key="index">
-        <ImageCanvas ref="image_canvas" :path="imgs" :_width="canvasWidth" :_height="canvasHeight"></ImageCanvas>
+        <ImageCanvas
+          ref="image_canvas"
+          :index="index"
+          :path="imgs"
+          :_width="canvasWidth"
+          :_height="canvasHeight"
+        ></ImageCanvas>
       </div>
     </div>
   </div>

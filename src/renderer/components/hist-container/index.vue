@@ -3,8 +3,8 @@
     <el-button id="hist-icon" type="text" @click="changeVisible()">
       <svg-icon icon-class="chart"></svg-icon>
     </el-button>
-    <div class="hist-container">
-      <canvas ref="hist" v-show="visible" id="hist" @click="changeVisible(false)"></canvas>
+    <div :id="`hist-container-${index}`" class="hist-container">
+      <canvas v-loading="loading" ref="hist" v-show="visible" id="hist" @click="changeVisible(false)"></canvas>
       <el-button
         class="close-icon"
         icon="el-icon-circle-close"
@@ -22,52 +22,179 @@ import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('preferenceStore')
 export default {
   name: 'HistContainer',
+  props: {
+    index: {
+      type: Number,
+      default: 0
+    }
+  },
   data() {
     return {
       visible: false,
-      hist: undefined
+      hist: undefined,
+      loading: false,
+      mask: undefined,
+      rgbaPlanes: undefined,
+      grayHist: undefined,
+      rgbHist: undefined,
+      rHist: undefined,
+      gHist: undefined,
+      bHist: undefined,
+      histConfig: {
+        histTypes: ['rgb'], // 'gray', 'rgb', 'red', 'green', 'blue'
+        scale: 1.0,
+        lineWidth: 1,
+        drawType: 'line', // "line"/"rect"
+        backgroundColor: [255, 255, 255, 255],
+        colors: new Map([
+          ['gray', [0, 0, 0]],
+          ['red', [255, 0, 0]],
+          ['green', [0, 255, 0]],
+          ['blue', [0, 0, 255]],
+          ['rgb', [0, 0, 0]]
+        ]),
+        accumulate: true,
+        histSize: [256],
+        ranges: [0, 256]
+      }
+    }
+  },
+  computed: {
+    containerId() {
+      return `hist-container-${this.index}`
     }
   },
   created() {
+    this.resetHists()
     this.visible = this.preference.defaultShowHist
   },
   mounted() {
     this.hist = this.$refs.hist
   },
+  beforeDestroy() {
+    this.resetHists()
+  },
   methods: {
     ...mapActions(['setPreference']),
+    resetHists() {
+      this.rgbaPlanes?.delete()
+      this.grayHist?.delete()
+      this.rgbHist?.delete()
+      this.rHist?.delete()
+      this.gHist?.delete()
+      this.bHist?.delete()
+      this.mask?.delete()
+      this.rgbaPlanes = undefined
+      this.grayHist = undefined
+      this.rgbHist = undefined
+      this.rHist = undefined
+      this.gHist = undefined
+      this.bHist = undefined
+      this.mask = undefined
+    },
+    getMask() {
+      if (!this.mask) {
+        this.mask = new cv.Mat()
+      }
+      return this.mask
+    },
+    getHist(sourceMat, histType) {
+      const { accumulate, histSize, ranges } = this.histConfig
+      const calcHist = (channelIndex, histName) => {
+        this[histName] = new cv.Mat()
+        const mask = this.getMask()
+        cv.calcHist(this.getRgbaPlanes(sourceMat), [channelIndex], mask, this[histName], histSize, ranges, accumulate)
+      }
+      switch (histType) {
+        case 'gray':
+          if (!this.grayHist) {
+            const srcVec = new cv.MatVector()
+            const mask = this.getMask()
+            const grayImg = new cv.Mat()
+            this.grayHist = new cv.Mat()
+
+            cv.cvtColor(sourceMat, grayImg, cv.COLOR_RGBA2GRAY, 0)
+            srcVec.push_back(grayImg)
+            cv.calcHist(srcVec, [0], mask, this.grayHist, histSize, ranges, accumulate)
+            srcVec.delete()
+          }
+          return this.grayHist
+        case 'red':
+          !this.gHist && calcHist(0, 'rHist')
+          return this.rHist
+        case 'green':
+          !this.gHist && calcHist(1, 'gHist')
+          return this.gHist
+        case 'blue':
+          !this.bHist && calcHist(2, 'bHist')
+          return this.bHist
+        case 'rgb':
+          if (!this.rgbHist) {
+            this.rgbHist = new cv.Mat()
+            const mask = this.getMask()
+            const rHist = this.getHist(sourceMat, 'red')
+            const gHist = this.getHist(sourceMat, 'green')
+            const bHist = this.getHist(sourceMat, 'blue')
+            cv.add(rHist, gHist, this.rgbHist, mask, rHist?.type())
+            cv.add(bHist, this.rgbHist, this.rgbHist, mask, bHist?.type())
+          }
+          return this.rgbHist
+      }
+    },
+    getRgbaPlanes(sourceMat) {
+      if (!this.rgbaPlanes) {
+        this.rgbaPlanes = new cv.MatVector()
+        cv.split(sourceMat, this.rgbaPlanes)
+      }
+      return this.rgbaPlanes
+    },
+    reGenerateHist(sourceMat, config = null) {
+      this.resetHists()
+      return this.generateHist(sourceMat, config)
+    },
     // 供外部调用直接生成直方图
     // 由于mat数据较大通过属性传递 需要额外占用存储空间
-    //不如通过方法调用 生成后直接释放
-    generateHist(sourceMat) {
-      const histMat = new cv.Mat()
-      cv.cvtColor(sourceMat, histMat, cv.COLOR_RGBA2GRAY, 0)
-      let srcVec = new cv.MatVector()
-      srcVec.push_back(histMat)
-      let accumulate = true
-      let channels = [0]
-      let histSize = [256]
-      let ranges = [0, 255]
-      let hist = new cv.Mat()
-      let mask = new cv.Mat()
-      let color = new cv.Scalar(255, 255, 255)
-      let scale = 1
-      cv.calcHist(srcVec, channels, mask, hist, histSize, ranges, accumulate)
-      let result = cv.minMaxLoc(hist, mask)
-      let max = result.maxVal
-      let dst = new cv.Mat.zeros(histMat.rows, histSize[0] * scale, cv.CV_8UC3)
-      for (let i = 0; i < histSize[0]; i++) {
-        let binVal = (hist.data32F[i] * histMat.rows) / max
-        let point1 = new cv.Point(i * scale, histMat.rows - 1)
-        let point2 = new cv.Point((i + 1) * scale - 1, histMat.rows - binVal)
-        cv.rectangle(dst, point1, point2, color, cv.FILLED)
+    // 不如通过方法调用 生成后直接释放
+    /**
+     * @param {array} config 直方图通道类型 // "gray"/"red"/"green"/"blue"
+     */
+    generateHist(sourceMat, config = null) {
+      this.loading = this.$loading({
+        target: `#hist-container-${this.index}`,
+        lock: false,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      const { histTypes, drawType, lineWidth, scale, colors, histSize, backgroundColor } = config ?? this.histConfig
+      let histRows = sourceMat.rows
+      let dst = new cv.Mat(histRows, histSize[0] * scale, cv.CV_8UC3, backgroundColor) // black background
+      for (let histType of histTypes) {
+        const hist = this.getHist(sourceMat, histType)
+        const color = new cv.Scalar(...colors.get(histType))
+        const mask = this.getMask()
+        let result = cv.minMaxLoc(hist, mask)
+        let max = result.maxVal
+        if (drawType === 'line') {
+          for (let i = 1; i < histSize[0]; i++) {
+            let binVal = (hist.data32F[i - 1] * histRows) / max
+            let binVal2 = (hist.data32F[i] * histRows) / max
+            let point1 = new cv.Point((i - 1) * scale, histRows - binVal)
+            let point2 = new cv.Point(i * scale, histRows - binVal2)
+            cv.line(dst, point1, point2, color, lineWidth)
+          }
+        } else {
+          for (let i = 0; i < histSize[0]; i++) {
+            let binVal = (hist.data32F[i] * histRows) / max
+            let point1 = new cv.Point(i * scale, histRows - 1)
+            let point2 = new cv.Point((i + 1) * scale - 1, histRows - binVal)
+            cv.rectangle(dst, point1, point2, color, cv.FILLED)
+          }
+        }
       }
 
+      this.loading?.close()
       cv.imshow(this.$refs.hist, dst)
-      histMat.delete()
-      srcVec.delete()
-      hist.delete()
-      mask.delete()
       dst.delete()
       sourceMat.delete()
       return this.getHistCanvas()
@@ -80,10 +207,8 @@ export default {
       copyCanvas.height = this.hist.height
       var context = copyCanvas.getContext('2d')
       context.drawImage(this.hist, 0, 0)
-
       return copyCanvas
     },
-
     changeVisible(visible) {
       this.visible = visible ?? !this.visible
       this.$emit('changeVisible', this.visible)

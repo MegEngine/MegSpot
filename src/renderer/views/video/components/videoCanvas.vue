@@ -3,7 +3,12 @@
     <div ref="header" :class="['header', selected ? 'selected-item' : '']" flex="main:justify cross:center">
       <div class="header-left" flex="cross:center" flex-box="0">
         <CoverMask :mask="maskDom" class="cover-mask">
-          <HistContainer ref="hist-container" :title="$t('general.histogram')" @changeVisible="handleHistVisible" />
+          <HistContainer
+            ref="hist-container"
+            :index="index"
+            :title="$t('general.histogram')"
+            @changeVisible="handleHistVisible"
+          />
         </CoverMask>
         <div class="icon-btn-group" flex="main:justify cross:center">
           <el-button
@@ -755,14 +760,14 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           const histCanvas = document.createElement('canvas')
-          if (!cv) {
+          if (!window.cv) {
             return reject()
           }
           histCanvas.width = this.video.videoWidth
           histCanvas.height = this.video.videoHeight
           let histCanvasCtx = histCanvas.getContext('2d')
           histCanvasCtx.drawImage(this.video, 0, 0)
-          this.currentHist = this.$refs['hist-container'].generateHist(cv.imread(histCanvas))
+          this.currentHist = this.$refs['hist-container'].reGenerateHist(window.cv.imread(histCanvas))
           resolve()
         } catch (err) {
           console.log('err', err)
@@ -1011,7 +1016,7 @@ export default {
       }
     },
     changeMousePosInfo(mousePos) {
-      if (isNaN(this.imagePosition?.x ) || isNaN(this.imagePosition?.width)) {
+      if (isNaN(this.imagePosition?.x) || isNaN(this.imagePosition?.width)) {
         this.mousePosInfo = {
           x: 0,
           y: 0
