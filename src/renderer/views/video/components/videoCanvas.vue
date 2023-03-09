@@ -92,7 +92,7 @@
             </div>
           </FrameSetting>
         </div>
-        <EffectPreview @change="changeCanvasStyle" />
+        <EffectPreview ref="effect-settings" @change="changeCanvasStyle" />
         <span class="svg-container" @click="fullScreen" :title="$t('video.fullscreen')" style="cursor: pointer">
           <svg-icon icon-class="fullscreen" />
         </span>
@@ -159,6 +159,7 @@ import * as CONSTANTS from '../video-constants'
 import { getFileName } from '@/filter/get-file-name'
 import { TimeManager } from '@/utils/video'
 import { throttle, getUuidv4 } from '@/utils'
+import { useWorker } from '@/utils/worker'
 
 export default {
   components: {
@@ -198,6 +199,7 @@ export default {
       // 监听图像文件的变化,变化后自动刷新图像
       wacther: undefined,
       loading: false,
+      ready: false,
       mediaInfo: {
         // FrameRate: 25,
         // frameCount: 1000
@@ -286,6 +288,14 @@ export default {
         {
           event: 'changeVideoSliderVisible',
           action: 'changeVideoSliderVisible'
+        },
+        {
+          event: 'adjustLevels',
+          action: 'adjustLevels'
+        },
+        {
+          event: 'adjustGamma',
+          action: 'adjustGamma'
         },
         {
           event: 'changeHistTypes',
@@ -736,12 +746,24 @@ export default {
     // 初始化bitMap
     async initbitMap(draw = true) {
       if (this.paused && this.video?.videoWidth) {
+        this.ready = false
         let offscreen = new OffscreenCanvas(this.video.videoWidth, this.video.videoHeight)
         let offCtx = offscreen.getContext('2d')
         offCtx.drawImage(this.video, 0, 0)
         this.bitMap = offscreen.transferToImageBitmap()
+        this.ready = true
         draw && this.drawImage(this.bitMap)
-        this.$refs['hist-container'].visible && this.generateHist()
+        this.$refs['hist-container'].visible && window.cv && this.generateHist()
+        const imageData = this.getImageData()
+        console.log('imageDate initbitmap', imageData)
+        useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
+          (res) => {
+            this.bitMap && this.bitMap?.close()
+            this.bitMap = null
+            this.bitMap = res
+            this.drawImage()
+          }
+        )
       }
     },
     initImage() {
@@ -755,28 +777,75 @@ export default {
         console.error('【Video-initImage】 only enable when paused')
       }
     },
-    generateHist(reGenerate = true) {
+    getImageData(_img) {
+      const img = _img ?? this.video
+      if (!img) {
+        return null
+      }
+      const _canvas = document.createElement('canvas')
+      _canvas.width = img?.width || img?.videoWidth
+      _canvas.height = img?.height || img?.videoHeight
+      const _ctx = _canvas.getContext('2d')
+      _ctx.drawImage(img, 0, 0)
+      return _ctx.getImageData(0, 0, _canvas.width, _canvas.height)
+    },
+    async initFilters() {
+      await useWorker(this.getName(false), 'initFilters')
+    },
+    applyFilters(type, params) {
+      if (this.paused && this.ready) {
+        const imageData = this.getImageData()
+        useWorker(this.getName(false), type, imageData, params).then((res) => {
+          this.bitMap && this.bitMap?.close()
+          this.bitMap = res
+          this.drawImage()
+        })
+      }
+    },
+    async adjustGamma({ parentId, ...params }) {
+      const { gamma } = params
+      if (!this.video || !gamma) {
+        return
+      }
+      const settingRef = this.$refs['effect-settings']
+      settingRef.generateFilterParams({ gamma })
+      this.applyFilters('gamma', params)
+    },
+    async adjustLevels({ parentId, ...params }) {
+      if (!this.video) {
+        return
+      }
+      const settingRef = this.$refs['effect-settings']
+      settingRef.generateFilterParams(params)
+      this.applyFilters('level', params)
+      // const preParams = settingRef.getParams()
+      // if (parentId !== this.path && Object.keys(preParams).some(key => preParams[key] !== params[key])) {
+
+      // }
+      return
+    },
+    generateHist(reGenerate = true, config = null) {
       return new Promise((resolve, reject) => {
         try {
           const histCanvas = document.createElement('canvas')
-          if (!window.cv) {
-            return reject()
-          }
           histCanvas.width = this.video.videoWidth
           histCanvas.height = this.video.videoHeight
           let histCanvasCtx = histCanvas.getContext('2d')
           histCanvasCtx.drawImage(this.video, 0, 0)
           this.currentHist = reGenerate
-            ? this.$refs['hist-container'].reGenerateHist(window.cv.imread(histCanvas))
-            : this.$refs['hist-container'].generateHist(window.cv.imread(histCanvas))
+            ? this.$refs['hist-container'].reGenerateHist(window.cv.imread(histCanvas), config)
+            : this.$refs['hist-container'].generateHist(window.cv.imread(histCanvas), config)
           resolve()
         } catch (err) {
           console.log('err', err)
         }
       })
     },
-    handleChangeHistTypes() {
-      this.generateHist(false)
+    handleChangeHistTypes(config = null) {
+      if (window.cv) {
+        this.generateHist(false, config)
+        this.$refs['hist-container'].setVisible(true)
+      }
     },
     initCanvas() {
       this.cs = this.canvas.getContext('2d')
@@ -789,6 +858,7 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           this.loading = true
+          this.ready = false
           if (this.video) {
             // console.log(this.video)
             this.video.pause()
@@ -959,9 +1029,10 @@ export default {
         this.$refs['hist-container'].setVisible(visible)
         return
       }
-      this.generateHist().then(() => {
-        this.$refs['hist-container'].setVisible(visible)
-      })
+      window.cv &&
+        this.generateHist().then(() => {
+          this.$refs['hist-container'].setVisible(visible)
+        })
     },
     handleScaleDbClick(data) {
       console.log('handleScaleDbClick', Object.values(arguments))

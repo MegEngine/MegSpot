@@ -118,6 +118,7 @@ export default {
       // 监听图像文件的变化,变化后自动刷新图像
       wacther: undefined,
       loading: false,
+      ready: false,
       header: null,
       canvas: null,
       maskDom: undefined,
@@ -417,20 +418,21 @@ export default {
         this[name](data)
       }
     },
-    initHist(reGenerate = true) {
+    initHist(reGenerate = true, config = null) {
       return new Promise((resolve, reject) => {
-        const cv = window.cv
+        const cv = window?.cv
         if (cv && this.image?.width) {
           this.currentHist = reGenerate
-            ? this.$refs['hist-container'].reGenerateHist(cv.imread(this.image))
-            : this.$refs['hist-container'].generateHist(cv.imread(this.image))
+            ? this.$refs['hist-container'].reGenerateHist(cv.imread(this.image), config)
+            : this.$refs['hist-container'].generateHist(cv.imread(this.image), config)
           resolve()
         }
         return reject()
       })
     },
-    handleChangeHistTypes() {
-      this.initHist(false)
+    handleChangeHistTypes(config) {
+      window?.cv?.Mat && this.initHist(false, config)
+      this.$refs['hist-container'].setVisible(true)
     },
     async initBitMap(_imageData) {
       return new Promise(async (resolve) => {
@@ -450,13 +452,15 @@ export default {
             this.bitMap = null
             this.bitMap = res
             this.drawImage()
-            resolve(res)
           }
         )
-        // resolve(this.bitMap)
+        resolve(this.bitMap)
       })
     },
-    async applyFilters(type, params) {
+    applyFilters(type, params) {
+      if (!this.ready) {
+        return
+      }
       const imageData = this.getImageData()
       useWorker(this.getName(false), type, imageData, params).then((res) => {
         this.bitMap && this.bitMap?.close()
@@ -530,6 +534,7 @@ export default {
       return _ctx.getImageData(0, 0, _canvas.width, _canvas.height)
     },
     async initImage(initPosition = true) {
+      this.ready = false
       this.loading = true
       return new Promise(async (resolve, reject) => {
         if (/tiff?$/.test(this.path)) {
@@ -542,6 +547,7 @@ export default {
           this.image = new Image(ifd.width, ifd.height)
           await this.initBitMap(imageData)
           this.loading = false
+          this.ready = true
           this.reDraw(initPosition)
           resolve()
         } else {
@@ -549,6 +555,7 @@ export default {
           this.image.onload = async () => {
             await this.initBitMap()
             this.loading = false
+            this.ready = true
             this.reDraw(initPosition)
             resolve()
           }
@@ -597,9 +604,10 @@ export default {
         return
       }
 
-      this.initHist().then(() => {
-        this.$refs['hist-container'].setVisible(visible)
-      })
+      window?.cv?.Mat &&
+        this.initHist().then(() => {
+          this.$refs['hist-container'].setVisible(visible)
+        })
     },
     handleScaleDbClick(data) {
       console.log('handleScaleDbClick', Object.values(arguments))
@@ -720,7 +728,7 @@ export default {
           }
         }
         this.drawImage()
-        this.$refs['hist-container'].visible && this.initHist()
+        this.$refs['hist-container'].visible && window?.cv?.Mat && this.initHist()
       })
     },
     snapshotModeInitPos() {

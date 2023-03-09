@@ -63,7 +63,7 @@ export default {
     invalidFolderTip: '文件夹不存在，请输入有效路径',
     imageFolderList: '图片目录列表',
     videoFolderList: '视频目录列表',
-    common: "通用"
+    common: '通用'
   },
   hotkey: {
     desc: '描述',
@@ -133,6 +133,7 @@ export default {
     opacity: '不透明度',
     blur: '模糊度',
     gamma: 'gamma值',
+    channel: '颜色通道',
     colorLevel: {
       title: '色阶',
       input: '输入色阶',
@@ -141,7 +142,8 @@ export default {
       inputHighlight: '白场',
       inputMidtones: '中间调',
       outputShadow: '输出黑场',
-      outputHighlight: '输出白场'
+      outputHighlight: '输出白场',
+      histogramTip: '使用指定颜色通道'
     },
     reset: '重置',
     resetAll: '重置所有'
@@ -250,14 +252,14 @@ export default {
     title: '直方图',
     close: '关闭直方图',
     setting: '直方图设置',
-    tip: "添加/移除该通道的直方图",
-    lineWidth: "线宽",
-    multi: "通道切换模式",
-    singleType: "单选模式",
-    multiType: "多选模式",
-    line: "线型",
-    rect: "填充",
-    backgroundColor: "背景颜色",
-    drawType: "绘制模式"
+    tip: '添加/移除该通道的直方图',
+    lineWidth: '线宽',
+    multi: '通道切换模式',
+    singleType: '单选模式',
+    multiType: '多选模式',
+    line: '线型',
+    rect: '填充',
+    backgroundColor: '背景颜色',
+    drawType: '绘制模式'
   }
 }

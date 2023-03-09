@@ -134,6 +134,7 @@ export default {
     opacity: 'opacity',
     blur: 'blur',
     gamma: 'gamma',
+    channel: "channel",
     colorLevel: {
       title: 'Color Levels',
       input: 'input levels',
@@ -142,7 +143,8 @@ export default {
       inputHighlight: 'inputHighlight',
       inputMidtones: 'inputMidtones',
       outputShadow: 'outputShadow',
-      outputHighlight: 'outputHighlight'
+      outputHighlight: 'outputHighlight',
+      histogramTip: "use specified color channel"
     },
     reset: 'reset',
     resetAll: 'reset all'

@@ -86,7 +86,7 @@ onmessage = async (e) => {
         filter.imageData = gammaCorrection({imageData: filter.beforeImageData??imageData,...params});
         break;
         case 'level':
-          filter.imageData = adjustLevel({imageData: filter.beforeImageData??imageData,...params});
+          filter.imageData = adjustLevel({imageData: filter.beforeImageData??imageData,...params}, preParams);
           break;
         }
         if (i+1<len) {
@@ -118,14 +118,30 @@ function gammaCorrection({imageData,gamma}) {
   return imageData
 }
 
-function adjustLevel({imageData, ...params}) {
+function checkIndex(index, channel) {
+  switch (index) {
+    case 0:
+      return channel === 'red'
+    case 1:
+      return channel === 'green'
+    case 2:
+      return channel === 'blue'
+  }
+  return true
+}
+
+function adjustLevel({imageData, ...params}, preParams) {
   const data = imageData.data
-  const { inputShadow, inputHighlight, inputMidtones, outputShadow, outputHighlight } = params 
+  const { channel, inputShadow, inputHighlight, inputMidtones, outputShadow, outputHighlight } = params 
   if ([inputShadow, inputHighlight, outputShadow, outputHighlight].join("") === "02550255" && inputMidtones===1) {
     return imageData
   }
   for (let i = 0; i < data.length; i += 4) {
-    for (let index = i; index < i+3; index++) {
+    for (let count = 0; count < 3; count++) {
+      if(channel !== 'rgb' && !checkIndex(count, channel)) {
+        continue
+      }
+      const index = i + count
       let input_map_color = clamp(
         ((data[index] - inputShadow) /
         (inputHighlight - inputShadow)) *

@@ -64,7 +64,7 @@ export default {
     invalidFolderTip: 'フォルダが存在しません。有効なパスを入力してください',
     imageFolderList: '画像フォルダ一覧',
     videoFolderList: 'ビデオフォルダリスト',
-    common: "一般"
+    common: '一般'
   },
   hotkey: {
     desc: '説明',
@@ -135,6 +135,7 @@ export default {
     opacity: '不透明度',
     blur: 'ぼかし',
     gamma: 'ガンマ値',
+    channel: 'カラーチャンネル',
     colorLevel: {
       title: '色レベル',
       input: '入力レベル',
@@ -143,7 +144,8 @@ export default {
       inputHighlight: '入力ハイライト',
       inputMidtones: '入力中間調',
       outputShadow: '出力シャドウ',
-      outputHighlight: '出力ハイライト'
+      outputHighlight: '出力ハイライト',
+      histogramTip: '指定されたカラーチャネルを使用します'
     },
     reset: 'リセット',
     resetAll: 'すべてリセット'
@@ -254,13 +256,13 @@ export default {
     close: 'ヒストグラムを閉じる',
     setting: 'ヒストグラム設定',
     tip: 'このチャンネルのヒストグラムを追加/削除します',
-    lineWidth: "線幅",
-    multi: "チャンネル選択タイプ",
-    singleType: "無線モード",
-    multiType: "複数選択モード",
-    line: "複数選択モード",
-    rect: "充填",
-    backgroundColor: "背景色",
-    drawType: "背景色"
+    lineWidth: '線幅',
+    multi: 'チャンネル選択タイプ',
+    singleType: '無線モード',
+    multiType: '複数選択モード',
+    line: '複数選択モード',
+    rect: '充填',
+    backgroundColor: '背景色',
+    drawType: '背景色'
   }
 }

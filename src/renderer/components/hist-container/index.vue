@@ -204,17 +204,18 @@ export default {
      * @param {array} config 直方图通道类型 // "gray"/"red"/"green"/"blue"
      */
     generateHist(sourceMat, config = null) {
-      const loading = this.$loading({
-        target: `#hist-container-${this.index}`,
-        lock: false,
-        text: 'Loading',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      })
-      const { histTypes, drawType, lineWidth, scale, histSize, backgroundColor } = config ?? this.histConfig
+      // const loading = this.$loading({
+      //   target: `#hist-container-${this.index}`,
+      //   lock: false,
+      //   text: 'Loading',
+      //   spinner: 'el-icon-loading',
+      //   background: 'rgba(0, 0, 0, 0.7)'
+      // })
+      const { histTypes, multi, drawType, lineWidth, scale, histSize, backgroundColor } = config ?? this.histConfig
       let histRows = sourceMat.rows
-      let dst = new cv.Mat(histRows, histSize[0] * scale, cv.CV_8UC3, backgroundColor.slice(0, 4)) // black background
-      for (let histType of histTypes) {
+      let dst = new cv.Mat(histRows, histSize[0] * scale, cv.CV_8UC3, backgroundColor.slice(0, 4))
+      const usedHistTypes = multi ? histTypes : [histTypes[0]]
+      for (let histType of usedHistTypes) {
         const hist = this.getHist(sourceMat, histType)
         const color = new cv.Scalar(...this.getLineColor(histType))
         const mask = this.getMask()
@@ -238,7 +239,7 @@ export default {
         }
       }
 
-      loading?.close()
+      // loading?.close()
       cv.imshow(this.$refs.hist, dst)
       dst.delete()
       sourceMat.delete()
