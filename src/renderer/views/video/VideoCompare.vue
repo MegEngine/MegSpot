@@ -17,10 +17,10 @@ export default {
     Content
   },
   mounted() {
-    this.initFiltersMap()
+    // this.initFiltersMap()
   },
   beforeDestroy() {
-    this.initFiltersMap()
+    // this.initFiltersMap()
   },
   methods: {
     async initFiltersMap() {

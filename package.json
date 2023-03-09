@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.2.0",
+  "version": "v2.2.1",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -44,7 +44,7 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "一、 新增功能：\n    1. 视频及图像都支持gamma及光阶调整;\n    2. 光阶调整支持指定特定颜色通道;\n    3. 支持显示指定通道的直方图（背景颜色、多选模式等直方图渲染设置可在图像设置中更改，界面右上角，布局选项右边的按钮）；\n2. 优化体验：同步上线相关更新的翻译。 \n3. 修复一些问题；",
+      "releaseNotes": "一、 新增功能：\n    1. 视频及图像都支持gamma及光阶调整;\n    2. 光阶调整支持指定特定颜色通道;\n    3. 支持显示指定通道的直方图（背景颜色、多选模式等直方图渲染设置可在图像设置中更改，界面右上角，布局选项右边的按钮）；\n二. 优化体验：同步上线相关更新的翻译。 \n三. 修复问题：\n    1. 取消filter在video上的使用；\n    2. 修复打开缩放设置时会更改选中模式的问题;",
       "releaseDate": "2023.3.9"
     },
     "directories": {

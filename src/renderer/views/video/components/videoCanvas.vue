@@ -289,14 +289,14 @@ export default {
           event: 'changeVideoSliderVisible',
           action: 'changeVideoSliderVisible'
         },
-        {
-          event: 'adjustLevels',
-          action: 'adjustLevels'
-        },
-        {
-          event: 'adjustGamma',
-          action: 'adjustGamma'
-        },
+        // {
+        //   event: 'adjustLevels',
+        //   action: 'adjustLevels'
+        // },
+        // {
+        //   event: 'adjustGamma',
+        //   action: 'adjustGamma'
+        // },
         {
           event: 'changeHistTypes',
           action: 'handleChangeHistTypes'
@@ -421,6 +421,7 @@ export default {
       this.video = null
     }
     this.bitMap && this.bitMap.close()
+    // this.initFilters()
   },
   watch: {
     path: {
@@ -754,16 +755,16 @@ export default {
         this.ready = true
         draw && this.drawImage(this.bitMap)
         this.$refs['hist-container'].visible && window.cv && this.generateHist()
-        const imageData = this.getImageData()
-        console.log('imageDate initbitmap', imageData)
-        useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
-          (res) => {
-            this.bitMap && this.bitMap?.close()
-            this.bitMap = null
-            this.bitMap = res
-            this.drawImage()
-          }
-        )
+        // const imageData = this.getImageData()
+        // console.log('imageDate initbitmap', imageData)
+        // useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
+        //   (res) => {
+        //     this.bitMap && this.bitMap?.close()
+        //     this.bitMap = null
+        //     this.bitMap = res
+        //     this.drawImage()
+        //   }
+        // )
       }
     },
     initImage() {
