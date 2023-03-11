@@ -1,14 +1,25 @@
 <template>
-  <el-dialog ref="aboutDialog" :visible.sync="visible" :title="$t('generateGIF.title')" width="80%" class="gifDialog"
-    center>
+  <el-dialog
+    ref="aboutDialog"
+    :visible.sync="visible"
+    :title="$t('generateGIF.title')"
+    width="80%"
+    class="gifDialog"
+    center
+  >
     <div id="imageItems">
       <el-table :data="gifImageList">
         <el-table-column :label="$t('generateGIF.image')" prop="imageName" width="350px">
           <template slot-scope="scope">
-            <el-select class="select" v-model="scope.row.imageName" placeholder="select image"
-              @change="selectImage(scope.row.imageName, scope.$index)">
+            <el-select
+              class="select"
+              v-model="scope.row.imageName"
+              :title="scope.row.path"
+              placeholder="select image"
+              @change="selectImage(scope.row.imageName, scope.$index)"
+            >
               <div v-for="item in selectList" :key="item">
-                <el-option :label="$options.filters.getFileName(item, false)" :value="item"></el-option>
+                <el-option :label="$options.filters.getFileName(item, false)" :title="item" :value="item"></el-option>
               </div>
             </el-select>
           </template>
@@ -30,8 +41,12 @@
       <div>
         <el-form :inline="true" :model="optionList">
           <el-form-item label="Image interval">
-            <el-input-number v-model="optionList.delay" placeholder="Image interval" controls-position="right"
-              :step="100">
+            <el-input-number
+              v-model="optionList.delay"
+              placeholder="Image interval"
+              controls-position="right"
+              :step="100"
+            >
               <template slot="append">ms</template>
             </el-input-number>
           </el-form-item>
@@ -149,42 +164,43 @@ export default {
           imageName: getFileName(item.path, false),
           canvas: item.canvas
         }))
+
+        this.downLoadDisable = true
+        this.generateLoading = true
+        this.fininshed = false
+        this.tip = ''
+        Promise.all(
+          this.gifImageList
+            .slice(0, -1) // 最后一个一直为空值
+            .map(
+              (item) =>
+                new Promise((resolve, reject) => {
+                  try {
+                    let imageName = getFileName(item.imageName, false)
+                    let description = imageName
+                    if (item.description) {
+                      description = item.description
+                    }
+                    let gifItem = {
+                      path: item.path,
+                      imageName,
+                      description
+                    }
+                    this.gifCanvasList.push(gifItem)
+                    resolve(gifItem)
+                  } catch (error) {
+                    reject(error)
+                  }
+                })
+            )
+        )
+          .then((values) => {
+            this.generateGif()
+          })
+          .catch((error) => {
+            console.log('error: ' + error)
+          })
       })
-      this.downLoadDisable = true
-      this.generateLoading = true
-      this.fininshed = false
-      this.tip = ''
-      Promise.all(
-        this.gifImageList
-          .slice(0, -1) // 最后一个一直为空值
-          .map(
-            (item) =>
-              new Promise((resolve, reject) => {
-                try {
-                  let imageName = getFileName(item.imageName, false)
-                  let description = imageName
-                  if (item.description) {
-                    description = item.description
-                  }
-                  let gifItem = {
-                    path: item.path,
-                    imageName,
-                    description
-                  }
-                  this.gifCanvasList.push(gifItem)
-                  resolve(gifItem)
-                } catch (error) {
-                  reject(error)
-                }
-              })
-          )
-      )
-        .then((values) => {
-          this.generateGif()
-        })
-        .catch((error) => {
-          console.log('error: ' + error)
-        })
     },
     generateCanvas() {
       const canvas = document.createElement('canvas')
@@ -206,7 +222,7 @@ export default {
       })
 
       this.gifCanvasList.forEach((element) => {
-        let index = this.imageDetails.findIndex((item) => item.imageName === element.imageName)
+        let index = this.imageDetails.findIndex((item) => item.path === element.path)
         const canvas = this.generateCanvas()
         const ctx = canvas.getContext('2d')
         const originCanvas = this.imageDetails[index].canvas
