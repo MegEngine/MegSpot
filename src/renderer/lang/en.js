@@ -174,7 +174,8 @@ export default {
     helpText:
       'Double-click the picture to activate the target container to achieve a single operation, click the picture description to edit',
     rotate: 'rotate',
-    generateGIF: 'generate GIF'
+    generateGIF: 'generate GIF',
+    scaleTip: 'Click to open the zoom ratio selector'
   },
   imageSetting: {
     title: 'image setting Panel',

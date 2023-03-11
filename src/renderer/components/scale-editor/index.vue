@@ -3,8 +3,9 @@
     <span
       v-show="!scaleEditorVisible"
       class="scale-number"
+      :title="$t('imageCenter.scaleTip')"
       :style="{ color: textColor }"
-      @dblclick.capture.stop="handleScaleDbClick"
+      @click.capture.stop="showScaleOptions"
     >
       {{ scaleData }}
     </span>
@@ -47,14 +48,26 @@ export default {
     }
   },
   methods: {
-    setNewScale(newScalse) {
-      this.$emit('update', Number(newScalse))
+    setNewScale(newScale) {
+      this.$bus.$emit('image_broadcast', {
+        name: 'setZoom',
+        data: {
+          newScale: Number(newScale)
+        }
+      })
     },
-    handleScaleDbClick() {
-      this.$emit('show')
+    showScaleOptions() {
+      this.$parent.$parent.scaleEditorVisible = true
+      this.$bus.$emit('image_broadcast', {
+        name: 'cacheScale',
+        data: {}
+      })
     },
     handleScaleReset() {
-      this.$emit('reset')
+      this.$bus.$emit('image_broadcast', {
+        name: 'resetZoom',
+        data: {}
+      })
     },
     handleChange(scale, oldScale) {
       this.scaleData = scale
@@ -86,6 +99,7 @@ export default {
   left: 4px;
   .scale-number {
     user-select: none;
+    cursor: pointer;
   }
   ::v-deep {
     .el-input-number {

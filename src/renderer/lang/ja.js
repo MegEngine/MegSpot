@@ -175,7 +175,8 @@ export default {
     helpText:
       '画像をダブルクリックして、その画像を個別に操作できます。ファイル名をクリックして、コメントが編集できます。',
     rotate: '回転',
-    generateGIF: 'gifを生成する'
+    generateGIF: 'gifを生成する',
+    scaleTip: 'クリックしてズーム比セレクターを開きます'
   },
   imageSetting: {
     title: '画像設定パネル',

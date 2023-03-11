@@ -115,9 +115,6 @@
             class="scale-editor"
             :scale="imgScale"
             :scaleEditorVisible.sync="scaleEditorVisible"
-            @show="showScaleEditor"
-            @reset="resetZoom"
-            @update="setZoom"
           />
           <ZoomViewer
             v-if="triggerRGB"
@@ -288,6 +285,18 @@ export default {
         {
           event: 'changeVideoSliderVisible',
           action: 'changeVideoSliderVisible'
+        },
+        {
+          event: 'cacheScale',
+          action: 'cacheScale'
+        },
+        {
+          event: 'resetZoom',
+          action: 'resetZoom'
+        },
+        {
+          event: 'setZoom',
+          action: 'setZoom'
         },
         // {
         //   event: 'adjustLevels',
@@ -735,7 +744,7 @@ export default {
       this.changeFrameUpdateFN(currentTime)
       // this.initbitMap()
     },
-    handleBroadcast({ name, data }) {
+    handleBroadcast({ name, data = { id: null } }) {
       if (this.selectedId) {
         if (data.id === this.path || this.selectedId === this.path) {
           this[name](data)
@@ -1035,13 +1044,6 @@ export default {
           this.$refs['hist-container'].setVisible(visible)
         })
     },
-    handleScaleDbClick(data) {
-      console.log('handleScaleDbClick', Object.values(arguments))
-      this.scaleEditorVisible = !this.scaleEditorVisible
-    },
-    handleScaleReset() {
-      console.log('handleScaleReset')
-    },
     changeZoom(data) {
       console.log('changeZoom', data)
     },
@@ -1144,10 +1146,10 @@ export default {
         let height = this.video.videoHeight
         this.afterFullSize = true
         this.imagePosition = { x, y, width, height }
-        this.doZoomEnd()
       } else {
         this.imagePosition = this.getImageInitPos(this.canvas, this.video)
       }
+      this.doZoomEnd()
       this.drawWhenPaused()
     },
     reDraw() {
@@ -1205,8 +1207,7 @@ export default {
       }
     },
     /******************ScaleEditor START******************/
-    showScaleEditor() {
-      this.scaleEditorVisible = true
+    cacheScale() {
       this.cachedPositionData = {
         scale: this.imgScale,
         imagePosition: { ...this.imagePosition }
@@ -1224,13 +1225,13 @@ export default {
         this.drawImage()
       }
     },
-    setZoom(scale) {
-      if (scale == this.imgScale) {
-        this.imgScale = scale // 必需, 触发scaleEditor组件更新
+    setZoom({ newScale }) {
+      if (newScale == this.imgScale) {
+        this.imgScale = newScale // 必需, 触发scaleEditor组件更新
         return
       }
-      const oldScale = this.imgScale ?? scale
-      const scaleRatio = scale / oldScale
+      const oldScale = this.imgScale ?? newScale
+      const scaleRatio = newScale / oldScale
       // 默认从画布中心放大
       const position = { x: this.canvas.width / 2, y: this.canvas.height / 2 }
       // 画像不占据整个画布时，从画像中心放大
@@ -1245,7 +1246,7 @@ export default {
         rate: scaleRatio,
         mousePos: position
       })
-      this.imgScale = scale
+      this.imgScale = newScale
     },
     /******************ScaleEditor END******************/
     doZoom(data) {

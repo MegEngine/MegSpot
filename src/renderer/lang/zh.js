@@ -172,7 +172,8 @@ export default {
     align2: '对齐(大小相同)',
     helpText: '双击图片可激活目标容器实现单独缩放旋转等操作，单击图片描述信息可编辑',
     rotate: '旋转',
-    generateGIF: '生成gif'
+    generateGIF: '生成gif',
+    scaleTip: '点击打开缩放比例选择器'
   },
   imageSetting: {
     title: '图像设置',
