@@ -130,9 +130,15 @@ export default {
   computed: {
     ...mapGetters(['imageList', 'imageConfig']),
     ...snapMapGetters(['files', 'snapshotConfig']),
+    currentLayout() {
+      return (
+        (this.snapshotMode ? this.snapshotConfig?.config?.imageStore?.imageConfig?.layout : this.imageConfig.layout) ??
+        this.imageConfig.layout
+      )
+    },
     // 每组图片数量
     groupCount() {
-      const str = this.imageConfig.layout,
+      const str = this.currentLayout,
         len = str.length
       return str[len - 3] * str[len - 1]
     },
@@ -143,10 +149,7 @@ export default {
         : []
     },
     containerStyle() {
-      switch (
-        (this.snapshotMode ? this.snapshotConfig?.config?.imageStore?.imageConfig?.layout : this.imageConfig.layout) ??
-        this.imageConfig.layout
-      ) {
+      switch (this.currentLayout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
           return {
             display: 'flex',
@@ -204,7 +207,7 @@ export default {
         this.updateAllCanvas()
       })
     },
-    'imageConfig.layout'() {
+    currentLayout() {
       this.$nextTick(() => {
         this.calcCanvasSize()
         this.updateAllCanvas()
@@ -342,7 +345,7 @@ export default {
     },
     calcWidth() {
       const containerWidth = document.body.clientWidth
-      switch (this.imageConfig.layout) {
+      switch (this.currentLayout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
         case GLOBAL_CONSTANTS.LAYOUT_1X2:
           return containerWidth
@@ -360,7 +363,7 @@ export default {
       const toolbarInfo = document.getElementsByClassName('toolbar')[0].getBoundingClientRect()
       const headerInfo = document.getElementsByClassName('header')[0].getBoundingClientRect()
       const containerHeight = document.body.clientHeight - toolbarInfo.height - headerInfo.height
-      switch (this.imageConfig.layout) {
+      switch (this.currentLayout) {
         case GLOBAL_CONSTANTS.LAYOUT_1X1:
         case GLOBAL_CONSTANTS.LAYOUT_2X1:
         case GLOBAL_CONSTANTS.LAYOUT_3X1:
@@ -501,16 +504,16 @@ export default {
     },
     getColumnLine() {
       //获取列数
-      if ([GLOBAL_CONSTANTS.LAYOUT_1X1, GLOBAL_CONSTANTS.LAYOUT_1X2].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_1X1, GLOBAL_CONSTANTS.LAYOUT_1X2].includes(this.currentLayout)) {
         return 1
       }
-      if ([GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(this.currentLayout)) {
         return 2
       }
-      if ([GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(this.currentLayout)) {
         return 3
       }
-      if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.imageConfig.layout)) {
+      if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.currentLayout)) {
         return 4
       }
     }
