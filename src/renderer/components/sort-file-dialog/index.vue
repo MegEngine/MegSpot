@@ -1,6 +1,6 @@
 <template>
   <el-dialog id="dialog" width="80%" :visible.sync="visible" :before-close="clear">
-    <span slot="title">{{ $t('sortFile.edit') + $t('sortFile.sortFile') }}</span>
+    <span slot="title">{{ $t('sortFile.edit') }}</span>
     <div class="toolbar" flex="dir:right">
       <el-button type="warning" @click="showTableFileList" class="item">
         {{ $t('sortFile.useTableFileList') }}
@@ -189,7 +189,7 @@ export default {
       const exist = await fse.pathExists(path)
       if (exist) {
         const data = await fse.readFile(path, 'utf8')
-        const sortList = data.split(EOF)
+        const sortList = data.trim().split(EOF)
         return sortList
       } else return []
     },

@@ -2,10 +2,17 @@
   <div class="home" flex="dir:top">
     <div class="tool" flex="main:justify cross:center">
       <div class="tool-items">
-        <el-button @click="addFolder" type="text" class="tool-item add-folder" title="add folder to root" size="small">
+        <el-button
+          @click="addFolder"
+          type="primary"
+          round
+          class="tool-item add-folder"
+          title="add folder to root"
+          size="mini"
+        >
           {{ $t('image.toolbar.addFolder') }}
         </el-button>
-        <SelectedBtn :selectedList="videoList" @update="setVideos" @remove="removeVideos" @click="emptyVideos" />
+        <SelectedBtn :selectedList="videoList" @update="setVideos" @remove="removeVideos" @clearAll="emptyVideos" />
         <el-button
           type="primary"
           round

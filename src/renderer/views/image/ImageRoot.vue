@@ -2,10 +2,17 @@
   <div class="home" flex="dir:top">
     <div class="tool" flex="main:justify cross:center">
       <div class="tool-items">
-        <el-button @click="addFolder" type="text" class="tool-item add-folder" title="add folder to root" size="small">
+        <el-button
+          @click="addFolder"
+          type="primary"
+          round
+          class="tool-item add-folder"
+          title="add folder to root"
+          size="mini"
+        >
           {{ $t('image.toolbar.addFolder') }}
         </el-button>
-        <SelectedBtn :selectedList="imageList" @update="setImages" @remove="removeImages" @click="emptyImages" />
+        <SelectedBtn :selectedList="imageList" @update="setImages" @remove="removeImages" @clearAll="emptyImages" />
         <el-button
           type="primary"
           round
@@ -21,7 +28,7 @@
           round
           title="drag-drop-compare"
           class="tool-item"
-          :disabled="!imageList.length"
+          :disabled="!imageList.length || imageList.length < 2"
           @click="dragDropCompare"
         >
           {{ $t('general.dragDropCompare') }}

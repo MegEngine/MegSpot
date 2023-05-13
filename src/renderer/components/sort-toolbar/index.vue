@@ -15,9 +15,11 @@
     >
       {{ $t('sortFile.apply') }}
     </el-button> -->
-    <el-button v-show="!generateVisible" :title="'Edit Sorting File'" @click="editSortFile">
-      {{ $t('sortFile.edit') }}
-    </el-button>
+    <el-tooltip :content="$t('sortFile.editTip')" placement="top">
+      <el-button v-show="!generateVisible" @click="editSortFile">
+        {{ $t('sortFile.edit') }}
+      </el-button>
+    </el-tooltip>
   </div>
 </template>
 

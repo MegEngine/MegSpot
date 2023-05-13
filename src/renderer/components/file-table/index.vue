@@ -46,7 +46,7 @@
           <search-input
             v-model="search"
             size="mini"
-            placeholder="filter file name according to input"
+            :placeholder="$t('general.filterFileName')"
             autofocus
             clearable
           >

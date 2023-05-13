@@ -8,6 +8,7 @@ export default {
     reset: 'Reset',
     edit: 'Edit',
     save: 'Save',
+    confirm: 'Confirm',
     cancel: 'Cancel',
     showVideoTip: 'show help videos'
   },
@@ -45,6 +46,7 @@ export default {
     thumbnail: 'thumbnail',
     fileName: 'file name',
     fileLoading: 'Loading files...',
+    filterFileName: 'Filter File Name',
     enableRegular: 'Enable/Disable Regular',
     groupNum: 'group number\nCtrl + ← page backword\nCtrl + → page forward',
     lastModifyTime: 'lastModifyTime',
@@ -229,6 +231,7 @@ export default {
     addFolder: 'add folder',
     afterAddFolder: 'and select one',
     edit: 'Custom file sorting configuration',
+    editTip: 'Change the order in which files are listed in the list below',
     generate: 'Generate',
     generateTip: 'Click to generate the .MegSpotSort.ini sorting configuration file in the current directory',
     sortFile: ' Sorting File',
@@ -239,6 +242,7 @@ export default {
   },
   gallery: {
     clear: 'Clear',
+    clearTip: 'Do you want to clear all selected files',
     enableNameSort: 'Sort by name',
     enableNameSortTip: 'Whether to sort by name',
     smartSort: 'Smart Sort',

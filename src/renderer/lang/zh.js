@@ -8,6 +8,7 @@ export default {
     reset: '重置',
     edit: '编辑',
     save: '保存',
+    confirm: '确定',
     cancel: '取消',
     showVideoTip: '查看演示'
   },
@@ -44,6 +45,7 @@ export default {
     thumbnail: '缩略图',
     fileName: '文件名',
     fileLoading: '加载文件中...',
+    filterFileName: '筛选文件名称',
     enableRegular: '启用/禁用正则',
     groupNum: '分组序号\nCtrl + ← 向前翻页\nCtrl + → 向后翻页',
     lastModifyTime: '最后修改时间',
@@ -227,6 +229,7 @@ export default {
     addFolder: '添加文件夹',
     afterAddFolder: '并从左侧目录树选择文件夹',
     edit: '自定义文件排序',
+    editTip: '更改文件在下方列表中的排列顺序',
     generate: '生成',
     generateTip: '点击即可在当前目录下生成.MegSpotSort.ini排序配置文件',
     sortFile: '排序文件',
@@ -237,6 +240,7 @@ export default {
   },
   gallery: {
     clear: '清空',
+    clearTip: '是否清空所有已选文件',
     enableNameSort: '名称排序',
     enableNameSortTip: '是否按照名称进行先后排序',
     smartSort: '智能排序',

@@ -1,8 +1,9 @@
 <template>
   <div class="gallery">
     <el-button
-      type="text"
+      type="primary"
       size="mini"
+      round
       @click="showModal"
       :disabled="!sortList.length"
       :title="'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'"
@@ -77,6 +78,7 @@ import { getImageUrlSync } from '@/utils/image'
 import { isImage, isVideo } from '@/components/file-tree/lib/util'
 import draggable from 'vuedraggable'
 import { arraySortByName } from '@/utils/file'
+import { i18nRender } from '@/lang'
 import { DELIMITER } from '@/constants'
 
 export default {
@@ -209,8 +211,15 @@ export default {
       this.$emit('click', path)
     },
     handleClearAll() {
-      this.sortList = []
-      this.hideModal()
+      this.$confirm(i18nRender('gallery.clearTip') + '?', i18nRender('gallery.clear'), {
+        confirmButtonText: `${i18nRender('common.confirm')} ${i18nRender('gallery.clear')}`,
+        cancelButtonText: i18nRender('common.cancel'),
+        type: 'warning',
+        'append-to-body': true
+      }).then(() => {
+        this.sortList = []
+        this.hideModal()
+      })
     },
     smartSort() {
       if (!this.sortList.length) return

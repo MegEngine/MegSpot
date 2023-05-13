@@ -20,7 +20,7 @@
           </span>
         </el-tooltip>
         <div class="folder-head-search" flex-box="1">
-          <search-input v-model="searchValue" placeholder="filter file name according to input"></search-input>
+          <search-input v-model="searchValue" :placeholder="$t('general.filterFileName')"></search-input>
         </div>
       </div>
       <span class="loading" v-if="showloading">

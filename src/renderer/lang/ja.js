@@ -8,6 +8,7 @@ export default {
     reset: 'リセット',
     edit: '編集',
     save: '保存',
+    confirm: 'もちろん',
     cancel: 'キャンセル',
     showVideoTip: 'デモビデオを表示'
   },
@@ -45,6 +46,7 @@ export default {
     thumbnail: 'サムネイル画像',
     fileName: 'ファイル名',
     fileLoading: 'ファイルを読み込んでいます...',
+    filterFileName: 'フィルターファイル名',
     enableRegular: '通常の有効化/無効化',
     groupNum: 'グループ番号\nCtrl + ← 戻る \nCtrl + → 進む',
     lastModifyTime: '更新日付',
@@ -230,6 +232,7 @@ export default {
     addFolder: 'フォルダーを追加',
     afterAddFolder: '并从左侧目录树选择文件夹',
     edit: '次に、左側のディレクトリツリーからフォルダを選択します',
+    editTip: '以下のリストに表示されるファイルの順序を変更します',
     generate: '生成',
     generateTip: 'クリックして、現在のディレクトリに.MegSpotSort.iniソート構成ファイルを生成します',
     sortFile: 'ファイルを並べ替える',
@@ -240,6 +243,7 @@ export default {
   },
   gallery: {
     clear: 'クリア',
+    clearTip: '選択したファイルをすべてクリアしますか',
     enableNameSort: '名前順',
     enableNameSortTip: '名前で並べ替えるかどうか',
     smartSort: 'スマートソーティング',

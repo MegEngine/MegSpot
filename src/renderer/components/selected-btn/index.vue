@@ -7,16 +7,18 @@
       type="text"
       size="mini"
       icon="el-icon-circle-close"
-      style="margin-right: 10px"
+      style="margin-right: 10px; color: red"
       :disabled="!selectedList.length"
-      :title="`${$t('common.hotKey')}：cmd/ctrl+delete`"
-      @click="$emit('click')"
+      :title="`${$t('gallery.clear')}\n${$t('common.hotKey')}：cmd/ctrl+delete`"
+      @click="clearAll"
     />
   </div>
 </template>
 
 <script>
 import Gallery from '@/components/gallery'
+import { i18nRender } from '@/lang'
+
 export default {
   name: 'SelectedBtn',
   components: { Gallery },
@@ -25,6 +27,18 @@ export default {
       required: true,
       type: Array,
       default: () => []
+    }
+  },
+  methods: {
+    clearAll() {
+      this.$confirm(i18nRender('gallery.clearTip') + '?', i18nRender('gallery.clear'), {
+        confirmButtonText: `${i18nRender('common.confirm')} ${i18nRender('gallery.clear')}`,
+        cancelButtonText: i18nRender('common.cancel'),
+        type: 'warning',
+        'append-to-body': true
+      }).then(() => {
+        this.$emit('clearAll')
+      })
     }
   }
 }
