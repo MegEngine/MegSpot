@@ -37,6 +37,7 @@ export default {
     float: 'フローティングボール',
     move: '移動距離(ピクセル/キーごとのプレス)',
     defaultFileListShowType: 'ファイルリストのデフォルトの表示タイプ',
+    colorPickerMode: 'カラーピッカーのカラー値の表示形式',
     importOrExportSettings: 'インポート/エクスポート設定',
     list: 'リスト',
     share: '共有',
@@ -178,7 +179,8 @@ export default {
       '画像をダブルクリックして、その画像を個別に操作できます。ファイル名をクリックして、コメントが編集できます。',
     rotate: '回転',
     generateGIF: 'gifを生成する',
-    scaleTip: 'クリックしてズーム比セレクターを開きます'
+    scaleTip: 'クリックしてズーム比セレクターを開きます',
+    copyColorTip: 'カラー値が正常にコピーされました'
   },
   imageSetting: {
     title: '画像設定パネル',

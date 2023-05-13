@@ -36,6 +36,7 @@ export default {
     float: '悬浮球',
     move: '移动距离(像素/每次按键)',
     defaultFileListShowType: '文件列表的默认显示类型',
+    colorPickerMode: '取色器色值的显示格式',
     importOrExportSettings: '导入/导出配置',
     list: '列表',
     share: '分享',
@@ -175,7 +176,8 @@ export default {
     helpText: '双击图片可激活目标容器实现单独缩放旋转等操作，单击图片描述信息可编辑',
     rotate: '旋转',
     generateGIF: '生成gif',
-    scaleTip: '点击打开缩放比例选择器'
+    scaleTip: '点击打开缩放比例选择器',
+    copyColorTip: '成功复制色值'
   },
   imageSetting: {
     title: '图像设置',

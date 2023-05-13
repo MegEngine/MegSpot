@@ -3,13 +3,17 @@
     <canvas ref="canvas" :width="r_width" :height="r_height"></canvas>
     <div class="color-tip">
       <div class="color-box" :style="boxStyle"></div>
-      <span class="color-text">{{ rgba }}</span>
+      <span class="color-text">{{ colorText }}</span>
     </div>
   </div>
 </template>
 
 <script>
 import { clamp, checkBoundary } from '@/utils'
+import { i18nRender } from '@/lang'
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapGetters } = createNamespacedHelpers('preferenceStore')
 
 export default {
   name: 'zoom-viewer',
@@ -76,6 +80,7 @@ export default {
     this.ctx.imageSmoothingEnabled = this.smooth
   },
   computed: {
+    ...mapGetters(['preference']),
     pixelNumAvg() {
       return Math.floor(this.pixelNum / 2)
     },
@@ -109,15 +114,30 @@ export default {
       }
     },
     boxStyle() {
-      const { R, G, B, A } = this.colorData
-      return `background-color: rgba(${R}, ${G}, ${B}, ${A});`
+      const { R, G, B } = this.colorData
+      return `background-color: rgb(${R}, ${G}, ${B});`
     },
-    rgba() {
-      const { R, G, B, A } = this.colorData
-      return ((1 << 24) + (R << 16) + (G << 8) + B).toString(16).slice(1)
+    colorText() {
+      switch (this.preference.colorPickerMode) {
+        case 'hex':
+          return this.hex()
+          break
+        case 'rgb':
+        default:
+          return this.rgb()
+          break
+      }
     }
   },
   methods: {
+    hex() {
+      const { R, G, B, A } = this.colorData
+      return ((1 << 24) + (R << 16) + (G << 8) + B).toString(16).slice(1)
+    },
+    rgb() {
+      const { R, G, B, A } = this.colorData
+      return `${R},${G},${B}`
+    },
     // HTMLCanvasElement or OffscreenCanvas
     // TODO: now not supports HTMLVideoElement
     draw(imgSource, { x, y }) {
@@ -179,9 +199,8 @@ export default {
       // this.ctx.drawImage(bitMap, 0, 0, this.canvas.width, this.canvas.heigh)
     },
     copyColor() {
-      const copyText = `#${this.rgba}`
-      navigator.clipboard?.writeText(copyText)?.then(() => {
-        this.$message.success(`成功复制色值: ${copyText}`)
+      navigator.clipboard?.writeText(this.colorText)?.then(() => {
+        this.$message.success(`${i18nRender('imageCenter.copyColorTip')}: ${this.colorText}`)
       })
     }
   }

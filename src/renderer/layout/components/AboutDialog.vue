@@ -27,6 +27,12 @@
                 <el-option :label="$t('general.thumbnail')" value="thumbnail"></el-option>
               </el-select>
             </el-form-item>
+            <el-form-item :label="$t('general.colorPickerMode')">
+              <el-select v-model="colorPickerMode">
+                <el-option value="rgb"></el-option>
+                <el-option value="hex"></el-option>
+              </el-select>
+            </el-form-item>
             <el-form-item :label="$t('general.importOrExportSettings')">
               <el-button @click="settingsImport" type="primary">{{ $t('general.import') }}</el-button>
               <el-button @click="settingsExport" type="primary">{{ $t('general.export') }}</el-button>
@@ -229,6 +235,16 @@ export default {
       set(arg) {
         this.setPreference({
           defaultFileListShowType: arg
+        })
+      }
+    },
+    colorPickerMode: {
+      get() {
+        return this.preference.colorPickerMode
+      },
+      set(arg) {
+        this.setPreference({
+          colorPickerMode: arg
         })
       }
     }

@@ -37,6 +37,7 @@ export default {
     float: 'floating ball',
     move: 'Movement distance (px/per keystroke)',
     defaultFileListShowType: 'Default Show Type of File List',
+    colorPickerMode: 'ColorPicker Mode',
     importOrExportSettings: 'import/export settings',
     list: 'list',
     share: 'share',
@@ -177,7 +178,8 @@ export default {
       'Double-click the picture to activate the target container to achieve a single operation, click the picture description to edit',
     rotate: 'rotate',
     generateGIF: 'generate GIF',
-    scaleTip: 'Click to open the zoom ratio selector'
+    scaleTip: 'Click to open the zoom ratio selector',
+    copyColorTip: 'Successfully copied color values'
   },
   imageSetting: {
     title: 'image setting Panel',
