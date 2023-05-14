@@ -9,7 +9,7 @@
     >
       {{ scaleData }}
     </span>
-    <div v-show="scaleEditorVisible" class="scale-input">
+    <div v-if="scaleEditorVisible" class="scale-input">
       <el-tooltip :disabled="preference.scaleOptions.length === 0" effect="light" popper-class="select-content">
         <el-input-number
           v-model="scaleData"

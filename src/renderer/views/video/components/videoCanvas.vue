@@ -1230,7 +1230,10 @@ export default {
         this.imgScale = newScale // 必需, 触发scaleEditor组件更新
         return
       }
-      const oldScale = this.imgScale ?? newScale
+      if (isNaN(this.imgScale)) {
+        return
+      }
+      const oldScale = Number(this.imgScale)
       const scaleRatio = newScale / oldScale
       // 默认从画布中心放大
       const position = { x: this.canvas.width / 2, y: this.canvas.height / 2 }
