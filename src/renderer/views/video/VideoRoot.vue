@@ -25,7 +25,19 @@
         >
           {{ $t('general.compare') }}
         </el-button>
+        <el-tooltip :content="$t('video.sequence.compareTip')">
+          <el-button
+            type="primary"
+            round
+            class="toolbar-item"
+            :disabled="!collections.length || collections.length < 2"
+            @click="showSequenceCompareDialog"
+          >
+            {{ $t('video.sequence.compare') }}
+          </el-button>
+        </el-tooltip>
       </div>
+      <FileSequenceSelector type="video" />
     </div>
     <div class="content" flex-box="1">
       <Split :style="{ height: splitHeight }" :gutterSize="4">
@@ -49,6 +61,8 @@
         </SplitArea>
       </Split>
     </div>
+
+    <FileSequenceCompareDialog ref="sequenceCompareDialogRef" type="video" />
   </div>
 </template>
 <script>
@@ -56,6 +70,8 @@ const { dialog } = require('@electron/remote')
 import Vue from 'vue'
 import FileTree from '@/components/file-tree/FileTree.vue'
 import ShowPath from '@/components/show-path'
+import FileSequenceSelector from '@/components/image-sequence'
+import FileSequenceCompareDialog from '@/components/image-sequence-compare-dialog'
 import VueSplit from 'vue-split-panel'
 import VideoPreview from './VideoPreview'
 import { debounce } from '@/utils'
@@ -68,7 +84,7 @@ import { handleEvent } from '@/tools/hotkey'
 Vue.use(VueSplit)
 export default {
   name: 'VideoRoot',
-  components: { FileTree, VideoPreview, SelectedBtn, ShowPath },
+  components: { FileTree, VideoPreview, SelectedBtn, ShowPath, FileSequenceSelector, FileSequenceCompareDialog },
   data() {
     return {
       isDraging: false,
@@ -79,7 +95,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['videoList', 'videoFolders', 'expandData', 'currentPath'])
+    ...mapGetters(['videoList', 'collections', 'videoFolders', 'expandData', 'currentPath'])
   },
   mounted() {
     this.initHotkeyEvents()
@@ -133,6 +149,9 @@ export default {
     },
     compare() {
       this.$router.push('/video/compare')
+    },
+    showSequenceCompareDialog() {
+      this.$refs.sequenceCompareDialogRef.show()
     },
     addFolder() {
       dialog

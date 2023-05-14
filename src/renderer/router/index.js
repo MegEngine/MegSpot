@@ -34,6 +34,12 @@ router.afterEach((to, from) => {
       view: to.fullPath,
       from: from.fullPath
     })
+
+    // clear tmp collections
+    if (!['image-compare', 'video-compare'].includes(to.name)) {
+      store.dispatch('imageStore/removeTmpCollection')
+      store.dispatch('videoStore/removeTmpCollection')
+    }
   })
 })
 export default router

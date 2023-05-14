@@ -6,7 +6,7 @@
       round
       @click="showModal"
       :disabled="!sortList.length"
-      :title="'cmd/ctrl+f show/hide selected file gallery. Click masking can hide gallery too.'"
+      :title="$t('gallery.showTip')"
     >
       {{ $t('general.selected') }}
     </el-button>
@@ -38,7 +38,7 @@
                 class="sortList"
               >
                 <transition-group id="drag" type="transition" name="flip-list">
-                  <div v-for="(item, index) in sortList" :key="item" class="dragItem" @click="handleClick(item)">
+                  <div v-for="(item, index) in sortList" :key="index" class="dragItem" @click="handleClick(item)">
                     <div
                       :class="[
                         (focusListIndex.length && focusListIndex.includes(index)) || focusList.includes(item)

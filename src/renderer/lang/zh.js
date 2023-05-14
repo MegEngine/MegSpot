@@ -27,6 +27,7 @@ export default {
     videoPlay: '视频播放',
     videoCompare: '图片对比',
     compare: '对比',
+    select: '选择',
     selected: '已选',
     language: '语言',
     import: '导入',
@@ -56,7 +57,7 @@ export default {
     sortDialogTips: 'tips:上下拖动可调整顺序',
     selectAll: '全部选择',
     clearAll: '全部清空',
-    delete: '删除此项',
+    delete: '删除',
     showAll: '显示全部',
     history: '历史记录',
     dragDropCompare: '拖拽对比',
@@ -107,6 +108,16 @@ export default {
     }
   },
   image: {
+    sequence: {
+      title: '图像序列',
+      label: '当前图像序列',
+      compare: '对比图像序列',
+      compareTip: '按序对比两个或多个图像序列（至少需要两个图像序列）',
+      selectTip: '选择至少两个图像序列',
+      createTip: '输入新序列名称, 按下回车后即可创建新的图像序列',
+      deleteTip: '删除该图像序列',
+      differentSizeTip: '图像序列的大小不同'
+    },
     toolbar: {
       openFolder: '打开文件夹',
       openFolderTip: '在系统文件资源管理器中打开该目录',
@@ -206,6 +217,13 @@ export default {
     }
   },
   video: {
+    sequence: {
+      title: '视频序列',
+      label: '当前视频序列',
+      compare: '对比视频序列',
+      compareTip: '按序对比两个或多个视频序列',
+      selectTip: '选择至少两个视频序列'
+    },
     speed: '播放速度',
     loop: '循环播放',
     play: '播放',
@@ -241,6 +259,7 @@ export default {
     defaultSortTip: '根据文件名排序'
   },
   gallery: {
+    showTip: '显示/隐藏当前图像序列\n快捷键: cmd/ctrl+f',
     clear: '清空',
     clearTip: '是否清空所有已选文件',
     enableNameSort: '名称排序',

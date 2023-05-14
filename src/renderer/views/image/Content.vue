@@ -90,9 +90,10 @@ export default {
       console.log('snapshot mode')
     }
     // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
-    else if (this.imageList.length <= 4) {
+    else if (!isNaN(this.$route.query?.groupSize) || this.imageList.length <= 4) {
       let smartLayout
-      switch (this.imageList.length) {
+      const num = Number(this.$route.query?.groupSize) || this.imageList.length
+      switch (num) {
         case 1:
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X1
           break

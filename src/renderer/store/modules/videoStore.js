@@ -1,11 +1,32 @@
 import * as GLOBAL_CONSTANT from '../../constants'
 import { trimSep } from '@/utils/file'
 
+export const useCurrentCollection = (state) => {
+  let collection = state.collections.find((collection) => collection.name === state.collectionName)
+  if (!collection) {
+    collection = {
+      name: state.collectionName,
+      type: 'file',
+      list: []
+    }
+    state.collections.push(collection)
+  }
+  return collection
+}
+
 const videoStore = {
   namespaced: true,
   state: {
     videoList: [],
     videoFolders: [],
+    collections: [
+      {
+        name: GLOBAL_CONSTANT.DEFAULT_VIDEO_COLLECTION_NAME,
+        type: 'file', // file / url / function
+        list: []
+      }
+    ],
+    collectionName: GLOBAL_CONSTANT.DEFAULT_VIDEO_COLLECTION_NAME,
     videoConfig: {
       smooth: true,
       speed: 1.0,
@@ -27,7 +48,15 @@ const videoStore = {
     expandData: []
   },
   getters: {
-    videoList: (state) => state.videoList,
+    videoList: (state) => {
+      const collection = useCurrentCollection(state)
+      return collection.list
+    },
+    collection: (state) => {
+      const collection = useCurrentCollection(state)
+      return collection
+    },
+    collections: (state) => state.collections,
     currentTime: (state) => state.currentTime,
     videoFolders: (state) => state.videoFolders,
     getVideoFolders: (state) => () => state.videoFolders,
@@ -57,27 +86,57 @@ const videoStore = {
       }
     },
     ADD_VIDEO: (state, video) => {
-      if (!state.videoList.includes(video)) {
-        state.videoList = [...state.videoList, video]
+      const collection = useCurrentCollection(state)
+      if (!collection.list.includes(video)) {
+        collection.list = [...collection.list, video]
       }
     },
     ADD_VIDEOS: (state, videos) => {
       if (videos.length) {
-        state.videoList = [...new Set(state.videoList.concat(videos))]
+        const collection = useCurrentCollection(state)
+        collection.list = [...new Set(collection.list.concat(videos))]
       }
     },
     REMOVE_VIDEO: (state, video) => {
-      if (state.videoList.includes(video)) {
-        const tmp = [...state.videoList]
-        tmp.splice(state.videoList.indexOf(video), 1)
-        state.videoList = tmp
+      const collection = useCurrentCollection(state)
+      if (collection.list.includes(video)) {
+        const tmp = [...collection.list]
+        tmp.splice(collection.list.indexOf(video), 1)
+        collection.list = tmp
       }
     },
     SET_VIDEOS: (state, newVideoList) => {
-      state.videoList = [...newVideoList]
+      const collection = useCurrentCollection(state)
+      collection.list = [...newVideoList]
     },
     EMPTY_VIDEOS: (state) => {
-      state.videoList = []
+      const collection = useCurrentCollection(state)
+      collection.list = []
+    },
+    ADD_COLLECTION: (state, newCollection) => {
+      const collection = state.collections.find((collection) => collection.name === newCollection.name)
+      if (!collection) {
+        state.collections = [...state.collections, newCollection]
+      }
+    },
+    REMOVE_COLLECTION: (state, collectionName) => {
+      const tmpList = [...state.collections]
+      const collectionIndex = tmpList.findIndex((collection) => collection.name === collectionName)
+      if (collectionIndex > -1) {
+        tmpList.splice(collectionIndex, 1)
+        state.collections = tmpList
+      }
+    },
+    REMOVE_TMP_COLLECTION: (state) => {
+      const collection = state.collections.find((collection) => collection.name === state.collectionName)
+      if (collection && collection.isTmp) {
+        state.collectionName = GLOBAL_CONSTANT.DEFAULT_VIDEO_COLLECTION_NAME
+      }
+      const tmpList = [...state.collections.filter((collection) => !collection.isTmp)]
+      state.collections = tmpList
+    },
+    SET_COLLECTION_NAME: (state, newCollectionName) => {
+      state.collectionName = newCollectionName
     },
     // 修改当前文件夹
     SET_CURRENT_FOLDER_PATH: (state, newFolderPath) => {
@@ -133,6 +192,30 @@ const videoStore = {
     },
     emptyVideos({ commit }) {
       commit('EMPTY_VIDEOS')
+    },
+    addCollection({ commit }, _newCollection) {
+      const newCollection = Object.assign(
+        {
+          name: '_newCollection',
+          type: 'file',
+          list: []
+        },
+        _newCollection
+      )
+      commit('ADD_COLLECTION', newCollection)
+    },
+    removeCollection({ commit }, collectionName) {
+      if (collectionName === GLOBAL_CONSTANT.DEFAULT_VIDEO_COLLECTION_NAME) {
+        console.log('cannot remove default image collection')
+        return
+      }
+      commit('REMOVE_COLLECTION', collectionName)
+    },
+    removeTmpCollection({ commit }) {
+      commit('REMOVE_TMP_COLLECTION')
+    },
+    setCollectionName({ commit }, newCollectionName) {
+      commit('SET_COLLECTION_NAME', newCollectionName)
     },
     //修改当前文件夹路径
     setFolderPath({ commit }, newFolderPath) {

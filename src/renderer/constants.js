@@ -28,6 +28,9 @@ export const NO_CACHE_FILE_PROTOCOL = 'no-cache-file'
 export const SHARE_FILE_NAME = '.MegSpotShare.ini'
 export const SHARE_ZIP_NAME = 'MegSpotShare.zip'
 
+export const DEFAULT_IMAGE_COLLECTION_NAME = 'defaultImageList'
+export const DEFAULT_VIDEO_COLLECTION_NAME = 'defaultVideoList'
+
 export const SHARE_PROJECT_DEFAULT_PROPS = () => ({
   name: '',
   snapPath: '',

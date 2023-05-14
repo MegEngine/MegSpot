@@ -1,17 +1,29 @@
 <template>
   <div id="image-container" ref="container" class="canvas-container" :style="containerStyle">
     <div v-for="(video, index) in videoGroupList" :key="index">
-      <VideoCanvas ref="video_canvas" :index="index" :path="video" :_width="canvasWidth" :_height="canvasHeight"
-        :subVideoControlMenu="subVideoControlMenu" @loaded="handleVideoLoaded" @ended="handleEnded"
-        @fullScreen="handleFullscreen"></VideoCanvas>
+      <VideoCanvas
+        ref="video_canvas"
+        :index="index"
+        :path="video"
+        :_width="canvasWidth"
+        :_height="canvasHeight"
+        :subVideoControlMenu="subVideoControlMenu"
+        @loaded="handleVideoLoaded"
+        @ended="handleEnded"
+        @fullScreen="handleFullscreen"
+      ></VideoCanvas>
     </div>
-    <Sticky v-if="isFloating" :contentDragDisabled="false" :disableDragFn="
-      (event) => {
-        return (
-          event.target.className.toString().includes('el-slider__') || event.target.tagName.toLowerCase() === 'strong'
-        )
-      }
-    ">
+    <Sticky
+      v-if="isFloating"
+      :contentDragDisabled="false"
+      :disableDragFn="
+        (event) => {
+          return (
+            event.target.className.toString().includes('el-slider__') || event.target.tagName.toLowerCase() === 'strong'
+          )
+        }
+      "
+    >
       <template v-slot:icon>
         <el-button type="text">
           <svg-icon icon-class="play" :clicked="true" class="svg-container" />
@@ -79,9 +91,10 @@ export default {
     this.marks = []
     this.setVideoConfig({ currentTime: 0 })
     // 使用智能布局 如果已选少 则自动优化布局 使用当前数量X1的布局
-    if (this.videoList.length <= 4) {
+    if (!isNaN(this.$route.query?.groupSize) || this.videoList.length <= 4) {
       let smartLayout
-      switch (this.videoList.length) {
+      const num = Number(this.$route.query?.groupSize) || this.videoList.length
+      switch (num) {
         case 1:
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X1
           break
@@ -539,7 +552,7 @@ export default {
   width: 100%;
   height: 100%;
 
-  .canvas-item+.canvas-item {
+  .canvas-item + .canvas-item {
     border-left: 1px solid red;
   }
 }

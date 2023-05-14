@@ -28,6 +28,7 @@ export default {
     videoPlay: 'video play',
     videoCompare: 'image compare',
     compare: 'compare',
+    select: 'select',
     selected: 'selected',
     language: 'Language',
     import: 'import',
@@ -57,7 +58,7 @@ export default {
     sortDialogTips: 'tips:drag to change order',
     selectAll: 'select all',
     clearAll: 'unselect all',
-    delete: 'delete this item',
+    delete: 'delete',
     showAll: 'show all',
     history: 'history log',
     dragDropCompare: 'drag&drop compare',
@@ -67,7 +68,7 @@ export default {
     invalidFolderTip: 'Folder does not exist,please input valid path',
     imageFolderList: 'Image Folder List',
     videoFolderList: 'Video Folder List',
-    common: "common"
+    common: 'common'
   },
   hotkey: {
     desc: 'description',
@@ -108,6 +109,16 @@ export default {
     }
   },
   image: {
+    sequence: {
+      title: '画像シーケンス',
+      label: '現在の画像シーケンス',
+      compare: '画像シーケンスを比較',
+      compareTip: '2 つ以上の画像シーケンスを連続して比較します',
+      selectTip: '少なくとも 2 つの画像シーケンスを選択してください',
+      createTip: '新しいシーケンス名を入力し、Enter キーを押して新しい画像シーケンスを作成します',
+      deleteTip: '画像シーケンスを削除',
+      differentSizeTip: '画像シーケンスのサイズは異なります'
+    },
     toolbar: {
       openFolder: 'Open Folder',
       openFolderTip: 'Open the directory in the system file resource manager',
@@ -137,7 +148,7 @@ export default {
     opacity: 'opacity',
     blur: 'blur',
     gamma: 'gamma',
-    channel: "channel",
+    channel: 'channel',
     colorLevel: {
       title: 'Color Levels',
       input: 'input levels',
@@ -147,7 +158,7 @@ export default {
       inputMidtones: 'inputMidtones',
       outputShadow: 'outputShadow',
       outputHighlight: 'outputHighlight',
-      histogramTip: "use specified color channel"
+      histogramTip: 'use specified color channel'
     },
     reset: 'reset',
     resetAll: 'reset all'
@@ -208,6 +219,13 @@ export default {
     }
   },
   video: {
+    sequence: {
+      title: 'Video sequence',
+      label: 'Current video sequence',
+      compare: 'Compare video sequences',
+      compareTip: 'Compare two or more video sequences sequentially',
+      selectTip: 'Select at least two video sequences'
+    },
     speed: 'speed',
     loop: 'loop',
     play: 'play',
@@ -243,6 +261,7 @@ export default {
     defaultSortTip: 'sort files by name'
   },
   gallery: {
+    showTip: 'Show/Hide the current file sequence\nShortcut key: cmd/ctrl+f ',
     clear: 'Clear',
     clearTip: 'Do you want to clear all selected files',
     enableNameSort: 'Sort by name',
@@ -261,14 +280,14 @@ export default {
     title: 'histogram',
     close: 'close histogram',
     setting: 'histogram settings',
-    tip: "add/remove the histogram of this channel",
-    lineWidth: "line width",
-    multi: "channel select type",
-    singleType: "radio mode",
-    multiType: "multiple mode",
-    line: "line",
-    rect: "filled rect",
-    backgroundColor: "background color",
-    drawType: "draw type"
+    tip: 'add/remove the histogram of this channel',
+    lineWidth: 'line width',
+    multi: 'channel select type',
+    singleType: 'radio mode',
+    multiType: 'multiple mode',
+    line: 'line',
+    rect: 'filled rect',
+    backgroundColor: 'background color',
+    drawType: 'draw type'
   }
 }

@@ -28,6 +28,7 @@ export default {
     videoPlay: '動画の再生',
     videoCompare: '画像比較',
     compare: '比較',
+    select: '選択する',
     selected: '選択ファイル',
     language: '言語',
     import: 'インポート',
@@ -57,7 +58,7 @@ export default {
     sortDialogTips: 'ヒント：ファイル名をドラッグして表示順を変更できます',
     selectAll: 'すべて選択',
     clearAll: 'すべて選択解除',
-    delete: 'このアイテムを削除',
+    delete: '消去',
     showAll: 'すべて表示',
     history: '履歴',
     dragDropCompare: 'ドラッグアンドドロップの比較',
@@ -108,6 +109,11 @@ export default {
     }
   },
   image: {
+    sequence: {
+      title: '画像シーケンス',
+      compare: '画像シーケンスを比較する',
+      compareTip: '2 つ以上の画像シーケンスを連続的に比較する'
+    },
     toolbar: {
       openFolder: 'フォルダを開く',
       addFolder: 'フォルダーを追加',
@@ -209,6 +215,13 @@ export default {
     }
   },
   video: {
+    sequence: {
+      title: 'ビデオシーケンス',
+      label: '現在のビデオシーケンス',
+      compare: 'ビデオシーケンスを比較する',
+      compareTip: '2 つ以上のビデオ シーケンスを順番に比較します。',
+      selectTip: '少なくとも 2 つのビデオ シーケンスを選択してください'
+    },
     speed: '再生速度',
     loop: 'リピート',
     play: '再生',
@@ -244,6 +257,7 @@ export default {
     defaultSortTip: '名前でファイルを並べ替える'
   },
   gallery: {
+    showTip: '現在のイメージ シーケンスの表示/非表示\nショートカット キー: cmd/ctrl+f',
     clear: 'クリア',
     clearTip: '選択したファイルをすべてクリアしますか',
     enableNameSort: '名前順',

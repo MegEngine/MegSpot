@@ -1,12 +1,12 @@
 <template>
   <div class="home" flex="dir:top">
-    <div class="tool" flex="main:justify cross:center">
-      <div class="tool-items">
+    <div class="toolbar" flex="main:justify cross:center">
+      <div class="toolbar-items">
         <el-button
           @click="addFolder"
           type="primary"
           round
-          class="tool-item add-folder"
+          class="toolbar-item add-folder"
           title="add folder to root"
           size="mini"
         >
@@ -17,7 +17,7 @@
           type="primary"
           round
           :title="`${$t('common.hotKey')}：cmd/ctrl+enter`"
-          class="tool-item"
+          class="toolbar-item"
           :disabled="!imageList.length"
           @click="compare"
         >
@@ -26,27 +26,38 @@
         <el-button
           type="primary"
           round
-          title="drag-drop-compare"
-          class="tool-item"
+          class="toolbar-item"
           :disabled="!imageList.length || imageList.length < 2"
           @click="dragDropCompare"
         >
           {{ $t('general.dragDropCompare') }}
         </el-button>
-        <el-button type="primary" round class="tool-item" @click="loadShareProject">
+        <el-tooltip :content="$t('image.sequence.compareTip')">
+          <el-button
+            type="primary"
+            round
+            class="toolbar-item"
+            :disabled="!collections.length || collections.length < 2"
+            @click="showSequenceCompareDialog"
+          >
+            {{ $t('image.sequence.compare') }}
+          </el-button>
+        </el-tooltip>
+        <el-button type="primary" round class="toolbar-item" @click="loadShareProject">
           {{ $t('image.toolbar.loadShareProject') }}
         </el-button>
         <!-- <el-button
           type="text"
           size="small"
           title="line-Browse"
-          class="tool-item"
+          class="toolbar-item"
           :disabled="!imageList.length"
           @click="imageBrowser"
         >
           {{ $t('general.imageBrowser') }}
         </el-button> -->
       </div>
+      <FileSequenceSelector />
     </div>
 
     <div class="content" flex-box="1">
@@ -71,6 +82,8 @@
         </SplitArea>
       </Split>
     </div>
+
+    <FileSequenceCompareDialog ref="sequenceCompareDialogRef" />
   </div>
 </template>
 
@@ -80,6 +93,8 @@ const { dialog } = require('@electron/remote')
 import FileTree from '@/components/file-tree/FileTree.vue'
 import SelectedBtn from '@/components/selected-btn'
 import ShowPath from '@/components/show-path'
+import FileSequenceSelector from '@/components/image-sequence'
+import FileSequenceCompareDialog from '@/components/image-sequence-compare-dialog'
 import ImagePreview from './ImagePreview'
 import { SnapshotHelper } from '@/tools/compress'
 import { createNamespacedHelpers } from 'vuex'
@@ -89,7 +104,7 @@ import { handleEvent } from '@/tools/hotkey'
 
 export default {
   name: 'ImageRoot',
-  components: { FileTree, ImagePreview, SelectedBtn, ShowPath },
+  components: { FileTree, ImagePreview, SelectedBtn, ShowPath, FileSequenceSelector, FileSequenceCompareDialog },
   data() {
     return {
       isDraging: false,
@@ -99,7 +114,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['imageList', 'imageFolders', 'expandData', 'currentPath'])
+    ...mapGetters(['imageList', 'imageFolders', 'expandData', 'currentPath', 'collections'])
   },
   mounted() {
     this.initHotkeyEvents()
@@ -145,6 +160,9 @@ export default {
     },
     dragDropCompare() {
       this.$router.push('/image/drag-drop-compare')
+    },
+    showSequenceCompareDialog() {
+      this.$refs.sequenceCompareDialogRef.show()
     },
     imageBrowser() {
       this.$router.push('/image/browser')
@@ -228,15 +246,15 @@ export default {
   box-sizing: border-box;
   position: relative;
 
-  .tool {
+  .toolbar {
     padding: 0 10px;
     border-bottom: 1px solid #eee;
 
-    .tool-items {
+    .toolbar-items {
       position: relative;
     }
 
-    .tool-item + .tool-item {
+    .toolbar-item + .toolbar-item {
       margin-left: 10px;
     }
   }

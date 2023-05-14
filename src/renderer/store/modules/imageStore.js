@@ -1,11 +1,32 @@
 import * as GLOBAL_CONSTANT from '../../constants'
 import { trimSep } from '@/utils/file'
 
+export const useCurrentCollection = (state) => {
+  let collection = state.collections.find((collection) => collection.name === state.collectionName)
+  if (!collection) {
+    collection = {
+      name: state.collectionName,
+      type: 'file',
+      list: []
+    }
+    state.collections.push(collection)
+  }
+  return collection
+}
+
 const imageStore = {
   namespaced: true,
   state: {
     imageFolders: [],
     imageList: [],
+    collections: [
+      {
+        name: GLOBAL_CONSTANT.DEFAULT_IMAGE_COLLECTION_NAME,
+        type: 'file', // file / url / function
+        list: []
+      }
+    ],
+    collectionName: GLOBAL_CONSTANT.DEFAULT_IMAGE_COLLECTION_NAME,
     imageConfig: {
       smooth: true,
       layout: GLOBAL_CONSTANT.LAYOUT_2X1,
@@ -20,7 +41,15 @@ const imageStore = {
     expandData: []
   },
   getters: {
-    imageList: (state) => state.imageList,
+    imageList: (state) => {
+      const collection = useCurrentCollection(state)
+      return collection.list
+    },
+    collection: (state) => {
+      const collection = useCurrentCollection(state)
+      return collection
+    },
+    collections: (state) => state.collections,
     imageFolders: (state) => state.imageFolders,
     getImageFolders: (state) => () => state.imageFolders,
     imageConfig: (state) => state.imageConfig,
@@ -50,30 +79,60 @@ const imageStore = {
       }
     },
     ADD_IMAGE: (state, image) => {
-      if (image && !state.imageList.includes(image)) {
-        state.imageList = [...state.imageList, image]
+      const collection = useCurrentCollection(state)
+      if (image && !collection.list.includes(image)) {
+        collection.list = [...collection.list, image]
       }
     },
     ADD_IMAGES: (state, images) => {
+      const collection = useCurrentCollection(state)
       if (images && images.length) {
-        state.imageList = [...new Set(state.imageList.concat(images))]
+        collection.list = [...new Set(collection.list.concat(images))]
       }
     },
     REMOVE_IMAGES: (state, images) => {
-      const tmp = [...state.imageList]
+      const collection = useCurrentCollection(state)
+      const tmp = [...collection.list]
       images.forEach((image) => {
         let index = tmp.indexOf(image)
         if (index > -1) {
           tmp.splice(index, 1)
         }
       })
-      state.imageList = tmp
+      collection.list = tmp
     },
     SET_IMAGES: (state, newImageList) => {
-      state.imageList = newImageList
+      const collection = useCurrentCollection(state)
+      collection.list = newImageList
     },
     EMPTY_IMAGE: (state) => {
-      state.imageList = []
+      const collection = useCurrentCollection(state)
+      collection.list = []
+    },
+    ADD_COLLECTION: (state, newCollection) => {
+      const collection = state.collections.find((collection) => collection.name === newCollection.name)
+      if (!collection) {
+        state.collections = [...state.collections, newCollection]
+      }
+    },
+    REMOVE_COLLECTION: (state, collectionName) => {
+      const tmpList = [...state.collections]
+      const collectionIndex = tmpList.findIndex((collection) => collection.name === collectionName)
+      if (collectionIndex > -1) {
+        tmpList.splice(collectionIndex, 1)
+        state.collections = tmpList
+      }
+    },
+    REMOVE_TMP_COLLECTION: (state) => {
+      const collection = state.collections.find((collection) => collection.name === state.collectionName)
+      if (collection && collection.isTmp) {
+        state.collectionName = GLOBAL_CONSTANT.DEFAULT_IMAGE_COLLECTION_NAME
+      }
+      const tmpList = [...state.collections.filter((collection) => !collection.isTmp)]
+      state.collections = tmpList
+    },
+    SET_COLLECTION_NAME: (state, newCollectionName) => {
+      state.collectionName = newCollectionName
     },
     // 修改当前文件夹
     SET_CURRENT_FOLDER_PATH: (state, newFolderPath) => {
@@ -125,6 +184,30 @@ const imageStore = {
     },
     emptyImages({ commit }) {
       commit('EMPTY_IMAGE')
+    },
+    addCollection({ commit }, _newCollection) {
+      const newCollection = Object.assign(
+        {
+          name: '_newCollection',
+          type: 'file',
+          list: []
+        },
+        _newCollection
+      )
+      commit('ADD_COLLECTION', newCollection)
+    },
+    removeCollection({ commit }, collectionName) {
+      if (collectionName === GLOBAL_CONSTANT.DEFAULT_IMAGE_COLLECTION_NAME) {
+        console.log('cannot remove default image collection')
+        return
+      }
+      commit('REMOVE_COLLECTION', collectionName)
+    },
+    removeTmpCollection({ commit }) {
+      commit('REMOVE_TMP_COLLECTION')
+    },
+    setCollectionName({ commit }, newCollectionName) {
+      commit('SET_COLLECTION_NAME', newCollectionName)
     },
     //修改当前文件夹路径
     setFolderPath({ commit }, newFolderPath) {
