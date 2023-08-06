@@ -38,6 +38,7 @@
             ref="zoom-viewer"
             :RGBAcolor.sync="RGBAcolor"
             :mousePos="mousePos"
+            :mousePosInfo="mousePosInfo"
             :parentWidth="_width"
             :parentHeight="_height"
           />

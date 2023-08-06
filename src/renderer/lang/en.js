@@ -39,6 +39,7 @@ export default {
     move: 'Movement distance (px/per keystroke)',
     defaultFileListShowType: 'Default Show Type of File List',
     colorPickerMode: 'ColorPicker Mode',
+    colorPickerShowPos: 'Show cursor position info in ColorPicker',
     importOrExportSettings: 'import/export settings',
     list: 'list',
     share: 'share',

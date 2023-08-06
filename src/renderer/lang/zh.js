@@ -38,6 +38,7 @@ export default {
     move: '移动距离(像素/每次按键)',
     defaultFileListShowType: '文件列表的默认显示类型',
     colorPickerMode: '取色器色值的显示格式',
+    colorPickerShowPos: '取色器中是否显示坐标信息',
     importOrExportSettings: '导入/导出配置',
     list: '列表',
     share: '分享',

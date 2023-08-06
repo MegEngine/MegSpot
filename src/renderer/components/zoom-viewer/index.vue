@@ -1,5 +1,6 @@
 <template>
   <div class="zoom-viewer" :style="style">
+    <div v-show="showPos" class="pos-info">{{ mousePosInfo.x.toFixed(2) }},{{ mousePosInfo.y.toFixed(2) }}</div>
     <canvas ref="canvas" :width="r_width" :height="r_height"></canvas>
     <div class="color-tip">
       <div class="color-box" :style="boxStyle"></div>
@@ -43,6 +44,13 @@ export default {
       default: false
     },
     mousePos: {
+      type: Object,
+      default: () => ({
+        x: 0,
+        y: 0
+      })
+    },
+    mousePosInfo: {
       type: Object,
       default: () => ({
         x: 0,
@@ -127,6 +135,9 @@ export default {
           return this.rgb()
           break
       }
+    },
+    showPos() {
+      return this.preference.colorPickerShowPos
     }
   },
   methods: {
@@ -216,6 +227,16 @@ export default {
     border: 1px solid rgb(254, 254, 254, 0.7);
   }
 
+  .pos-info {
+    display: block;
+    flex: 1;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    color: #fefefe;
+    background-color: #22272e;
+    border-radius: 3px;
+  }
   .color-tip {
     width: 100%;
     height: 20xp;

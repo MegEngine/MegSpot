@@ -20,6 +20,8 @@ const preferenceStore = {
       defaultFileListShowType: 'list',
       // 取色器显示色值的格式
       colorPickerMode: 'rgb', // `rgb` / `hex`
+      // 取色器中是否显示鼠标坐标
+      colorPickerShowPos: true,
       // 每次手动按键时图像的移动距离, 默认为100像素
       moveDistance: 100,
       // 视频控制条位置 fixed(固定在toolbar) / float (悬浮球)

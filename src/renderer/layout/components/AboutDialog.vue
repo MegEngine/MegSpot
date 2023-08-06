@@ -17,8 +17,12 @@
           <el-form label-position="right">
             <el-form-item :label="$t('general.language')">
               <el-select v-model="appLanguage">
-                <el-option v-for="item in langOptions" :key="item.value" :label="item.label"
-                  :value="item.value"></el-option>
+                <el-option
+                  v-for="item in langOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
               </el-select>
             </el-form-item>
             <el-form-item :label="$t('general.defaultFileListShowType')">
@@ -32,6 +36,9 @@
                 <el-option value="rgb"></el-option>
                 <el-option value="hex"></el-option>
               </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('general.colorPickerShowPos')">
+              <el-switch v-model="colorPickerShowPos" />
             </el-form-item>
             <el-form-item :label="$t('general.importOrExportSettings')">
               <el-button @click="settingsImport" type="primary">{{ $t('general.import') }}</el-button>
@@ -58,10 +65,19 @@
           </el-row>
         </el-tab-pane>
         <el-tab-pane name="hotkey" :label="$t('help.hotkey')">
-          <vxe-table ref="xTable" :data="hotkeys" :edit-config="{ trigger: 'manual', mode: 'row' }" :expand-config="{
-            accordion: true,
-            visibleMethod: expandVisibleMethod
-          }" :height="maxHeight" :loading="loading" class="hotkey-table-scrollbar" keep-source>
+          <vxe-table
+            ref="xTable"
+            :data="hotkeys"
+            :edit-config="{ trigger: 'manual', mode: 'row' }"
+            :expand-config="{
+              accordion: true,
+              visibleMethod: expandVisibleMethod
+            }"
+            :height="maxHeight"
+            :loading="loading"
+            class="hotkey-table-scrollbar"
+            keep-source
+          >
             <!-- <vxe-column field="name" title="Name">
               <template #default="{row}">
                 <span>{{ row.name }}</span>
@@ -69,14 +85,25 @@
             </vxe-column> -->
             <vxe-column type="expand" width="80">
               <template #content="{ row, rowIndex }">
-                <el-card v-for="(_, index) in temporaryKeysArrProxy" :key="index" flex="cross:center"
-                  style="width: 100%">
+                <el-card
+                  v-for="(_, index) in temporaryKeysArrProxy"
+                  :key="index"
+                  flex="cross:center"
+                  style="width: 100%"
+                >
                   <div flex="cross:center">
-                    <el-input :id="generateRowId(rowIndex, index)" :disabled="activeRowId !== generateRowId(rowIndex)"
-                      v-model="temporaryKeysArrProxy[index]"></el-input>
+                    <el-input
+                      :id="generateRowId(rowIndex, index)"
+                      :disabled="activeRowId !== generateRowId(rowIndex)"
+                      v-model="temporaryKeysArrProxy[index]"
+                    ></el-input>
                     <el-tooltip :content="$t('gallery.clear')" placement="top">
-                      <el-button icon="el-icon-close" circle @click="clearKeys(index, generateRowId(rowIndex, index))"
-                        style="margin-left: 10px"></el-button>
+                      <el-button
+                        icon="el-icon-close"
+                        circle
+                        @click="clearKeys(index, generateRowId(rowIndex, index))"
+                        style="margin-left: 10px"
+                      ></el-button>
                       <!-- TODO:检测重复；支持单独重置 -->
                       <!-- <span v-if="
                         [...temporaryKeysArr[index]].sort().toString() !==
@@ -92,7 +119,7 @@
             </vxe-column>
             <vxe-column :title="$t('hotkey.desc')" field="desc" align="left">
               <template #default="{ row }">
-                {{ $t(`hotkey.${row.name }`) || row.desc }}
+                {{ $t(`hotkey.${row.name}`) || row.desc }}
               </template>
             </vxe-column>
             <vxe-column :title="$t('hotkey.key')" field="keysArr" width="250">
@@ -247,6 +274,16 @@ export default {
           colorPickerMode: arg
         })
       }
+    },
+    colorPickerShowPos: {
+      get() {
+        return this.preference.colorPickerShowPos
+      },
+      set(arg) {
+        this.setPreference({
+          colorPickerShowPos: arg
+        })
+      }
     }
   },
   watch: {
@@ -267,11 +304,12 @@ export default {
     },
     visible: {
       handler: function (newVal) {
-        newVal && trackEvent('page_view', {
-          category: 'help',
-          view: 'help',
-          from: this.$route?.path
-        })
+        newVal &&
+          trackEvent('page_view', {
+            category: 'help',
+            view: 'help',
+            from: this.$route?.path
+          })
       },
       immediate: true
     }

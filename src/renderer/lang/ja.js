@@ -39,6 +39,7 @@ export default {
     move: '移動距離(ピクセル/キーごとのプレス)',
     defaultFileListShowType: 'ファイルリストのデフォルトの表示タイプ',
     colorPickerMode: 'カラーピッカーのカラー値の表示形式',
+    colorPickerMode: 'カラーピッカーにカーソル位置情報を表示',
     importOrExportSettings: 'インポート/エクスポート設定',
     list: 'リスト',
     share: '共有',
