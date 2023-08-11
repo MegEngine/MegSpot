@@ -64,6 +64,7 @@ import { createNamespacedHelpers } from 'vuex'
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore')
 const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
 import { getImageUrlSyncNoCache } from '@/utils/image'
+import { getOverlapRect } from '@/utils/canvas'
 import { throttle, debounce } from '@/utils'
 import { SCALE_CONSTANTS, DRAG_CONSTANTS } from '@/constants'
 import chokidar from 'chokidar'
@@ -128,6 +129,8 @@ export default {
         height: 0
       },
       bitMap: null,
+      imgMat: null,
+      imgMatRequestId: null,
       imagePosition: null,
       cachedPositionData: null,
       imgScale: 'N/A',
@@ -277,6 +280,9 @@ export default {
           outputs: newVal
         })
       }
+    },
+    imgScaleNum() {
+      return !isNaN(this.imgScale) ? Number(this.imgScale) : 0
     }
   },
   async mounted() {
@@ -288,6 +294,10 @@ export default {
   },
   beforeDestroy() {
     this.removeEvents()
+    if (this.imgMat) {
+      this.imgMat?.delete()
+      this.imgMat = null
+    }
     this.bitMap && this.bitMap?.close()
     this.initFilters()
   },
@@ -327,6 +337,11 @@ export default {
         this.setSmooth()
       },
       immediate: true
+    },
+    'preference.showRGBText': {
+      handler(newVal, oldVal) {
+        this.drawImage()
+      }
     }
   },
   methods: {
@@ -430,19 +445,41 @@ export default {
     },
     initHist(reGenerate = true, config = null) {
       return new Promise((resolve, reject) => {
-        const cv = window?.cv
-        if (cv && this.image?.width) {
+        let mat
+        const cv = this.$cv
+        if (this.imgMat) {
+          mat = this.imgMat.clone()
+        } else if (cv && this.image?.width) {
+          mat = cv.imread(this.image)
+        }
+        if (mat) {
           this.currentHist = reGenerate
-            ? this.$refs['hist-container'].reGenerateHist(cv.imread(this.image), config)
-            : this.$refs['hist-container'].generateHist(cv.imread(this.image), config)
+            ? this.$refs['hist-container'].reGenerateHist(mat, config)
+            : this.$refs['hist-container'].generateHist(mat, config)
           resolve()
         }
         return reject()
       })
     },
     handleChangeHistTypes(config) {
-      window?.cv?.Mat && this.initHist(false, config)
+      this.$cv?.Mat && this.initHist(false, config)
       this.$refs['hist-container'].setVisible(true)
+    },
+    async initImageMat() {
+      const cv = this.$cv
+      if (this.imgMatRequestId) {
+        cancelAnimationFrame(this.imgMatRequestId)
+        this.imgMatRequestId = 0
+      }
+      if (cv && this.image?.width) {
+        if (this.imgMat) {
+          this.imgMat?.delete()
+          this.imgMat = null
+        }
+        this.imgMat = cv.imread(this.image)
+      } else {
+        this.imgMatRequestId = requestAnimationFrame(this.initImageMat)
+      }
     },
     async initBitMap(_imageData) {
       return new Promise(async (resolve) => {
@@ -556,6 +593,7 @@ export default {
           const imageData = toRGBA8(ifd)
           this.image = new Image(ifd.width, ifd.height)
           await this.initBitMap(imageData)
+          this.initImageMat()
           this.loading = false
           this.ready = true
           this.reDraw(initPosition)
@@ -564,6 +602,7 @@ export default {
           this.image = new Image()
           this.image.onload = async () => {
             await this.initBitMap()
+            this.initImageMat()
             this.loading = false
             this.ready = true
             this.reDraw(initPosition)
@@ -584,10 +623,91 @@ export default {
       this.initCanvas()
       this.initImage()
     },
+    pickCanvasColor(x, y) {
+      if (!this.cs) {
+        console.log('this.cs')
+        return null
+      }
+
+      const pixel = this.cs.getImageData(x, y, 1, 1)
+      let [R, G, B, A] = pixel.data
+      A = parseInt(A / 255)
+      return {
+        R,
+        G,
+        B,
+        A,
+        isBright: (0.299 * R + 0.587 * G + 0.114 * B) / 255 >= 0.8
+      }
+    },
+    async drawRGBText() {
+      const cv = this.$cv
+      if (this.preference.showRGBText && cv && this.imgMat && this.imagePosition && this.image && this.cs && this.imgScaleNum >= 42) {
+        if (this.drawRGBTextReqId) {
+          cancelAnimationFrame(this.drawRGBTextReqId)
+          this.drawRGBTextReqId = null
+        }
+
+        const that = this
+        this.drawRGBTextReqId = requestAnimationFrame(() => {
+          const imgScaleNum = that.imgScaleNum
+          const { x, y } = that.imagePosition
+
+          const viewerRect = { x: 0, y: 0, width: that._width, height: that._height }
+          const overlapRect = getOverlapRect(that.imagePosition, viewerRect)
+          if (!overlapRect) {
+            return
+          }
+          Object.assign(overlapRect, {
+            x: Math.max(0, Math.floor((overlapRect.x - x) / imgScaleNum) - 1),
+            y: Math.max(0, Math.floor((overlapRect.y - y) / imgScaleNum) - 1),
+            width: Math.min(that.imgMat.cols, Math.ceil(overlapRect.width / imgScaleNum) + 1),
+            height: Math.min(that.imgMat.rows, Math.ceil(overlapRect.height / imgScaleNum) + 1)
+          })
+
+          const fontSize = Math.floor((imgScaleNum * 0.8) / 3)
+          const gap = 2
+          const padding = (imgScaleNum - fontSize * 3 - gap * 2) / 2
+
+          that.cs.restore()
+          that.cs.save()
+          that.cs.font = `bold ${fontSize}px Arial`
+          that.cs.fillStyle = 'black'
+          that.cs.textAlign = 'center'
+
+          const rect = new cv.Rect(overlapRect.x, overlapRect.y, overlapRect.width, overlapRect.height)
+          const roi = that.imgMat.roi(rect)
+          const channelCount = that.imgMat.channels()
+
+          const drawOffset1 = padding + fontSize
+          const drawOffset2 = drawOffset1 + fontSize + gap
+          const drawOffset3 = drawOffset2 + fontSize + gap
+
+          for (let row = 0; row < roi.rows; row++) {
+            for (let col = 0; col < roi.cols; col++) {
+              let pixelValue = []
+              for (let ch = 0; ch < channelCount; ch++) {
+                pixelValue.push(roi.ucharPtr(row, col)[ch])
+              }
+              const [R, G, B] = pixelValue
+              const isBright = (0.299 * R + 0.587 * G + 0.114 * B) / 255 >= 0.8
+              that.cs.fillStyle = isBright ? 'black' : 'white'
+              const _x = x + imgScaleNum * (overlapRect.x + col + 0.5)
+              const _y = y + imgScaleNum * (overlapRect.y + row)
+              !isNaN(R) && that.cs.fillText(`R: ${R}`, _x, _y + drawOffset1)
+              !isNaN(G) && that.cs.fillText(`G: ${G}`, _x, _y + drawOffset2)
+              !isNaN(B) && that.cs.fillText(`B: ${B}`, _x, _y + drawOffset3)
+            }
+          }
+          that.cs.restore()
+        })
+      }
+    },
     async drawImage(img = null) {
       let { x, y, width, height } = this.imagePosition || this.getImageInitPos(this.canvas, this.image)
       this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height)
       this.cs.drawImage(img ?? this.bitMap, x, y, width, height)
+      this.drawRGBText()
     },
     handleClick() {
       this.triggerRGB && this.$refs['zoom-viewer']?.copyColor()
@@ -614,7 +734,7 @@ export default {
         return
       }
 
-      window?.cv?.Mat &&
+      this.$cv?.Mat &&
         this.initHist().then(() => {
           this.$refs['hist-container'].setVisible(visible)
         })
@@ -732,7 +852,7 @@ export default {
         }
         this.drawImage()
         this.doZoomEnd()
-        this.$refs['hist-container'].visible && window?.cv?.Mat && this.initHist()
+        this.$refs['hist-container'].visible && this.$cv?.Mat && this.initHist()
       })
     },
     snapshotModeInitPos() {
@@ -867,6 +987,7 @@ export default {
           width
         }
         this.imgScale = 'N/A'
+        this.doZoomEnd()
         this.drawImage()
       }
     },

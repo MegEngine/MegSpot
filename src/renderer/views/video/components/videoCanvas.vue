@@ -155,6 +155,7 @@ import chokidar from 'chokidar'
 import * as CONSTANTS from '../video-constants'
 import { getFileName } from '@/filter/get-file-name'
 import { TimeManager } from '@/utils/video'
+import { getOverlapRect } from '@/utils/canvas'
 import { throttle, getUuidv4 } from '@/utils'
 import { useWorker } from '@/utils/worker'
 
@@ -223,6 +224,7 @@ export default {
         height: 0
       },
       bitMap: null,
+      imgMat: null,
       imagePosition: null,
       cachedPositionData: null,
       imgScale: 'N/A',
@@ -404,6 +406,9 @@ export default {
         backgroundColor: 'red',
         opacity: 0.5
       }
+    },
+    imgScaleNum() {
+      return !isNaN(this.imgScale) ? Number(this.imgScale) : 0
     }
   },
   async mounted() {
@@ -428,6 +433,10 @@ export default {
       }
       this.video.remove()
       this.video = null
+    }
+    if (this.imgMat) {
+      this.imgMat?.delete()
+      this.imgMat = null
     }
     this.bitMap && this.bitMap.close()
     // this.initFilters()
@@ -457,6 +466,7 @@ export default {
             .on('change', (path, details) => {
               console.log('video--change', path, details)
               // this.initbitMap();
+              // this.initImageMat()
               this.initVideo()
             })
             .on('unlink', (path, details) => {
@@ -502,6 +512,11 @@ export default {
       this.updateZoomViewer = throttle(1000 / newRate, function () {
         this.$refs['zoom-viewer']?.draw(...arguments)
       })
+    },
+    'preference.showRGBText': {
+      handler(newVal, oldVal) {
+        this.drawImage()
+      }
     }
   },
   methods: {
@@ -539,6 +554,7 @@ export default {
       }
       if (this.paused && this.video?.videoWidth) {
         this.initbitMap()
+        this.initImageMat()
       } else {
         this.drawImage()
       }
@@ -699,6 +715,7 @@ export default {
       this.paused = true
       if (this.paused) {
         this.initbitMap()
+        this.initImageMat()
       }
     },
     handleVideoResetTime() {
@@ -743,6 +760,7 @@ export default {
       // console.log('offset', this.offset)
       this.changeFrameUpdateFN(currentTime)
       // this.initbitMap()
+      // this.initImageMat()
     },
     handleBroadcast({ name, data = { id: null } }) {
       if (this.selectedId) {
@@ -834,18 +852,32 @@ export default {
       // }
       return
     },
+    getVideoImageData() {
+      const histCanvas = document.createElement('canvas')
+      histCanvas.width = this.video.videoWidth
+      histCanvas.height = this.video.videoHeight
+      const histCanvasCtx = histCanvas.getContext('2d')
+      histCanvasCtx.drawImage(this.video, 0, 0)
+      const imgData = histCanvasCtx.getImageData(0, 0, histCanvas.width, histCanvas.height)
+      return imgData
+    },
     generateHist(reGenerate = true, config = null) {
       return new Promise((resolve, reject) => {
         try {
-          const histCanvas = document.createElement('canvas')
-          histCanvas.width = this.video.videoWidth
-          histCanvas.height = this.video.videoHeight
-          let histCanvasCtx = histCanvas.getContext('2d')
-          histCanvasCtx.drawImage(this.video, 0, 0)
-          this.currentHist = reGenerate
-            ? this.$refs['hist-container'].reGenerateHist(window.cv.imread(histCanvas), config)
-            : this.$refs['hist-container'].generateHist(window.cv.imread(histCanvas), config)
-          resolve()
+          let mat
+          const cv = this.$cv
+          if (this.imgMat) {
+            mat = this.imgMat.clone()
+          } else if (cv) {
+            const imgData = this.getVideoImageData()
+            mat = cv.matFromImageData(imgData)
+          }
+          if (mat) {
+            this.currentHist = reGenerate
+              ? this.$refs['hist-container'].reGenerateHist(mat, config)
+              : this.$refs['hist-container'].generateHist(mat, config)
+            resolve()
+          }
         } catch (err) {
           console.log('err', err)
         }
@@ -879,6 +911,7 @@ export default {
           this.video.addEventListener('ended', () => {
             this.currentTime = this.video.currentTime
             this.initbitMap()
+            this.initImageMat()
             this.$emit('ended')
           })
 
@@ -917,6 +950,7 @@ export default {
             this.doZoomEnd()
             this.loading = false
             await this.initbitMap()
+            this.initImageMat()
             this.reset()
             resolve()
           })
@@ -984,11 +1018,100 @@ export default {
       console.log('reMount')
       this.initCanvas()
       await this.initbitMap()
+      this.initImageMat()
       this.reset()
     },
     clearCanvas() {
       const maxLen = this.canvas.width * this.canvas.height * 4
       this.cs.clearRect(-maxLen, -maxLen, 2 * maxLen, 2 * maxLen)
+    },
+    async initImageMat() {
+      const cv = this.$cv
+      if (this.imgMatRequestId) {
+        cancelAnimationFrame(this.imgMatRequestId)
+        this.imgMatRequestId = 0
+      }
+      if (cv && this.video?.videoWidth) {
+        if (this.imgMat) {
+          this.imgMat?.delete()
+          this.imgMat = null
+        }
+        const imgData = this.getVideoImageData()
+        this.imgMat = cv.matFromImageData(imgData)
+      } else {
+        this.imgMatRequestId = requestAnimationFrame(this.initImageMat)
+      }
+    },
+    async drawRGBText() {
+      const cv = this.$cv
+      if (
+        this.paused &&
+        this.preference.showRGBText &&
+        cv &&
+        this.imgMat &&
+        this.imagePosition &&
+        this.cs &&
+        this.imgScaleNum >= 42
+      ) {
+        if (this.drawRGBTextReqId) {
+          cancelAnimationFrame(this.drawRGBTextReqId)
+          this.drawRGBTextReqId = null
+        }
+
+        const that = this
+        this.drawRGBTextReqId = requestAnimationFrame(() => {
+          const imgScaleNum = that.imgScaleNum
+          const { x, y } = that.imagePosition
+
+          const viewerRect = { x: 0, y: 0, width: that._width, height: that._height }
+          const overlapRect = getOverlapRect(that.imagePosition, viewerRect)
+          if (!overlapRect) {
+            return
+          }
+          Object.assign(overlapRect, {
+            x: Math.max(0, Math.floor((overlapRect.x - x) / imgScaleNum) - 1),
+            y: Math.max(0, Math.floor((overlapRect.y - y) / imgScaleNum) - 1),
+            width: Math.min(that.imgMat.cols, Math.ceil(overlapRect.width / imgScaleNum) + 1),
+            height: Math.min(that.imgMat.rows, Math.ceil(overlapRect.height / imgScaleNum) + 1)
+          })
+
+          const fontSize = Math.floor((imgScaleNum * 0.8) / 3)
+          const gap = 2
+          const padding = (imgScaleNum - fontSize * 3 - gap * 2) / 2
+
+          that.cs.restore()
+          that.cs.save()
+          that.cs.font = `bold ${fontSize}px Arial`
+          that.cs.fillStyle = 'black'
+          that.cs.textAlign = 'center'
+
+          const rect = new cv.Rect(overlapRect.x, overlapRect.y, overlapRect.width, overlapRect.height)
+          const roi = that.imgMat.roi(rect)
+          const channelCount = that.imgMat.channels()
+
+          const drawOffset1 = padding + fontSize
+          const drawOffset2 = drawOffset1 + fontSize + gap
+          const drawOffset3 = drawOffset2 + fontSize + gap
+
+          for (let row = 0; row < roi.rows; row++) {
+            for (let col = 0; col < roi.cols; col++) {
+              let pixelValue = []
+              for (let ch = 0; ch < channelCount; ch++) {
+                pixelValue.push(roi.ucharPtr(row, col)[ch])
+              }
+              const [R, G, B] = pixelValue
+              const isBright = (0.299 * R + 0.587 * G + 0.114 * B) / 255 >= 0.8
+              that.cs.fillStyle = isBright ? 'black' : 'white'
+              const _x = x + imgScaleNum * (overlapRect.x + col + 0.5)
+              const _y = y + imgScaleNum * (overlapRect.y + row)
+              !isNaN(R) && that.cs.fillText(`R: ${R}`, _x, _y + drawOffset1)
+              !isNaN(G) && that.cs.fillText(`G: ${G}`, _x, _y + drawOffset2)
+              !isNaN(B) && that.cs.fillText(`B: ${B}`, _x, _y + drawOffset3)
+            }
+          }
+          that.cs.restore()
+        })
+      }
     },
     drawImage(img) {
       if (!this.imagePosition) return
@@ -1008,6 +1131,8 @@ export default {
       if (this.dynamicPickColor && this.triggerRGB) {
         this.doHandleMove()
       }
+
+      this.drawRGBText()
     },
     handleClick() {
       this.triggerRGB && this.$refs['zoom-viewer']?.copyColor()
@@ -1274,6 +1399,7 @@ export default {
         }
         this.imgScale = 'N/A'
       }
+      this.doZoomEnd()
       this.drawImage()
     },
     doZoomEnd() {

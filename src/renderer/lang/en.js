@@ -91,7 +91,8 @@ export default {
     moveLeft: 'move left',
     moveRight: 'move right',
     moveDown: 'move downward',
-    pickColor: 'Turn on/off the color picker'
+    pickColor: 'Turn on/off the color picker',
+    rgbText: 'Enable/disable the display of RGB values in each pixel block'
   },
   dashboard: {
     entries: {

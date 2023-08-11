@@ -17,6 +17,7 @@ English | [中文](README.md)
 - Mac, Linux, Window cross-platform support & automatic update support.
 - **HEVC/H.265 video hard decoding support**.
 - Support the comparison of any screen of multiple videos.
+- [RGB Viewer](https://github.com/MegEngine/MegSpot/wiki/RGB-Viewer)
 - Support terminal command.
 - Support multiple languages: Chinese, English, Japanese.
 

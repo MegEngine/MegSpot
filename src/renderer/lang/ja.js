@@ -91,7 +91,8 @@ export default {
     moveLeft: '左に移動',
     moveRight: '向右移动',
     moveDown: '下に移動',
-    pickColor: 'カラーピッカーのオン/オフを切り替えます'
+    pickColor: 'カラーピッカーのオン/オフを切り替えます',
+    rgbText: '各ピクセルブロックのRGB値の表示を有効/無効にします。'
   },
   dashboard: {
     entries: {

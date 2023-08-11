@@ -36,6 +36,7 @@
 - [文件选择](https://github.com/MegEngine/MegSpot/wiki/文件选择)
   - [文件列表](https://github.com/MegEngine/MegSpot/wiki/文件列表)
   - [文件长廊](https://github.com/MegEngine/MegSpot/wiki/文件长廊)
+- [RGB Viewer](https://github.com/MegEngine/MegSpot/wiki/RGB-Viewer)
 - [命令行操作](https://github.com/MegEngine/MegSpot/wiki/命令行操作)
 - [多语言支持](https://github.com/MegEngine/MegSpot/wiki/语言支持)
 - [帮助视频](https://github.com/MegEngine/MegSpot/wiki/帮助视频)

@@ -90,7 +90,8 @@ export default {
     moveLeft: '向左移动',
     moveRight: '向右移动',
     moveDown: '向下移动',
-    pickColor: '打开/关闭取色器'
+    pickColor: '打开/关闭取色器',
+    rgbText: '启用/关闭RGB数值在每个像素块中的显示'
   },
   dashboard: {
     entries: {

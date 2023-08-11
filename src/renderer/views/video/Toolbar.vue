@@ -30,6 +30,7 @@
         <el-radio-button :label="false">{{ $t('imageCenter.nearestInterpolation') }}</el-radio-button>
         <el-radio-button :label="true">{{ $t('imageCenter.bilinearInterpolation') }}</el-radio-button>
       </el-radio-group>
+      <RGBTextBtn class="gap" />
     </div>
     <div class="tip" flex="cross:center">
       <div class="select">
@@ -270,8 +271,9 @@ import SelectedBtn from '@/components/selected-btn'
 import { createNamespacedHelpers } from 'vuex'
 import GifDialog from '@/components/gif-dialog'
 import ImageSetting from '@/components/image-setting'
+import RGBTextBtn from '@//components/RGBTextBtn'
 const { mapGetters, mapActions } = createNamespacedHelpers('videoStore')
-const { mapGetters: preferenceMapGetters } = createNamespacedHelpers('preferenceStore')
+const { mapGetters: preferenceMapGetters, mapActions: preferenceMapActions } = createNamespacedHelpers('preferenceStore')
 import { throttle } from '@/utils'
 import { handleEvent } from '@/tools/hotkey'
 import { TimeManager } from '@/utils/video'
@@ -321,7 +323,7 @@ export default {
       hotkeyUpEvents: undefined
     }
   },
-  components: { SelectedBtn, GifDialog, ImageSetting },
+  components: { SelectedBtn, GifDialog, ImageSetting, RGBTextBtn },
   async mounted() {
     this.initHotkeyEvents()
     window.addEventListener('keydown', this.handleHotKey, true)
@@ -337,6 +339,7 @@ export default {
   },
   methods: {
     ...mapActions(['emptyVideos', 'removeVideos', 'setVideoConfig', 'setVideos']),
+    ...preferenceMapActions(['setPreference']),
     initHotkeyEvents() {
       this.hotkeyDownEvents = new Map([
         [
@@ -455,6 +458,12 @@ export default {
               name: 'doDrag',
               data: { offset: { x: -this.preference.moveDistance, y: 0 } }
             })
+          }
+        ],
+        [
+          'rgbText',
+          () => {
+            this.setPreference({ showRGBText: !this.preference.showRGBText })
           }
         ]
       ])

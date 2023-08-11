@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.2.3",
+  "version": "v2.2.4",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -44,8 +44,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "一、 新增功能：\n    1. 图像及视频都支持多序列，并可进行不同序列之间的对比;\n    2. 取色器的色值支持rgb及hex两种显示格式，可在设置中更改; \n二. 优化体验：\n    更新工具栏ui；同步上线相关更新的翻译。 \n三. 修复问题：\n    1. 修复某些图像不能正确同步地缩放的问题;\n    2. 修复快照模式布局未正常加载的问题;",
-      "releaseDate": "2023.5.14"
+      "releaseNotes": "新增功能：\n    1. 支持RGB Viewer模式，显示每个像素块的RGB值，图像对比及视频对比(暂停时)均可用;\n    2. 取色器支持显示鼠标x、y坐标信息，可在设置中手动启用/关闭;",
+      "releaseDate": "2023.08.11"
     },
     "directories": {
       "output": "build"

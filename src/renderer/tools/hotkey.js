@@ -158,6 +158,11 @@ export const DEFAULT_HOTKEYS = [
     name: 'right',
     desc: 'compare to right',
     keysArr: [['ArrowRight']]
+  },
+  {
+    name: 'rgbText',
+    desc: 'display RGB values in pixel blocks',
+    keysArr: [['c']]
   }
 ].map((item, index) => {
   item.index = index
