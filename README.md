@@ -33,6 +33,7 @@
 - [视频对比](https://github.com/MegEngine/MegSpot/wiki/视频对比)
   - [视频预览](https://github.com/MegEngine/MegSpot/wiki/%E8%A7%86%E9%A2%91%E5%AF%B9%E6%AF%94#%E8%A7%86%E9%A2%91%E9%A2%84%E8%A7%88)
   - [视频截屏对比](https://github.com/MegEngine/MegSpot/wiki/%E8%A7%86%E9%A2%91%E5%AF%B9%E6%AF%94#%E8%A7%86%E9%A2%91%E6%88%AA%E5%B1%8F%E5%AF%B9%E6%AF%94)
+  - [视频播放进度同步](https://github.com/MegEngine/MegSpot/wiki/%E8%A7%86%E9%A2%91%E6%92%AD%E6%94%BE%E8%BF%9B%E5%BA%A6%E5%90%8C%E6%AD%A5)
 - [文件选择](https://github.com/MegEngine/MegSpot/wiki/文件选择)
   - [文件列表](https://github.com/MegEngine/MegSpot/wiki/文件列表)
   - [文件长廊](https://github.com/MegEngine/MegSpot/wiki/文件长廊)
