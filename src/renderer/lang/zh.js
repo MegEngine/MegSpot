@@ -244,7 +244,8 @@ export default {
     videoInfoTip: '显示视频信息',
     reAnalyze: '检测',
     reAnalyzeTip: '重新检测视频信息',
-    resetAnalyze: '重置'
+    resetAnalyze: '重置',
+    enableSyncTime: '同步视频进度'
   },
   sortFile: {
     apply: '应用',

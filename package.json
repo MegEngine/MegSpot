@@ -228,5 +228,7 @@
       "path": "git-cz"
     }
   },
-  "__npminstall_done": false
+  "volta": {
+    "node": "16.20.2"
+  }
 }

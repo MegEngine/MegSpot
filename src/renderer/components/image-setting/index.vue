@@ -94,6 +94,10 @@
               </el-select>
             </div>
             <div v-if="$route.path.includes('video')" flex="main:justify" class="setting-item">
+              <span>{{ $t('video.enableSyncTime') }}：</span>
+              <el-switch v-model="enableSyncTime"></el-switch>
+            </div>
+            <div v-if="$route.path.includes('video')" flex="main:justify" class="setting-item">
               <span>{{ $t('imageCenter.frameStep') }}(s):</span>
               <el-input-number
                 v-model="frameCompareInterval"
@@ -255,6 +259,16 @@ export default {
       set(arg) {
         this.setVideoConfig({
           muted: arg
+        })
+      }
+    },
+    enableSyncTime: {
+      get() {
+        return this.videoConfig.enableSyncTime
+      },
+      set(arg) {
+        this.setVideoConfig({
+          enableSyncTime: arg
         })
       }
     },

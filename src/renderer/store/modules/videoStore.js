@@ -34,6 +34,7 @@ const videoStore = {
       dynamicPickColor: false,
       layout: GLOBAL_CONSTANT.LAYOUT_2X1,
       allVideoPaused: true, // 所有视频都为暂停状态
+      enableSyncTime: true, // 启用视频进度同步
       minRenderInterval: 0.01, // 视频最小渲染间隔，
       // interval: 0.0833, // 视频逐帧对比间隔，默认为近似1/12秒
       muted: true, // 视频是否静音

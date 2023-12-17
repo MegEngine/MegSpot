@@ -6,14 +6,8 @@
           <HistContainer ref="hist-container" :index="index" @changeVisible="handleHistVisible" />
         </CoverMask>
         <div class="icon-btn-group" flex="main:justify cross:center">
-          <el-button
-            slot="reference"
-            type="text"
-            size="mini"
-            @click="handleVideoSliderVisible"
-            class="svg-container"
-            :title="$t('video.processTip')"
-          >
+          <el-button slot="reference" type="text" size="mini" @click="handleVideoSliderVisible" class="svg-container"
+            :title="$t('video.processTip')">
             <svg-icon icon-class="video-bar" :title="$t('video.processTip')" />
           </el-button>
           <!-- 默认使用视频同步，不再单独播放、暂停单个视频； 可采用offset调整 -->
@@ -45,48 +39,27 @@
         </div>
       </el-tooltip>
       <div v-else flex="cross:center" flex-box="0">
-        <el-button
-          :disabled="!previousFrameAvailable"
-          type="text"
-          size="mini"
-          class="svg-container"
-          :title="$t('imageCenter.previousFrame')"
-          @click="changeFrame(-1)"
-        >
+        <el-button :disabled="!previousFrameAvailable" type="text" size="mini" class="svg-container"
+          :title="$t('imageCenter.previousFrame')" @click="changeFrame(-1)">
           <svg-icon icon-class="frame" />
         </el-button>
-        <el-button
-          :disabled="!nextFrameAvailable"
-          type="text"
-          size="mini"
-          class="svg-container"
-          :title="$t('imageCenter.nextFrame')"
-          @click="changeFrame(1)"
-          style="margin-left: 0"
-        >
+        <el-button :disabled="!nextFrameAvailable" type="text" size="mini" class="svg-container"
+          :title="$t('imageCenter.nextFrame')" @click="changeFrame(1)" style="margin-left: 0">
           <svg-icon icon-class="frame" style="transform: rotate(180deg)" />
         </el-button>
       </div>
 
       <div v-show="videoSliderVisible" class="progress-container" flex="main:center cross:center" flex-box="1">
-        <video-slider
-          :value="currentTime / frameChangeRate"
-          :max="duration / frameChangeRate"
-          @update="changeVideoTime"
-        ></video-slider>
+        <video-slider :value="currentTime / frameChangeRate" :max="duration / frameChangeRate"
+          @update="changeVideoTime"></video-slider>
       </div>
 
       <div class="header-right" flex="main:right cross:center" flex-box="0">
         <div v-show="videoSliderVisible" class="video-tool" flex="cross:center">
           <input :value="(currentTime / frameChangeRate).toFixed(2)" @change="changeVideoTime" class="time-input" />
-          <FrameSetting
-            :path="path"
-            :frameRate.sync="frameRate"
-            :frameCount.sync="frameCount"
-            :displayedFrames="displayedFrames"
-            :displayedFramesInSecond="displayedFramesInSecond"
-            @update="handleUpdateMediaInfo"
-          >
+          <FrameSetting :path="path" :frameRate.sync="frameRate" :frameCount.sync="frameCount"
+            :displayedFrames="displayedFrames" :displayedFramesInSecond="displayedFramesInSecond"
+            @update="handleUpdateMediaInfo">
             <div class="frames" flex="main:center cross:center">
               <span class="frame-text ellipsis">{{ displayedFrames }}</span>
             </div>
@@ -99,31 +72,13 @@
       </div>
     </div>
     <div ref="container" class="canvas-container" id="canvas-container" :style="canvasStyle">
-      <OperationContainer
-        id="canvas-container"
-        ref="canvas-container"
-        @drag="handleDrag"
-        @zoom="handleZoom"
-        @scrollEnd="handleZoomEnd"
-        @click="handleClick"
-        @dbclick="handleDbclick"
-        @mouseMove="handleMove"
-      >
+      <OperationContainer id="canvas-container" ref="canvas-container" @drag="handleDrag" @zoom="handleZoom"
+        @scrollEnd="handleZoomEnd" @click="handleClick" @dbclick="handleDbclick" @mouseMove="handleMove">
         <div v-loading="loading" element-loading-background="rgba(0, 0, 0, 0)" class="canvas-item" @contextmenu.prevent>
-          <ScaleEditor
-            v-if="preference.showScale"
-            class="scale-editor"
-            :scale="imgScale"
-            :scaleEditorVisible.sync="scaleEditorVisible"
-          />
-          <ZoomViewer
-            v-if="triggerRGB"
-            ref="zoom-viewer"
-            :RGBAcolor.sync="RGBAcolor"
-            :mousePos="mousePos"
-            :parentWidth="_width"
-            :parentHeight="_height"
-          />
+          <ScaleEditor v-if="preference.showScale" class="scale-editor" :scale="imgScale"
+            :scaleEditorVisible.sync="scaleEditorVisible" />
+          <ZoomViewer v-if="triggerRGB" ref="zoom-viewer" :RGBAcolor.sync="RGBAcolor" :mousePos="mousePos"
+            :parentWidth="_width" :parentHeight="_height" />
           <canvas ref="canvas" :width="_width" :height="_height"></canvas>
           <div v-if="triggerRGB || preference.showDot" ref="feedback" id="feedback" :style="feedbackStyle"></div>
           <div v-if="preference.showMousePos" v-show="mousePosInfo.x" class="mouse-position">
@@ -289,6 +244,10 @@ export default {
           action: 'changeVideoSliderVisible'
         },
         {
+          event: 'syncVideoTime',
+          action: 'syncVideoTime'
+        },
+        {
           event: 'cacheScale',
           action: 'cacheScale'
         },
@@ -383,6 +342,9 @@ export default {
     minRenderInterval() {
       return this.videoConfig.minRenderInterval
     },
+    enableSyncTime() {
+      return this.videoConfig.enableSyncTime
+    },
     // 视频是否静音
     muted() {
       return this.videoConfig.muted
@@ -392,9 +354,8 @@ export default {
       return this.videoConfig.speed
     },
     formatMediaInfo() {
-      return `<span>${this.mediaInfo?.FrameRate ? this.frameRate + ' FPS' : '' || ''}</span>&nbsp;&nbsp;<span>${
-        this.mediaInfo?.FrameCount ? this.frameCount + ' Frame' : ''
-      }</span>`
+      return `<span>${this.mediaInfo?.FrameRate ? this.frameRate + ' FPS' : '' || ''}</span>&nbsp;&nbsp;<span>${this.mediaInfo?.FrameCount ? this.frameCount + ' Frame' : ''
+        }</span>`
     },
     feedbackStyle() {
       const x = this.mousePos.x
@@ -726,8 +687,15 @@ export default {
       //   })
       // }
     },
-    changeVideoTime(event) {
+    syncVideoTime({ index, currentTime }) {
+      this.index !== index && this.changeVideoTime(currentTime, true)
+    },
+    changeVideoTime(event, noEffect = false) {
       const currentTime = Number(event?.target?.value ?? event) * this.frameChangeRate
+      this.enableSyncTime && !noEffect && this.$bus.$emit('syncVideoTime', {
+        index: this.index,
+        currentTime
+      })
       if (!this.video || isNaN(currentTime)) return
 
       const timingObj = TimeManager.getTimingObj()
@@ -1501,6 +1469,7 @@ export default {
     height: 18px;
     line-height: 16px;
     background-color: #f6f6f6;
+
     // padding-right: 10px;
     .svg-container {
       // cursor: pointer;
@@ -1515,11 +1484,13 @@ export default {
       width: 100%;
       height: 16px;
       padding: 0 8px;
+
       progress {
         appearance: none;
         display: block;
         width: 100%;
         height: 14px;
+
         &::-webkit-progress-bar {
           background-color: rgba(255, 255, 255, 0.938);
           border-radius: 3px;
@@ -1531,20 +1502,22 @@ export default {
         }
       }
     }
+
     .header-left {
-      .svg-container + .svg-container {
+      .svg-container+.svg-container {
         margin-right: 3px;
       }
+
       ::v-deep {
         .el-button {
-          & + & {
+          &+& {
             margin-left: 0;
           }
         }
       }
 
       .icon-btn-group {
-        .svg-container + .svg-container {
+        .svg-container+.svg-container {
           margin: 0 0 0 3px;
         }
       }
@@ -1554,6 +1527,7 @@ export default {
       .svg-container {
         font-size: 20px;
       }
+
       .video-tool {
         .time-input {
           max-width: 40px;
@@ -1561,11 +1535,13 @@ export default {
           text-align: center;
           border: 1px solid #707078;
           border-radius: 4px;
+
           &:focus {
             border: unset;
             outline: 1px solid $primaryColor;
           }
         }
+
         .frames {
           margin-left: 3px;
           min-width: 60px;
@@ -1577,6 +1553,7 @@ export default {
           user-select: none;
         }
       }
+
       .frame-text {
         font-weight: bold;
       }
@@ -1588,22 +1565,28 @@ export default {
       position: relative;
       width: 100%;
       height: 100%;
+
       img {
         object-fit: contain;
         vertical-align: middle;
       }
+
       ::v-deep {
+
         input,
         .el-input-group__append {
           border-radius: 0;
         }
+
         .el-input-group__append,
         .el-input-group__prepend {
           padding: 0 6px;
+
           &:hover {
             color: green;
           }
         }
+
         .el-input__inner {
           padding: 0 2px;
         }
@@ -1655,6 +1638,7 @@ export default {
   .el-input-number--small {
     width: 100px;
   }
+
   .el-input-number {
     line-height: 30px;
 
@@ -1662,12 +1646,14 @@ export default {
       width: 100px;
       height: 18px;
       line-height: 18px;
+
       .el-input__inner {
         padding: 5px;
         height: 18px;
         color: black;
       }
     }
+
     .el-input-number__increase,
     .el-input-number__decrease {
       width: 14px;
@@ -1675,6 +1661,7 @@ export default {
       line-height: 16px;
     }
   }
+
   .el-button {
     padding: 2.5px 6px;
   }

@@ -246,7 +246,8 @@ export default {
     videoInfoTip: 'show video info',
     reAnalyze: 'reAnalyze',
     reAnalyzeTip: 'reAnalyze video info',
-    resetAnalyze: 'reset'
+    resetAnalyze: 'reset',
+    enableSyncTime: 'enableSyncTime'
   },
   sortFile: {
     apply: 'Apply',

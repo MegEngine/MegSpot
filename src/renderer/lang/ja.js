@@ -242,7 +242,8 @@ export default {
     videoInfoTip: 'ビデオ情報を表示',
     reAnalyze: '検出',
     reAnalyzeTip: 'ビデオ情報を検出する',
-    resetAnalyze: 'リセット'
+    resetAnalyze: 'リセット',
+    enableSyncTime: 'ビデオの進行状況の同期'
   },
   sortFile: {
     apply: '応用',
