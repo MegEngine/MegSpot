@@ -137,6 +137,17 @@ export default {
     },
     folder: {
       loadingText: '文件夹资源获取中...'
+    },
+    layout: {
+      dialogTitle: '新建布局设置',
+      rowLabel: '行数',
+      columnLabel: '列数',
+      confirm: '确认新建',
+      layoutExists: '该配置已存在',
+      successAdded: '已成功添加新布局',
+      confirmUseNewLayout: '是否立即使用该布局',
+      confirmDialogTitle: '使用新布局',
+      confirmUse: '立即使用'
     }
   },
   imagePreview: {

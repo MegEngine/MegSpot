@@ -1,5 +1,6 @@
 import { getArrStr } from '@/tools/hotkey'
 import { getType } from '@/utils'
+import { DEFAULT_LAYOUTS } from '@/constants'
 
 const preferenceStore = {
   namespaced: true,
@@ -29,7 +30,8 @@ const preferenceStore = {
       videoProcessBarStyle: 'fixed',
       showScale: true,
       showMousePos: true,
-      hotkeys: []
+      hotkeys: [],
+      layouts: DEFAULT_LAYOUTS
     },
     // gamma校正
     gamma: 1,

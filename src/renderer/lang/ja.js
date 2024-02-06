@@ -134,6 +134,17 @@ export default {
     },
     folder: {
       loadingText: 'データの読み込み...'
+    },
+    layout: {
+      dialogTitle: '新しいレイアウト設定',
+      rowLabel: '行の数',
+      columnLabel: '列の数',
+      confirm: '新規確認',
+      layoutExists: 'レイアウト構成はすでに存在します',
+      successAdded: '新しいレイアウト構成が正常に追加されました',
+      confirmUseNewLayout: 'このレイアウトを今すぐ使用しますか',
+      confirmDialogTitle: '新しいレイアウトを使用する',
+      confirmUse: 'すぐに使用する'
     }
   },
   imagePreview: {

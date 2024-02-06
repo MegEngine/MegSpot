@@ -138,6 +138,17 @@ export default {
     },
     folder: {
       loadingText: 'loading resource...'
+    },
+    layout: {
+      dialogTitle: 'New Layout Config',
+      rowLabel: 'Rows',
+      columnLabel: 'Columns',
+      confirm: 'Confirm Create',
+      layoutExists: 'The layout config is already exists',
+      successAdded: 'New layout config added successfully',
+      confirmUseNewLayout: 'Whether to use this layout immediately',
+      confirmDialogTitle: 'Use New Layout',
+      confirmUse: 'Use Now'
     }
   },
   imagePreview: {

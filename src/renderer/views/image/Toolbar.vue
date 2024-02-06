@@ -175,30 +175,29 @@
             </span>
           </el-button>
         </el-button-group>
-        <el-select
-          v-if="!snapshotMode"
-          v-model="layout"
-          placeholder="layout"
-          class="layout-selector"
-          size="mini"
-          :title="$t('general.layout')"
-        >
-          <el-option
-            v-for="item in [
-              GLOBAL_CONSTANTS.LAYOUT_1X1,
-              GLOBAL_CONSTANTS.LAYOUT_1X2,
-              GLOBAL_CONSTANTS.LAYOUT_2X2,
-              GLOBAL_CONSTANTS.LAYOUT_2X1,
-              GLOBAL_CONSTANTS.LAYOUT_3X1,
-              GLOBAL_CONSTANTS.LAYOUT_3X2,
-              GLOBAL_CONSTANTS.LAYOUT_4X1
-            ]"
-            :disabled="imageList.length < parseInt(item[0]) * parseInt(item[2])"
-            :key="item"
-            :label="item"
-            :value="item"
-          ></el-option>
-        </el-select>
+        <div class="gap layout-group">
+          <el-select
+            v-if="!snapshotMode"
+            v-model="layout"
+            placeholder="layout"
+            size="mini"
+            class="layout-selector"
+            :title="$t('general.layout')"
+            filterable
+          >
+            <el-option
+              v-for="item in preference.layouts"
+              :disabled="imageList.length < parseInt(item[0]) * parseInt(item[2])"
+              :key="item"
+              :label="item"
+              :value="item"
+            ></el-option>
+          </el-select>
+          <el-tooltip :content="$t('image.layout.dialogTitle')" placement="top">
+            <el-button icon="el-icon-plus" class="layout-creator" @click="$refs.layoutDialogRef.show()"></el-button>
+          </el-tooltip>
+          <newLayoutDialog ref="layoutDialogRef" />
+        </div>
         <el-button-group class="gap">
           <ImageSetting></ImageSetting>
         </el-button-group>
@@ -213,13 +212,15 @@ import { createNamespacedHelpers } from 'vuex'
 import GifDialog from '@/components/gif-dialog'
 import ImageSetting from '@/components/image-setting'
 import RGBTextBtn from '@//components/RGBTextBtn'
+import newLayoutDialog from '@//components/new-layout-dialog'
 const { mapGetters, mapActions } = createNamespacedHelpers('imageStore')
-const { mapGetters: preferenceMapGetters, mapActions: preferenceMapActions } = createNamespacedHelpers('preferenceStore')
+const { mapGetters: preferenceMapGetters, mapActions: preferenceMapActions } =
+  createNamespacedHelpers('preferenceStore')
 import { throttle } from '@/utils'
 import { handleEvent } from '@/tools/hotkey'
 
 export default {
-  components: { SelectedBtn, GifDialog, ImageSetting, RGBTextBtn },
+  components: { SelectedBtn, GifDialog, ImageSetting, RGBTextBtn, newLayoutDialog },
   props: {
     snapshotMode: {
       type: Boolean,
@@ -535,9 +536,27 @@ export default {
   }
 
   .right {
-    .layout-selector {
-      width: 80px;
-      margin-left: 20px;
+    .tool-btns {
+      display: flex;
+      align-items: center;
+      .layout-group {
+        margin-left: 16px;
+
+        .layout-selector {
+          width: 70px;
+        }
+        .layout-creator.el-button--mini {
+          padding: 7px 1px;
+          width: 30px;
+        }
+        &:hover {
+          margin-right: 0;
+          .layout-creator.el-button--mini {
+            color: #fff;
+            background-color: #4085da;
+          }
+        }
+      }
     }
   }
 }

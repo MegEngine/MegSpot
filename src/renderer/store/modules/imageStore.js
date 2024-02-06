@@ -29,7 +29,7 @@ const imageStore = {
     collectionName: GLOBAL_CONSTANT.DEFAULT_IMAGE_COLLECTION_NAME,
     imageConfig: {
       smooth: true,
-      layout: GLOBAL_CONSTANT.LAYOUT_2X1,
+      layout: GLOBAL_CONSTANT.LAYOUT_1x2,
       defaultSort: {
         order: 'asc',
         field: 'name'

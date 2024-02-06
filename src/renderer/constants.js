@@ -10,12 +10,12 @@ export const DIRECTION_BOTTOM = 'direction_bottom'
 export const DIRECTION_TOP = 'direction_top'
 
 export const LAYOUT_1X1 = '1x1'
-export const LAYOUT_1X2 = '1x2'
+export const LAYOUT_1x2 = '1x2'
+export const LAYOUT_1X3 = '1x3'
+export const LAYOUT_1X4 = '1x4'
 export const LAYOUT_2X1 = '2x1'
-export const LAYOUT_3X1 = '3x1'
-export const LAYOUT_4X1 = '4x1'
 export const LAYOUT_2X2 = '2x2'
-export const LAYOUT_3X2 = '3x2'
+export const LAYOUT_2X3 = '2x3'
 
 export const SCALE_CONSTANTS = 1 / 6
 export const DRAG_CONSTANTS = 1 / 4
@@ -31,19 +31,21 @@ export const SHARE_ZIP_NAME = 'MegSpotShare.zip'
 export const DEFAULT_IMAGE_COLLECTION_NAME = 'defaultImageList'
 export const DEFAULT_VIDEO_COLLECTION_NAME = 'defaultVideoList'
 
+export const DEFAULT_LAYOUTS = [LAYOUT_1X1, LAYOUT_1x2, LAYOUT_1X3, LAYOUT_1X4, LAYOUT_2X1, LAYOUT_2X2, LAYOUT_2X3]
+
 export const SHARE_PROJECT_DEFAULT_PROPS = () => ({
   name: '',
   snapPath: '',
   config: {
     imageStore: {
       imageConfig: {
-        layout: LAYOUT_2X1,
+        layout: LAYOUT_1x2,
         smooth: true
       }
     },
     videoStore: {
       videoConfig: {
-        layout: LAYOUT_2X1,
+        layout: LAYOUT_1x2,
         smooth: true
       }
     },

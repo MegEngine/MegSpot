@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.2.5",
+  "version": "v2.2.6",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -44,8 +44,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "新增功能：\n    1. 视频对比中支持并默认启用视频进度同步功能，可在工具栏最右侧的图像设置中进行更改，详情请见github wiki说明",
-      "releaseDate": "2023.12.17"
+      "releaseNotes": "新增功能：\n    1. 支持新建任意行数、列数的布局配置",
+      "releaseDate": "2024.02.07"
     },
     "directories": {
       "output": "build"
@@ -229,6 +229,7 @@
     }
   },
   "volta": {
-    "node": "16.20.2"
+    "node": "16.20.2",
+    "yarn": "1.22.21"
   }
 }

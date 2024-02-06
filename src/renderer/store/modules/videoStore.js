@@ -32,7 +32,7 @@ const videoStore = {
       speed: 1.0,
       currentTime: 0,
       dynamicPickColor: false,
-      layout: GLOBAL_CONSTANT.LAYOUT_2X1,
+      layout: GLOBAL_CONSTANT.LAYOUT_1x2,
       allVideoPaused: true, // 所有视频都为暂停状态
       enableSyncTime: true, // 启用视频进度同步
       minRenderInterval: 0.01, // 视频最小渲染间隔，

@@ -98,10 +98,10 @@ export default {
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X1
           break
         case 2:
-          smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X1
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_1x2
           break
         case 3:
-          smartLayout = GLOBAL_CONSTANTS.LAYOUT_3X1
+          smartLayout = GLOBAL_CONSTANTS.LAYOUT_1X3
           break
         case 4:
           smartLayout = GLOBAL_CONSTANTS.LAYOUT_2X2
@@ -134,7 +134,7 @@ export default {
     currentLayout() {
       return (
         (this.snapshotMode ? this.snapshotConfig?.config?.imageStore?.imageConfig?.layout : this.imageConfig.layout) ??
-        this.imageConfig.layout
+        GLOBAL_CONSTANTS.DEFAULT_LAYOUTS[0]
       )
     },
     // 每组图片数量
@@ -150,50 +150,60 @@ export default {
         : []
     },
     containerStyle() {
-      switch (this.currentLayout) {
-        case GLOBAL_CONSTANTS.LAYOUT_1X1:
-          return {
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        case GLOBAL_CONSTANTS.LAYOUT_2X1:
-          return {
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr'
-          }
-        case GLOBAL_CONSTANTS.LAYOUT_1X2:
-          return {
-            display: 'grid',
-            gridTemplateRows: '50% 50%'
-          }
-        case GLOBAL_CONSTANTS.LAYOUT_3X1:
-          return {
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr'
-          }
-        case GLOBAL_CONSTANTS.LAYOUT_4X1:
-          return {
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr 1fr'
-          }
-        case GLOBAL_CONSTANTS.LAYOUT_2X2:
-          return {
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gridTemplateRows: '50% 50%'
-          }
-        case GLOBAL_CONSTANTS.LAYOUT_3X2:
-          return {
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gridTemplateRows: '50% 50%'
-          }
-        default:
-          return {
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr'
-          }
+      const rows = parseInt(this.currentLayout[0])
+      const columns = parseInt(this.currentLayout[2])
+      const rowGap = 0,
+        columnGap = 0
+      return {
+        display: 'grid',
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
+        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+        gap: `${rowGap} ${columnGap}`
       }
+      // switch (this.currentLayout) {
+      //   case GLOBAL_CONSTANTS.LAYOUT_1X1:
+      //     return {
+      //       display: 'flex',
+      //       flexDirection: 'column'
+      //     }
+      //   case GLOBAL_CONSTANTS.LAYOUT_1x2:
+      //     return {
+      //       display: 'grid',
+      //       gridTemplateColumns: '1fr 1fr'
+      //     }
+      //   case GLOBAL_CONSTANTS.LAYOUT_2X1:
+      //     return {
+      //       display: 'grid',
+      //       gridTemplateRows: '50% 50%'
+      //     }
+      //   case GLOBAL_CONSTANTS.LAYOUT_1X3:
+      //     return {
+      //       display: 'grid',
+      //       gridTemplateColumns: '1fr 1fr 1fr'
+      //     }
+      //   case GLOBAL_CONSTANTS.LAYOUT_1X4:
+      //     return {
+      //       display: 'grid',
+      //       gridTemplateColumns: '1fr 1fr 1fr 1fr'
+      //     }
+      //   case GLOBAL_CONSTANTS.LAYOUT_2X2:
+      //     return {
+      //       display: 'grid',
+      //       gridTemplateColumns: '1fr 1fr',
+      //       gridTemplateRows: '50% 50%'
+      //     }
+      //   case GLOBAL_CONSTANTS.LAYOUT_2X3:
+      //     return {
+      //       display: 'grid',
+      //       gridTemplateColumns: '1fr 1fr 1fr',
+      //       gridTemplateRows: '50% 50%'
+      //     }
+      //   default:
+      //     return {
+      //       display: 'grid',
+      //       gridTemplateColumns: '1fr 1fr'
+      //     }
+      // }
     }
   },
   watch: {
@@ -346,35 +356,13 @@ export default {
     },
     calcWidth() {
       const containerWidth = document.body.clientWidth
-      switch (this.currentLayout) {
-        case GLOBAL_CONSTANTS.LAYOUT_1X1:
-        case GLOBAL_CONSTANTS.LAYOUT_1X2:
-          return containerWidth
-        case GLOBAL_CONSTANTS.LAYOUT_2X1:
-        case GLOBAL_CONSTANTS.LAYOUT_2X2:
-          return containerWidth / 2
-        case GLOBAL_CONSTANTS.LAYOUT_3X1:
-        case GLOBAL_CONSTANTS.LAYOUT_3X2:
-          return containerWidth / 3
-        case GLOBAL_CONSTANTS.LAYOUT_4X1:
-          return containerWidth / 4
-      }
+      return containerWidth / parseInt(this.currentLayout[2])
     },
     calcHeight() {
       const toolbarInfo = document.getElementsByClassName('toolbar')[0].getBoundingClientRect()
       const headerInfo = document.getElementsByClassName('header')[0].getBoundingClientRect()
       const containerHeight = document.body.clientHeight - toolbarInfo.height - headerInfo.height
-      switch (this.currentLayout) {
-        case GLOBAL_CONSTANTS.LAYOUT_1X1:
-        case GLOBAL_CONSTANTS.LAYOUT_2X1:
-        case GLOBAL_CONSTANTS.LAYOUT_3X1:
-        case GLOBAL_CONSTANTS.LAYOUT_4X1:
-          return containerHeight
-        case GLOBAL_CONSTANTS.LAYOUT_2X2:
-        case GLOBAL_CONSTANTS.LAYOUT_3X2:
-        case GLOBAL_CONSTANTS.LAYOUT_1X2:
-          return containerHeight / 2
-      }
+      return containerHeight / parseInt(this.currentLayout[0])
     },
     setOverLay({ direction, status }) {
       const handlecover = this.handleCompareOptions(direction)
@@ -503,20 +491,9 @@ export default {
         coveredArr[i].setCoverStatus(layImg, status)
       }
     },
+    //获取列数
     getColumnLine() {
-      //获取列数
-      if ([GLOBAL_CONSTANTS.LAYOUT_1X1, GLOBAL_CONSTANTS.LAYOUT_1X2].includes(this.currentLayout)) {
-        return 1
-      }
-      if ([GLOBAL_CONSTANTS.LAYOUT_2X2, GLOBAL_CONSTANTS.LAYOUT_2X1].includes(this.currentLayout)) {
-        return 2
-      }
-      if ([GLOBAL_CONSTANTS.LAYOUT_3X1, GLOBAL_CONSTANTS.LAYOUT_3X2].includes(this.currentLayout)) {
-        return 3
-      }
-      if ([GLOBAL_CONSTANTS.LAYOUT_4X1].includes(this.currentLayout)) {
-        return 4
-      }
+      return parseInt(this.currentLayout[2])
     }
   }
 }
@@ -524,7 +501,6 @@ export default {
 <style lang="scss" scoped>
 #image-container {
   overflow-x: hidden;
-  gap: 2px;
 
   .canvas-item + .canvas-item {
     border-left: 1px solid red;
