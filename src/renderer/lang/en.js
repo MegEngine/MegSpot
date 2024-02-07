@@ -112,14 +112,14 @@ export default {
   },
   image: {
     sequence: {
-      title: '画像シーケンス',
-      label: '現在の画像シーケンス',
-      compare: '画像シーケンスを比較',
-      compareTip: '2 つ以上の画像シーケンスを連続して比較します',
-      selectTip: '少なくとも 2 つの画像シーケンスを選択してください',
-      createTip: '新しいシーケンス名を入力し、Enter キーを押して新しい画像シーケンスを作成します',
-      deleteTip: '画像シーケンスを削除',
-      differentSizeTip: '画像シーケンスのサイズは異なります'
+      title: 'Image sequence',
+      label: 'current sequence',
+      compare: 'compare sequences',
+      compareTip: 'Compare two or more image sequences in sequence (at least two image sequences are required)',
+      selectTip: 'Select at least two image sequences',
+      createTip: 'Enter the name of the new sequence and press Enter to create a new image sequence',
+      deleteTip: 'Delete this image sequence',
+      differentSizeTip: 'The sizes of the image sequences are different'
     },
     toolbar: {
       openFolder: 'Open Folder',
