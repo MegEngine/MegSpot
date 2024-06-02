@@ -91,7 +91,8 @@ export default {
     moveRight: '向右移动',
     moveDown: '向下移动',
     pickColor: '打开/关闭取色器',
-    rgbText: '启用/关闭RGB数值在每个像素块中的显示'
+    rgbText: '启用/关闭RGB数值在每个像素块中的显示',
+    compare: "对两张图像进行拖拽对比"
   },
   dashboard: {
     entries: {
@@ -213,8 +214,8 @@ export default {
     showMousePos: '显示光标位置'
   },
   imageDragDropCompare: {
-    hideLine: '隐藏比较线',
-    displayLine: '显示比较线',
+    hideLine: '隐藏文件名和比较线',
+    displayLine: '显示文件名和比较线',
     tip: '默认情况下，比较已选的前两张图片。如需修改请打开已选进行切换。'
   },
   generateGIF: {

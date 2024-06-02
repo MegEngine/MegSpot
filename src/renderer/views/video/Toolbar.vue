@@ -138,6 +138,17 @@
             :disabled="!videoPaused"
             type="text"
             size="mini"
+            :title="$t('general.dragDropCompare')"
+            @click="handleCompare"
+          >
+            <span class="svg-container" :title="$t('general.dragDropCompare')">
+              <svg-icon icon-class="jiantou" style="transform: rotate(90deg); display: block"></svg-icon>
+            </span>
+          </el-button>
+          <el-button
+            :disabled="!videoPaused"
+            type="text"
+            size="mini"
             :title="$t('general.shareAsProject')"
             @click="handleShare"
           >
@@ -346,11 +357,14 @@ export default {
         [
           'back',
           () => {
+            if (this.$parent.showCompare) {
+              return
+            }
             if (this.fullScreening && document.fullscreenElement && document.fullscreenElement.nodeName === 'VIDEO') {
               document.exitFullscreen()
               this.setVideoConfig({ fullScreening: false })
               document.body.removeChild(document.body.lastChild)
-            } else {
+            } else  {
               this.goBack()
             }
           }
@@ -466,7 +480,13 @@ export default {
           () => {
             this.setPreference({ showRGBText: !this.preference.showRGBText })
           }
-        ]
+        ],
+        [
+          'compare',
+          () => {
+            this.handleCompare()
+          }
+        ],
       ])
 
       this.hotkeyUpEvents = new Map([
@@ -647,6 +667,9 @@ export default {
     changeGroup(groupNum) {
       this.startIndex = Math.max(0, (groupNum - 1) * this.groupCount + this.offset)
       this.$bus.$emit('changeGroup', this.startIndex)
+    },
+    handleCompare() {
+      this.$bus.$emit('compare')
     },
     handleShare() {
       this.$bus.$emit('share')

@@ -75,6 +75,10 @@ export default {
           action: 'share'
         },
         {
+          event: 'compare',
+          action: 'compare'
+        },
+        {
           event: 'imageCenter_exportImage',
           action: 'exportImage'
         },
@@ -283,6 +287,44 @@ export default {
       canvasViews.forEach((canvasContainer) => {
         canvasContainer.reDraw(true)
       })
+    },
+    async compare() {
+      const canvasViews = this.$refs['image_canvas']
+      const twoCanvas = (
+        await Promise.allSettled(
+          canvasViews.slice(0, 2).map(async (canvas, index) => {
+            const shareCanvas = {
+              index,
+              name: '',
+              _width: 0,
+              _height: 0,
+              imagePosition: {},
+              radius: 10,
+              imgScale: '1',
+              displayTimestamp: 0,
+              displayedFrames: 0
+            }
+            Object.keys(shareCanvas).forEach((key) => {
+              if (canvas[key] !== void 0) {
+                shareCanvas[key] = canvas[key]
+              }
+            })
+            const { snapshotMode: _snapshotMode, path, image } = canvas
+            shareCanvas.path = path
+            const imageBlob = await this.imageToBlob(image)
+            shareCanvas.imageUrl = URL.createObjectURL(imageBlob)
+            console.log(shareCanvas)
+            shareCanvas.name = canvas.getName(false)
+            return shareCanvas
+          })
+        )
+      ).map((i) => i.value)
+      twoCanvas.sort((a, b) => a.index - b.index)
+      console.log('twoCanvas', twoCanvas)
+      this.$parent.showCompare = true
+      setTimeout(() => {
+        this.$parent.$refs.imageDragCompareRef.setImageInfoList(twoCanvas)
+      }, 0)
     },
     async share() {
       this.$message.info(i18nRender(`image.toolbar.snapshotGenerating`))

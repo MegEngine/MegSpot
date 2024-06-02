@@ -1,20 +1,33 @@
 <template>
   <div class="video-center" flex="dir:top box:first">
-    <Toolbar></Toolbar>
-    <Content ref="content" class="content-container"></Content>
+    <Toolbar v-show="!showCompare"></Toolbar>
+    <Content ref="content" v-show="!showCompare" class="content-container"></Content>
+    <ImageDragDropCompare
+      ref="imageDragCompareRef"
+      v-show="showCompare"
+      v-model="showCompare"
+      :isExternal="true"
+    ></ImageDragDropCompare>
   </div>
 </template>
 
 <script>
 import Toolbar from './Toolbar'
 import Content from './Content'
+import ImageDragDropCompare from '../image/ImageDragDropCompare'
 import { useWorker } from '@/utils/worker'
 
 export default {
   name: 'video-compare',
   components: {
     Toolbar,
-    Content
+    Content,
+    ImageDragDropCompare
+  },
+  data() {
+    return {
+      showCompare: false
+    }
   },
   mounted() {
     // this.initFiltersMap()

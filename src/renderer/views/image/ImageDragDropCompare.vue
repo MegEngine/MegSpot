@@ -16,10 +16,10 @@
           @click="emptyImages"
         />
         <el-radio-group v-model="direction" size="mini" class="show-type-container" @change="changeDirection">
-          <el-radio-button label="true">
+          <el-radio-button label="vertical">
             <svg-icon icon-class="jiantou"></svg-icon>
           </el-radio-button>
-          <el-radio-button label="false">
+          <el-radio-button label="horizontal">
             <svg-icon icon-class="jiantou" style="transform: rotate(90deg); display: block"></svg-icon>
           </el-radio-button>
         </el-radio-group>
@@ -37,6 +37,28 @@
     </div>
     <div class="canvas">
       <canvas id="canvas"></canvas>
+      <el-tooltip :content="image1Name">
+        <div
+          v-show="showName1 && status"
+          id="name1"
+          class="image-name"
+          :style="`top: ${canvasPosition.top + 20}px; left: 20px;`"
+        >
+          {{ image1Name }}
+        </div>
+      </el-tooltip>
+      <el-tooltip :content="image2Name">
+        <div
+          v-show="showName2 && status"
+          id="name2"
+          class="image-name"
+          :style="
+            direction === 'horizontal' ? `top: ${canvasPosition.top + 20}px; right: 20px;` : 'bottom: 20px; left: 20px;'
+          "
+        >
+          {{ image2Name }}
+        </div>
+      </el-tooltip>
       <div id="line1-hover">
         <div id="line1"></div>
       </div>
@@ -52,14 +74,31 @@ const { mapGetters, mapActions } = createNamespacedHelpers('imageStore')
 import { throttle } from '@/utils'
 import { getImageUrlSync } from '@/utils/image'
 import SelectedBtn from '@/components/selected-btn'
+import { EOF, DELIMITER, SORTING_FILE_NAME } from '@/constants'
 
 export default {
   name: 'ImageDragDropCompare',
   components: { SelectedBtn },
+  model: {
+    prop: 'showCompare',
+    event: 'update'
+  },
+  props: {
+    showCompare: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    isExternal: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
   data() {
     return {
       status: true,
-      direction: 'false',
+      direction: 'horizontal',
       newLineX: 0,
       leftDis: 0,
       topDis: 0,
@@ -73,6 +112,13 @@ export default {
       line2: null, //横线
       image1: null,
       image2: null,
+      image1Name: '',
+      image2Name: '',
+      showName1: true,
+      showName2: true,
+      name1Rect: null,
+      name2Rect: null,
+      imageInfoList: void 0,
       selectedList: [],
       imageBitMap1: undefined,
       imageBitMap2: undefined,
@@ -90,7 +136,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['imageList'])
+    ...mapGetters({
+      _imageList: 'imageList'
+    }),
+    imageList() {
+      return this.imageInfoList ? this.imageInfoList.map((i) => i.imageUrl) : this._imageList
+    }
   },
   watch: {
     imageList(newVal, oldVal = []) {
@@ -98,6 +149,7 @@ export default {
     }
   },
   mounted() {
+    console.log('mounted', this.$router, this.$route)
     window.addEventListener('resize', this.resize, true)
     window.addEventListener('keydown', this.handleHotKey, true)
     this.content = document.getElementsByClassName('canvas')[0]
@@ -113,7 +165,6 @@ export default {
     window.removeEventListener('keydown', this.handleHotKey, true)
     window.removeEventListener('resize', this.resize, true)
   },
-
   methods: {
     ...mapActions(['removeImages', 'emptyImages', 'setImages']),
     resize: throttle(100, function () {
@@ -127,13 +178,17 @@ export default {
       this.imgScale = 1
       this.canvas = document.getElementById('canvas')
       this.cs = this.canvas.getContext('2d')
-      this.imageLengthCheck()
+      !this.isExternal && this.imageLengthCheck()
       this.addEvents()
     },
     setParams() {
       this.initCanvas()
       this.initLine()
       this.initImage()
+    },
+    setImageInfoList(imageInfoList) {
+      this.imageInfoList = imageInfoList
+      this.imageLengthCheck()
     },
     initCanvas() {
       this.canvas.width = document.body.clientWidth
@@ -178,7 +233,7 @@ export default {
     imageLengthCheck() {
       if (this.imageList.length >= 2) {
         this.setParams()
-      } else {
+      } else if (!this.isExternal) {
         const h = this.$createElement
         this.$msgbox({
           title: 'warning',
@@ -213,22 +268,38 @@ export default {
       this.imgScale = 1
       this.image1 = new Image()
       this.image2 = new Image()
-      if (this.selectedList.length === 0) {
-        this.selectedList.push(this.imageList[0])
-        this.selectedList.push(this.imageList[1])
+
+      this.selectedList = [...this.imageList.slice(0, 2)]
+
+      if (this.isExternal) {
+        this.image1Name = this.imageInfoList[0].name
+        this.image2Name = this.imageInfoList[1].name
+      } else {
+        const namePaths1 = this.imageList[0].split(DELIMITER)
+        this.image1Name = namePaths1[namePaths1.length - 1]
+        const namePaths2 = this.imageList[1].split(DELIMITER)
+        this.image2Name = namePaths2[namePaths2.length - 1]
       }
-      let imgSrc1 = getImageUrlSync(this.selectedList[0]) //默认只取列表中前两个进行比较
-      let imgSrc2 = getImageUrlSync(this.selectedList[1])
+
+      let imgSrc1 = this.imageInfoList ? this.selectedList[0] : getImageUrlSync(this.selectedList[0]) //默认只取列表中前两个进行比较
+      let imgSrc2 = this.imageInfoList ? this.selectedList[1] : getImageUrlSync(this.selectedList[1])
       this.image1.onload = async () => {
-        this.imagePosition = this.getImageInitPos(this.canvas, this.image1)
         this.imageBitMap1 = await createImageBitmap(this.image1)
-        this.image2.src = imgSrc2 //等待第一张图加载完毕再加载第二张图，然后一起绘制
-      }
-      this.image1.src = imgSrc1
-      this.image2.onload = async () => {
-        this.imageBitMap2 = await createImageBitmap(this.image2)
         this.drawImage()
       }
+      this.image2.onload = async () => {
+        this.imagePosition = this.getImageInitPos(this.canvas, this.image2)
+        this.imageBitMap2 = await createImageBitmap(this.image2)
+        this.image1.src = imgSrc1 //等待第一张图加载完毕再加载第二张图，然后一起绘制
+      }
+      this.image2.src = imgSrc2
+    },
+    initNameDicRect() {
+      const name1Div = document.getElementById('name1')
+      this.name1Rect = name1Div.getBoundingClientRect()
+
+      const name2Div = document.getElementById('name2')
+      this.name2Rect = name2Div.getBoundingClientRect()
     },
     //添加事件
     addEvents() {
@@ -440,14 +511,14 @@ export default {
       //清空画布再重新画图
       this.cs.clearRect(0, 0, canvas.width, canvas.height) //在给定的矩形内清除指定的像素
       this.cs.drawImage(
-        this.imageBitMap1,
+        this.imageBitMap2,
         x, //x
         y, //y
         width, //width
         height //height
       )
       this.cs.drawImage(
-        this.imageBitMap2,
+        this.imageBitMap1,
         0, //sx开始裁剪的位置
         0, //sy
         cutLeft, //swidth裁剪的宽度
@@ -460,22 +531,31 @@ export default {
     }),
     //获取第二张图额外的信息，比如裁多少，用多少
     getImageParams() {
-      let cutLeft = this.image2.width
+      let cutLeft = this.image1.width
       let useLeft = this.imagePosition.width
 
-      let cutHeight = this.image2.height
+      let cutHeight = this.image1.height
       let useHeight = this.imagePosition.height
 
+      if (!this.name1Rect || !this.name2Rect) {
+        this.initNameDicRect()
+      }
       if (this.flag) {
         //计算当前分割线相对于image的比例，并计算出相对于画布的高度。
         let scale = (this.topDis - this.imagePosition.y - this.canvasPosition.top) / (this.initHeight * this.imgScale)
-        cutHeight = scale * this.image2.height
+        cutHeight = scale * this.image1.height
         useHeight = scale * this.initHeight * this.imgScale
+
+        this.showName1 = useHeight + this.imagePosition.y + this.canvasPosition.top >= this.name1Rect.bottom
+        this.showName2 = useHeight + this.imagePosition.y + this.canvasPosition.top <= this.name2Rect.top
       } else {
         //计算当前分割线相对于image的比例，并计算出相对于画布的宽度。
         let scale = (this.leftDis - this.imagePosition.x - this.canvasPosition.left) / (this.initWidth * this.imgScale)
-        cutLeft = scale * this.image2.width
+        cutLeft = scale * this.image1.width
         useLeft = scale * this.initWidth * this.imgScale
+
+        this.showName1 = useLeft + this.imagePosition.x + this.canvasPosition.left >= this.name1Rect.right
+        this.showName2 = useLeft + this.imagePosition.x + this.canvasPosition.left <= this.name2Rect.left
       }
       return {
         cutLeft,
@@ -506,12 +586,20 @@ export default {
       }
       this.setParams()
       this.hoverLine.addEventListener('mousedown', this.handleLineDown, false)
+      this.initNameDicRect()
     },
     changeStatus() {
       this.line.style.display = this.status ? 'none' : 'inline'
       this.status = !this.status
     },
     goBack() {
+      if (this.isExternal) {
+        this.$parent.showCompare = false
+        this.imageInfoList && this.imageInfoList.forEach(URL.revokeObjectURL)
+        this.selectedList = []
+        this.imageInfoList = void 0
+        return
+      }
       if (window.history.length > 1) {
         this.$router.back()
       } else {
@@ -520,6 +608,9 @@ export default {
       }
     },
     handleHotKey(event) {
+      if (!this.$parent.showCompare) {
+        return
+      }
       // esc
       if (event.keyCode === 27) {
         this.goBack()
@@ -558,6 +649,18 @@ export default {
   }
 
   .canvas {
+    .image-name {
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #fefefe;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      max-width: 400px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     #canvas {
       position: absolute;
       left: 0px;

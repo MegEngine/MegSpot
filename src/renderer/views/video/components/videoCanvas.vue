@@ -50,13 +50,13 @@
       </div>
 
       <div v-show="videoSliderVisible" class="progress-container" flex="main:center cross:center" flex-box="1">
-        <video-slider :value="currentTime / frameChangeRate" :max="duration / frameChangeRate"
+        <video-slider :value="displayTimestamp" :max="duration / frameChangeRate"
           @update="changeVideoTime"></video-slider>
       </div>
 
       <div class="header-right" flex="main:right cross:center" flex-box="0">
         <div v-show="videoSliderVisible" class="video-tool" flex="cross:center">
-          <input :value="(currentTime / frameChangeRate).toFixed(2)" @change="changeVideoTime" class="time-input" />
+          <input :value="displayTimestamp.toFixed(2)" @change="changeVideoTime" class="time-input" />
           <FrameSetting :path="path" :frameRate.sync="frameRate" :frameCount.sync="frameCount"
             :displayedFrames="displayedFrames" :displayedFramesInSecond="displayedFramesInSecond"
             @update="handleUpdateMediaInfo">
@@ -308,6 +308,9 @@ export default {
     },
     frameFrequency() {
       return 1 / this.frameRate
+    },
+    displayTimestamp() {
+      return this.currentTime / this.frameChangeRate
     },
     millisecond() {
       return this.currentTime - Math.floor(this.currentTime)

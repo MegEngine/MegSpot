@@ -79,6 +79,10 @@ export default {
         {
           event: 'share',
           action: 'share'
+        },
+        {
+          event: 'compare',
+          action: 'compare'
         }
       ],
       marks: [],
@@ -430,6 +434,45 @@ export default {
     getMarks(data, callback) {
       callback(this.marks)
       return this.marks
+    },
+    async compare() {
+      const canvasViews = this.$refs['video_canvas']
+      const twoCanvas = (
+        await Promise.allSettled(
+          canvasViews.slice(0, 2).map(async (canvas) => {
+            const shareCanvas = {
+              name: '',
+              _width: 0,
+              _height: 0,
+              imagePosition: {},
+              radius: 10,
+              imgScale: '1',
+              displayTimestamp: 0,
+              displayedFrames: 0
+            }
+            Object.keys(shareCanvas).forEach((key) => {
+              if (canvas[key] !== void 0) {
+                shareCanvas[key] = canvas[key]
+              }
+            })
+            const { snapshotMode: _snapshotMode, path, image } = canvas
+            shareCanvas.path = path
+            const imageBlob = await canvas.initImage()
+            shareCanvas.imageUrl = URL.createObjectURL(imageBlob)
+            if (shareCanvas.displayTimestamp > 0 && shareCanvas.displayedFrames > 0) {
+              shareCanvas.name =
+                canvas.getName(false) + `.png — ${shareCanvas.displayTimestamp}s(${shareCanvas.displayedFrames})`
+            } else {
+              shareCanvas.name = canvas.getName(false) + '.png'
+            }
+            return shareCanvas
+          })
+        )
+      ).map((i) => i.value)
+      this.$parent.showCompare = true
+      setTimeout(() => {
+        this.$parent.$refs.imageDragCompareRef.setImageInfoList(twoCanvas)
+      }, 0)
     },
     async share() {
       // console.log('share', this.$refs['video_canvas'])

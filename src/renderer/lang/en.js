@@ -62,7 +62,7 @@ export default {
     delete: 'delete',
     showAll: 'show all',
     history: 'history log',
-    dragDropCompare: 'drag&drop compare',
+    dragDropCompare: 'drag compare',
     imageBrowser: 'image browser',
     imageList: 'Image List',
     videoList: 'Video List',
@@ -92,7 +92,8 @@ export default {
     moveRight: 'move right',
     moveDown: 'move downward',
     pickColor: 'Turn on/off the color picker',
-    rgbText: 'Enable/disable the display of RGB values in each pixel block'
+    rgbText: 'Enable/disable the display of RGB values in each pixel block',
+    compare: "Drag and drop to compare two images"
   },
   dashboard: {
     entries: {
@@ -215,8 +216,8 @@ export default {
     showMousePos: 'show mouse position'
   },
   imageDragDropCompare: {
-    hideLine: 'hide comparison line',
-    displayLine: 'display comparison line',
+    hideLine: 'Hide filenames and comparison line',
+    displayLine: 'Display filenames and comparison line',
     tip: 'By default, the first two pictures that have been selected are compared. If you need to modify, please open the selected to switch.'
   },
   generateGIF: {

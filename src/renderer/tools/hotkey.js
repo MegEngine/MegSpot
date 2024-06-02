@@ -163,7 +163,12 @@ export const DEFAULT_HOTKEYS = [
     name: 'rgbText',
     desc: 'display RGB values in pixel blocks',
     keysArr: [['c']]
-  }
+  },
+  {
+    name: 'compare',
+    desc: 'compare two image',
+    keysArr: [[ctrlOrCommand, 'x']]
+  },
 ].map((item, index) => {
   item.index = index
   return item

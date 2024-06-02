@@ -92,7 +92,8 @@ export default {
     moveRight: '向右移动',
     moveDown: '下に移動',
     pickColor: 'カラーピッカーのオン/オフを切り替えます',
-    rgbText: '各ピクセルブロックのRGB値の表示を有効/無効にします。'
+    rgbText: '各ピクセルブロックのRGB値の表示を有効/無効にします。',
+    compare: "ドラッグアンドドロップで2つの画像を比較します"
   },
   dashboard: {
     entries: {
@@ -211,8 +212,8 @@ export default {
     showMousePos: 'マウスの位置を表示'
   },
   imageDragDropCompare: {
-    hideLine: '比較ラインを隠す',
-    displayLine: '比較ライン表示',
+    hideLine: 'ファイル名と比較行を非表示にする',
+    displayLine: 'ファイル名と比較行を表示する',
     tip: 'デフォルトでは、選択された画像の最初の2つが比較されます。 変更する場合は、選択を開いて切り替えてください。'
   },
   generateGIF: {

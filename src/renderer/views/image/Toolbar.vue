@@ -113,6 +113,11 @@
           </span>
         </el-button>
         <GifDialog ref="gifDialog" :selectList="imageList.slice(startIndex, startIndex + groupCount)"></GifDialog>
+        <el-button type="text" size="mini" :title="$t('general.dragDropCompare')" @click="handleCompare">
+          <span class="svg-container" :title="$t('general.dragDropCompare')">
+            <svg-icon icon-class="jiantou" style="transform: rotate(90deg)"></svg-icon>
+          </span>
+        </el-button>
         <el-button type="text" size="mini" :title="$t('general.shareAsProject')" @click="handleShare">
           <span class="svg-container" :title="$t('general.share')">
             <svg-icon icon-class="share" />
@@ -284,10 +289,16 @@ export default {
       const hotkeyUpEvents = new Map()
 
       hotkeyDownEvents.set('back', () => {
+        if (this.$parent.showCompare) {
+          return
+        }
         this.goBack()
       })
       hotkeyDownEvents.set('pickColor', () => {
         this.pickColor()
+      })
+      hotkeyDownEvents.set('compare', () => {
+        this.handleCompare()
       })
       hotkeyDownEvents.set('top', () => {
         this.overlay(GLOBAL_CONSTANTS.DIRECTION_TOP)
@@ -411,6 +422,9 @@ export default {
     },
     handleShare() {
       this.$bus.$emit('share')
+    },
+    handleCompare() {
+      this.$bus.$emit('compare')
     },
     pickColor() {
       this.traggerRGB = !this.traggerRGB
