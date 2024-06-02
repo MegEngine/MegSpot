@@ -313,14 +313,12 @@ export default {
             shareCanvas.path = path
             const imageBlob = await this.imageToBlob(image)
             shareCanvas.imageUrl = URL.createObjectURL(imageBlob)
-            console.log(shareCanvas)
             shareCanvas.name = canvas.getName(false)
             return shareCanvas
           })
         )
       ).map((i) => i.value)
       twoCanvas.sort((a, b) => a.index - b.index)
-      console.log('twoCanvas', twoCanvas)
       this.$parent.showCompare = true
       setTimeout(() => {
         this.$parent.$refs.imageDragCompareRef.setImageInfoList(twoCanvas)

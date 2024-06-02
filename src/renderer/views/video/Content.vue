@@ -439,8 +439,9 @@ export default {
       const canvasViews = this.$refs['video_canvas']
       const twoCanvas = (
         await Promise.allSettled(
-          canvasViews.slice(0, 2).map(async (canvas) => {
+          canvasViews.slice(0, 2).map(async (canvas,index) => {
             const shareCanvas = {
+              index,
               name: '',
               _width: 0,
               _height: 0,
@@ -469,6 +470,7 @@ export default {
           })
         )
       ).map((i) => i.value)
+      twoCanvas.sort((a, b) => a.index - b.index)
       this.$parent.showCompare = true
       setTimeout(() => {
         this.$parent.$refs.imageDragCompareRef.setImageInfoList(twoCanvas)

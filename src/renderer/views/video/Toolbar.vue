@@ -669,7 +669,9 @@ export default {
       this.$bus.$emit('changeGroup', this.startIndex)
     },
     handleCompare() {
-      this.$bus.$emit('compare')
+      if (this.videoPaused) {
+        this.$bus.$emit('compare')
+      }
     },
     handleShare() {
       this.$bus.$emit('share')
