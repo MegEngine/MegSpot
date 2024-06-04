@@ -77,12 +77,13 @@
       "icon": "build/icons/logo.icns",
       "category": "public.app-category.utilities",
       "target": [
-        "zip",
-        "dmg"
-      ],
-      "arch": [
-        "x64",
-        "arm64"
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ]
     },
     "win": {
