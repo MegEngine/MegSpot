@@ -40,7 +40,7 @@
       }
     ],
     "productName": "MegSpot",
-    "artifactName": "${productName}-${version}-${os}.${ext}",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
@@ -79,6 +79,10 @@
       "target": [
         "zip",
         "dmg"
+      ],
+      "arch": [
+        "x64",
+        "arm64"
       ]
     },
     "win": {
