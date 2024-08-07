@@ -146,7 +146,8 @@ export default {
       confirmUseNewLayout: 'このレイアウトを今すぐ使用しますか',
       confirmDialogTitle: '新しいレイアウトを使用する',
       confirmUse: 'すぐに使用する'
-    }
+    },
+    covered: '覆われた'
   },
   imagePreview: {
     title: '色とフィルター',
@@ -171,7 +172,13 @@ export default {
       histogramTip: '指定されたカラーチャネルを使用します'
     },
     reset: 'リセット',
-    resetAll: 'すべてリセット'
+    resetAll: 'すべてリセット',
+    mode: {
+      title: '画像レンダリングモード',
+      name: 'レンダリングモード',
+      canvas: 'canvas',
+      image: 'image'
+    }
   },
   imageCenter: {
     bilinearInterpolation: 'バイリニア補間',

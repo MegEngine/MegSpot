@@ -151,6 +151,7 @@ export default {
     imageGroupList() {
       return this.imageList.length
         ? this.imageList.slice(this.groupStartIndex, this.groupStartIndex + this.groupCount)
+        // ? [this.imageList[0], this.imageList[0]]
         : []
     },
     containerStyle() {
@@ -438,6 +439,7 @@ export default {
       const canvasViews = this.$refs['image_canvas']
       let snapShotArr = []
       let coveredArr = []
+      // TODO: multi canvas to compare
       if ([GLOBAL_CONSTANTS.DIRECTION_LEFT, GLOBAL_CONSTANTS.DIRECTION_RIGHT].includes(direction)) {
         //左右对比,取整行进行比较
         if (columnLen === 3) {

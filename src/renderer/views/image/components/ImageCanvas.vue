@@ -5,7 +5,11 @@
         <HistContainer ref="hist-container" :index="index" @changeVisible="handleHistVisible" />
       </CoverMask>
       <el-tooltip placement="bottom" :open-delay="800">
-        <span class="compare-name" flex-box="1" v-html="getTitle"></span>
+        <span
+          class="compare-name"
+          flex-box="1"
+          v-html="isCovering ? coverTitle + ` (${$t('image.covered')})` : getTitle"
+        ></span>
         <div slot="content">
           {{ path }}
           <br />
@@ -13,7 +17,9 @@
           <span class="size">{{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span>
         </div>
       </el-tooltip>
-      <EffectPreview ref="effect-settings" @change="changeCanvasStyle" />
+      <div v-show="!isCovering" class="mode-selector" @click="setMode()">{{ mode }}</div>
+      <div v-show="isCovering" class="mode-selector">{{ coverMode }}</div>
+      <EffectPreview ref="effect-settings" :mode="mode" @change="changeCanvasStyle" @set-mode="setMode" />
     </div>
     <div ref="container" class="canvas-container" id="canvas-container" :style="canvasStyle">
       <OperationContainer
@@ -26,7 +32,13 @@
         @dbclick="handleDbclick"
         @mouseMove="handleMove"
       >
-        <div v-loading="loading" element-loading-background="rgba(0, 0, 0, 0)" class="canvas-item" @contextmenu.prevent>
+        <div
+          v-loading="loading"
+          element-loading-background="rgba(0, 0, 0, 0)"
+          class="canvas-item"
+          :style="`width: ${_width}px; height: ${_height}px;`"
+          @contextmenu.prevent
+        >
           <ScaleEditor
             v-if="preference.showScale"
             class="scale-editor"
@@ -42,7 +54,21 @@
             :parentWidth="_width"
             :parentHeight="_height"
           />
-          <canvas ref="canvas" :width="_width" :height="_height"></canvas>
+          <canvas
+            v-show="(!isCovering && mode === 'canvas') || (isCovering && coverMode === 'canvas')"
+            ref="canvas"
+            :width="_width"
+            :height="_height"
+          ></canvas>
+          <img
+            v-show="(!isCovering && mode === 'image') || (isCovering && coverMode === 'image')"
+            :src="isCovering ? coverPath : path"
+            :style="
+              imagePosition
+                ? `position: absolute; left: ${imagePosition.x}px; top: ${imagePosition.y}px; width: ${imagePosition.width}px; height: ${imagePosition.height}px;`
+                : ''
+            "
+          />
           <div v-if="triggerRGB || preference.showDot" ref="feedback" id="feedback" :style="feedbackStyle"></div>
           <div v-if="preference.showMousePos" v-show="mousePosInfo.x" class="mouse-position">
             <span>x={{ mousePosInfo.x.toFixed(2) }},y={{ mousePosInfo.y.toFixed(2) }}</span>
@@ -218,7 +244,12 @@ export default {
       mousePosInfo: {
         x: 0,
         y: 0
-      }
+      },
+      mode: 'image', // 'canvas' | 'image'
+      isCovering: false,
+      coverPath: '',
+      coverTitle: '',
+      coverMode: 'image'
     }
   },
   computed: {
@@ -385,6 +416,9 @@ export default {
       // 叠加显示时候 生成快照
       return {
         snapShot: this.canvas,
+        title: this.getTitle,
+        path: this.path,
+        mode: this.mode,
         hist: this.currentHist
       }
     },
@@ -640,9 +674,20 @@ export default {
         isBright: (0.299 * R + 0.587 * G + 0.114 * B) / 255 >= 0.8
       }
     },
+    setMode(newMode) {
+      this.mode = newMode || (this.mode === 'canvas' ? 'image' : 'canvas')
+    },
     async drawRGBText() {
       const cv = this.$cv
-      if (this.preference.showRGBText && cv && this.imgMat && this.imagePosition && this.image && this.cs && this.imgScaleNum >= 42) {
+      if (
+        this.preference.showRGBText &&
+        cv &&
+        this.imgMat &&
+        this.imagePosition &&
+        this.image &&
+        this.cs &&
+        this.imgScaleNum >= 42
+      ) {
         if (this.drawRGBTextReqId) {
           cancelAnimationFrame(this.drawRGBTextReqId)
           this.drawRGBTextReqId = null
@@ -806,7 +851,11 @@ export default {
       }
     },
     // 外部直接调用
-    setCoverStatus({ snapShot, hist }, status) {
+    setCoverStatus({ snapShot, hist, mode, path, title }, status) {
+      this.isCovering = status
+      this.coverPath = path
+      this.coverTitle = title
+      this.coverMode = mode
       if (status) {
         this.cs.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.cs.drawImage(snapShot, 0, 0)
@@ -1099,6 +1148,20 @@ export default {
     line-height: 16px;
     background-color: #f6f6f6;
     padding-right: 10px;
+
+    .mode-selector {
+      width: 41px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 4px;
+      padding: 0 2px;
+      border: 1px solid gray;
+      border-radius: 5px;
+      font-size: 11px;
+      color: gray;
+      cursor: pointer;
+    }
   }
 
   .canvas-container {
@@ -1107,10 +1170,10 @@ export default {
       width: 100%;
       height: 100%;
 
-      img {
-        object-fit: contain;
-        vertical-align: middle;
-      }
+      // img {
+      //   object-fit: contain;
+      //   vertical-align: middle;
+      // }
 
       ::v-deep {
         input,

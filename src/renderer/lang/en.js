@@ -150,7 +150,8 @@ export default {
       confirmUseNewLayout: 'Whether to use this layout immediately',
       confirmDialogTitle: 'Use New Layout',
       confirmUse: 'Use Now'
-    }
+    },
+    covered: 'covered'
   },
   imagePreview: {
     title: 'Color and Filters',
@@ -175,7 +176,13 @@ export default {
       histogramTip: 'use specified color channel'
     },
     reset: 'reset',
-    resetAll: 'reset all'
+    resetAll: 'reset all',
+    mode: {
+      title: 'Image Render Mode',
+      name: 'Render Mode',
+      canvas: 'canvas',
+      image: 'image'
+    }
   },
   imageCenter: {
     bilinearInterpolation: 'bilinar',

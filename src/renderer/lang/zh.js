@@ -149,7 +149,8 @@ export default {
       confirmUseNewLayout: '是否立即使用该布局',
       confirmDialogTitle: '使用新布局',
       confirmUse: '立即使用'
-    }
+    },
+    covered: '覆盖图像'
   },
   imagePreview: {
     title: '色彩与滤镜',
@@ -174,7 +175,13 @@ export default {
       histogramTip: '使用指定颜色通道'
     },
     reset: '重置',
-    resetAll: '重置所有'
+    resetAll: '重置所有',
+    mode: {
+      title: '图像渲染模式',
+      name: '渲染模式',
+      canvas: 'canvas',
+      image: 'image'
+    }
   },
   imageCenter: {
     bilinearInterpolation: '双线性',

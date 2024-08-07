@@ -2,6 +2,20 @@
   <el-tooltip effect="light" placement="bottom">
     <div slot="content" class="image-style-container">
       <el-divider>
+        <span class="title-style">{{ $t('imagePreview.mode.title') }}</span>
+      </el-divider>
+      <el-row :gutter="10" flex="cross:center">
+        <el-col :span="6">
+          <span class="text-style">{{ $t('imagePreview.mode.name') }}</span>
+        </el-col>
+        <el-col :span="18">
+          <div style="display: flex; justify-content: flex-end;">
+            <el-radio v-model="theMode" label="canvas" border>{{ $t('imagePreview.mode.canvas') }}</el-radio>
+            <el-radio v-model="theMode" label="image" border>{{ $t('imagePreview.mode.image') }}</el-radio>
+          </div>
+        </el-col>
+      </el-row>
+      <el-divider>
         <span class="title-style">{{ $t('imagePreview.title') }}</span>
       </el-divider>
       <el-row :gutter="10" flex="cross:center">
@@ -233,11 +247,18 @@ import VueSlider from 'vue-slider-component'
 import { debounce } from '@/utils'
 import { bus } from '@/utils/bus'
 import { histTypeOptions } from '@/components/hist-container/config'
+import { type } from 'os'
 
 export default {
   name: 'EffectPreview',
   components: {
     VueSlider
+  },
+  props: {
+    mode: {
+      type: String,
+      default: 'canvas'
+    }
   },
   data() {
     return {
@@ -316,6 +337,14 @@ export default {
           this.outputLevels = [this.outputLevels[0], val]
         }
       }
+    },
+    theMode: {
+      get() {
+        return this.mode
+      },
+      set(val) {
+        this.setMode(val)
+      }
     }
   },
   watch: {
@@ -356,10 +385,13 @@ export default {
         }
       },
       immediate: false
-    }
+    },
   },
   methods: {
     ...mapActions(['setPreference']),
+    setMode(newMode) {
+      this.$emit('set-mode', newMode)
+    },
     resetImageStyle() {
       // 预览处理效果
       this.brightness = 100

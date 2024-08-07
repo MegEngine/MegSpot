@@ -310,6 +310,7 @@ export default {
       const canvasViews = this.$refs['video_canvas']
       let snapShotArr = []
       let coveredArr = []
+      // TODO: multi canvas to compare
       if ([GLOBAL_CONSTANTS.DIRECTION_LEFT, GLOBAL_CONSTANTS.DIRECTION_RIGHT].includes(direction)) {
         //左右对比,取整行进行比较
         if (columnLen === 3) {
