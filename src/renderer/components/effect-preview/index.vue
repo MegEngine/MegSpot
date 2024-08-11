@@ -134,7 +134,7 @@
           <el-slider :min="0" :max="15" v-model="blur" show-input></el-slider>
         </el-col>
       </el-row>
-      <el-row :gutter="10" flex="cross:center">
+      <!-- <el-row :gutter="10" flex="cross:center">
         <el-col :span="6">
           <span class="text-style">{{ $t('imagePreview.gamma') }}</span>
         </el-col>
@@ -228,7 +228,7 @@
             />
           </div>
         </el-col>
-      </el-row>
+      </el-row> -->
       <div flex="main:justify">
         <el-switch v-model="enableXray" active-text="Xray"></el-switch>
         <el-button @click="resetImageStyle">{{ $t('imagePreview.resetAll') }}</el-button>

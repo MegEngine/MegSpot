@@ -259,14 +259,14 @@ export default {
           event: 'setZoom',
           action: 'setZoom'
         },
-        // {
-        //   event: 'adjustLevels',
-        //   action: 'adjustLevels'
-        // },
-        // {
-        //   event: 'adjustGamma',
-        //   action: 'adjustGamma'
-        // },
+        {
+          event: 'adjustLevels',
+          action: 'adjustLevels'
+        },
+        {
+          event: 'adjustGamma',
+          action: 'adjustGamma'
+        },
         {
           event: 'changeHistTypes',
           action: 'handleChangeHistTypes'
@@ -753,7 +753,7 @@ export default {
         this.ready = true
         draw && this.drawImage(this.bitMap)
         this.$refs['hist-container'].visible && window.cv && this.generateHist()
-        // const imageData = this.getImageData()
+        const imageData = this.getImageData()
         // console.log('imageDate initbitmap', imageData)
         // useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
         //   (res) => {
@@ -789,16 +789,16 @@ export default {
       return _ctx.getImageData(0, 0, _canvas.width, _canvas.height)
     },
     async initFilters() {
-      await useWorker(this.getName(false), 'initFilters')
+      // await useWorker(this.getName(false), 'initFilters')
     },
     applyFilters(type, params) {
       if (this.paused && this.ready) {
-        const imageData = this.getImageData()
-        useWorker(this.getName(false), type, imageData, params).then((res) => {
-          this.bitMap && this.bitMap?.close()
-          this.bitMap = res
-          this.drawImage()
-        })
+        // const imageData = this.getImageData()
+        // useWorker(this.getName(false), type, imageData, params).then((res) => {
+        //   this.bitMap && this.bitMap?.close()
+        //   this.bitMap = res
+        //   this.drawImage()
+        // })
       }
     },
     async adjustGamma({ parentId, ...params }) {

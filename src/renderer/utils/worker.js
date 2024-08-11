@@ -1,6 +1,6 @@
 import path from 'path'
 
-const workerPath = path.join(__static, '/sw.js')
+const workerPath = 'file:///' + path.join(__static, '/sw.js')
 
 export const useWorker = (id, type, imageData, params) => {
   return new Promise(async (resolve, reject) => {

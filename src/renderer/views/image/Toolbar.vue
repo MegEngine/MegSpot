@@ -32,7 +32,7 @@
         <el-radio-button :label="false">{{ $t('imageCenter.nearestInterpolation') }}</el-radio-button>
         <el-radio-button :label="true">{{ $t('imageCenter.bilinearInterpolation') }}</el-radio-button>
       </el-radio-group>
-      <RGBTextBtn class="gap" />
+      <!-- <RGBTextBtn class="gap" /> -->
       <el-button
         v-if="snapshotMode"
         type="text"

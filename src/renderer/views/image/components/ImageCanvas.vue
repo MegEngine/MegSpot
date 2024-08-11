@@ -61,12 +61,21 @@
             :height="_height"
           ></canvas>
           <img
-            v-show="(!isCovering && mode === 'image') || (isCovering && coverMode === 'image')"
-            :src="isCovering ? coverPath : path"
+            v-show="!isCovering && mode === 'image'"
+            :src="imgPath"
             :style="
-              imagePosition
+              (imagePosition
                 ? `position: absolute; left: ${imagePosition.x}px; top: ${imagePosition.y}px; width: ${imagePosition.width}px; height: ${imagePosition.height}px;`
-                : ''
+                : '') + effectStyle
+            "
+          />
+          <img
+            v-show="isCovering && coverMode === 'image'"
+            :src="coverPath"
+            :style="
+              (imagePosition
+                ? `position: absolute; left: ${imagePosition.x}px; top: ${imagePosition.y}px; width: ${imagePosition.width}px; height: ${imagePosition.height}px;`
+                : '') + effectStyle
             "
           />
           <div v-if="triggerRGB || preference.showDot" ref="feedback" id="feedback" :style="feedbackStyle"></div>
@@ -249,7 +258,8 @@ export default {
       isCovering: false,
       coverPath: '',
       coverTitle: '',
-      coverMode: 'image'
+      coverMode: 'image',
+      effectStyle: ''
     }
   },
   computed: {
@@ -314,6 +324,9 @@ export default {
     },
     imgScaleNum() {
       return !isNaN(this.imgScale) ? Number(this.imgScale) : 0
+    },
+    imgPath() {
+      return getImageUrlSyncNoCache(this.path)
     }
   },
   async mounted() {
@@ -404,6 +417,7 @@ export default {
       return this.afterFullSize || !isTooSmall
     },
     setCanvasStyle({ style }) {
+      this.effectStyle = `filter: ${style}`
       this.canvas.style.filter = style
     },
     setSmooth() {
@@ -417,7 +431,7 @@ export default {
       return {
         snapShot: this.canvas,
         title: this.getTitle,
-        path: this.path,
+        path: this.imgPath,
         mode: this.mode,
         hist: this.currentHist
       }
@@ -527,14 +541,14 @@ export default {
             })
           : this.getImageData()
         this.bitMap = await createImageBitmap(imageData)
-        useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
-          (res) => {
-            this.bitMap && this.bitMap?.close()
-            this.bitMap = null
-            this.bitMap = res
-            this.drawImage()
-          }
-        )
+        // useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
+        //   (res) => {
+        //     this.bitMap && this.bitMap?.close()
+        //     this.bitMap = null
+        //     this.bitMap = res
+        //     this.drawImage()
+        //   }
+        // )
         resolve(this.bitMap)
       })
     },
@@ -542,12 +556,12 @@ export default {
       if (!this.ready) {
         return
       }
-      const imageData = this.getImageData()
-      useWorker(this.getName(false), type, imageData, params).then((res) => {
-        this.bitMap && this.bitMap?.close()
-        this.bitMap = res
-        this.drawImage()
-      })
+      // const imageData = this.getImageData()
+      // useWorker(this.getName(false), type, imageData, params).then((res) => {
+      //   this.bitMap && this.bitMap?.close()
+      //   this.bitMap = res
+      //   this.drawImage()
+      // })
     },
     async adjustGamma({ parentId, ...params }) {
       const { gamma } = params
@@ -595,12 +609,12 @@ export default {
               })
             })
         } else {
-          resolve(getImageUrlSyncNoCache(this.path)) //        'C:/Demo/1-1%20-%20副本.jpg'
+          resolve(this.imgPath) //        'C:/Demo/1-1%20-%20副本.jpg'
         }
       })
     },
     async initFilters() {
-      await useWorker(this.getName(false), 'initFilters')
+      // await useWorker(this.getName(false), 'initFilters')
     },
     getImageData(_img) {
       const img = _img ?? this.image
