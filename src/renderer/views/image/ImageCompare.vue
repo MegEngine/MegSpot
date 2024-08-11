@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     async initFiltersMap() {
-      // await useWorker('all', 'initFiltersMap')
+      await useWorker('all', 'initFiltersMap')
     },
   }
 }

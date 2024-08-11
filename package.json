@@ -171,7 +171,7 @@
     "css-loader": "^5.0.1",
     "del": "^6.0.0",
     "dmg-builder": "23.6.0",
-    "electron": "^31.3.1",
+    "electron": "^26.6.10",
     "electron-builder": "^24.13.3",
     "electron-devtools-vendor": "^1.1.0",
     "electron-playwright-helpers": "^1.2.0",

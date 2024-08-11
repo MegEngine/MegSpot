@@ -77,7 +77,7 @@ onmessage = async (e) => {
     
     initFilters(resetFilters, resetFiltersExcluedResetIndex)
 
-    console.log(`【${id.length > 13 ? "..." + id.slice(-10) : id}】 process filters: ${filters.map(i => i.name).concat(resetFilters.map(i => i.name)).join("->")},`, `params: ${JSON.stringify(params)}`)
+    // console.log(`【${id.length > 13 ? "..." + id.slice(-10) : id}】 process filters: ${filters.map(i => i.name).concat(resetFilters.map(i => i.name)).join("->")},`, `params: ${JSON.stringify(params)}`)
 
     for (let i = 0; i < len; i++) {
       const filter = resetFilters[i];
@@ -95,7 +95,7 @@ onmessage = async (e) => {
     } 
     filters = filters.concat(resetFilters)
   }  else {
-    console.log(`${id} skip filter`)
+    // console.log(`${id} skip filter`)
   }
 
   filtersMap.set(id, {filters, params})

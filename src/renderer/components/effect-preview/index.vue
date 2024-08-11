@@ -134,7 +134,7 @@
           <el-slider :min="0" :max="15" v-model="blur" show-input></el-slider>
         </el-col>
       </el-row>
-      <!-- <el-row :gutter="10" flex="cross:center">
+      <el-row v-show="isCanvas" :gutter="10" flex="cross:center">
         <el-col :span="6">
           <span class="text-style">{{ $t('imagePreview.gamma') }}</span>
         </el-col>
@@ -142,10 +142,10 @@
           <el-slider :min="0.01" :max="10" :step="0.01" v-model="gammaData" show-input @input="updateGama"></el-slider>
         </el-col>
       </el-row>
-      <el-divider>
+      <el-divider v-show="isCanvas">
         <span class="title-style">{{ $t('imagePreview.colorLevel.title') }}</span>
       </el-divider>
-      <el-row :gutter="2" flex="cross:center">
+      <el-row v-show="isCanvas" :gutter="2" flex="cross:center">
         <el-col :span="4">
           <span class="text-style">{{ $t('imagePreview.channel') }}</span>
         </el-col>
@@ -162,7 +162,7 @@
           </el-radio-group>
         </el-col>
       </el-row>
-      <el-row :gutter="2" flex="cross:center">
+      <el-row v-show="isCanvas" :gutter="2" flex="cross:center">
         <el-col :span="6">
           <span class="text-style">{{ $t('imagePreview.colorLevel.input') }}</span>
         </el-col>
@@ -188,7 +188,7 @@
           </div>
         </el-col>
       </el-row>
-      <el-row :gutter="10" flex="cross:center">
+      <el-row v-show="isCanvas" :gutter="10" flex="cross:center">
         <el-col :span="6">
           <span class="text-style">{{ $t('imagePreview.colorLevel.inputMidtones') }}</span>
         </el-col>
@@ -203,7 +203,7 @@
           ></el-slider>
         </el-col>
       </el-row>
-      <el-row :gutter="2" flex="cross:center">
+      <el-row v-show="isCanvas" :gutter="2" flex="cross:center">
         <el-col :span="6">
           <span class="text-style">{{ $t('imagePreview.colorLevel.input') }}</span>
         </el-col>
@@ -228,7 +228,7 @@
             />
           </div>
         </el-col>
-      </el-row> -->
+      </el-row>
       <div flex="main:justify">
         <el-switch v-model="enableXray" active-text="Xray"></el-switch>
         <el-button @click="resetImageStyle">{{ $t('imagePreview.resetAll') }}</el-button>
@@ -297,6 +297,9 @@ export default {
         filter += `${item}(${this[item]}px) `
       })
       return filter
+    },
+    isCanvas() {
+      return this.mode === 'canvas'
     },
     inputShadow: {
       get() {

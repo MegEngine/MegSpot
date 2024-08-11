@@ -541,14 +541,14 @@ export default {
             })
           : this.getImageData()
         this.bitMap = await createImageBitmap(imageData)
-        // useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
-        //   (res) => {
-        //     this.bitMap && this.bitMap?.close()
-        //     this.bitMap = null
-        //     this.bitMap = res
-        //     this.drawImage()
-        //   }
-        // )
+        useWorker(this.getName(false), 'all', imageData, this.$refs['effect-settings'].generateFilterParams({})).then(
+          (res) => {
+            this.bitMap && this.bitMap?.close()
+            this.bitMap = null
+            this.bitMap = res
+            this.drawImage()
+          }
+        )
         resolve(this.bitMap)
       })
     },
@@ -556,12 +556,12 @@ export default {
       if (!this.ready) {
         return
       }
-      // const imageData = this.getImageData()
-      // useWorker(this.getName(false), type, imageData, params).then((res) => {
-      //   this.bitMap && this.bitMap?.close()
-      //   this.bitMap = res
-      //   this.drawImage()
-      // })
+      const imageData = this.getImageData()
+      useWorker(this.getName(false), type, imageData, params).then((res) => {
+        this.bitMap && this.bitMap?.close()
+        this.bitMap = res
+        this.drawImage()
+      })
     },
     async adjustGamma({ parentId, ...params }) {
       const { gamma } = params
@@ -614,7 +614,7 @@ export default {
       })
     },
     async initFilters() {
-      // await useWorker(this.getName(false), 'initFilters')
+      await useWorker(this.getName(false), 'initFilters')
     },
     getImageData(_img) {
       const img = _img ?? this.image
