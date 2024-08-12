@@ -73,9 +73,9 @@ function onAppReady() {
     })
   })
   if (!registerSucceed) console.error('Failed to register protocol')
-  protocol.interceptFileProtocol('file', (request, callback) => {
-    callback(request)
-  })
+  // protocol.interceptFileProtocol('file', (request, callback) => {
+  //   callback(request)
+  // })
 }
 // 禁止缓存
 app.isReady() ? onAppReady() : app.on('ready', onAppReady)
