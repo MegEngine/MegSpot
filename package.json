@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.2.19",
+  "version": "v2.2.20",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -44,8 +44,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "一、新增功能：\n    1. 支持`image`和`canvas`两种显示模式；\n    2. 支持显示在`image`模式下显示`HDR`原图图像。",
-      "releaseDate": "2024.08.11"
+      "releaseNotes": "一、修复：\n    1. 修复新图像模式下的旋转和翻转。",
+      "releaseDate": "2024.00.22"
     },
     "directories": {
       "output": "build"

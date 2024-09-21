@@ -17,7 +17,7 @@
           <span class="size">{{ bitMap && bitMap.width }} x {{ bitMap && bitMap.height }}</span>
         </div>
       </el-tooltip>
-      <div v-show="!isCovering" class="mode-selector" @click="setMode()">{{ mode }}</div>
+      <!-- <div v-show="!isCovering" class="mode-selector" @click="setMode()">{{ mode }}</div> -->
       <div v-show="isCovering" class="mode-selector">{{ coverMode }}</div>
       <EffectPreview ref="effect-settings" :mode="mode" @change="changeCanvasStyle" @set-mode="setMode" />
     </div>
@@ -66,7 +66,7 @@
             :style="
               (imagePosition
                 ? `position: absolute; left: ${imagePosition.x}px; top: ${imagePosition.y}px; width: ${imagePosition.width}px; height: ${imagePosition.height}px;`
-                : '') + effectStyle
+                : '') + `transform: rotate(${rotateDegree}deg) scale(${reverseScaleX}, ${reverseScaleY});` + effectStyle
             "
           />
           <img
@@ -75,7 +75,7 @@
             :style="
               (imagePosition
                 ? `position: absolute; left: ${imagePosition.x}px; top: ${imagePosition.y}px; width: ${imagePosition.width}px; height: ${imagePosition.height}px;`
-                : '') + effectStyle
+                : '') + `transform: rotate(${rotateDegree}deg) scale(${reverseScaleX}, ${reverseScaleY});` + effectStyle
             "
           />
           <div v-if="triggerRGB || preference.showDot" ref="feedback" id="feedback" :style="feedbackStyle"></div>
@@ -259,7 +259,10 @@ export default {
       coverPath: '',
       coverTitle: '',
       coverMode: 'image',
-      effectStyle: ''
+      effectStyle: '',
+      rotateDegree: 0,
+      reverseScaleX: 1,
+      reverseScaleY: 1
     }
   },
   computed: {
@@ -882,6 +885,7 @@ export default {
       }
     },
     async reset(val) {
+      // this.rotateDegree = 0
       if (val) {
         let x = 0,
           y = 0
@@ -954,6 +958,14 @@ export default {
         //比较宽，所以宽占100%,高居中
         height = canvas.width / imageRadio
         y = (canvas.height - height) / 2
+      }
+      if (this.mode === 'image' && Math.abs((this.rotateDegree / 90)) % 2 === 1) {
+        return {
+          x: y,
+          y: x,
+          width: height,
+          height: width
+        }
       }
       return {
         x,
@@ -1089,6 +1101,7 @@ export default {
       }
     },
     rotate(degree) {
+      this.rotateDegree += degree
       let offscreenWidth = this.bitMap.height
       let offscreenHight = this.bitMap.width
       let offsreen = new OffscreenCanvas(offscreenWidth, offscreenHight)
@@ -1096,11 +1109,15 @@ export default {
       if (degree < 0) {
         offCtx.translate(0, this.bitMap.width)
         offCtx.rotate((-90 * Math.PI) / 180)
-        ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
+        if (this.mode !== 'image') {
+          [this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
+        }
       } else if (degree > 0) {
         offCtx.translate(this.bitMap.height, 0)
         offCtx.rotate((90 * Math.PI) / 180)
-        ;[this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
+        if (this.mode !== 'image') {
+          [this.imagePosition.width, this.imagePosition.height] = [this.imagePosition.height, this.imagePosition.width]
+        }
       }
       offCtx.drawImage(this.bitMap, 0, 0)
       this.bitMap?.close()
@@ -1117,10 +1134,12 @@ export default {
         //左右翻转
         offCtx.translate(this.bitMap.width, 0)
         offCtx.scale(-1, 1)
+        this.reverseScaleX = -this.reverseScaleX
       } else if (direction < 0) {
         //上下翻转
         offCtx.translate(0, this.bitMap.height)
         offCtx.scale(1, -1)
+        this.reverseScaleY = -this.reverseScaleY
       }
       offCtx.drawImage(this.bitMap, 0, 0)
       this.bitMap?.close()
