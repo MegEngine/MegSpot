@@ -20,10 +20,12 @@ import VXETable from 'vxe-table'
 import 'vxe-table/lib/style.css'
 import VueSplit from 'vue-split-panel'
 import VueScroll from 'vuescroll'
+import VueLazyload from 'vue-lazyload'
 
 import { initEventBus } from '@/utils/bus'
 import { initAnalyze } from '@/utils/analyze'
 
+Vue.use(VueLazyload)
 Vue.use(VXETable)
 Vue.use(VueSplit)
 Vue.use(VueScroll)

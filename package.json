@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.2.20",
+  "version": "v2.2.21",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -44,8 +44,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "一、修复：\n    1. 修复新图像模式下的旋转和翻转。",
-      "releaseDate": "2024.00.22"
+      "releaseNotes": "一、性能优化：\n    1. 对gallery画廊的图像列表启用懒加载，解决了文件过多时导致的卡顿问题",
+      "releaseDate": "2024.10.28"
     },
     "directories": {
       "output": "build"
@@ -125,6 +125,7 @@
     "vue": "^2.6.12",
     "vue-awesome-swiper": "^4.1.1",
     "vue-i18n": "^8.22.4",
+    "vue-lazyload": "1.3.3",
     "vue-router": "^3.4.9",
     "vue-split-panel": "^1.0.4",
     "vuedraggable": "^2.24.3",
