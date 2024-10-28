@@ -52,8 +52,8 @@
                         </span>
                       </div>
                       <div class="content" flex="main:center cross:center">
-                        <img name="dragItem" :src="getImageUrlSync(item)" v-if="isImage(item)" />
-                        <video name="dragItem" :src="getImageUrlSync(item)" v-if="isVideo(item)" />
+                        <img name="dragItem" loading="lazy" decoding="async" :src="getImageUrlSync(item)" v-if="isImage(item)" />
+                        <video name="dragItem" loading="lazy" :src="getImageUrlSync(item)" v-if="isVideo(item)" />
                       </div>
                       <div class="name" :title="item">
                         <span v-html="$options.filters.getFileName(item)"></span>
