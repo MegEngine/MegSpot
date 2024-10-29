@@ -1,6 +1,6 @@
 {
   "name": "MegSpot",
-  "version": "v2.2.21",
+  "version": "v2.2.22",
   "author": "weiyajun <weiyajun@megvii.com>",
   "description": "A tool to improve the viewing of pictures and videos by researchers",
   "homepage": "https://github.com/MegEngine/MegSpot",
@@ -44,8 +44,8 @@
     "appId": "org.megvii.megspot",
     "copyright": " Copyright (c) 2022 Megvii Inc. All rights reserved.",
     "releaseInfo": {
-      "releaseNotes": "一、性能优化：\n    1. 对gallery画廊的图像列表启用懒加载，解决了文件过多时导致的卡顿问题",
-      "releaseDate": "2024.10.28"
+      "releaseNotes": "一、性能优化：\n    1. 对图像预览列表启用懒加载，解决了文件过多时导致的卡顿问题",
+      "releaseDate": "2024.10.29"
     },
     "directories": {
       "output": "build"
