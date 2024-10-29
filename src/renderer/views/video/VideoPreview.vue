@@ -70,7 +70,7 @@
           :removeVuexItem="removeVideos"
         >
           <template v-slot:default="slotProps">
-            <video controls style="object-fit: contain; width: 200px; height: 120px" :src="slotProps.src"></video>
+            <video :src="slotProps.src" controls style="object-fit: contain; width: 200px; height: 120px" loading="lazy"></video>
           </template>
         </Thumbnail>
       </div>

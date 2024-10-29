@@ -52,7 +52,7 @@
                         </span>
                       </div>
                       <div class="content" flex="main:center cross:center">
-                        <img v-if="isImage(item)" v-lazy="getImageUrlSync(item)" name="dragItem" width="200px" height="130px" loading="lazy" />
+                        <img v-if="isImage(item)" v-lazy="getImageUrlSync(item)" name="dragItem" width="200px" height="130px" loading="lazy" decoding="async" />
                         <video v-if="isVideo(item)" v-lazy="getImageUrlSync(item)" name="dragItem" width="200px" height="130px" loading="lazy" />
                       </div>
                       <div class="name" :title="item">
