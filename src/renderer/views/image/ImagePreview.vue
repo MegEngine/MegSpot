@@ -73,7 +73,7 @@
           :removeVuexItem="removeImages"
         >
           <template v-slot:default="slotProps">
-            <img :src="slotProps.src" style="object-fit: contain; width: 200px; height: 170px" />
+            <img v-lazy="slotProps.src" style="object-fit: contain; width: 200px; height: 170px" loading="lazy" decoding="async" />
           </template>
         </Thumbnail>
       </div>
