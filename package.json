@@ -132,7 +132,7 @@
     "vuescroll": "^4.17.3",
     "vuex": "^3.6.0",
     "vuex-electron-store": "^1.4.26",
-    "vxe-table": "^3.4.5",
+    "vxe-table": "~3.8.25",
     "xe-utils": "^3.4.0"
   },
   "devDependencies": {
